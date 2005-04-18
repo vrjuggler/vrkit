@@ -7,7 +7,7 @@ import SConsAddons.Options;   # Get the modular options stuff
 import SConsAddons.Options.VRJuggler.VRJ
 import SConsAddons.Options.OpenSG
 import SConsAddons.Util       # Get the utils
-import sys, os, re, string
+import sys, os, re, string, glob
 pj = os.path.join
 
 # Setup base scons options and settings
@@ -59,12 +59,16 @@ if not SConsAddons.Util.hasHelpFlag():
    opts.Save(options_cache_filename, env)
 
    # Setup the build environment
-   env.Append( CPPPATH = ['.',] )
+   # Add local directory to path and the "root" directory for this project
+   env.Append( CPPPATH = ['.', pj('..','..','..')] )
    vrj_options.updateEnv(env)
    opensg_options.updateEnv(env)
 
-   #env.Program('vrjOpensgNav', ['app.cpp','OpenSGNav.cpp'])   
-   env.Program('infi_app', ['infi_app.cpp',])   
+   #env.Program('infi_app', ['infi_app.cpp',])   
+   src_files = glob.glob('*.cpp')
+   print "Src files: ", src_files
+   env.Program('infi_app', src_files)
+   
 
 Help(help_text);
 

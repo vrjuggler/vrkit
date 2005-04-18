@@ -17,6 +17,8 @@
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
 
+#include <OpenSG/VRJ/Viewer/Viewer.h>
+
 
 class OpenSgViewer : public vrj::OpenSGApp
 {
@@ -25,17 +27,19 @@ public:
       : vrj::OpenSGApp(kern)
    {;}
    virtual ~OpenSgViewer()
-   {;}    
+   {;}
    virtual void init();
    virtual void contextInit();
    virtual void preFrame();
- 
+   virtual void postFrame()
+   {;}
+
    virtual void initScene();
    virtual OSG::NodePtr getScene()
    {
       return mSceneRoot;
    }
-    
+
    void setFilename(std::string filename)
    {
       mFileName = filename;
@@ -43,14 +47,14 @@ public:
 
 protected:
    void initGl();
-   
+
 protected:
    std::string    mFileName;
-   
+
    OSG::NodePtr        mSceneRoot;
    OSG::TransformPtr   mSceneTransform;
    OSG::NodePtr        mModelRoot;
-    
+
    OSG::NodePtr  mLightNode;
    OSG::NodePtr  mLightBeacon;
 };
@@ -84,7 +88,7 @@ void OpenSgViewer::initScene()
    else
    {
       std::cout << "Loading scene: " << mFileName << std::endl;
-      mModelRoot = 
+      mModelRoot =
          osg::SceneFileHandler::the().read((osg::Char8*)(mFileName.c_str()));
    }
 
@@ -156,19 +160,19 @@ int main(int argc, char* argv[])
    {
       std::cerr << "Not enough arguments:  app config-file(s)" << std::endl;
    }
-   
+
    vrj::Kernel* kernel = vrj::Kernel::instance();     // Get the kernel
    OpenSgViewer* app   = new OpenSgViewer(kernel);    // Create the app object
-                                                                             
+
    for(int i=1; i<argc; ++i)
    {
       kernel->loadConfigFile(argv[i]);      // Configure the kernel
    }
-   
+
    kernel->start();                         // Start the kernel thread
    kernel->setApplication(app);             // Give application to kernel
    kernel->waitForKernelStop();             // Block until kernel stops
-   
+
    return 0;
 }
 
