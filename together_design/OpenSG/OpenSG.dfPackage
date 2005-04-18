@@ -1,0 +1,28 @@
+package id16k9xe7kv3km8e7kva78b;
+
+/**
+@version 2.0
+@physicalPackage
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:design#Class#id4eu7te7kv3km8e7kva78t.diagram:oiref><oihard>
+@__modelType reference
+@__fqn <oiref:#Package#OpenSG.VRJ:oiref> 
+*/
+class reference {
+}}/**
+@__tags
+@shapeType ClassDiagram 
+*/
+class __tags {
+}/**
+@__options 
+*/
+class __options {
+}/**
+@__positions 
+*/
+class __positions {
+}
