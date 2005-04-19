@@ -45,6 +45,14 @@ public:
     */
    virtual void init();
 
+   /** Intitialize the context.
+    * @note: Derived classes must call base class implementation.
+    */
+   virtual void contextInit()
+   {
+      vrj::OpenSGApp::contextInit();
+   }
+
    /** Called at the beginning of each frame.
     * @note: Derived class implementations <b>MUST</b> call up to this method.
     */
@@ -57,15 +65,27 @@ public:
    virtual void postFrame()
    {;}
 
+   /** Return the root of the associated scene. */
+   ScenePtr getSceneObj()
+   {
+      return mScene;
+   }
+
 public:
    UserPtr      getUser()
    { return mUser; }
 
-   /** Return the root of the associated scene. */
-   OSG::NodePtr getSceneRoot()
+   /** Return the base of our scene object's root. */
+   virtual OSG::NodePtr getScene()
    {
-      return mScene->getSceneRoot();
+      return getSceneObj()->getSceneRoot().node();
    }
+
+   /** Dummied init scene method.  It is pure virtual in base so we have
+    * to provide an implementation.
+    */
+   virtual void initScene()
+   {;}
 
 protected:
    Viewer()

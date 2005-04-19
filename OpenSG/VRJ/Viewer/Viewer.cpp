@@ -6,6 +6,8 @@ namespace inf
 
 void Viewer::init()
 {
+   vrj::OpenSGApp::init();
+
    // Create an initialize the user
    mUser = User::create();
    mUser->init();

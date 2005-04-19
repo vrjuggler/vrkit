@@ -14,12 +14,7 @@ namespace inf
  * This class holds all information related to a user of the application.
  * This includes devices they are using and their position in the virtual world.
  *
- * Coordinate systems used:
- *
- * - V - Virtual World (vw): This is the coord sys of the objects in the scene
- * - P - Platform (plat): This is the platform moving through the virtual world.
- * - W - World (rw): This is the coord sys of the realworld of the user.
- *
+ * @see Scene for definition of the coordinate frames used.
  */
 class User : public boost::enable_shared_from_this<User>
 {

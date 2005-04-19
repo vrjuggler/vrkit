@@ -22,11 +22,6 @@ class reference2 {
 */
 class reference4 {
 }/**
-@__ref <oiref:cpp#Class#inf::Scene:oiref><oihard>
-@__modelType reference 
-*/
-class reference5 {
-}/**
 @__ref <oiref:cpp#Class#inf::Plugin:oiref><oihard>
 @__modelType reference 
 */
@@ -76,6 +71,16 @@ class reference16 {
 @__modelType reference 
 */
 class reference51 {
+}/**
+@__ref <oiref:cpp#Class#SceneData:oiref><oihard>
+@__modelType reference 
+*/
+class reference79 {
+}/**
+@__ref <oiref:cpp#Class#CollideData:oiref><oihard>
+@__modelType reference 
+*/
+class reference80 {
 }}/**
 @__tags
 @shapeType ClassDiagram 
@@ -87,30 +92,36 @@ class __tags {
 class __options {
 }/**
 @__positions <oigroup:MemberLink#<oiref:cpp#Member#inf::User#lnkViewPlatform:oiref>=650,109,650,180:oigroup>
-<oigroup:Composite#supplierCardinality#MemberLink#<oiref:cpp#Member#inf::Plugin#lnkGrabber:oiref>=246,413,32,13,0:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::Scene#lnkSceneData:oiref>=530,518,530,540:oigroup>
+<oigroup:Composite#supplierCardinality#MemberLink#<oiref:cpp#Member#inf::Plugin#lnkGrabber:oiref>=232,433,32,13,0:oigroup>
 <oigroup:<oiref:cpp#Class#inf::ResourceMgr:oiref>=930,20,131,79,1:oigroup>
 <oigroup:MemberLink#<oiref:cpp#Member#inf::ViewPlatform#lnkNavStrategy:oiref>=672,295,672,360:oigroup>
-<oigroup:<oiref:design#Class#id2dxt8e7kv3km8e7kva79a.node50:oiref>=30,540,283,40,1:oigroup>
-<oigroup:<oiref:cpp#Class#inf::Devices:oiref>=800,30,94,79,1:oigroup>
-<oigroup:<oiref:cpp#Class#inf::Scene:oiref>=360,290,200,202,1:oigroup>
-<oigroup:Composite#supplierCardinality#MemberLink#<oiref:cpp#Member#inf::Viewer#lnkPlugin:oiref>=258,243,30,13,0:oigroup>
-<oigroup:<oiref:design#Class#id2dxt8e7kv3km8e7kva79a.node15:oiref>=790,530,220,100,0:oigroup>
-<oigroup:<oiref:cpp#Class#inf::Viewer:oiref>=260,20,200,176,1:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::User#lnkDevices:oiref>=730,69,800,69:oigroup>
+<oigroup:<oiref:design#Class#id2dxt8e7kv3km8e7kva79a.node50:oiref>=20,580,235,47,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::Devices:oiref>=800,40,94,79,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::Scene:oiref>=360,290,200,228,1:oigroup>
+<oigroup:Composite#supplierCardinality#MemberLink#<oiref:cpp#Member#inf::Viewer#lnkPlugin:oiref>=253,303,30,13,0:oigroup>
+<oigroup:<oiref:design#Class#id2dxt8e7kv3km8e7kva79a.node15:oiref>=880,410,220,100,0:oigroup>
+<oigroup:<oiref:cpp#Class#inf::Viewer:oiref>=260,20,200,267,1:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::User#lnkDevices:oiref>=730,79,800,79:oigroup>
+<oigroup:<oiref:cpp#Extends#CollideData#SceneData:oiref>=552,670,552,632:oigroup>
 <oigroup:<oiref:design#Class#id2dxt8e7kv3km8e7kva79a.node:oiref>=810,340,187,40,1:oigroup>
+<oigroup:<oiref:cpp#Extends#OpenSgViewer#inf::Viewer:oiref>=210,153,260,153:oigroup>
 <oigroup:MemberLink#<oiref:cpp#Member#inf::User#mViewPlatform:oiref>=660,157,660,210:oigroup>
 <oigroup:<oiref:cpp#Class#Configuration:oiref>=960,220,111,79,1:oigroup>
 <oigroup:<oiref:cpp#Class#inf::NavStrategy:oiref>=610,360,125,92,1:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::Plugin#lnkGrabber:oiref>=282,339,282,430:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkPlugin:oiref>=292,196,292,260:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#OpenSgViewer#lnkViewer:oiref>=210,134,260,134:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::Plugin#lnkGrabber:oiref>=268,399,268,450:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkPlugin:oiref>=287,287,287,320:oigroup>
 <oigroup:<oiref:cpp#Class#inf::User:oiref>=530,20,200,137,1:oigroup>
-<oigroup:<oiref:cpp#Class#OpenSgViewer:oiref>=10,10,200,420,0:oigroup>
+<oigroup:<oiref:cpp#Class#OpenSgViewer:oiref>=10,10,200,300,0:oigroup>
 <oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkUser:oiref>=460,88,530,88:oigroup>
-<oigroup:<oiref:cpp#Class#inf::Grabber:oiref>=230,430,96,79,1:oigroup>
+<oigroup:<oiref:cpp#Class#CollideData:oiref>=520,670,94,79,1:oigroup>
+<oigroup:<oiref:cpp#Class#SceneData:oiref>=500,540,84,92,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::Grabber:oiref>=210,450,96,79,1:oigroup>
 <oigroup:Composite#supplierCardinality#MemberLink#<oiref:cpp#Member#inf::ViewPlatform#lnkNavStrategy:oiref>=636,343,32,13,0:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkScene:oiref>=410,196,410,290:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkScene:oiref>=410,248,410,290:oigroup>
 <oigroup:<oiref:cpp#Class#inf::ViewPlatform:oiref>=590,210,179,85,1:oigroup>
-<oigroup:<oiref:cpp#Class#inf::Plugin:oiref>=240,260,85,79,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::Plugin:oiref>=230,320,85,79,1:oigroup>
 
 */
 class __positions {
@@ -136,7 +147,8 @@ class node15 {
 @__modelType node
 @name Note3
 @text Where are the extension points?
-Do we derive a new Viewer, Scene, what? 
+- Derive new Viewer class
+- Add new data to SceneData list 
 */
 class node50 {
 }
