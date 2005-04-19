@@ -57,6 +57,9 @@ protected:
 
    OSG::NodePtr  mLightNode;
    OSG::NodePtr  mLightBeacon;
+private:
+   inf::Viewer * lnkViewer;
+protected:
 };
 
 
