@@ -18,4 +18,11 @@ void Viewer::init()
 }
 
 
+void Viewer::preFrame()
+{
+   // Update the user (and navigation)
+   getUser()->update(shared_from_this());
+}
+
+
 }

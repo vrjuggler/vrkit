@@ -2,7 +2,11 @@
 #define VIEWPLATFORM_H
 
 #include <OpenSG/VRJ/Viewer/NavStrategy.h>
+#include <OpenSG/VRJ/Viewer/ViewerPtr.h>
+
 #include <gmtl/Matrix.h>
+#include <gmtl/MatrixOps.h>
+#include <gmtl/External/OpenSGConvert.h>
 
 namespace inf
 {
@@ -20,14 +24,57 @@ public:
    ViewPlatform()
    {;}
 
+   /** Update the view platform (navigation) */
+   void update(ViewerPtr viewer);
+
+   void setNavStrategy(NavStrategyPtr navStrat)
+   {
+      mNavStrategy = navStrat;
+   }
+
+   NavStrategyPtr getNavStrategy()
+   {
+      return mNavStrategy;
+   }
+
+   /** Return the current position.
+    * This is the position of the view platform in the virtual world.
+    * vw_M_vp
+    */
+   const gmtl::Matrix44f& getCurPos()
+   {
+      return mCurPos;
+   }
+
+   void setCurPos(const gmtl::Matrix44f& mat)
+   {
+      mCurPos = mat;
+      gmtl::invert(mCurPosInv, mCurPos);
+   }
+
+   /** Get the inverse of the current position.
+    * vp_M_vw
+    */
+   const gmtl::Matrix44f& getCurPosInv()
+   {
+      return mCurPosInv;
+   }
+
 private:
-   /* The current positon of the platform in the virtual world. vw_M_plat */
+   /* The current positon of the platform in the virtual world. vw_M_vp.
+   * This is the positiong of the virtual platform in the virtual world.
+   */
    gmtl::Matrix44f   mCurPos;
 
-   /**
-    * @directed
+   /** Inverse matrix of the current position.
+    * vp_M_vw
     */
-   NavStrategy * lnkNavStrategy;
+   gmtl::Matrix44f   mCurPosInv;
+
+   /** The active navigation strategy. */
+   /**@link association*/
+   /*# NavStrategy mNavStrategy; */
+   NavStrategyPtr    mNavStrategy;
 };
 
 }

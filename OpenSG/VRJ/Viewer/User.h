@@ -2,8 +2,9 @@
 #define USER_H
 
 #include <OpenSG/VRJ/Viewer/UserPtr.h>
-#include <OpenSG/VRJ/Viewer/DevicesPtr.h>
+#include <OpenSG/VRJ/Viewer/InterfaceTrader.h>
 #include <OpenSG/VRJ/Viewer/ViewPlatform.h>
+#include <OpenSG/VRJ/Viewer/ViewerPtr.h>
 
 #include <boost/enable_shared_from_this.hpp>
 
@@ -22,7 +23,22 @@ public:
    static UserPtr create();
 
    void init()
-   {;
+   {;}
+
+   /** Update user and user associated information.
+    * @post: User and viewplatform are updated.
+    */
+   void update(ViewerPtr viewer);
+
+   InterfaceTrader& getInterfaceTrader()
+   {
+      return mInterfaceTrader;
+   }
+
+   /** Return the view platform that we are using. */
+   ViewPlatform& getViewPlatform()
+   {
+      return mViewPlatform;
    }
 
 protected:
@@ -30,10 +46,8 @@ protected:
    {;}
 
 private:
-   /** Devices abstraction for the user.
-   * @link association */
-   /*# Devices lnkDevices; */
-   DevicesPtr     mDevices;
+   /** Devices abstraction for the user. */
+   InterfaceTrader    mInterfaceTrader;
 
    ViewPlatform   mViewPlatform;    /** The user's view platform. */
 };

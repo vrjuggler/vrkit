@@ -9,5 +9,10 @@ UserPtr User::create()
    return new_user;
 }
 
+void User::update(ViewerPtr viewer)
+{
+   mViewPlatform.update(viewer);
+}
+
 }
 

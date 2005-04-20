@@ -19,6 +19,9 @@
 
 #include <OpenSG/VRJ/Viewer/Viewer.h>
 
+#include <OpenSG/VRJ/Viewer/SimpleNavStrategy.h>
+#include <OpenSG/VRJ/Viewer/User.h>
+
 class OpenSgViewer;
 typedef boost::shared_ptr<OpenSgViewer> OpenSgViewerPtr;
 
@@ -71,6 +74,8 @@ void OpenSgViewer::contextInit()
 
 void OpenSgViewer::preFrame()
 {
+   // Call up to get navigation and plugin updates.
+   inf::Viewer::preFrame();
    // Do nothing
 }
 
@@ -146,6 +151,12 @@ void OpenSgViewer::init()
    osg::beginEditCP(scene_transform_root.node());
       scene_transform_root.node()->addChild(light_node);
    osg::endEditCP(scene_transform_root.node());
+
+   // Setup the navigation and intialize it
+   inf::SimpleNavStrategyPtr simple_nav = inf::SimpleNavStrategy::create();
+   simple_nav->init(shared_from_this());
+
+   getUser()->getViewPlatform().setNavStrategy(simple_nav);
 }
 
 

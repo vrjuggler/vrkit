@@ -56,8 +56,7 @@ public:
    /** Called at the beginning of each frame.
     * @note: Derived class implementations <b>MUST</b> call up to this method.
     */
-   virtual void preFrame()
-   {;}
+   virtual void preFrame();
 
    /** Called at the end of each frame.
     * @note: Derived class implementations <b>MUST</b> call up to this method.
@@ -100,7 +99,8 @@ private:
    UserPtr     mUser;
 
    /** The scene we are using.
-   * @link association */
+   * @link association
+   * @supplierCardinality 1*/
    /*# Scene lnkScene; */
    ScenePtr    mScene;
 
