@@ -13,7 +13,7 @@
 #include <OpenSG/VRJ/Viewer/ScenePtr.h>
 
 #include <vector>
-#include <Scene.h>
+#include <OpenSG/VRJ/Viewer/Scene.h>
 
 
 namespace inf
