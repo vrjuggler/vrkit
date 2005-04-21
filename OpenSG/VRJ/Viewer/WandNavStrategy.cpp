@@ -29,6 +29,23 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
 {
    vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
 
+   const vpr::Interval cur_time(mWandInterface->getWandPos()->getTimeStamp());
+   const vpr::Interval delta(cur_time - mLastFrameTime);
+   float delta_sec(0.0f);
+
+   // Sanity check on the frame delta.
+   if ( cur_time > mLastFrameTime )
+   {
+      delta_sec = delta.secf();
+
+      if ( delta_sec > 1.0f )
+      {
+         delta_sec = 1.0f;
+      }
+   }
+
+   mLastFrameTime = cur_time;
+
    const float inc_vel(0.005f);
    const float max_vel(0.5f);
 
@@ -53,10 +70,10 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
       mVelocity -= inc_vel;
    }
 
-   // Restrict range
-   if(mVelocity < 0)
+   // Restrict velocity range to [0.0,max_vel].
+   if ( mVelocity < 0.0f )
    {
-      mVelocity = 0;
+      mVelocity = 0.0f;
    }
    if(mVelocity > max_vel)
    {
@@ -98,9 +115,7 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
 
          gmtl::Quatf source_quat;
          gmtl::Quatf slerp_quat;
-         // XXX: This needs to be time-based rotation.  This value of 0.005f
-         // is to compensate for a high frame rate with a simple test model.
-         gmtl::slerp(slerp_quat, 0.005f, source_quat, goal_quat);
+         gmtl::slerp(slerp_quat, delta_sec, source_quat, goal_quat);
 
          gmtl::Matrix44f rot_xform;
          gmtl::set(rot_xform, slerp_quat);
@@ -116,8 +131,9 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
       // - Translation is in the real world (virtual platform) coordinate
       //   system
       gmtl::Matrix44f wand_mat(mWandInterface->getWandPos()->getData());
-      gmtl::Vec3f z_dir = gmtl::Vec3f(0.0f, 0.0f, -mVelocity);
-      gmtl::Vec3f trans = wand_mat * z_dir;
+      gmtl::Vec3f z_dir(0.0f, 0.0f, -mVelocity);
+      gmtl::Vec3f trans_delta = z_dir * delta_sec;
+      gmtl::Vec3f trans = wand_mat * trans_delta;
 
       // If we are in walk mode, we have to clamp the Y translation value to
       // the "ground."

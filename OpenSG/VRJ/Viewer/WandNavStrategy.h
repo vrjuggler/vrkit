@@ -6,6 +6,8 @@
 #include <OpenSG/VRJ/Viewer/NavStrategy.h>
 #include <OpenSG/VRJ/Viewer/WandInterfacePtr.h>
 
+#include <vpr/Util/Interval.h>
+
 #include <OpenSG/VRJ/Viewer/WandNavStrategyPtr.h>
 
 
@@ -41,7 +43,8 @@ protected:
    };
 
    WandNavStrategy()
-      : mVelocity(0.0f)
+      : mLastFrameTime(0, vpr::Interval::Sec)
+      , mVelocity(0.0f)
       , mNavMode(WALK)
       , ACCEL_BUTTON(0)
       , STOP_BUTTON(1)
@@ -50,6 +53,8 @@ protected:
    {
       ;
    }
+
+   vpr::Interval mLastFrameTime;
 
    WandInterfacePtr mWandInterface;
 
