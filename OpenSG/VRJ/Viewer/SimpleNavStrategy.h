@@ -30,8 +30,20 @@ public:
    virtual void update(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
 protected:
+   /** Navigation mode. */
+   enum NavMode
+   {
+      WALK,     /**< Walk (drive) mode */
+      FLY       /**< Fly mode */
+   };
+
    SimpleNavStrategy()
       : mVelocity(0.0f)
+      , mNavMode(WALK)
+      , ACCEL_BUTTON(0)
+      , STOP_BUTTON(1)
+      , ROTATE_BUTTON(2)
+      , MODE_BUTTON(3)
    {
       ;
    }
@@ -39,6 +51,12 @@ protected:
    WandInterfacePtr mWandInterface;
 
    float mVelocity;
+   NavMode mNavMode;
+
+   const int ACCEL_BUTTON;
+   const int STOP_BUTTON;
+   const int ROTATE_BUTTON;
+   const int MODE_BUTTON;
 };
 
 }
