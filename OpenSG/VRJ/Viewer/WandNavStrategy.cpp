@@ -46,9 +46,6 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
 
    mLastFrameTime = cur_time;
 
-   const float inc_vel(0.005f);
-   const float max_vel(0.5f);
-
    gadget::DigitalInterface& accel_button =
       mWandInterface->getButton(ACCEL_BUTTON);
    gadget::DigitalInterface& stop_button =
@@ -61,13 +58,13 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
    // Update velocity
    if ( accel_button->getData() == gadget::Digital::ON )
    {
-      mVelocity += inc_vel;
+      mVelocity += mAcceleration;
       std::cout << "vel: " << mVelocity << std::endl;
    }
-   else if(mVelocity > 0)
+   else if ( mVelocity > 0.0f )
    {
       std::cout << "vel: " << mVelocity << std::endl;
-      mVelocity -= inc_vel;
+      mVelocity -= mAcceleration;
    }
 
    // Restrict velocity range to [0.0,max_vel].
@@ -75,9 +72,9 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
    {
       mVelocity = 0.0f;
    }
-   if(mVelocity > max_vel)
+   if ( mVelocity > mMaxVelocity )
    {
-      mVelocity = max_vel;
+      mVelocity = mMaxVelocity;
    }
 
    if ( stop_button->getData() == gadget::Digital::ON )
@@ -149,6 +146,16 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
    }
 
    viewPlatform.setCurPos(cur_pos);
+}
+
+void WandNavStrategy::setMaximumVelocity(const float maxVelocity)
+{
+   mMaxVelocity = maxVelocity;
+}
+
+void WandNavStrategy::setAcceleration(const float acceleration)
+{
+   mAcceleration = acceleration;
 }
 
 }

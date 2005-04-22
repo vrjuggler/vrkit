@@ -33,6 +33,12 @@ public:
    virtual void init(ViewerPtr viewer);
 
    virtual void update(ViewerPtr viewer, ViewPlatform& viewPlatform);
+   
+   /** @name Configuration methods */
+   //@{
+   void setMaximumVelocity(const float minVelocity);
+   void setAcceleration(const float acceleration);
+   //@}
 
 protected:
    /** Navigation mode. */
@@ -45,6 +51,8 @@ protected:
    WandNavStrategy()
       : mLastFrameTime(0, vpr::Interval::Sec)
       , mVelocity(0.0f)
+      , mMaxVelocity(0.5f)
+      , mAcceleration(0.005f)
       , mNavMode(WALK)
       , ACCEL_BUTTON(0)
       , STOP_BUTTON(1)
@@ -59,6 +67,8 @@ protected:
    WandInterfacePtr mWandInterface;
 
    float mVelocity;
+   float mMaxVelocity;
+   float mAcceleration;
    NavMode mNavMode;
 
    const int ACCEL_BUTTON;
