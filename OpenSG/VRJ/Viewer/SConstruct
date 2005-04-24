@@ -36,10 +36,40 @@ def BuildLinuxEnvironment():
    )
 
    return env
-   
+
+def BuildDarwinEnvironment():
+   "Builds a base environment for other modules to build on set up for Darwin"
+   global optimize, profile, builders
+
+   CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions',
+               '-Wno-conversion', '-Ddarwin', '-Wno-long-double']
+   LINKFLAGS = ['-Wl,-bind_at_load']
+
+   # Enable profiling?
+#   if profile != 'no':
+#      CXXFLAGS.extend(['-pg'])
+#      LINKFLAGS.extend(['-pg'])
+
+   # Debug or optimize build?
+#   if optimize != 'no':
+#      CXXFLAGS.extend(['-DNDEBUG', '-O2'])
+#   else:
+#      CXXFLAGS.extend(['-D_DEBUG', '-g', '-fno-inline', '-fno-default-inline'])
+   CXXFLAGS.extend(['-D_DEBUG', '-g', '-fno-inline'])
+
+   return Environment(
+      ENV         = os.environ,
+      CXXFLAGS    = CXXFLAGS,
+      LINKFLAGS   = LINKFLAGS
+   )
+
 # --- Main Build --- #
 help_text = "\n---- Build system ----\n";
-env = BuildLinuxEnvironment()
+if GetPlatform() == 'linux' or GetPlatform() == 'freebsd':
+   env = BuildLinuxEnvironment()
+elif GetPlatform() == 'mac':
+   env = BuildDarwinEnvironment()
+
 build_dir = "build." + GetPlatform();
    
 # ---------- Options ------------ #
