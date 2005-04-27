@@ -1,6 +1,11 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
+#ifdef WIN32
+#include <windows.h>
+#include <winsock.h>
+#endif
+
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
 
