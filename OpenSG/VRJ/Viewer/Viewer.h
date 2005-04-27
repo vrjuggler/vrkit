@@ -1,10 +1,13 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
+#include <vector>
+#include <boost/enable_shared_from_this.hpp>
+
+#include <vpr/vpr.h>
+#include <vpr/DynLoad/Library.h>
 #include <vrj/Kernel/Kernel.h>
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
-
-#include <boost/enable_shared_from_this.hpp>
 
 #include <OpenSG/VRJ/Viewer/ViewerPtr.h>
 
@@ -12,7 +15,6 @@
 #include <OpenSG/VRJ/Viewer/UserPtr.h>
 #include <OpenSG/VRJ/Viewer/ScenePtr.h>
 
-#include <vector>
 #include <OpenSG/VRJ/Viewer/Scene.h>
 
 
@@ -26,7 +28,9 @@ namespace inf
  *
  * (It may actually be a VRJ app object in the future)
  */
-class Viewer : public vrj::OpenSGApp, public boost::enable_shared_from_this<Viewer>
+class Viewer
+   : public vrj::OpenSGApp
+   , public boost::enable_shared_from_this<Viewer>
 {
 public:
    static ViewerPtr create()
@@ -70,6 +74,11 @@ public:
       return mScene;
    }
 
+   void addPlugin(PluginPtr plugin)
+   {
+      mPlugins.push_back(plugin);
+   }
+
 public:
    UserPtr      getUser()
    { return mUser; }
@@ -104,6 +113,8 @@ private:
    /*# Scene lnkScene; */
    ScenePtr    mScene;
 
+   std::vector<vpr::LibraryPtr> mLoadedDsos;
+
    /** List of plugins
    * @link association
    * @supplierCardinality 0..**/
@@ -112,4 +123,6 @@ private:
 };
 
 }
+
+
 #endif

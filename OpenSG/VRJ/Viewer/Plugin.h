@@ -3,6 +3,8 @@
 
 #include <OpenSG/VRJ/Viewer/ViewerPtr.h>
 
+#define INF_PLUGIN_API_MAJOR    1
+#define INF_PLUGIN_API_MINOR    0
 
 namespace inf
 {
