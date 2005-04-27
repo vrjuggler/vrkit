@@ -167,9 +167,11 @@ int main(int argc, char* argv[])
    }
 
    vrj::Kernel* kernel = vrj::Kernel::instance();     // Get the kernel
+   kernel->scanForConfigDefinitions("definitions");
+
    OpenSgViewerPtr app = OpenSgViewer::create();      // Create the app object
 
-   for(int i=1; i<argc; ++i)
+   for ( int i = 1; i < argc; ++i )
    {
       kernel->loadConfigFile(argv[i]);      // Configure the kernel
    }

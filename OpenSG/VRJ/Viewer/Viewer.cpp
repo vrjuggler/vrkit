@@ -1,5 +1,8 @@
+#include <algorithm>
+
 #include <vpr/vpr.h>
 #include <vpr/DynLoad/LibraryLoader.h>
+#include <jccl/Config/Configuration.h>
 
 #include <OpenSG/VRJ/Viewer/User.h>
 #include <OpenSG/VRJ/Viewer/Plugin.h>
@@ -69,6 +72,28 @@ struct PluginCreateCallable
    inf::ViewerPtr mViewer;
 };
 
+struct ElementRemovePredicate
+{
+   ElementRemovePredicate(inf::PluginPtr plugin)
+      : mPlugin(plugin)
+   {
+   }
+
+   bool operator()(jccl::ConfigElementPtr e)
+   {
+      if ( mPlugin->canHandleElement(e) && mPlugin->config(e) )
+      {
+         return true;
+      }
+      else
+      {
+         return false;
+      }
+   }
+
+   inf::PluginPtr mPlugin;
+};
+
 }
 
 namespace inf
@@ -78,6 +103,14 @@ void Viewer::init()
 {
    vrj::OpenSGApp::init();
 
+   jccl::Configuration cfg;
+   bool cfg_loaded = cfg.load("viewer.jconf");
+
+   if ( ! cfg_loaded )
+   {
+      std::cerr << "WARNING: Failed to load our configuration!" << std::endl;
+   }
+
    // Create an initialize the user
    mUser = User::create();
    mUser->init();
@@ -86,44 +119,113 @@ void Viewer::init()
    mScene = Scene::create();
    mScene->init();
 
-   // XXX: This bit is hard-coded for now while I get it working.
-   std::vector<std::string> search_path(1);
-   search_path[0] = "plugins";
-   vpr::LibraryPtr dso = vpr::LibraryLoader::findDSO("SimpleNavPlugin",
-                                                     search_path);
-
-   if ( dso.get() != NULL )
+   if ( cfg_loaded )
    {
-      const std::string get_version_func("getPluginInterfaceVersion");
-      const std::string create_func("create");
+      const std::string app_elt_type("infiscape_opensg_viewer");
+      const std::string plugin_path_prop("plugin_path");
+      const std::string plugin_prop("plugin");
 
-      VersionCheckCallable version_functor;
+      std::vector<jccl::ConfigElementPtr> app_elts;
 
-      vpr::ReturnStatus version_status =
-         vpr::LibraryLoader::findEntryPoint(dso, get_version_func,
-                                            version_functor);
+      cfg.getByType(app_elt_type, app_elts);
 
-      if ( ! version_status.success() )
+      if ( ! app_elts.empty() )
       {
-         std::cerr << "Version mismatch!" << std::endl;
-      }
-      else
-      {
-         PluginCreateCallable create_functor(shared_from_this());
+         jccl::ConfigElementPtr app_cfg = app_elts[0];
 
-         vpr::ReturnStatus create_status;
-         create_status = vpr::LibraryLoader::findEntryPoint(dso, create_func,
-                                                            create_functor);
+         std::vector<std::string> search_path;
+         search_path.push_back("plugins");
 
-         if ( create_status.success() )
+         const unsigned int num_paths(app_cfg->getNum(plugin_path_prop));
+
+         for ( unsigned int i = 0; i < num_paths; ++i )
          {
-            mLoadedDsos.push_back(dso);
+            search_path.push_back(
+               app_cfg->getProperty<std::string>(plugin_path_prop, i)
+            );
+         }
+
+         std::vector<jccl::ConfigElementPtr> all_elts = cfg.vec();
+
+         // Remove app_cfg from all_elts since we are the consumer for that
+         // element.
+         all_elts.erase(std::remove(all_elts.begin(), all_elts.end(), app_cfg),
+                        all_elts.end());
+
+         const std::string get_version_func("getPluginInterfaceVersion");
+         const std::string create_func("create");
+
+         const unsigned int num_plugins(app_cfg->getNum(plugin_prop));
+
+         for ( unsigned int i = 0; i < num_plugins; ++i )
+         {
+            std::string plugin_name =
+               app_cfg->getProperty<std::string>(plugin_prop, i);
+            vpr::LibraryPtr dso = vpr::LibraryLoader::findDSO(plugin_name,
+                                                              search_path);
+
+            if ( dso.get() != NULL )
+            {
+               VersionCheckCallable version_functor;
+
+               vpr::ReturnStatus version_status =
+                  vpr::LibraryLoader::findEntryPoint(dso, get_version_func,
+                                                     version_functor);
+
+               if ( ! version_status.success() )
+               {
+                  std::cerr << "Version mismatch!  Plug-in '" << plugin_name
+                            << "' cannot be used." << std::endl;
+               }
+               else
+               {
+                  PluginCreateCallable create_functor(shared_from_this());
+
+                  vpr::ReturnStatus create_status =
+                     vpr::LibraryLoader::findEntryPoint(dso, create_func,
+                                                        create_functor);
+
+                  if ( create_status.success() )
+                  {
+                     mLoadedDsos.push_back(dso);
+
+                     // The newly created plug-in will be at the end of
+                     // mPlugins.
+                     // XXX: This is a bit dodgy...
+                     inf::PluginPtr plugin = mPlugins[mPlugins.size() -1 ];
+
+                     // Configure the newly loaded plug-in and remove all the
+                     // elements (if any) from all_elts that the plug-in
+                     // consumes.
+                     ElementRemovePredicate remove_pred(plugin);
+                     std::vector<jccl::ConfigElementPtr>::iterator new_end =
+                        std::remove_if(all_elts.begin(), all_elts.end(),
+                                       remove_pred);
+                     all_elts.erase(new_end, all_elts.end());
+                  }
+               }
+            }
+            else
+            {
+               std::cerr << "WARNING: Failed to load plug-in '" << plugin_name
+                         << "'!" << std::endl;
+            }
+         }
+
+         if ( ! all_elts.empty() )
+         {
+            std::cout << "Unconsumed config elements from "
+                      << cfg.getFileName() << ":\n";
+
+            std::vector<jccl::ConfigElementPtr>::iterator i;
+            for ( i = all_elts.begin(); i != all_elts.end(); ++i )
+            {
+               std::cout << "\t" << (*i)->getName() << "\n";
+            }
+
+            std::cout << std::flush;
          }
       }
-   }
-   else
-   {
-      std::cerr << "Failed to load plug-in!" << std::endl;
    }
 }
 

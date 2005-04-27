@@ -32,6 +32,16 @@ public:
 
    virtual void init(ViewerPtr viewer);
 
+   /**
+    * @pre \c init() has been called.
+    */
+   virtual bool canHandleElement(jccl::ConfigElementPtr elt);
+
+   /**
+    * @pre \c canHandleElement() returned true.
+    */
+   virtual bool config(jccl::ConfigElementPtr elt);
+
    /** @name Configuration methods */
    //@{
    void setMaximumVelocity(const float minVelocity);
@@ -61,6 +71,11 @@ protected:
    }
 
    virtual void updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
+
+   static std::string getElementType()
+   {
+      return std::string("wand_nav_plugin");
+   }
 
    vpr::Interval mLastFrameTime;
 

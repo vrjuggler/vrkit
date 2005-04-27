@@ -30,6 +30,16 @@ public:
 
    virtual void init(ViewerPtr viewer);
 
+   virtual bool canHandleElement(jccl::ConfigElementPtr elt)
+   {
+      return false;
+   }
+
+   virtual bool config(jccl::ConfigElementPtr elt)
+   {
+      return false;
+   }
+
 protected:
    /** Navigation mode. */
    enum NavMode

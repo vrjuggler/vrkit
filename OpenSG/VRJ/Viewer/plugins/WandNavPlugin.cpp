@@ -44,6 +44,32 @@ void WandNavPlugin::init(ViewerPtr viewer)
    mWandInterface = if_trader.getWandInterface();
 }
 
+bool WandNavPlugin::canHandleElement(jccl::ConfigElementPtr elt)
+{
+   return elt->getID() == getElementType();
+}
+
+bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
+{
+   vprASSERT(elt->getID() == getElementType() &&
+             "Got unexpected config element type");
+
+   float max_velocity = elt->getProperty<float>("max_velocity");
+   float accel        = elt->getProperty<float>("acceleration");
+
+   if ( max_velocity > 0.0f )
+   {
+      setMaximumVelocity(max_velocity);
+   }
+
+   if ( accel > 0.0f )
+   {
+      setAcceleration(accel);
+   }
+
+   return true;
+}
+
 void WandNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
 {
    vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
