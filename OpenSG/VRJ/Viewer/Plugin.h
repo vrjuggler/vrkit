@@ -1,21 +1,27 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-class inf::Grabber;
+#include <OpenSG/VRJ/Viewer/ViewerPtr.h>
+
 
 namespace inf
 {
+
 /**
- * A plugin is an abstract interface that allows for an extension point in the system.  It could be used to add capabilities to the system.
- *
- * There may need to be "controller" plugins and "system" plugins.  This is still a little sketchy to me.
- *
- * NOTE: Still be fleshed out
+ * A plugin is an abstract interface that allows for an extension point in the
+ * system.  It is used to add capabilities to the application.
  */
 class Plugin
 {
-private:
-   Grabber * lnkGrabber;
+public:
+   virtual ~Plugin();
+
+   virtual void init(inf::ViewerPtr viewer) = 0;
+
+   virtual void update(inf::ViewerPtr viewer) = 0;
+
+protected:
+   Plugin();
 };
 
 }
