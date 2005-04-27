@@ -104,11 +104,9 @@ void WandNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
    if ( accel_button->getData() == gadget::Digital::ON )
    {
       mVelocity += mAcceleration;
-      std::cout << "vel: " << mVelocity << std::endl;
    }
    else if ( mVelocity > 0.0f )
    {
-      std::cout << "vel: " << mVelocity << std::endl;
       mVelocity -= mAcceleration;
    }
 
