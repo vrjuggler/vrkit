@@ -1,33 +1,34 @@
-#ifndef SIMPLE_NAV_STRATEGY_H
-#define SIMPLE_NAV_STRATEGY_H
+#ifndef SIMPLE_NAV_PLUGIN_H
+#define SIMPLE_NAV_PLUGIN_H
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/VRJ/Viewer/NavStrategy.h>
-#include <OpenSG/VRJ/Viewer/SimpleNavStrategyPtr.h>
 #include <OpenSG/VRJ/Viewer/WandInterfacePtr.h>
+#include <OpenSG/VRJ/Viewer/Plugin.h>
+#include <OpenSG/VRJ/Viewer/plugins/NavPlugin.h>
+#include <OpenSG/VRJ/Viewer/plugins/SimpleNavPluginPtr.h>
 
 
 namespace inf
 {
 
-class SimpleNavStrategy : public NavStrategy, public boost::enable_shared_from_this<SimpleNavStrategy>
+class SimpleNavPlugin
+   : public NavPlugin
+   , public boost::enable_shared_from_this<SimpleNavPlugin>
 {
 public:
-   static SimpleNavStrategyPtr create()
+   static SimpleNavPluginPtr create()
    {
-      SimpleNavStrategyPtr new_strategy = SimpleNavStrategyPtr(new SimpleNavStrategy);
+      SimpleNavPluginPtr new_strategy = SimpleNavPluginPtr(new SimpleNavPlugin);
       return new_strategy;
    }
 
-   virtual ~SimpleNavStrategy()
+   virtual ~SimpleNavPlugin()
    {
       ;
    }
 
    virtual void init(ViewerPtr viewer);
-
-   virtual void update(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
 protected:
    /** Navigation mode. */
@@ -37,7 +38,7 @@ protected:
       FLY       /**< Fly mode */
    };
 
-   SimpleNavStrategy()
+   SimpleNavPlugin()
       : mVelocity(0.0f)
       , mNavMode(WALK)
       , ACCEL_BUTTON(0)
@@ -47,6 +48,8 @@ protected:
    {
       ;
    }
+
+   virtual void updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
    WandInterfacePtr mWandInterface;
 

@@ -13,38 +13,43 @@
 #include <OpenSG/VRJ/Viewer/Viewer.h>
 #include <OpenSG/VRJ/Viewer/WandInterface.h>
 #include <OpenSG/VRJ/Viewer/User.h>
-#include <OpenSG/VRJ/Viewer/WandNavStrategy.h>
+#include <OpenSG/VRJ/Viewer/plugins/SimpleNavPlugin.h>
 
+
+extern "C"
+{
+
+/** @name Plug-in Entry Points */
+//@{
+void getPluginInterfaceVersion(vpr::Uint32& majorVer, vpr::Uint32& minorVer)
+{
+   majorVer = INF_PLUGIN_API_MAJOR;
+   minorVer = INF_PLUGIN_API_MINOR;
+}
+
+inf::PluginPtr create()
+{
+   return inf::SimpleNavPlugin::create();
+}
+//@}
+
+}
 
 namespace inf
 {
 
-void WandNavStrategy::init(ViewerPtr viewer)
+void SimpleNavPlugin::init(ViewerPtr viewer)
 {
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
 }
 
-void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
+void SimpleNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
 {
    vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
 
-   const vpr::Interval cur_time(mWandInterface->getWandPos()->getTimeStamp());
-   const vpr::Interval delta(cur_time - mLastFrameTime);
-   float delta_sec(0.0f);
-
-   // Sanity check on the frame delta.
-   if ( cur_time > mLastFrameTime )
-   {
-      delta_sec = delta.secf();
-
-      if ( delta_sec > 1.0f )
-      {
-         delta_sec = 1.0f;
-      }
-   }
-
-   mLastFrameTime = cur_time;
+   const float inc_vel(0.005f);
+   const float max_vel(0.5f);
 
    gadget::DigitalInterface& accel_button =
       mWandInterface->getButton(ACCEL_BUTTON);
@@ -58,23 +63,23 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
    // Update velocity
    if ( accel_button->getData() == gadget::Digital::ON )
    {
-      mVelocity += mAcceleration;
+      mVelocity += inc_vel;
       std::cout << "vel: " << mVelocity << std::endl;
    }
-   else if ( mVelocity > 0.0f )
+   else if(mVelocity > 0)
    {
       std::cout << "vel: " << mVelocity << std::endl;
-      mVelocity -= mAcceleration;
+      mVelocity -= inc_vel;
    }
 
-   // Restrict velocity range to [0.0,max_vel].
-   if ( mVelocity < 0.0f )
+   // Restrict range
+   if(mVelocity < 0)
    {
-      mVelocity = 0.0f;
+      mVelocity = 0;
    }
-   if ( mVelocity > mMaxVelocity )
+   if(mVelocity > max_vel)
    {
-      mVelocity = mMaxVelocity;
+      mVelocity = max_vel;
    }
 
    if ( stop_button->getData() == gadget::Digital::ON )
@@ -112,7 +117,9 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
 
          gmtl::Quatf source_quat;
          gmtl::Quatf slerp_quat;
-         gmtl::slerp(slerp_quat, delta_sec, source_quat, goal_quat);
+         // XXX: This needs to be time-based rotation.  This value of 0.005f
+         // is to compensate for a high frame rate with a simple test model.
+         gmtl::slerp(slerp_quat, 0.005f, source_quat, goal_quat);
 
          gmtl::Matrix44f rot_xform;
          gmtl::set(rot_xform, slerp_quat);
@@ -128,9 +135,8 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
       // - Translation is in the real world (virtual platform) coordinate
       //   system
       gmtl::Matrix44f wand_mat(mWandInterface->getWandPos()->getData());
-      gmtl::Vec3f z_dir(0.0f, 0.0f, -mVelocity);
-      gmtl::Vec3f trans_delta = z_dir * delta_sec;
-      gmtl::Vec3f trans = wand_mat * trans_delta;
+      gmtl::Vec3f z_dir = gmtl::Vec3f(0.0f, 0.0f, -mVelocity);
+      gmtl::Vec3f trans = wand_mat * z_dir;
 
       // If we are in walk mode, we have to clamp the Y translation value to
       // the "ground."
@@ -146,16 +152,6 @@ void WandNavStrategy::update(ViewerPtr viewer, ViewPlatform& viewPlatform)
    }
 
    viewPlatform.setCurPos(cur_pos);
-}
-
-void WandNavStrategy::setMaximumVelocity(const float maxVelocity)
-{
-   mMaxVelocity = maxVelocity;
-}
-
-void WandNavStrategy::setAcceleration(const float acceleration)
-{
-   mAcceleration = acceleration;
 }
 
 }

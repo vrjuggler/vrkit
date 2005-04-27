@@ -63,12 +63,19 @@ def BuildDarwinEnvironment():
       LINKFLAGS   = LINKFLAGS
    )
 
+optimize = ARGUMENTS.get('optimize', 'no')
+Export('optimize')
+
 # --- Main Build --- #
 help_text = "\n---- Build system ----\n";
 if GetPlatform() == 'linux' or GetPlatform() == 'freebsd':
    env = BuildLinuxEnvironment()
 elif GetPlatform() == 'mac':
    env = BuildDarwinEnvironment()
+
+# Export symbols for use by SConscript files in subdirectories.
+Export('GetPlatform')
+Export('env')
 
 build_dir = "build." + GetPlatform();
    
@@ -93,6 +100,8 @@ if not SConsAddons.Util.hasHelpFlag():
    env.Append( CPPPATH = ['.', pj('..','..','..')] )
    vrj_options.updateEnv(env)
    opensg_options.updateEnv(env)
+
+   SConscript(dirs = ['plugins'])
 
    #env.Program('infi_app', ['infi_app.cpp',])   
    src_files = glob.glob('*.cpp')

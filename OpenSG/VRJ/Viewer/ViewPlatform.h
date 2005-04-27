@@ -1,7 +1,6 @@
 #ifndef VIEWPLATFORM_H
 #define VIEWPLATFORM_H
 
-#include <OpenSG/VRJ/Viewer/NavStrategy.h>
 #include <OpenSG/VRJ/Viewer/ViewerPtr.h>
 
 #include <gmtl/Matrix.h>
@@ -26,16 +25,6 @@ public:
 
    /** Update the view platform (navigation) */
    void update(ViewerPtr viewer);
-
-   void setNavStrategy(NavStrategyPtr navStrat)
-   {
-      mNavStrategy = navStrat;
-   }
-
-   NavStrategyPtr getNavStrategy()
-   {
-      return mNavStrategy;
-   }
 
    /** Return the current position.
     * This is the position of the view platform in the virtual world.
@@ -70,11 +59,6 @@ private:
     * vp_M_vw
     */
    gmtl::Matrix44f   mCurPosInv;
-
-   /** The active navigation strategy. */
-   /**@link association*/
-   /*# NavStrategy mNavStrategy; */
-   NavStrategyPtr    mNavStrategy;
 };
 
 }

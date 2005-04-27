@@ -1,39 +1,37 @@
-#ifndef WAND_NAV_STRATEGY_H
-#define WAND_NAV_STRATEGY_H
+#ifndef WAND_NAV_PLUGIN_H
+#define WAND_NAV_PLUGIN_H
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/VRJ/Viewer/NavStrategy.h>
 #include <OpenSG/VRJ/Viewer/WandInterfacePtr.h>
 
 #include <vpr/Util/Interval.h>
 
-#include <OpenSG/VRJ/Viewer/WandNavStrategyPtr.h>
+#include <OpenSG/VRJ/Viewer/plugins/NavPlugin.h>
+#include <OpenSG/VRJ/Viewer/plugins/WandNavPluginPtr.h>
 
 
 namespace inf
 {
 
-class WandNavStrategy
-   : public NavStrategy
-   , public boost::enable_shared_from_this<WandNavStrategy>
+class WandNavPlugin
+   : public NavPlugin
+   , public boost::enable_shared_from_this<WandNavPlugin>
 {
 public:
-   static WandNavStrategyPtr create()
+   static WandNavPluginPtr create()
    {
-      WandNavStrategyPtr new_strategy = WandNavStrategyPtr(new WandNavStrategy);
+      WandNavPluginPtr new_strategy = WandNavPluginPtr(new WandNavPlugin);
       return new_strategy;
    }
 
-   virtual ~WandNavStrategy()
+   virtual ~WandNavPlugin()
    {
       ;
    }
 
    virtual void init(ViewerPtr viewer);
 
-   virtual void update(ViewerPtr viewer, ViewPlatform& viewPlatform);
-   
    /** @name Configuration methods */
    //@{
    void setMaximumVelocity(const float minVelocity);
@@ -48,7 +46,7 @@ protected:
       FLY       /**< Fly mode */
    };
 
-   WandNavStrategy()
+   WandNavPlugin()
       : mLastFrameTime(0, vpr::Interval::Sec)
       , mVelocity(0.0f)
       , mMaxVelocity(0.5f)
@@ -61,6 +59,8 @@ protected:
    {
       ;
    }
+
+   virtual void updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
    vpr::Interval mLastFrameTime;
 

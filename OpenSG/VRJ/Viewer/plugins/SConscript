@@ -1,0 +1,34 @@
+#!python
+
+import os.path
+
+Import('env optimize')
+Import('GetPlatform')
+
+class Plugin:
+   def __init__(self, name, srcs, useDebug = False):
+      self.name = name
+
+      if useDebug:
+         self.name += '_d'
+
+      self.srcs = srcs
+
+   def getName(self):
+      return self.name
+
+   def getSources(self):
+      return self.srcs
+
+if GetPlatform() == 'mac':
+   env['SHLINKFLAGS'] = ['-bundle', '-m']
+
+use_debug = (optimize != 'yes')
+plugins = [Plugin('SimpleNavPlugin', ['SimpleNavPlugin.cpp'], use_debug),
+           Plugin('WandNavPlugin', ['WandNavPlugin.cpp'], use_debug)]
+
+# XXX: I don't like this one bit.
+env.Append(CPPPATH = [os.path.join('..', '..', '..', '..')])
+
+for p in plugins:
+   env.SharedLibrary(p.getName(), p.getSources(), SHLIBPREFIX = '')

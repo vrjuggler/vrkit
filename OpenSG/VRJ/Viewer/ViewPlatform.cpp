@@ -7,8 +7,6 @@ namespace inf
 
 void ViewPlatform::update(ViewerPtr viewer)
 {
-   mNavStrategy->update(viewer, *this);
-
    // Update the scene graph transformation here
    CoredTransformPtr xform_node = viewer->getSceneObj()->getTransformRoot();
    OSG::Matrix new_xform;
@@ -21,4 +19,3 @@ void ViewPlatform::update(ViewerPtr viewer)
 }
 
 }
-

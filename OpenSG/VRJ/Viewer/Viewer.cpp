@@ -89,7 +89,7 @@ void Viewer::init()
    // XXX: This bit is hard-coded for now while I get it working.
    std::vector<std::string> search_path(1);
    search_path[0] = "plugins";
-   vpr::LibraryPtr dso = vpr::LibraryLoader::findDSO("SimpleNavStrategy",
+   vpr::LibraryPtr dso = vpr::LibraryLoader::findDSO("SimpleNavPlugin",
                                                      search_path);
 
    if ( dso.get() != NULL )
