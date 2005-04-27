@@ -1,8 +1,9 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
+#include <OpenSG/VRJ/Viewer/Config.h>
+
 #ifdef WIN32
-#include <windows.h>
 #include <winsock.h>
 #endif
 
@@ -33,7 +34,7 @@ namespace inf
  *
  * (It may actually be a VRJ app object in the future)
  */
-class Viewer
+class IOV_CLASS_API Viewer
    : public vrj::OpenSGApp
    , public boost::enable_shared_from_this<Viewer>
 {

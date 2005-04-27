@@ -1,6 +1,8 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
+#include <OpenSG/VRJ/Viewer/Config.h>
+
 #include <jccl/Config/ConfigElementPtr.h>
 
 #include <OpenSG/VRJ/Viewer/ViewerPtr.h>
@@ -15,7 +17,7 @@ namespace inf
  * A plugin is an abstract interface that allows for an extension point in the
  * system.  It is used to add capabilities to the application.
  */
-class Plugin
+class IOV_CLASS_API Plugin
 {
 public:
    virtual ~Plugin();
