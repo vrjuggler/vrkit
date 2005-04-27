@@ -29,6 +29,7 @@ plugins = [Plugin('SimpleNavPlugin', ['SimpleNavPlugin.cpp'], use_debug),
 
 # XXX: I don't like this one bit.
 env.Append(CPPPATH = [os.path.join('..', '..', '..', '..')])
+env['LIBPATH'] += ['..']
 
 for p in plugins:
    env.SharedLibrary(p.getName(), p.getSources(), SHLIBPREFIX = '')

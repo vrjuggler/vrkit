@@ -101,14 +101,19 @@ if not SConsAddons.Util.hasHelpFlag():
    vrj_options.updateEnv(env)
    opensg_options.updateEnv(env)
 
+   app_src = 'infi_app.cpp'
+   lib_name = 'iov'
+
+   lib_src_files = glob.glob('*.cpp')
+   lib_src_files.remove(app_src)
+   env.SharedLibrary(lib_name, lib_src_files)
+
    SConscript(dirs = ['plugins'])
 
-   #env.Program('infi_app', ['infi_app.cpp',])   
-   src_files = glob.glob('*.cpp')
-   print "Src files: ", src_files
-   env.Program('infi_app', src_files)
-   
+   env['LIBPATH'] += ['.']
+   env['LIBS'].insert(0, lib_name)
+   env.Program('infi_app', app_src)
 
-Help(help_text);
+Help(help_text)
 
 # end   
