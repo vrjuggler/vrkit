@@ -21,13 +21,13 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-void getPluginInterfaceVersion(vpr::Uint32& majorVer, vpr::Uint32& minorVer)
+IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer, vpr::Uint32& minorVer)
 {
    majorVer = INF_PLUGIN_API_MAJOR;
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-inf::PluginPtr create()
+IOV_PLUGIN_API(inf::PluginPtr) create()
 {
    return inf::WandNavPlugin::create();
 }

@@ -1,6 +1,8 @@
 #ifndef WAND_NAV_PLUGIN_H
 #define WAND_NAV_PLUGIN_H
 
+#include <OpenSG/VRJ/Viewer/plugins/PluginConfig.h>
+
 #include <boost/enable_shared_from_this.hpp>
 
 #include <OpenSG/VRJ/Viewer/WandInterfacePtr.h>
