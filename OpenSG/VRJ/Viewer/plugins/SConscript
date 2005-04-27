@@ -2,7 +2,7 @@
 
 import os.path
 
-Import('env optimize')
+Import('baseEnv optimize')
 Import('GetPlatform')
 
 class Plugin:
@@ -20,16 +20,18 @@ class Plugin:
    def getSources(self):
       return self.srcs
 
+env = baseEnv.Copy()
+
 if GetPlatform() == 'mac':
-   env['SHLINKFLAGS'] = ['-bundle', '-m']
+   env.Replace(SHLINKFLAGS = '-bundle')
 
 use_debug = (optimize != 'yes')
 plugins = [Plugin('SimpleNavPlugin', ['SimpleNavPlugin.cpp'], use_debug),
            Plugin('WandNavPlugin', ['WandNavPlugin.cpp'], use_debug)]
 
-# XXX: I don't like this one bit.
 env.Append(CPPPATH = [os.path.join('..', '..', '..', '..')])
-env['LIBPATH'] += ['..']
+env.Append(LIBPATH = ['..'])
+env.Prepend(LIBS = ['iov'])
 
 for p in plugins:
    env.SharedLibrary(p.getName(), p.getSources(), SHLIBPREFIX = '')
