@@ -1,0 +1,12 @@
+#!python
+
+import glob
+import os.path
+
+Import('baseEnv optimize')
+Import('GetPlatform')
+
+env = baseEnv.Copy()
+env.Append(CPPPATH = [os.path.join('..', '..', '..', '..')])
+
+env.SharedLibrary('iov', glob.glob('*.cpp'))
