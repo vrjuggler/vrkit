@@ -48,6 +48,11 @@ public:
    virtual ~Viewer()
    {;}
 
+   void setConfiguration(const std::string& cfgFile)
+   {
+      mCfgFile = cfgFile;
+   }
+
    /** Initialize (build) the viewer
     * @post: All objects managed by the viewer are initialized
     *        and setup.
@@ -105,6 +110,8 @@ protected:
    Viewer()
       : vrj::OpenSGApp(NULL)
    {;}
+
+   std::string mCfgFile;
 
 private:
 

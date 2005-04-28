@@ -170,6 +170,7 @@ int main(int argc, char* argv[])
    kernel->scanForConfigDefinitions("definitions");
 
    OpenSgViewerPtr app = OpenSgViewer::create();      // Create the app object
+   app->setConfiguration("viewer.jconf");
 
    for ( int i = 1; i < argc; ++i )
    {
@@ -182,5 +183,3 @@ int main(int argc, char* argv[])
 
    return 0;
 }
-
-

@@ -103,8 +103,13 @@ void Viewer::init()
 {
    vrj::OpenSGApp::init();
 
+   bool cfg_loaded(false);
    jccl::Configuration cfg;
-   bool cfg_loaded = cfg.load("viewer.jconf");
+
+   if ( ! mCfgFile.empty() )
+   {
+      cfg_loaded = cfg.load(mCfgFile);
+   }
 
    if ( ! cfg_loaded )
    {
