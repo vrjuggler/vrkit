@@ -16,7 +16,6 @@
 
 #include <vpr/Util/GUID.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/InvalidTypeException.h>
 #include <OpenSG/VRJ/Viewer/IOV/SceneData.h>
 #include <OpenSG/VRJ/Viewer/IOV/ScenePtr.h>
 
