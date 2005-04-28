@@ -243,6 +243,60 @@ void CenterPointGrabPlugin::update(ViewerPtr viewer)
    }
 }
 
+bool CenterPointGrabPlugin::canHandleElement(jccl::ConfigElementPtr elt)
+{
+   return elt->getID() == getElementType();
+}
+
+bool CenterPointGrabPlugin::config(jccl::ConfigElementPtr elt)
+{
+   vprASSERT(canHandleElement(elt));
+
+   const std::string isect_prop("intersect_color");
+   const std::string grab_prop("grab_color");
+
+   float isect_color[3];
+   float grab_color[3];
+
+   isect_color[0] = elt->getProperty<float>(isect_prop, 0);
+   isect_color[1] = elt->getProperty<float>(isect_prop, 1);
+   isect_color[2] = elt->getProperty<float>(isect_prop, 2);
+
+   if ( isect_color[0] >= 0.0f && isect_color[0] <= 1.0f &&
+        isect_color[1] >= 0.0f && isect_color[1] <= 1.0f &&
+        isect_color[2] >= 0.0f && isect_color[2] <= 1.0f )
+   {
+      mIntersectColor.setValuesRGB(isect_color[0], isect_color[1],
+                                   isect_color[2]);
+   }
+   else
+   {
+      std::cerr << "WARNING: Ignoring invalid inersection highlight color <"
+                << isect_color[0] << "," << isect_color[1] << ","
+                << isect_color[2] << ">" << std::endl;
+   }
+
+   grab_color[0] = elt->getProperty<float>(grab_prop, 0);
+   grab_color[1] = elt->getProperty<float>(grab_prop, 1);
+   grab_color[2] = elt->getProperty<float>(grab_prop, 2);
+
+   if ( grab_color[0] >= 0.0f && grab_color[0] <= 1.0f &&
+        grab_color[1] >= 0.0f && grab_color[1] <= 1.0f &&
+        grab_color[2] >= 0.0f && grab_color[2] <= 1.0f )
+   {
+      mIntersectColor.setValuesRGB(grab_color[0], grab_color[1],
+                                   grab_color[2]);
+   }
+   else
+   {
+      std::cerr << "WARNING: Ignoring invalid grab highlight color <"
+                << grab_color[0] << "," << grab_color[1] << ","
+                << grab_color[2] << ">" << std::endl;
+   }
+
+   return true;
+}
+
 // The implementation of this helper method is adapted from
 // OSG::SimpleSceneManager::updateHighlight() in OpenSG 1.4.0.
 void CenterPointGrabPlugin::updateHighlight(OSG::NodePtr highlightNode)

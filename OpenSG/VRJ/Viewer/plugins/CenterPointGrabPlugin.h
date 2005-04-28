@@ -3,6 +3,7 @@
 
 #include <OpenSG/VRJ/Viewer/plugins/PluginConfig.h>
 
+#include <string>
 #include <boost/enable_shared_from_this.hpp>
 
 #include <OpenSG/OSGGeoPropPtrs.h>
@@ -38,15 +39,9 @@ public:
 
    virtual void update(inf::ViewerPtr viewer);
 
-   virtual bool canHandleElement(jccl::ConfigElementPtr elt)
-   {
-      return false;
-   }
+   virtual bool canHandleElement(jccl::ConfigElementPtr elt);
 
-   virtual bool config(jccl::ConfigElementPtr elt)
-   {
-      return false;
-   }
+   virtual bool config(jccl::ConfigElementPtr elt);
 
 protected:
    CenterPointGrabPlugin()
@@ -61,6 +56,11 @@ protected:
 
 private:
    void updateHighlight(OSG::NodePtr highlightNode);
+
+   static std::string getElementType()
+   {
+      return std::string("center_point_grab_plugin");
+   }
 
    const int GRAB_BUTTON;
 
