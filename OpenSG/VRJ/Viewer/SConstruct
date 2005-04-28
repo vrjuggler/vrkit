@@ -46,7 +46,7 @@ def BuildDarwinEnvironment():
 
    CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions',
                '-Wno-conversion', '-Ddarwin', '-Wno-long-double']
-   LINKFLAGS = ['-Wl,-bind_at_load']
+   LINKFLAGS = []
 
    # Enable profiling?
 #   if profile != 'no':
@@ -110,6 +110,10 @@ if not SConsAddons.Util.hasHelpFlag():
    env.Prepend(LIBS = [lib_name])
 
    SConscript(dirs = ['IOV', 'plugins'])
+
+   # XXX: There has to be a better way to do this.
+   if GetPlatform() == 'mac':
+      env.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
    env.Program('infi_app', glob.glob('*.cpp'))
 
