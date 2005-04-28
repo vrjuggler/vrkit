@@ -64,11 +64,9 @@ void SimpleNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
    if ( accel_button->getData() == gadget::Digital::ON )
    {
       mVelocity += inc_vel;
-      std::cout << "vel: " << mVelocity << std::endl;
    }
    else if(mVelocity > 0)
    {
-      std::cout << "vel: " << mVelocity << std::endl;
       mVelocity -= inc_vel;
    }
 
