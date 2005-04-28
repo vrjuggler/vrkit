@@ -1,7 +1,12 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include <OpenSG/VRJ/Viewer/IOV/ScenePtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/Config.h>
+
+#include <boost/concept_check.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/enable_shared_from_this.hpp>
+
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGRefPtr.h>
@@ -9,11 +14,12 @@
 #include <OpenSG/OSGGroup.h>
 #include <OpenSG/OSGTransform.h>
 
-#include <boost/enable_shared_from_this.hpp>
-
-#include <OpenSG/VRJ/Viewer/IOV/SceneData.h>
-
 #include <vpr/Util/GUID.h>
+
+#include <OpenSG/VRJ/Viewer/IOV/InvalidTypeException.h>
+#include <OpenSG/VRJ/Viewer/IOV/SceneData.h>
+#include <OpenSG/VRJ/Viewer/IOV/ScenePtr.h>
+
 
 namespace inf
 {
@@ -35,7 +41,7 @@ namespace inf
  * - W - World (rw): This is the coord sys of the realworld of the user.
  *
  */
-class Scene : public boost::enable_shared_from_this<Scene>
+class IOV_CLASS_API Scene : public boost::enable_shared_from_this<Scene>
 {
 public:
    /** Factory method for scenes. */
@@ -96,16 +102,46 @@ public:
 
    /**
     * Returns the value in the collection of scene data associated with the
-    * given key.
+    * given key.  If no value is associated with the given key, then a value
+    * is creaetd using \c T::create() (which means that \c T must have a
+    * static method \c create() that returns \c boost::shared_ptr<T>).
+    *
+    * @post If no value is already associated with \c key, then a value of
+    *       type \c boost::shared_ptr<T> is created and stored in the
+    *       collection of scene data.
     *
     * @param key        the key (index) of the value to be returned
     *
-    * @returns A \c inf::SceneDataPtr is returned to the caller.  If the
-    *          collection of scene data has a value associated with \c key,
-    *          then that value is returned.  Otherwise, the returned object
-    *          is a NULL shared pointer.
+    * @returns A shared pointer of type \c boost::shared_ptr<T> is returned to
+    *          the caller that is guaranteed to be valid.  If the collection
+    *          of scene data has a value associated with \c key, then that
+    *          value is returned.  Otherwise, a new object is created and
+    *          returned.
     */
-   inf::SceneDataPtr getSceneData(const vpr::GUID& key) const;
+   template<typename T>
+   boost::shared_ptr<T> getSceneData(const vpr::GUID& key)
+   {
+      // Be sure that the use of boost::dynamic_pointer_cast will succeed.
+      BOOST_STATIC_ASSERT((boost::is_convertible<T, SceneData>::value));
+
+      boost::shared_ptr<T> value;
+
+      std::map<vpr::GUID, inf::SceneDataPtr>::iterator i =
+         mSceneData.find(key);
+
+      if ( i == mSceneData.end() )
+      {
+         value = T::create();
+         setSceneData(key, value);
+      }
+      else
+      {
+         inf::SceneDataPtr base_value = (*i).second;
+         value = boost::dynamic_pointer_cast<T>(base_value);
+      }
+
+      return value;
+   }
 
    /**
     * Removes the value in the container of scene data associated with the
