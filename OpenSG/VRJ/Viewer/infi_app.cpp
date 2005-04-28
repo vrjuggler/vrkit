@@ -19,6 +19,8 @@
 
 #include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
 #include <OpenSG/VRJ/Viewer/IOV/User.h>
+#include <OpenSG/VRJ/Viewer/IOV/Scene.h>
+#include <OpenSG/VRJ/Viewer/IOV/GrabData.h>
 
 
 class OpenSgViewer;
@@ -100,6 +102,19 @@ void OpenSgViewer::init()
          osg::SceneFileHandler::the().read((osg::Char8*)(mFileName.c_str()));
    }
 
+   OSG::TransformPtr model_xform_core = OSG::Transform::create();
+   OSG::beginEditCP(model_xform_core, OSG::Transform::MatrixFieldMask);
+      OSG::Matrix model_pos;
+      model_xform_core->setMatrix(model_pos);
+   OSG::endEditCP(model_xform_core, OSG::Transform::MatrixFieldMask);
+
+   inf::CoredTransformPtr model_xform =
+      inf::CoredTransformPtr(model_xform_core);
+
+   OSG::beginEditCP(model_xform);
+      model_xform.node()->addChild(model_root);
+   OSG::endEditCP(model_xform);
+
    // --- Light setup --- //
    // - Add directional light for scene
    // - Create a beacon for it and connect to that beacon
@@ -140,16 +155,21 @@ void OpenSgViewer::init()
    // --- Setup Scene -- //
    // add the loaded scene to the light node, so that it is lit by the light
    OSG::beginEditCP(light_node);
-      light_node->addChild(model_root);
+      light_node->addChild(model_xform);
    OSG::endEditCP(light_node);
 
    // create the root part of the scene
-   inf::CoredTransformPtr scene_transform_root = getSceneObj()->getTransformRoot();
+   inf::ScenePtr scene = getSceneObj();
+   inf::CoredTransformPtr scene_transform_root = scene->getTransformRoot();
 
    // Set up the root node
    osg::beginEditCP(scene_transform_root.node());
       scene_transform_root.node()->addChild(light_node);
    osg::endEditCP(scene_transform_root.node());
+
+   inf::GrabDataPtr grab_data =
+      scene->getSceneData<inf::GrabData>(inf::GrabData::type_guid);
+   grab_data->addObject(model_xform);
 }
 
 void OpenSgViewer::initGl()
