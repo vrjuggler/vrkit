@@ -9,10 +9,10 @@
 #include <gmtl/Xforms.h>
 #include <gmtl/Generate.h>
 
-#include <OpenSG/VRJ/Viewer/InterfaceTrader.h>
-#include <OpenSG/VRJ/Viewer/Viewer.h>
-#include <OpenSG/VRJ/Viewer/WandInterface.h>
-#include <OpenSG/VRJ/Viewer/User.h>
+#include <OpenSG/VRJ/Viewer/IOV/InterfaceTrader.h>
+#include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
+#include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
+#include <OpenSG/VRJ/Viewer/IOV/User.h>
 #include <OpenSG/VRJ/Viewer/plugins/SimpleNavPlugin.h>
 
 

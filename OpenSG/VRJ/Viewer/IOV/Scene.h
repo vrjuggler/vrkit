@@ -1,7 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include <OpenSG/VRJ/Viewer/ScenePtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/ScenePtr.h>
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGRefPtr.h>
@@ -11,7 +11,7 @@
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/VRJ/Viewer/SceneData.h>
+#include <OpenSG/VRJ/Viewer/IOV/SceneData.h>
 
 #include <vpr/Util/GUID.h>
 

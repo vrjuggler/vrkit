@@ -1,12 +1,12 @@
 #ifndef WANDINTERFACE_H
 #define WANDINTERFACE_H
 
-#include <OpenSG/VRJ/Viewer/DeviceInterface.h>
+#include <OpenSG/VRJ/Viewer/IOV/DeviceInterface.h>
 #include <gadget/Type/DigitalInterface.h>
 #include <gadget/Type/PositionInterface.h>
 #include <vector>
 
-#include <OpenSG/VRJ/Viewer/WandInterfacePtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
 
 
 namespace inf

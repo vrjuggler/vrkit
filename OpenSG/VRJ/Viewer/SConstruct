@@ -46,7 +46,7 @@ def BuildDarwinEnvironment():
 
    CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions',
                '-Wno-conversion', '-Ddarwin', '-Wno-long-double']
-   LINKFLAGS = []
+   LINKFLAGS = ['-Wl,-bind_at_load']
 
    # Enable profiling?
 #   if profile != 'no':
@@ -102,26 +102,16 @@ if not SConsAddons.Util.hasHelpFlag():
    vrj_options.updateEnv(baseEnv)
    opensg_options.updateEnv(baseEnv)
 
-   app_src = 'infi_app.cpp'
    lib_name = 'iov'
 
    env = baseEnv.Copy()
    env.Prepend(CPPPATH = ['.', pj('..','..','..')])
+   env.Append(LIBPATH = ['IOV'])
+   env.Prepend(LIBS = [lib_name])
 
-   lib_src_files = glob.glob('*.cpp')
-   lib_src_files.remove(app_src)
-   env.SharedLibrary(lib_name, lib_src_files)
+   SConscript(dirs = ['IOV', 'plugins'])
 
-   SConscript(dirs = ['plugins'])
-
-   # XXX: There has to be a better way to do this.
-   if GetPlatform() == 'mac':
-      linkflags = ['-Wl,-bind_at_load']
-   else:
-      linkflags = env['LINKFLAGS']
-
-   env.Program('infi_app', app_src, LIBPATH = env['LIBPATH'] + ['.'],
-               LIBS = [lib_name] + env['LIBS'], LINKFLAGS = linkflags)
+   env.Program('infi_app', glob.glob('*.cpp'))
 
 Help(help_text)
 

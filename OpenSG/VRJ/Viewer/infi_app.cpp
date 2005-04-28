@@ -17,9 +17,9 @@
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
 
-#include <OpenSG/VRJ/Viewer/Viewer.h>
+#include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
+#include <OpenSG/VRJ/Viewer/IOV/User.h>
 
-#include <OpenSG/VRJ/Viewer/User.h>
 
 class OpenSgViewer;
 typedef boost::shared_ptr<OpenSgViewer> OpenSgViewerPtr;

@@ -30,7 +30,7 @@ plugins = [Plugin('SimpleNavPlugin', ['SimpleNavPlugin.cpp'], use_debug),
            Plugin('WandNavPlugin', ['WandNavPlugin.cpp'], use_debug)]
 
 env.Append(CPPPATH = [os.path.join('..', '..', '..', '..')])
-env.Append(LIBPATH = ['..'])
+env.Append(LIBPATH = [os.path.join('..', 'IOV')])
 env.Prepend(LIBS = ['iov'])
 
 for p in plugins:

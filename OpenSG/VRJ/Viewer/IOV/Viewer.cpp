@@ -4,9 +4,9 @@
 #include <vpr/DynLoad/LibraryLoader.h>
 #include <jccl/Config/Configuration.h>
 
-#include <OpenSG/VRJ/Viewer/User.h>
-#include <OpenSG/VRJ/Viewer/Plugin.h>
-#include <OpenSG/VRJ/Viewer/Viewer.h>
+#include <OpenSG/VRJ/Viewer/IOV/User.h>
+#include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
+#include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
 
 
 namespace

@@ -1,10 +1,10 @@
 #ifndef USER_H
 #define USER_H
 
-#include <OpenSG/VRJ/Viewer/UserPtr.h>
-#include <OpenSG/VRJ/Viewer/InterfaceTrader.h>
-#include <OpenSG/VRJ/Viewer/ViewPlatform.h>
-#include <OpenSG/VRJ/Viewer/ViewerPtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/UserPtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/InterfaceTrader.h>
+#include <OpenSG/VRJ/Viewer/IOV/ViewPlatform.h>
+#include <OpenSG/VRJ/Viewer/IOV/ViewerPtr.h>
 
 #include <boost/enable_shared_from_this.hpp>
 

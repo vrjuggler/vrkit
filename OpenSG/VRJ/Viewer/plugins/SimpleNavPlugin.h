@@ -5,8 +5,8 @@
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/VRJ/Viewer/WandInterfacePtr.h>
-#include <OpenSG/VRJ/Viewer/Plugin.h>
+#include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
 #include <OpenSG/VRJ/Viewer/plugins/NavPlugin.h>
 #include <OpenSG/VRJ/Viewer/plugins/SimpleNavPluginPtr.h>
 

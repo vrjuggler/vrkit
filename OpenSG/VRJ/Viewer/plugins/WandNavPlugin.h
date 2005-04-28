@@ -5,7 +5,7 @@
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/VRJ/Viewer/WandInterfacePtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
 
 #include <vpr/Util/Interval.h>
 

@@ -1,7 +1,7 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include <OpenSG/VRJ/Viewer/Config.h>
+#include <OpenSG/VRJ/Viewer/IOV/Config.h>
 
 #ifdef WIN32
 #include <winsock.h>
@@ -15,13 +15,13 @@
 #include <vrj/Kernel/Kernel.h>
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
 
-#include <OpenSG/VRJ/Viewer/ViewerPtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/ViewerPtr.h>
 
-#include <OpenSG/VRJ/Viewer/PluginPtr.h>
-#include <OpenSG/VRJ/Viewer/UserPtr.h>
-#include <OpenSG/VRJ/Viewer/ScenePtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/PluginPtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/UserPtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/ScenePtr.h>
 
-#include <OpenSG/VRJ/Viewer/Scene.h>
+#include <OpenSG/VRJ/Viewer/IOV/Scene.h>
 
 
 namespace inf

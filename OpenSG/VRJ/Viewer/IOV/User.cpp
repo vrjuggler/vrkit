@@ -1,4 +1,4 @@
-#include <OpenSG/VRJ/Viewer/User.h>
+#include <OpenSG/VRJ/Viewer/IOV/User.h>
 
 namespace inf
 {

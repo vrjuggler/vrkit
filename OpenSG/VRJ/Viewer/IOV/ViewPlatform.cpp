@@ -1,6 +1,6 @@
-#include <OpenSG/VRJ/Viewer/ViewPlatform.h>
-#include <OpenSG/VRJ/Viewer/Scene.h>
-#include <OpenSG/VRJ/Viewer/Viewer.h>
+#include <OpenSG/VRJ/Viewer/IOV/ViewPlatform.h>
+#include <OpenSG/VRJ/Viewer/IOV/Scene.h>
+#include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
 
 namespace inf
 {

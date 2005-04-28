@@ -3,7 +3,7 @@
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/VRJ/Viewer/SceneDataPtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/SceneDataPtr.h>
 
 
 namespace inf
