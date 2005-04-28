@@ -30,7 +30,7 @@ public:
     * This is the position of the view platform in the virtual world.
     * vw_M_vp
     */
-   const gmtl::Matrix44f& getCurPos()
+   const gmtl::Matrix44f& getCurPos() const
    {
       return mCurPos;
    }
@@ -44,7 +44,7 @@ public:
    /** Get the inverse of the current position.
     * vp_M_vw
     */
-   const gmtl::Matrix44f& getCurPosInv()
+   const gmtl::Matrix44f& getCurPosInv() const
    {
       return mCurPosInv;
    }
