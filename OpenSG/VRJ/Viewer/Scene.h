@@ -76,6 +76,52 @@ public:
    }
    //@}
 
+   /** @name Accessors for Scene Data */
+   //@{
+   /**
+    * Sets the value for the given key in the collection of scene data.  If
+    * a value is already associated with \c key, then that value is replaced
+    * with \c value.  The previous value is returned to the caller.
+    *
+    * @param key        the key (index) used for storing the given value
+    * @param value      the value to store in the collection of scene data
+    *
+    * @returns A \c inf::SceneDataPtr is returned to the caller.  If the
+    *          collection of scene data already had a value associated with
+    *          \c key, then the old value is returned.  Otherwise, the
+    *          returned object is a NULL shared pointer.
+    */
+   inf::SceneDataPtr setSceneData(const vpr::GUID& key,
+                                  inf::SceneDataPtr value);
+
+   /**
+    * Returns the value in the collection of scene data associated with the
+    * given key.
+    *
+    * @param key        the key (index) of the value to be returned
+    *
+    * @returns A \c inf::SceneDataPtr is returned to the caller.  If the
+    *          collection of scene data has a value associated with \c key,
+    *          then that value is returned.  Otherwise, the returned object
+    *          is a NULL shared pointer.
+    */
+   inf::SceneDataPtr getSceneData(const vpr::GUID& key) const;
+
+   /**
+    * Removes the value in the container of scene data associated with the
+    * given key.  The removed value is returned to the caller.  If there is
+    * no value associated with the given key, then this method has no effect.
+    *
+    * @param key        the key (index) of the value to be removed
+    *
+    * @returns A \c inf::SceneDataPtr is returned to the caller.  If the
+    *          collection of scene data has a value associated with \c key,
+    *          then the old value is returned.  Otherwise, the returned object
+    *          is a NULL shared pointer.
+    */
+   inf::SceneDataPtr removeSceneData(const vpr::GUID& key);
+   //@}
+
 protected:
    Scene()
    {;}
