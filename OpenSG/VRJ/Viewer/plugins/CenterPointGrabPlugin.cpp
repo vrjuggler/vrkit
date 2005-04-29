@@ -2,6 +2,7 @@
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
 #include <gmtl/Vec.h>
+#include <gmtl/External/OpenSGConvert.h>
 
 #include <vpr/vpr.h>
 
@@ -116,8 +117,6 @@ void CenterPointGrabPlugin::init(ViewerPtr viewer)
 
 void CenterPointGrabPlugin::update(ViewerPtr viewer)
 {
-   const gmtl::Matrix44f wand_pos(mWandInterface->getWandPos()->getData());
-
    const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
 
    // cur_pos is the position of the view platform in the virtual world:
@@ -125,14 +124,18 @@ void CenterPointGrabPlugin::update(ViewerPtr viewer)
    const gmtl::Matrix44f& cur_pos(view_platform.getCurPos());
 
    // Get the wand transformation in virtual world coordinates.
+   const gmtl::Matrix44f wand_pos(mWandInterface->getWandPos()->getData());
    const gmtl::Matrix44f wand_xform_vw = cur_pos * wand_pos;
-   const gmtl::Vec3f wand_pos_vw = gmtl::makeTrans<gmtl::Vec3f>(wand_xform_vw);
-   const OSG::Pnt3f wand_point(wand_pos_vw[0], wand_pos_vw[1], wand_pos_vw[2]);
 
    // Perform intersection tests with all the grabbable objects if and only
    // if we are not already grabbing an object.
    if ( ! mGrabbing )
    {
+      const gmtl::Vec3f wand_pos_vw =
+         gmtl::makeTrans<gmtl::Vec3f>(wand_xform_vw);
+      const OSG::Pnt3f wand_point(wand_pos_vw[0], wand_pos_vw[1],
+                                  wand_pos_vw[2]);
+
       inf::CoredTransformPtr intersect_obj;
 
       const GrabData::object_list_t& objects = mGrabData->getObjects();
@@ -237,8 +240,10 @@ void CenterPointGrabPlugin::update(ViewerPtr viewer)
    // Move the grabbed object.
    if ( mGrabbing )
    {
+      osg::Matrix obj_mat;
+      gmtl::set(obj_mat, wand_xform_vw);
       OSG::beginEditCP(mGrabbedObj, OSG::Transform::MatrixFieldMask);
-         mGrabbedObj->getMatrix().setTranslate(wand_point);
+         mGrabbedObj->setMatrix(obj_mat);
       OSG::endEditCP(mGrabbedObj, OSG::Transform::MatrixFieldMask);
    }
 }
