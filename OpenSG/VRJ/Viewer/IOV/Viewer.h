@@ -12,7 +12,6 @@
 
 #include <vpr/vpr.h>
 #include <vpr/DynLoad/Library.h>
-#include <vrj/Kernel/Kernel.h>
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
 
 #include <OpenSG/VRJ/Viewer/IOV/ViewerPtr.h>
@@ -85,10 +84,7 @@ public:
       return mScene;
    }
 
-   void addPlugin(PluginPtr plugin)
-   {
-      mPlugins.push_back(plugin);
-   }
+   void addPlugin(PluginPtr plugin);
 
 public:
    UserPtr      getUser()

@@ -6,71 +6,12 @@
 
 #include <OpenSG/VRJ/Viewer/IOV/User.h>
 #include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
+#include <OpenSG/VRJ/Viewer/IOV/PluginHandler.h>
 #include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
 
 
 namespace
 {
-
-struct VersionCheckCallable
-{
-   VersionCheckCallable()
-   {
-   }
-
-   bool operator()(void* func)
-   {
-      void (*version_func)(vpr::Uint32&, vpr::Uint32&);
-      version_func = (void (*)(vpr::Uint32&, vpr::Uint32&)) func;
-
-      unsigned int major_ver;
-      unsigned int minor_ver;
-      (*version_func)(major_ver, minor_ver);
-
-      // TODO: Now do something with the version info that we got back ...
-
-      return true;
-   }
-
-   static const vpr::Uint32 sPluginMajor;
-   static const vpr::Uint32 sPluginMinor;
-};
-
-const vpr::Uint32 VersionCheckCallable::sPluginMajor(INF_PLUGIN_API_MAJOR);
-const vpr::Uint32 VersionCheckCallable::sPluginMinor(INF_PLUGIN_API_MINOR);
-
-struct PluginCreateCallable
-{
-   PluginCreateCallable(inf::ViewerPtr viewer)
-      : mViewer(viewer)
-   {
-   }
-
-   bool operator()(void* func)
-   {
-      inf::PluginPtr (*create_func)();
-
-      create_func = (inf::PluginPtr (*)()) func;
-      inf::PluginPtr plugin = (*create_func)();
-
-      if ( NULL == plugin.get() )
-      {
-         std::cerr << "Plug-in creation failed." << std::endl;
-      }
-      else
-      {
-         std::cout << "Initializing the plug-in ..." << std::endl;
-         // Initialize the newly loaded plug-in.
-         plugin->init(mViewer);
-
-         mViewer->addPlugin(plugin);
-      }
-
-      return true;
-   }
-
-   inf::ViewerPtr mViewer;
-};
 
 struct ElementRemovePredicate
 {
@@ -157,9 +98,6 @@ void Viewer::init()
          all_elts.erase(std::remove(all_elts.begin(), all_elts.end(), app_cfg),
                         all_elts.end());
 
-         const std::string get_version_func("getPluginInterfaceVersion");
-         const std::string create_func("create");
-
          const unsigned int num_plugins(app_cfg->getNum(plugin_prop));
 
          for ( unsigned int i = 0; i < num_plugins; ++i )
@@ -174,7 +112,8 @@ void Viewer::init()
                VersionCheckCallable version_functor;
 
                vpr::ReturnStatus version_status =
-                  vpr::LibraryLoader::findEntryPoint(dso, get_version_func,
+                  vpr::LibraryLoader::findEntryPoint(dso,
+                                                     PluginHandler::GET_VERSION_FUNC,
                                                      version_functor);
 
                if ( ! version_status.success() )
@@ -184,14 +123,20 @@ void Viewer::init()
                }
                else
                {
-                  PluginCreateCallable create_functor(shared_from_this());
+                  inf::ViewerPtr viewer = shared_from_this();
+                  PluginCreateCallable<ViewerPtr> create_functor(viewer);
 
                   vpr::ReturnStatus create_status =
-                     vpr::LibraryLoader::findEntryPoint(dso, create_func,
+                     vpr::LibraryLoader::findEntryPoint(dso,
+                                                        PluginHandler::CREATE_FUNC,
                                                         create_functor);
 
                   if ( create_status.success() )
                   {
+                     // At this point, the plug-in has been instantiated,
+                     // added to our collection of loaded plug-ins, and
+                     // initialized.
+
                      mLoadedDsos.push_back(dso);
 
                      // The newly created plug-in will be at the end of
@@ -244,6 +189,12 @@ void Viewer::preFrame()
 
    // Update the user (and navigation)
    getUser()->update(shared_from_this());
+}
+
+void Viewer::addPlugin(PluginPtr plugin)
+{
+   plugin->init(shared_from_this());
+   mPlugins.push_back(plugin);
 }
 
 }

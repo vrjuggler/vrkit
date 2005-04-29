@@ -7,6 +7,7 @@
 #include <jccl/Config/ConfigElementPtr.h>
 
 #include <OpenSG/VRJ/Viewer/IOV/ViewerPtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/PluginPtr.h>
 
 #define INF_PLUGIN_API_MAJOR    1
 #define INF_PLUGIN_API_MINOR    0
