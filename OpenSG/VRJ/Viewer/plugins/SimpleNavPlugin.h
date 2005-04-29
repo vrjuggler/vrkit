@@ -30,6 +30,11 @@ public:
       ;
    }
 
+   virtual std::string getDescription()
+   {
+      return std::string("Navigation");
+   }
+
    virtual void init(ViewerPtr viewer);
 
    virtual bool canHandleElement(jccl::ConfigElementPtr elt)

@@ -35,6 +35,11 @@ public:
       /* Do nothing. */ ;
    }
 
+   virtual std::string getDescription()
+   {
+      return std::string("Center Point Grabbing");
+   }
+
    virtual void init(inf::ViewerPtr viewer);
 
    virtual void update(inf::ViewerPtr viewer);

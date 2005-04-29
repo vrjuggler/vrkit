@@ -3,6 +3,7 @@
 
 #include <OpenSG/VRJ/Viewer/IOV/Config.h>
 
+#include <string>
 #include <jccl/Config/ConfigElementPtr.h>
 
 #include <OpenSG/VRJ/Viewer/IOV/ViewerPtr.h>
@@ -21,6 +22,12 @@ class IOV_CLASS_API Plugin
 {
 public:
    virtual ~Plugin();
+
+   /**
+    * Returns a short (two- or three-word) description of this plug-in
+    * suitable for being displayed to the application user.
+    */
+   virtual std::string getDescription() = 0;
 
    virtual void init(inf::ViewerPtr viewer) = 0;
 

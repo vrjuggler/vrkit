@@ -32,6 +32,11 @@ public:
       ;
    }
 
+   virtual std::string getDescription()
+   {
+      return std::string("Navigation");
+   }
+
    virtual void init(ViewerPtr viewer);
 
    /**
