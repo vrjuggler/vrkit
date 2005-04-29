@@ -29,7 +29,8 @@ use_debug = (optimize != 'yes')
 plugins = [Plugin('SimpleNavPlugin', ['SimpleNavPlugin.cpp'], use_debug),
            Plugin('WandNavPlugin', ['WandNavPlugin.cpp'], use_debug),
            Plugin('CenterPointGrabPlugin', ['CenterPointGrabPlugin.cpp'],
-                  use_debug)
+                  use_debug),
+           Plugin('ModeSwitchPlugin', ['ModeSwitchPlugin.cpp'], use_debug)
           ]
 
 env.Append(CPPPATH = [os.path.join('..', '..', '..', '..')])
