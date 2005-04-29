@@ -65,7 +65,7 @@ private:
 
    static std::string getElementType()
    {
-      return std::string("center_point_grab_plugin");
+      return std::string("point_grab_plugin");
    }
 
    const int GRAB_BUTTON;
