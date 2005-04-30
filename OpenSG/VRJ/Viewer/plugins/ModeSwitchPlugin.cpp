@@ -6,9 +6,12 @@
 #include <OpenSG/VRJ/Viewer/IOV/User.h>
 #include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
+#include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
 #include <OpenSG/VRJ/Viewer/IOV/PluginHandler.h>
 #include <OpenSG/VRJ/Viewer/plugins/ModeSwitchPlugin.h>
 
+
+static inf::PluginCreator sPluginCreator("Mode Switch Plug-in");
 
 extern "C"
 {
@@ -22,9 +25,10 @@ IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginPtr) create()
+IOV_PLUGIN_API(inf::PluginCreator*) create()
 {
-   return inf::ModeSwitchPlugin::create();
+   sPluginCreator.setPlugin(inf::ModeSwitchPlugin::create());
+   return &sPluginCreator;
 }
 //@}
 

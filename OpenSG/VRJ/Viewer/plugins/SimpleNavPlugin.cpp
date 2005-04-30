@@ -11,10 +11,13 @@
 
 #include <OpenSG/VRJ/Viewer/IOV/InterfaceTrader.h>
 #include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
+#include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
 #include <OpenSG/VRJ/Viewer/IOV/User.h>
 #include <OpenSG/VRJ/Viewer/plugins/SimpleNavPlugin.h>
 
+
+static inf::PluginCreator sPluginCreator("Simple Navigator Plug-in");
 
 extern "C"
 {
@@ -27,9 +30,10 @@ IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer, vpr::Uint3
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginPtr) create()
+IOV_PLUGIN_API(inf::PluginCreator*) create()
 {
-   return inf::SimpleNavPlugin::create();
+   sPluginCreator.setPlugin(inf::SimpleNavPlugin::create());
+   return &sPluginCreator;
 }
 //@}
 

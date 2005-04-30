@@ -8,6 +8,7 @@
 #include <vpr/vpr.h>
 
 #include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
+#include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
 
 
 namespace inf
@@ -60,10 +61,11 @@ struct PluginCreateCallable
     */
    bool operator()(void* func)
    {
-      inf::PluginPtr (*create_func)();
+      inf::PluginCreator* (*create_func)();
 
-      create_func = (inf::PluginPtr (*)()) func;
-      inf::PluginPtr plugin = (*create_func)();
+      create_func = (inf::PluginCreator* (*)()) func;
+      inf::PluginCreator* creator = (*create_func)();
+      inf::PluginPtr plugin = creator->getPlugin();
 
       if ( NULL == plugin.get() )
       {
