@@ -50,7 +50,30 @@ public:
     */
    virtual bool config(jccl::ConfigElementPtr elt) = 0;
 
+#ifdef WIN32
+   /**
+    * Overlaod delete so that we can delete our memory correctly.  This is
+    * necessary for DLLs on Win32 to release memory from the correct memory
+    * space.  All subclasses must overload delete similarly.
+    */
+   void operator delete(void* p)
+   {
+      if ( NULL != p )
+      {
+         Plugin* plugin_ptr = static_cast<Plugin*>(p);
+         plugin_ptr->destroy();
+      }
+   }
+#endif
+
 protected:
+   /**
+    * Subclasses must implement this so that dynamically loaded plug-ins
+    * delete themselves in the correct memory space.  This uses a template
+    * pattern.
+    */
+   virtual void destroy() = 0;
+
    Plugin();
 };
 

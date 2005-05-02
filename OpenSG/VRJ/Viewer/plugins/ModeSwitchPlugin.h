@@ -45,7 +45,25 @@ public:
 
    void addPlugin(inf::PluginPtr plugin);
 
+   /**
+    * Invokes the global scope delete operator.  This is required for proper
+    * releasing of memory in DLLs on Win32.
+    */
+   void operator delete(void* p)
+   {
+      ::operator delete(p);
+   }
+
 protected:
+   /**
+    * Deletes this object.  This is an implementation of the pure virtual
+    * inf::Plugin::destroy() method.
+    */
+   virtual void destroy()
+   {
+      delete this;
+   }
+
    ModeSwitchPlugin()
       : SWITCH_BUTTON(3)
       , mCurrentMode(0)
