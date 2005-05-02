@@ -17,7 +17,8 @@
 #include <OpenSG/VRJ/Viewer/plugins/PointGrabPlugin.h>
 
 
-static inf::PluginCreator sPluginCreator("Point Grab Plug-in");
+static inf::PluginCreator sPluginCreator(&inf::PointGrabPlugin::create,
+                                         "Point Grab Plug-in");
 
 extern "C"
 {
@@ -31,9 +32,8 @@ IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreator*) create()
+IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
 {
-   sPluginCreator.setPlugin(inf::PointGrabPlugin::create());
    return &sPluginCreator;
 }
 //@}

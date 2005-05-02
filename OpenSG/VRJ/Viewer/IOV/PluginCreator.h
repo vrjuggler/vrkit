@@ -4,6 +4,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/Config.h>
 
 #include <string>
+#include <boost/function.hpp>
 #include <vpr/vpr.h>
 
 #include <OpenSG/VRJ/Viewer/IOV/PluginPtr.h>
@@ -15,21 +16,17 @@ namespace inf
 class IOV_CLASS_API PluginCreator
 {
 public:
-   PluginCreator(const std::string& pluginName,
+   PluginCreator(boost::function<inf::PluginPtr ()> creator,
+                 const std::string& pluginName,
                  const vpr::Uint32 pluginMajorVer = 1,
                  const vpr::Uint32 pluginMinorVer = 0,
                  const vpr::Uint32 pluginPatchVer = 0);
 
    ~PluginCreator();
 
-   void setPlugin(inf::PluginPtr plugin)
+   inf::PluginPtr createPlugin() const
    {
-      mPluginPtr = plugin;
-   }
-
-   inf::PluginPtr getPlugin() const
-   {
-      return mPluginPtr;
+      return mCreator();
    }
 
    const std::string& getPluginName() const
@@ -58,14 +55,14 @@ public:
    }
 
 private:
+   boost::function<inf::PluginPtr ()> mCreator;
+
    std::string mPluginName;
 
    vpr::Uint32 mPluginMajorVer;
    vpr::Uint32 mPluginMinorVer;
    vpr::Uint32 mPluginPatchVer;
    std::string mPluginVersionStr;
-
-   inf::PluginPtr mPluginPtr;
 };
 
 }

@@ -11,7 +11,8 @@
 #include <OpenSG/VRJ/Viewer/plugins/ModeSwitchPlugin.h>
 
 
-static inf::PluginCreator sPluginCreator("Mode Switch Plug-in");
+static inf::PluginCreator sPluginCreator(&inf::ModeSwitchPlugin::create,
+                                         "Mode Switch Plug-in");
 
 extern "C"
 {
@@ -25,9 +26,8 @@ IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreator*) create()
+IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
 {
-   sPluginCreator.setPlugin(inf::ModeSwitchPlugin::create());
    return &sPluginCreator;
 }
 //@}
@@ -110,11 +110,11 @@ bool ModeSwitchPlugin::config(jccl::ConfigElementPtr elt)
 
          if ( dso.get() != NULL )
          {
+            const std::string get_ver_func(PluginHandler::GET_VERSION_FUNC);
             VersionCheckCallable version_functor;
 
             vpr::ReturnStatus version_status =
-               vpr::LibraryLoader::findEntryPoint(dso,
-                                                  PluginHandler::GET_VERSION_FUNC,
+               vpr::LibraryLoader::findEntryPoint(dso, get_ver_func,
                                                   version_functor);
 
             if ( ! version_status.success() )
@@ -124,12 +124,12 @@ bool ModeSwitchPlugin::config(jccl::ConfigElementPtr elt)
             }
             else
             {
+               const std::string get_creator_func(PluginHandler::GET_CREATOR_FUNC);
                inf::ModeSwitchPluginPtr handler = shared_from_this();
                PluginCreateCallable<ModeSwitchPluginPtr> create_functor(handler);
 
                vpr::ReturnStatus create_status =
-                  vpr::LibraryLoader::findEntryPoint(dso,
-                                                     PluginHandler::CREATE_FUNC,
+                  vpr::LibraryLoader::findEntryPoint(dso, get_creator_func,
                                                      create_functor);
 
                if ( create_status.success() )

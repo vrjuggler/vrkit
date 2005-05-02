@@ -109,11 +109,11 @@ void Viewer::init()
 
             if ( dso.get() != NULL )
             {
+               const std::string get_ver_func(PluginHandler::GET_VERSION_FUNC);
                VersionCheckCallable version_functor;
 
                vpr::ReturnStatus version_status =
-                  vpr::LibraryLoader::findEntryPoint(dso,
-                                                     PluginHandler::GET_VERSION_FUNC,
+                  vpr::LibraryLoader::findEntryPoint(dso, get_ver_func,
                                                      version_functor);
 
                if ( ! version_status.success() )
@@ -123,12 +123,12 @@ void Viewer::init()
                }
                else
                {
+                  const std::string get_creator_func(PluginHandler::GET_CREATOR_FUNC);
                   inf::ViewerPtr viewer = shared_from_this();
                   PluginCreateCallable<ViewerPtr> create_functor(viewer);
 
                   vpr::ReturnStatus create_status =
-                     vpr::LibraryLoader::findEntryPoint(dso,
-                                                        PluginHandler::CREATE_FUNC,
+                     vpr::LibraryLoader::findEntryPoint(dso, get_creator_func,
                                                         create_functor);
 
                   if ( create_status.success() )

@@ -18,7 +18,7 @@ class IOV_CLASS_API PluginHandler
 {
 public:
    static const std::string GET_VERSION_FUNC;
-   static const std::string CREATE_FUNC;
+   static const std::string GET_CREATOR_FUNC;
 };
 
 class IOV_CLASS_API VersionCheckCallable
@@ -61,11 +61,11 @@ struct PluginCreateCallable
     */
    bool operator()(void* func)
    {
-      inf::PluginCreator* (*create_func)();
+      inf::PluginCreator* (*get_creator_func)();
 
-      create_func = (inf::PluginCreator* (*)()) func;
-      inf::PluginCreator* creator = (*create_func)();
-      inf::PluginPtr plugin = creator->getPlugin();
+      get_creator_func = (inf::PluginCreator* (*)()) func;
+      inf::PluginCreator* creator = (*get_creator_func)();
+      inf::PluginPtr plugin = creator->createPlugin();
 
       if ( NULL == plugin.get() )
       {

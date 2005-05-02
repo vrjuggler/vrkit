@@ -17,7 +17,8 @@
 #include <OpenSG/VRJ/Viewer/plugins/CenterPointGrabPlugin.h>
 
 
-static inf::PluginCreator sPluginCreator("Center Point Grab Plug-in");
+static inf::PluginCreator sPluginCreator(&inf::CenterPointGrabPlugin::create,
+                                         "Center Point Grab Plug-in");
 
 extern "C"
 {
@@ -31,9 +32,8 @@ IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreator*) create()
+IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
 {
-   sPluginCreator.setPlugin(inf::CenterPointGrabPlugin::create());
    return &sPluginCreator;
 }
 //@}

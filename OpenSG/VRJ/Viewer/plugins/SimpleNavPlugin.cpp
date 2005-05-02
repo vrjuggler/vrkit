@@ -17,7 +17,8 @@
 #include <OpenSG/VRJ/Viewer/plugins/SimpleNavPlugin.h>
 
 
-static inf::PluginCreator sPluginCreator("Simple Navigator Plug-in");
+static inf::PluginCreator sPluginCreator(&inf::SimpleNavPlugin::create,
+                                         "Simple Navigator Plug-in");
 
 extern "C"
 {
@@ -30,9 +31,8 @@ IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer, vpr::Uint3
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreator*) create()
+IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
 {
-   sPluginCreator.setPlugin(inf::SimpleNavPlugin::create());
    return &sPluginCreator;
 }
 //@}
