@@ -208,9 +208,9 @@ void CenterPointGrabPlugin::updateState(ViewerPtr viewer)
       mWandInterface->getButton(GRAB_BUTTON);
 
    // If we are intersecting an object but not grabbing it and the grab
-   // button is pressed, grab the intersected object.
+   // button has just been pressed, grab the intersected object.
    if ( mIntersecting && ! mGrabbing &&
-        grab_button->getData() == gadget::Digital::ON )
+        grab_button->getData() == gadget::Digital::TOGGLE_ON )
    {
       mGrabbing   = true;
       mGrabbedObj = mIntersectedObj;
@@ -221,8 +221,9 @@ void CenterPointGrabPlugin::updateState(ViewerPtr viewer)
       OSG::endEditCP(mHighlightMaterial,
                      OSG::SimpleMaterial::DiffuseFieldMask);
    }
-   // If the grab button is not pressed, then we cannot be grabbing anything.
-   else if ( grab_button->getData() != gadget::Digital::ON )
+   // If we are grabbing an object and the grab button has just been pressed
+   // again, release the grabbed object.
+   else if ( mGrabbing && grab_button->getData() != gadget::Digital::TOGGLE_ON )
    {
       mGrabbing = false;
 
