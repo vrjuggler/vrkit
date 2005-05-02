@@ -23,7 +23,8 @@ def BuildLinuxEnvironment():
    "Builds a base environment for other modules to build on set up for linux"
    env = Environment( ENV=os.environ)
 
-   CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions', '-Wno-conversion']
+   CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions', '-Wunused',
+               '-Wno-conversion']
    LINKFLAGS = []
    LIBPATH = []
 
@@ -44,7 +45,7 @@ def BuildDarwinEnvironment():
    "Builds a base environment for other modules to build on set up for Darwin"
    global optimize, profile, builders
 
-   CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions',
+   CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions', '-Wunused',
                '-Wno-conversion', '-Ddarwin', '-Wno-long-double']
    LINKFLAGS = []
 
