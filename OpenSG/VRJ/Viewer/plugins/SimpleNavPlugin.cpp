@@ -179,18 +179,19 @@ void SimpleNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
                gmtl::Vec3f z_dir = gmtl::Vec3f(0.0f, 0.0f, -mVelocity);
                gmtl::Vec3f trans = wand_mat * z_dir;
 
-               // If we are in walk mode, we have to clamp the Y translation
-               // value to the "ground."
-               if ( mNavMode == WALK )
-               {
-                  trans[1] = 0.0f;
-               }
-
                gmtl::Matrix44f trans_mat;
                gmtl::setTrans(trans_mat, trans);
 
                // vw_M_vp = vw_M_vp * vp_M_vp'
                cur_pos = cur_pos * trans_mat;
+
+               // If we are in walk mode, we have to clamp the Y translation
+               // value to the "ground."
+               if ( mNavMode == WALK )
+               {
+                  // Remember that GMTL matrices are column-major.
+                  cur_pos[1][3] = 0.0f;
+               }
             }
             break;
          default:
