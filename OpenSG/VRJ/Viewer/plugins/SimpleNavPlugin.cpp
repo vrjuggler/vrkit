@@ -14,6 +14,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
 #include <OpenSG/VRJ/Viewer/IOV/User.h>
+#include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
 #include <OpenSG/VRJ/Viewer/plugins/SimpleNavPlugin.h>
 
 
@@ -47,9 +48,9 @@ SimpleNavPlugin::SimpleNavPlugin()
    , mNavState(RESET)
    , mVelocity(0.0f)
    , mNavMode(WALK)
-   , ACCEL_BUTTON(0)
-   , ROTATE_BUTTON(1)
-   , MODE_BUTTON(2)
+   , ACCEL_BUTTON(inf::buttons::NAV_GO_BUTTON)
+   , ROTATE_BUTTON(inf::buttons::NAV_ROTATE_BUTTON)
+   , MODE_BUTTON(inf::buttons::NAV_TOGGLE_BUTTON)
 {
    mCanNavigate = isFocused();
 }

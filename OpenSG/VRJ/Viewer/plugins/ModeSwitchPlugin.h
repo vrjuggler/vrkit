@@ -12,6 +12,7 @@
 
 #include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
+#include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
 #include <OpenSG/VRJ/Viewer/plugins/ModeSwitchPluginPtr.h>
 
 
@@ -67,7 +68,7 @@ protected:
    }
 
    ModeSwitchPlugin()
-      : SWITCH_BUTTON(3)
+      : SWITCH_BUTTON(inf::buttons::MODE_SWITCH_BUTTON)
       , mCurrentMode(0)
    {
       /* Do nothing. */ ;

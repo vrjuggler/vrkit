@@ -12,6 +12,7 @@
 
 #include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
+#include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
 #include <OpenSG/VRJ/Viewer/plugins/CenterPointGrabPluginPtr.h>
 
 
@@ -70,7 +71,7 @@ protected:
    }
 
    CenterPointGrabPlugin()
-      : GRAB_BUTTON(0)
+      : GRAB_BUTTON(inf::buttons::GRAB_TOGGLE_BUTTON)
       , mIntersecting(false)
       , mGrabbing(false)
       , mIntersectColor(1.0f, 1.0f, 0.0f)

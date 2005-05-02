@@ -14,6 +14,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
 #include <OpenSG/VRJ/Viewer/IOV/User.h>
+#include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
 #include <OpenSG/VRJ/Viewer/plugins/WandNavPlugin.h>
 
 
@@ -50,9 +51,9 @@ WandNavPlugin::WandNavPlugin()
    , mMaxVelocity(0.5f)
    , mAcceleration(0.005f)
    , mNavMode(WALK)
-   , ACCEL_BUTTON(0)
-   , ROTATE_BUTTON(1)
-   , MODE_BUTTON(2)
+   , ACCEL_BUTTON(inf::buttons::NAV_GO_BUTTON)
+   , ROTATE_BUTTON(inf::buttons::NAV_ROTATE_BUTTON)
+   , MODE_BUTTON(inf::buttons::NAV_TOGGLE_BUTTON)
 {
    mCanNavigate = isFocused();
 }
