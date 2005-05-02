@@ -141,6 +141,12 @@
 				RelativePath="..\..\Iov\Plugin.cpp">
 			</File>
 			<File
+				RelativePath="..\..\Iov\PluginCreator.cpp">
+			</File>
+			<File
+				RelativePath="..\..\Iov\PluginHandler.cpp">
+			</File>
+			<File
 				RelativePath="..\..\Iov\Scene.cpp">
 			</File>
 			<File
@@ -185,6 +191,12 @@
 			</File>
 			<File
 				RelativePath="..\..\Iov\Plugin.h">
+			</File>
+			<File
+				RelativePath="..\..\Iov\PluginCreator.h">
+			</File>
+			<File
+				RelativePath="..\..\Iov\PluginHandler.h">
 			</File>
 			<File
 				RelativePath="..\..\Iov\PluginPtr.h">
