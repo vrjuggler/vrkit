@@ -74,6 +74,13 @@ protected:
       delete this;
    }
 
+   enum NavState
+   {
+      RESET,
+      TRANSLATE,
+      ROTATE
+   };
+
    /** Navigation mode. */
    enum NavMode
    {
@@ -81,21 +88,13 @@ protected:
       FLY       /**< Fly mode */
    };
 
-   WandNavPlugin()
-      : mLastFrameTime(0, vpr::Interval::Sec)
-      , mVelocity(0.0f)
-      , mMaxVelocity(0.5f)
-      , mAcceleration(0.005f)
-      , mNavMode(WALK)
-      , ACCEL_BUTTON(0)
-      , STOP_BUTTON(1)
-      , ROTATE_BUTTON(2)
-      , MODE_BUTTON(3)
-   {
-      ;
-   }
+   WandNavPlugin();
 
-   virtual void updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
+   virtual void focusChanged();
+
+   virtual void updateNavState(ViewerPtr viewer, ViewPlatform& viewPlatform);
+
+   virtual void runNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
    static std::string getElementType()
    {
@@ -105,6 +104,9 @@ protected:
    vpr::Interval mLastFrameTime;
 
    WandInterfacePtr mWandInterface;
+
+   bool mCanNavigate;
+   NavState mNavState;
 
    float mVelocity;
    float mMaxVelocity;

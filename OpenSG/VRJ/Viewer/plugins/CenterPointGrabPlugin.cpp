@@ -119,7 +119,7 @@ void CenterPointGrabPlugin::init(ViewerPtr viewer)
    mCoredHighlightNode = inf::CoredGeomPtr(geo);
 }
 
-void CenterPointGrabPlugin::update(ViewerPtr viewer)
+void CenterPointGrabPlugin::updateState(ViewerPtr viewer)
 {
    const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
 
@@ -240,10 +240,23 @@ void CenterPointGrabPlugin::update(ViewerPtr viewer)
          mGrabbedObj = sEmptyCoredXformNode;
       }
    }
+}
 
+void CenterPointGrabPlugin::run(inf::ViewerPtr viewer)
+{
    // Move the grabbed object.
    if ( mGrabbing )
    {
+      const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
+
+      // cur_pos is the position of the view platform in the virtual world:
+      // vw_M_vp
+      const gmtl::Matrix44f& cur_pos(view_platform.getCurPos());
+
+      // Get the wand transformation in virtual world coordinates.
+      const gmtl::Matrix44f wand_pos(mWandInterface->getWandPos()->getData());
+      const gmtl::Matrix44f wand_xform_vw = cur_pos * wand_pos;
+
       osg::Matrix obj_mat;
       gmtl::set(obj_mat, wand_xform_vw);
       OSG::beginEditCP(mGrabbedObj, OSG::Transform::MatrixFieldMask);

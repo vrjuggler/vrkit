@@ -18,6 +18,7 @@ Plugin::~Plugin()
 // important to ensure that polymorphic types are compiled into the correct
 // place.
 Plugin::Plugin()
+   : mIsFocused(false)
 {
    /* Do nothing. */ ;
 }

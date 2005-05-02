@@ -16,9 +16,14 @@ public:
       /* Do nothing. */ ;
    }
 
-   void update(inf::ViewerPtr viewer)
+   void updateState(inf::ViewerPtr viewer)
    {
-      updateNav(viewer, viewer->getUser()->getViewPlatform());
+      updateNavState(viewer, viewer->getUser()->getViewPlatform());
+   }
+
+   void run(inf::ViewerPtr viewer)
+   {
+      runNav(viewer, viewer->getUser()->getViewPlatform());
    }
 
 protected:
@@ -31,8 +36,11 @@ protected:
     * Template method pattern interface used for navigation strategies to
     * update themselves.
     */
-   virtual void updateNav(inf::ViewerPtr viewer,
-                          inf::ViewPlatform& viewPlatform) = 0;
+   virtual void updateNavState(inf::ViewerPtr viewer,
+                               inf::ViewPlatform& viewPlatform) = 0;
+
+   virtual void runNav(inf::ViewerPtr viewer,
+                       inf::ViewPlatform& viewPlatform) = 0;
 };
 
 

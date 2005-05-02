@@ -32,7 +32,23 @@ public:
 
    virtual void init(inf::ViewerPtr viewer) = 0;
 
-   virtual void update(inf::ViewerPtr viewer) = 0;
+   /**
+    * Tells this plug-in to update its state, which generally means that it
+    * should do whatever it needs to do before run() is invoked.
+    *
+    * @pre This plug-in has focus.
+    */
+   virtual void updateState(inf::ViewerPtr viewer) = 0;
+
+   /**
+    * Tells this plug-in that it can perform its specific action(s) based on
+    * its current state.  The state of this plug-in may or may not have been
+    * updated depending on its focus, but this method will be invoked
+    * regardless of the focus state.
+    *
+    * @see updateState(), setFocused()
+    */
+   virtual void run(inf::ViewerPtr viewer) = 0;
 
    virtual bool canHandleElement(jccl::ConfigElementPtr elt) = 0;
 
@@ -49,6 +65,23 @@ public:
     *         config element has not been consumed.
     */
    virtual bool config(jccl::ConfigElementPtr elt) = 0;
+
+   bool isFocused() const
+   {
+      return mIsFocused;
+   }
+
+   /**
+    * Changes the focus state of this plug-in.
+    */
+   void setFocused(const bool focused)
+   {
+      if ( mIsFocused != focused )
+      {
+         mIsFocused = focused;
+         focusChanged();
+      }
+   }
 
 #ifdef WIN32
    /**
@@ -75,6 +108,13 @@ protected:
    virtual void destroy() = 0;
 
    Plugin();
+
+   virtual void focusChanged()
+   {
+      /* Do nothing. */ ;
+   }
+
+   bool mIsFocused;
 };
 
 }

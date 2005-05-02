@@ -163,24 +163,54 @@ bool ModeSwitchPlugin::config(jccl::ConfigElementPtr elt)
    return status;
 }
 
-void ModeSwitchPlugin::update(inf::ViewerPtr viewer)
+void ModeSwitchPlugin::updateState(inf::ViewerPtr viewer)
 {
    gadget::DigitalInterface& switch_button =
       mWandInterface->getButton(SWITCH_BUTTON);
 
    if ( switch_button->getData() == gadget::Digital::TOGGLE_ON )
    {
+      const int old_mode(mCurrentMode);
       mCurrentMode = (mCurrentMode + 1) % mPlugins.size();
+
+      if ( ! mPlugins.empty() )
+      {
+         mPlugins[old_mode]->setFocused(false);
+         mPlugins[mCurrentMode]->setFocused(true);
+         std::cout << getDescription() << std::endl;
+      }
    }
 
    if ( ! mPlugins.empty() )
    {
-      mPlugins[mCurrentMode]->update(viewer);
+      mPlugins[mCurrentMode]->updateState(viewer);
+   }
+}
+
+void ModeSwitchPlugin::run(inf::ViewerPtr viewer)
+{
+   std::vector<PluginPtr>::iterator i;
+   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   {
+      (*i)->run(viewer);
    }
 }
 
 void ModeSwitchPlugin::addPlugin(inf::PluginPtr plugin)
 {
+   // If this is the first plug-in being added, then it will be the one to
+   // get focus.
+   if ( mPlugins.empty() )
+   {
+      plugin->setFocused(true);
+   }
+   // Otherwise, all other plug-ins remain unfocused until a plug-in switch
+   // is performed.
+   else
+   {
+      plugin->setFocused(false);
+   }
+
    plugin->init(mViewer);
    mPlugins.push_back(plugin);
 }

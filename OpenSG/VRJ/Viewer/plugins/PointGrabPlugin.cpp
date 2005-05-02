@@ -119,7 +119,7 @@ void PointGrabPlugin::init(ViewerPtr viewer)
    mCoredHighlightNode = inf::CoredGeomPtr(geo);
 }
 
-void PointGrabPlugin::update(ViewerPtr viewer)
+void PointGrabPlugin::updateState(ViewerPtr viewer)
 {
    const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
 
@@ -254,10 +254,23 @@ void PointGrabPlugin::update(ViewerPtr viewer)
          gmtl::identity(m_wand_M_obj);
       }
    }
+}
 
+void PointGrabPlugin::run(inf::ViewerPtr viewer)
+{
    // Move the grabbed object.
    if ( mGrabbing )
    {
+      const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
+
+      // vw_M_vp is the current position of the view platform in the virtual
+      // world.
+      const gmtl::Matrix44f& vw_M_vp(view_platform.getCurPos());
+
+      // Get the wand transformation in virtual world coordinates.
+      const gmtl::Matrix44f vp_M_wand(mWandInterface->getWandPos()->getData());
+      const gmtl::Matrix44f vw_M_wand = vw_M_vp * vp_M_wand;
+
       gmtl::Matrix44f cur_obj_mat;
       gmtl::set(cur_obj_mat, mGrabbedObj->getMatrix());
       gmtl::Matrix44f new_obj_mat = vw_M_wand * m_wand_M_obj;

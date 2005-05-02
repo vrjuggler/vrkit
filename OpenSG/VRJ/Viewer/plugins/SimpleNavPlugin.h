@@ -66,6 +66,13 @@ protected:
       delete this;
    }
 
+   enum NavState
+   {
+      RESET,
+      TRANSLATE,
+      ROTATE
+   };
+
    /** Navigation mode. */
    enum NavMode
    {
@@ -73,20 +80,18 @@ protected:
       FLY       /**< Fly mode */
    };
 
-   SimpleNavPlugin()
-      : mVelocity(0.0f)
-      , mNavMode(WALK)
-      , ACCEL_BUTTON(0)
-      , STOP_BUTTON(1)
-      , ROTATE_BUTTON(2)
-      , MODE_BUTTON(3)
-   {
-      ;
-   }
+   SimpleNavPlugin();
 
-   virtual void updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
+   virtual void focusChanged();
+
+   virtual void updateNavState(ViewerPtr viewer, ViewPlatform& viewPlatform);
+
+   virtual void runNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
    WandInterfacePtr mWandInterface;
+
+   bool mCanNavigate;
+   NavState mNavState;
 
    float mVelocity;
    NavMode mNavMode;

@@ -182,9 +182,19 @@ void Viewer::init()
 void Viewer::preFrame()
 {
    std::vector<inf::PluginPtr>::iterator i;
+
+   // First, we update the state of each plug-in.  All plug-ins will get a
+   // consistent view of the run-time state of the system before being run.
    for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
-      (*i)->update(shared_from_this());
+      (*i)->updateState(shared_from_this());
+   }
+
+   // Then, we tell each plug-in to do its thing.  Any given plug-in may
+   // change the state of the system as a result of performing its task(s).
+   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   {
+      (*i)->run(shared_from_this());
    }
 
    // Update the user (and navigation)
@@ -193,6 +203,7 @@ void Viewer::preFrame()
 
 void Viewer::addPlugin(PluginPtr plugin)
 {
+   plugin->setFocused(true);
    plugin->init(shared_from_this());
    mPlugins.push_back(plugin);
 }

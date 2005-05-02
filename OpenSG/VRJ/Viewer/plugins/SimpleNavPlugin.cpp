@@ -42,13 +42,38 @@ IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
 namespace inf
 {
 
+SimpleNavPlugin::SimpleNavPlugin()
+   : mCanNavigate(false)
+   , mNavState(RESET)
+   , mVelocity(0.0f)
+   , mNavMode(WALK)
+   , ACCEL_BUTTON(0)
+   , STOP_BUTTON(1)
+   , ROTATE_BUTTON(2)
+   , MODE_BUTTON(3)
+{
+   mCanNavigate = isFocused();
+}
+
 void SimpleNavPlugin::init(ViewerPtr viewer)
 {
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
 }
 
-void SimpleNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
+void SimpleNavPlugin::focusChanged()
+{
+   // We can only navigate when we have focus.
+   mCanNavigate = isFocused();
+
+   if ( ! mCanNavigate )
+   {
+      mVelocity = 0.0f;
+   }
+}
+
+void SimpleNavPlugin::updateNavState(ViewerPtr viewer,
+                                     ViewPlatform& viewPlatform)
 {
    vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
 
@@ -97,63 +122,91 @@ void SimpleNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
                 << std::endl;
    }
 
-   gmtl::Matrix44f cur_pos = viewPlatform.getCurPos();
-
    // If the accelerate button and the rotate button are pressed together,
    // then reset to the starting point translation and rotation.
    if ( accel_button->getData() && rotate_button->getData() )
    {
-      mVelocity = 0.0f;
-      gmtl::identity(cur_pos);
+      mNavState = RESET;
    }
-   // Handle rotations.
    else if ( rotate_button->getData() == gadget::Digital::ON )
    {
-      gmtl::Matrix44f rot_mat(mWandInterface->getWandPos()->getData());
-      gmtl::setTrans(rot_mat, gmtl::Vec3f(0.0f, 0.0f, 0.0f));
-
-      if ( gmtl::MAT_IDENTITY44F != rot_mat )
-      {
-         float y_rot = gmtl::makeYRot(rot_mat);
-         gmtl::Quatf goal_quat(0.0f, 1.0f, 0.0f, y_rot);
-
-         gmtl::Quatf source_quat;
-         gmtl::Quatf slerp_quat;
-         // XXX: This needs to be time-based rotation.  This value of 0.005f
-         // is to compensate for a high frame rate with a simple test model.
-         gmtl::slerp(slerp_quat, 0.005f, source_quat, goal_quat);
-
-         gmtl::Matrix44f rot_xform;
-         gmtl::set(rot_xform, slerp_quat);
-         gmtl::postMult(cur_pos, rot_xform);
-      }
+      mNavState = ROTATE;
    }
-   // Travel in model
    else
    {
-      // - Find forward direction of wand (negative z)
-      // - Translate along that direction
-      // Get the wand matrix
-      // - Translation is in the real world (virtual platform) coordinate
-      //   system
-      gmtl::Matrix44f wand_mat(mWandInterface->getWandPos()->getData());
-      gmtl::Vec3f z_dir = gmtl::Vec3f(0.0f, 0.0f, -mVelocity);
-      gmtl::Vec3f trans = wand_mat * z_dir;
+      mNavState = TRANSLATE;
+   }
+}
 
-      // If we are in walk mode, we have to clamp the Y translation value to
-      // the "ground."
-      if ( mNavMode == WALK )
+void SimpleNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
+{
+   if ( mCanNavigate )
+   {
+      gmtl::Matrix44f cur_pos = viewPlatform.getCurPos();
+
+      switch ( mNavState )
       {
-         trans[1] = 0.0f;
+         case RESET:
+            mVelocity = 0.0f;
+            gmtl::identity(cur_pos);
+            break;
+         // Handle rotations.
+         case ROTATE:
+            {
+               gmtl::Matrix44f rot_mat(mWandInterface->getWandPos()->getData());
+               gmtl::setTrans(rot_mat, gmtl::Vec3f(0.0f, 0.0f, 0.0f));
+
+               if ( gmtl::MAT_IDENTITY44F != rot_mat )
+               {
+                  float y_rot = gmtl::makeYRot(rot_mat);
+                  gmtl::Quatf goal_quat(0.0f, 1.0f, 0.0f, y_rot);
+
+                  gmtl::Quatf source_quat;
+                  gmtl::Quatf slerp_quat;
+                  // XXX: This needs to be time-based rotation.  This value of
+                  // 0.005f is to compensate for a high frame rate with a
+                  // simple test model.
+                  gmtl::slerp(slerp_quat, 0.005f, source_quat, goal_quat);
+
+                  gmtl::Matrix44f rot_xform;
+                  gmtl::set(rot_xform, slerp_quat);
+                  gmtl::postMult(cur_pos, rot_xform);
+               }
+            }
+            break;
+         // Travel in model.
+         case TRANSLATE:
+            {
+               // - Find forward direction of wand (negative z)
+               // - Translate along that direction
+               // Get the wand matrix
+               // - Translation is in the real world (virtual platform)
+               //   coordinate system
+               gmtl::Matrix44f wand_mat(mWandInterface->getWandPos()->getData());
+               gmtl::Vec3f z_dir = gmtl::Vec3f(0.0f, 0.0f, -mVelocity);
+               gmtl::Vec3f trans = wand_mat * z_dir;
+
+               // If we are in walk mode, we have to clamp the Y translation
+               // value to the "ground."
+               if ( mNavMode == WALK )
+               {
+                  trans[1] = 0.0f;
+               }
+
+               gmtl::Matrix44f trans_mat;
+               gmtl::setTrans(trans_mat, trans);
+
+               // vw_M_vp = vw_M_vp * vp_M_vp'
+               cur_pos = cur_pos * trans_mat;
+            }
+            break;
+         default:
+            vprASSERT(false && "Bad value in mNavState");
+            break;
       }
 
-      gmtl::Matrix44f trans_mat;
-      gmtl::setTrans(trans_mat, trans);
-
-      cur_pos = cur_pos * trans_mat;            // vw_M_vp = vw_M_vp * vp_M_vp'
+      viewPlatform.setCurPos(cur_pos);
    }
-
-   viewPlatform.setCurPos(cur_pos);
 }
 
 }

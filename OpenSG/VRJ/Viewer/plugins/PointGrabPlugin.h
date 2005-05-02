@@ -43,7 +43,9 @@ public:
 
    virtual void init(inf::ViewerPtr viewer);
 
-   virtual void update(inf::ViewerPtr viewer);
+   virtual void updateState(inf::ViewerPtr viewer);
+
+   virtual void run(inf::ViewerPtr viewer);
 
    virtual bool canHandleElement(jccl::ConfigElementPtr elt);
 
