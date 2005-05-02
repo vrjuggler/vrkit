@@ -51,9 +51,8 @@ WandNavPlugin::WandNavPlugin()
    , mAcceleration(0.005f)
    , mNavMode(WALK)
    , ACCEL_BUTTON(0)
-   , STOP_BUTTON(1)
-   , ROTATE_BUTTON(2)
-   , MODE_BUTTON(3)
+   , ROTATE_BUTTON(1)
+   , MODE_BUTTON(2)
 {
    mCanNavigate = isFocused();
 }
@@ -108,8 +107,6 @@ void WandNavPlugin::updateNavState(ViewerPtr viewer,
 
    gadget::DigitalInterface& accel_button =
       mWandInterface->getButton(ACCEL_BUTTON);
-   gadget::DigitalInterface& stop_button =
-      mWandInterface->getButton(STOP_BUTTON);
    gadget::DigitalInterface& rotate_button =
       mWandInterface->getButton(ROTATE_BUTTON);
    gadget::DigitalInterface& mode_button =
@@ -122,7 +119,7 @@ void WandNavPlugin::updateNavState(ViewerPtr viewer,
    }
    else if ( mVelocity > 0.0f )
    {
-      mVelocity -= mAcceleration;
+      mVelocity = 0.0f;
    }
 
    // Restrict velocity range to [0.0,max_vel].
@@ -133,11 +130,6 @@ void WandNavPlugin::updateNavState(ViewerPtr viewer,
    if ( mVelocity > mMaxVelocity )
    {
       mVelocity = mMaxVelocity;
-   }
-
-   if ( stop_button->getData() == gadget::Digital::ON )
-   {
-      mVelocity = 0;
    }
 
    // Swap the navigation mode if the mode switching button was toggled on.

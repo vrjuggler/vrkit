@@ -114,7 +114,6 @@ protected:
    NavMode mNavMode;
 
    const int ACCEL_BUTTON;
-   const int STOP_BUTTON;
    const int ROTATE_BUTTON;
    const int MODE_BUTTON;
 };

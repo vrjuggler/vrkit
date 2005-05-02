@@ -48,9 +48,8 @@ SimpleNavPlugin::SimpleNavPlugin()
    , mVelocity(0.0f)
    , mNavMode(WALK)
    , ACCEL_BUTTON(0)
-   , STOP_BUTTON(1)
-   , ROTATE_BUTTON(2)
-   , MODE_BUTTON(3)
+   , ROTATE_BUTTON(1)
+   , MODE_BUTTON(2)
 {
    mCanNavigate = isFocused();
 }
@@ -82,8 +81,6 @@ void SimpleNavPlugin::updateNavState(ViewerPtr viewer,
 
    gadget::DigitalInterface& accel_button =
       mWandInterface->getButton(ACCEL_BUTTON);
-   gadget::DigitalInterface& stop_button =
-      mWandInterface->getButton(STOP_BUTTON);
    gadget::DigitalInterface& rotate_button =
       mWandInterface->getButton(ROTATE_BUTTON);
    gadget::DigitalInterface& mode_button =
@@ -96,7 +93,7 @@ void SimpleNavPlugin::updateNavState(ViewerPtr viewer,
    }
    else if(mVelocity > 0)
    {
-      mVelocity -= inc_vel;
+      mVelocity = 0.0f;
    }
 
    // Restrict range
@@ -107,11 +104,6 @@ void SimpleNavPlugin::updateNavState(ViewerPtr viewer,
    if(mVelocity > max_vel)
    {
       mVelocity = max_vel;
-   }
-
-   if ( stop_button->getData() == gadget::Digital::ON )
-   {
-      mVelocity = 0;
    }
 
    // Swap the navigation mode if the mode switching button was toggled on.
