@@ -5,7 +5,6 @@
 
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
-#include <gmtl/External/OpenSGConvert.h>
 
 namespace inf
 {

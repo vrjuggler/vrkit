@@ -1,3 +1,5 @@
+#include <gmtl/External/OpenSGConvert.h>
+
 #include <OpenSG/VRJ/Viewer/IOV/ViewPlatform.h>
 #include <OpenSG/VRJ/Viewer/IOV/Scene.h>
 #include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
