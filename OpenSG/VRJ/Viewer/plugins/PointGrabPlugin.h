@@ -11,6 +11,8 @@
 #include <OpenSG/OSGSimpleGeometry.h>
 #include <OpenSG/OSGSimpleMaterial.h>
 
+#include <snx/SoundHandle.h>
+
 #include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
 #include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
@@ -110,6 +112,9 @@ private:
    OSG::SimpleMaterialPtr mHighlightMaterial;
 
    gmtl::Matrix44f m_wand_M_obj;
+
+   snx::SoundHandle mIntersectSound;
+   snx::SoundHandle mGrabSound;
 };
 
 }

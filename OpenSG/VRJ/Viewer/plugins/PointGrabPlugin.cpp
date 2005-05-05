@@ -117,6 +117,9 @@ void PointGrabPlugin::init(ViewerPtr viewer)
    OSG::addRefCP(geo);
 
    mCoredHighlightNode = inf::CoredGeomPtr(geo);
+
+   mIntersectSound.init("intersect");
+   mGrabSound.init("grab");
 }
 
 void PointGrabPlugin::updateState(ViewerPtr viewer)
@@ -178,6 +181,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
          // highlight node for this new object.
          if ( mIntersectedObj.node() != OSG::NullFC )
          {
+            mIntersectSound.trigger();
             mIntersecting = true;
 
             OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
@@ -211,6 +215,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
    if ( mIntersecting && ! mGrabbing &&
         grab_button->getData() == gadget::Digital::TOGGLE_ON )
    {
+      mGrabSound.trigger();
       mGrabbing   = true;
       mGrabbedObj = mIntersectedObj;
 
