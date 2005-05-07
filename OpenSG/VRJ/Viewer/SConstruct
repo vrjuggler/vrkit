@@ -98,6 +98,13 @@ if not SConsAddons.Util.hasHelpFlag():
    opts.Update(baseEnv)
    opts.Save(options_cache_filename, baseEnv)
 
+   # XXX: Hack around SConsAddons.Options.OpenSG.OpenSG not letting us provide
+   # extra arguments to osg-config.  (Of course, if osg-config wasn't totally
+   # braindead on Mac OS X, this wouldn't be such a problem.)
+   if GetPlatform() == 'mac':
+      mac_opts = os.popen(opensg_options.osgconfig_cmd + " --cflags System").read()
+      opensg_options.found_cflags = mac_opts.strip().split(" ")
+
    # Setup the build environment
    # Add local directory to path and the "root" directory for this project
    vrj_options.updateEnv(baseEnv)
