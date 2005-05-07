@@ -23,37 +23,37 @@ int main(int argc, char* argv[])
    const int EXIT_ERR_MISSING_ADDR(2);
    const int EXIT_ERR_EXCEPTION(-1);
 
+   std::string master_addr;
+   std::string root_name;
+
+   po::options_description generic("Generic options");
+   generic.add_options()
+      ("version,v", "print version string")
+      ("help", "produce help message")
+      ;
+
+   po::options_description config("Configuration");
+   config.add_options()
+      ("jconf,j", po::value< std::vector<std::string> >()->composing(),
+       "VR Juggler config file")
+      ("addr,a", po::value<std::string>(&master_addr),
+       "Master address and port number in the form address:port")
+      ("root,r",
+       po::value<std::string>(&root_name)->default_value("RootNode"),
+       "Name of the root node being shared by the master")
+      ;
+
+   po::options_description cmdline_options;
+   cmdline_options.add(generic).add(config);
+
+   po::options_description config_file_options;
+   config_file_options.add(config);
+
+   po::options_description visible("Allowed options");
+   visible.add(generic).add(config);
+
    try
    {
-      std::string master_addr;
-      std::string root_name;
-
-      po::options_description generic("Generic options");
-      generic.add_options()
-         ("version,v", "print version string")
-         ("help", "produce help message")
-         ;
-
-      po::options_description config("Configuration");
-      config.add_options()
-         ("jconf,j", po::value< std::vector<std::string> >()->composing(),
-          "VR Juggler config file")
-         ("addr,a", po::value<std::string>(&master_addr),
-          "Master address and port number in the form address:port")
-         ("root,r",
-          po::value<std::string>(&root_name)->default_value("RootNode"),
-          "Name of the root node being shared by the master")
-         ;
-
-      po::options_description cmdline_options;
-      cmdline_options.add(generic).add(config);
-
-      po::options_description config_file_options;
-      config_file_options.add(config);
-
-      po::options_description visible("Allowed options");
-      visible.add(generic).add(config);
-
       po::variables_map vm;
       store(po::parse_command_line(argc, argv, cmdline_options), vm);
 
@@ -113,6 +113,7 @@ int main(int argc, char* argv[])
    catch (std::exception& ex)
    {
       std::cout << ex.what() << std::endl;
+      std::cout << visible << std::endl;
       return EXIT_ERR_EXCEPTION;
    }
 
