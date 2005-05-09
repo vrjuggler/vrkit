@@ -98,19 +98,19 @@ void Viewer::init()
       {
          jccl::ConfigElementPtr app_cfg = app_elts[0];
 
-         // Set ourselves up as a rendering master (or not depending on the
-         // configuration).
-         configureNetwork(app_cfg);
-
          std::string root_name =
             app_cfg->getProperty<std::string>(root_name_prop);
 
-         // This has to be done after the slave connections are received so
+         // This has to be done before the slave connections are received so
          // that this change is included with the initial sync.
          CoredGroupPtr root_node = mScene->getSceneRoot();
          OSG::beginEditCP(root_node);
             OSG::setName(root_node.node(), root_name);
          OSG::endEditCP(root_node);
+
+         // Set ourselves up as a rendering master (or not depending on the
+         // configuration).
+         configureNetwork(app_cfg);
 
          std::vector<jccl::ConfigElementPtr> all_elts = cfg.vec();
 
@@ -226,6 +226,13 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
                    << std::endl;
          mChannels[s] = mConnection->acceptPoint();
       }
+
+      OSG::UInt8 finish(false);
+
+      mConnection->signal();
+      mAspect->sendSync(*mConnection, OSG::Thread::getCurrentChangeList());
+      mConnection->putValue(finish);
+      mConnection->flush();
 
       // NOTE: We are not clearing the change list at this point
       // because that would blow away any actions taken during the
