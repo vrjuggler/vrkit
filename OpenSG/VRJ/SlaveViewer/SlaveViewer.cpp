@@ -130,6 +130,8 @@ namespace inf
 SlaveViewer::SlaveViewer(const std::string& masterAddr,
                          const std::string& rootNodeName)
    : vrj::OpenSGApp()
+   , EXIT_ERR_CONNECT_FAIL(256)
+   , EXIT_ERR_COMM(257)
    , mMasterAddr(masterAddr)
    , mRootNodeName(rootNodeName)
    , mAspect(new OSG::RemoteAspect())
@@ -140,15 +142,7 @@ SlaveViewer::SlaveViewer(const std::string& masterAddr,
 
 SlaveViewer::~SlaveViewer()
 {
-   if ( NULL != mConnection )
-   {
-      delete mConnection;
-   }
-
-   if ( NULL != mAspect )
-   {
-      delete mAspect;
-   }
+   shutdown();
 }
 
 void SlaveViewer::initScene()
@@ -172,83 +166,121 @@ void SlaveViewer::initScene()
       }
    }
 
-   mConnection->connectPoint(mMasterAddr);
-   mConnection->selectChannel();
+   mChannel = mConnection->connectPoint(mMasterAddr);
 
-   mConnection->wait();
-   mAspect->receiveSync(*mConnection);
-
-   OSG::Thread::getCurrentChangeList()->clearAll();
-   int finish(0);
-   mConnection->getValue(finish);
-
-   std::cout << "--- Field Containers ---" << std::endl;
-   for ( unsigned int i = 0; i < gMaybeNamedFcs.size(); ++i )
+   if ( mChannel != -1 )
    {
-      OSG::AttachmentContainerPtr acp = gMaybeNamedFcs[i];
+      mConnection->selectChannel();
 
-      const char* node_name = OSG::getName(acp);
+      mConnection->wait();
+      mAspect->receiveSync(*mConnection);
 
-      if ( NULL == node_name )
+      OSG::Thread::getCurrentChangeList()->clearAll();
+      int finish(0);
+      mConnection->getValue(finish);
+
+      std::cout << "--- Field Containers ---" << std::endl;
+      for ( unsigned int i = 0; i < gMaybeNamedFcs.size(); ++i )
       {
-         std::cout << i << ": <NULL>" << std::endl;
-      }
-      else
-      {
-         std::cout << i << ": " << node_name << std::endl;
-      }
-   }
-   std::cout << "------" << std::endl;
+         OSG::AttachmentContainerPtr acp = gMaybeNamedFcs[i];
 
-   std::cout << "--- Searching for scene root (name is " << mRootNodeName
-             << ") ---" << std::endl;
+         const char* node_name = OSG::getName(acp);
 
-   const std::vector<OSG::FieldContainerPtr>* fcs =
-      OSG::FieldContainerFactory::the()->getFieldContainerStore();
-
-   for ( OSG::UInt32 i = 0; i < fcs->size(); ++i )
-   {
-      OSG::NodePtr node = OSG::NodePtr::dcast((*fcs)[i]);
-
-      if ( OSG::NullFC != node )
-      {
-         const char* node_name = OSG::getName(node);
-
-         if ( node_name != NULL && std::string(node_name) == mRootNodeName )
+         if ( NULL == node_name )
          {
-            std::cout << "Found it." << std::endl;
-            mSceneRoot = node;
-            break;
+            std::cout << i << ": <NULL>" << std::endl;
+         }
+         else
+         {
+            std::cout << i << ": " << node_name << std::endl;
          }
       }
-   }
+      std::cout << "------" << std::endl;
 
-   if ( OSG::NullFC == mSceneRoot.node() )
+      std::cout << "--- Searching for scene root (name is " << mRootNodeName
+                << ") ---" << std::endl;
+
+      const std::vector<OSG::FieldContainerPtr>* fcs =
+         OSG::FieldContainerFactory::the()->getFieldContainerStore();
+
+      for ( OSG::UInt32 i = 0; i < fcs->size(); ++i )
+      {
+         OSG::NodePtr node = OSG::NodePtr::dcast((*fcs)[i]);
+
+         if ( OSG::NullFC != node )
+         {
+            const char* node_name = OSG::getName(node);
+
+            if ( node_name != NULL && std::string(node_name) == mRootNodeName )
+            {
+               std::cout << "Found it." << std::endl;
+               mSceneRoot = node;
+               break;
+            }
+         }
+      }
+
+      if ( OSG::NullFC == mSceneRoot.node() )
+      {
+         std::cout << "NOT FOUND." << std::endl;
+         ::exit(-256);
+      }
+
+      std::cout << "------" << std::endl;
+   }
+   else
    {
-      std::cout << "NOT FOUND." << std::endl;
-      ::exit(-256);
+      std::cerr << "ERROR: Failed to connect to master!" << std::endl;
+      OSG::osgExit();
+      ::exit(EXIT_ERR_CONNECT_FAIL);
    }
-
-   std::cout << "------" << std::endl;
 }
 
 void SlaveViewer::preFrame()
 {
-   int finish(0);
-
-   if ( mConnection->wait(0) )
+   try
    {
-      mAspect->receiveSync(*mConnection);
-      OSG::Thread::getCurrentChangeList()->clearAll();
-      mConnection->getValue(finish);
+      int finish(0);
+
+      if ( mConnection->wait(0) )
+      {
+         mAspect->receiveSync(*mConnection);
+         OSG::Thread::getCurrentChangeList()->clearAll();
+         mConnection->getValue(finish);
+      }
+
+      if ( finish != 0 )
+      {
+         mConnection->putValue(finish);
+         mConnection->flush();
+
+         shutdown();
+
+         OSG::osgExit();
+         ::exit(EXIT_SUCCESS);
+      }
    }
-
-   if ( finish != 0 )
+   catch (OSG::Exception& ex)
    {
-      mConnection->putValue(finish);
-      mConnection->flush();
+      std::cerr << ex.what() << std::endl;
+      shutdown();
 
       OSG::osgExit();
+      ::exit(EXIT_ERR_COMM);
+   }
+}
+
+void SlaveViewer::shutdown()
+{
+   if ( NULL != mConnection )
+   {
+      mConnection->disconnect();
+      delete mConnection;
+   }
+
+   if ( NULL != mAspect )
+   {
+      delete mAspect;
    }
 }
 

@@ -35,13 +35,19 @@ public:
    virtual void preFrame();
 
 private:
+   void shutdown();
+
+   const int EXIT_ERR_CONNECT_FAIL;
+   const int EXIT_ERR_COMM;
+
    std::string mMasterAddr;
    std::string mRootNodeName;
 
    CoredGroupPtr mSceneRoot;
 
-   OSG::RemoteAspect*    mAspect;
-   OSG::PointConnection* mConnection;
+   OSG::RemoteAspect*       mAspect;
+   OSG::PointConnection*    mConnection;
+   OSG::Connection::Channel mChannel;
 };
 
 }
