@@ -35,6 +35,12 @@ public:
    virtual void preFrame();
 
 private:
+   bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+
+   bool changedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+
+   bool destroyedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+
    void shutdown();
 
    std::string mMasterAddr;
@@ -45,6 +51,14 @@ private:
    OSG::RemoteAspect        mAspect;
    OSG::PointConnection*    mConnection;
    OSG::Connection::Channel mChannel;
+
+   std::vector<OSG::AttachmentContainerPtr> mMaybeNamedFcs;
+
+#ifdef _DEBUG
+   unsigned int mNodes;
+   unsigned int mTransforms;
+   unsigned int mGeometries;
+#endif
 };
 
 }

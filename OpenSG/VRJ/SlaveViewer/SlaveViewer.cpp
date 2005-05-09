@@ -25,104 +25,6 @@ const vpr::DebugCategory infSLAVE_APP(
    "SLAVE_APP:"
 );
 
-std::vector<OSG::AttachmentContainerPtr> gMaybeNamedFcs;
-
-#ifdef _DEBUG
-unsigned int gNodes(0);
-unsigned int gTransforms(0);
-unsigned int gGeometries(0);
-#endif
-
-bool changedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*)
-{
-#ifdef _DEBUG
-   vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL)
-      << "Changed: " << fcp->getType().getName().str() << " "
-      << fcp.getFieldContainerId() << std::endl;
-
-   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
-
-   if ( OSG::NullFC != acp )
-   {
-      const char* node_name = OSG::getName(acp);
-      if ( NULL == node_name )
-      {
-         vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL) << "<NULL>" << std::endl;
-      }
-      else
-      {
-         vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL) << "\tname: " << node_name
-                                                  << std::endl;
-      }
-   }
-#endif
-
-   return true;
-}
-
-bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*)
-{
-#ifdef _DEBUG
-   if ( OSG::Node::getClassType() == fcp->getType() )
-   {
-      ++gNodes;
-   }
-   else if ( OSG::Transform::getClassType() == fcp->getType() )
-   {
-      ++gTransforms;
-   }
-   else if ( OSG::Geometry::getClassType() == fcp->getType() )
-   {
-      ++gGeometries;
-   }
-
-   std::cout << "Created: " << fcp->getType().getName().str() << " "
-             << fcp.getFieldContainerId() << std::endl;
-#endif
-
-   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
-
-   if ( OSG::NullFC != acp )
-   {
-#ifdef _DEBUG
-      const char* node_name = OSG::getName(acp);
-
-      if ( NULL == node_name )
-      {
-         std::cout << "<NULL>" << std::endl;
-      }
-      else
-      {
-         std::cout << "\tname: " << node_name << std::endl;
-      }
-#endif
-
-      gMaybeNamedFcs.push_back(acp);
-   }
-
-   return true;
-}
-
-bool destroyedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*)
-{
-#ifdef _DEBUG
-   if ( OSG::Node::getClassType() == fcp->getType() )
-   {
-      --gNodes;
-   }
-   else if ( OSG::Transform::getClassType() == fcp->getType() )
-   {
-      --gTransforms;
-   }
-   else if ( OSG::Geometry::getClassType() == fcp->getType() )
-   {
-      --gGeometries;
-   }
-#endif
-
-   return true;
-}
-
 }
 
 namespace inf
@@ -134,6 +36,11 @@ SlaveViewer::SlaveViewer(const std::string& masterAddr,
    , mMasterAddr(masterAddr)
    , mRootNodeName(rootNodeName)
    , mConnection(NULL)
+#ifdef _DEBUG
+   , mNodes(0)
+   , mTransforms(0)
+   , mGeometries(0)
+#endif
 {
    mConnection = OSG::ConnectionFactory::the().createPoint("StreamSock");
 }
@@ -146,11 +53,19 @@ SlaveViewer::~SlaveViewer()
 void SlaveViewer::initScene()
 {
    OSG::RemoteAspect::Functor changed =
-      OSG::osgTypedFunctionFunctor2CPtrRef<bool, OSG::FieldContainerPtr, OSG::RemoteAspect*>(changedFunction);
+      OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
+         bool, SlaveViewer, OSG::FieldContainerPtr, OSG::RemoteAspect*
+      >(this, &SlaveViewer::changedFunction);
+
    OSG::RemoteAspect::Functor destroyed =
-      OSG::osgTypedFunctionFunctor2CPtrRef<bool, OSG::FieldContainerPtr, OSG::RemoteAspect*>(destroyedFunction);
+      OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
+         bool, SlaveViewer, OSG::FieldContainerPtr, OSG::RemoteAspect*
+      >(this, &SlaveViewer::destroyedFunction);
+
    OSG::RemoteAspect::Functor created =
-      OSG::osgTypedFunctionFunctor2CPtrRef<bool, OSG::FieldContainerPtr, OSG::RemoteAspect*>(createdFunction);
+      OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
+         bool, SlaveViewer, OSG::FieldContainerPtr, OSG::RemoteAspect*
+      >(this, &SlaveViewer::createdFunction);
 
    for ( OSG::UInt32 i = 0; i < OSG::TypeFactory::the()->getNumTypes(); ++i )
    {
@@ -178,9 +93,9 @@ void SlaveViewer::initScene()
       mConnection->getValue(finish);
 
       std::cout << "--- Field Containers ---" << std::endl;
-      for ( unsigned int i = 0; i < gMaybeNamedFcs.size(); ++i )
+      for ( unsigned int i = 0; i < mMaybeNamedFcs.size(); ++i )
       {
-         OSG::AttachmentContainerPtr acp = gMaybeNamedFcs[i];
+         OSG::AttachmentContainerPtr acp = mMaybeNamedFcs[i];
 
          const char* node_name = OSG::getName(acp);
 
@@ -266,6 +181,99 @@ void SlaveViewer::preFrame()
       OSG::osgExit();
       ::exit(inf::EXIT_ERR_COMM);
    }
+}
+
+bool SlaveViewer::createdFunction(OSG::FieldContainerPtr& fcp,
+                                  OSG::RemoteAspect*)
+{
+#ifdef _DEBUG
+   if ( OSG::Node::getClassType() == fcp->getType() )
+   {
+      ++mNodes;
+   }
+   else if ( OSG::Transform::getClassType() == fcp->getType() )
+   {
+      ++mTransforms;
+   }
+   else if ( OSG::Geometry::getClassType() == fcp->getType() )
+   {
+      ++mGeometries;
+   }
+
+   std::cout << "Created: " << fcp->getType().getName().str() << " "
+             << fcp.getFieldContainerId() << std::endl;
+#endif
+
+   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
+
+   if ( OSG::NullFC != acp )
+   {
+#ifdef _DEBUG
+      const char* node_name = OSG::getName(acp);
+
+      if ( NULL == node_name )
+      {
+         std::cout << "<NULL>" << std::endl;
+      }
+      else
+      {
+         std::cout << "\tname: " << node_name << std::endl;
+      }
+#endif
+
+      mMaybeNamedFcs.push_back(acp);
+   }
+
+   return true;
+}
+
+bool SlaveViewer::changedFunction(OSG::FieldContainerPtr& fcp,
+                                  OSG::RemoteAspect*)
+{
+#ifdef _DEBUG
+   vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL)
+      << "Changed: " << fcp->getType().getName().str() << " "
+      << fcp.getFieldContainerId() << std::endl;
+
+   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
+
+   if ( OSG::NullFC != acp )
+   {
+      const char* node_name = OSG::getName(acp);
+      if ( NULL == node_name )
+      {
+         vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL) << "<NULL>" << std::endl;
+      }
+      else
+      {
+         vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL) << "\tname: " << node_name
+                                                  << std::endl;
+      }
+   }
+#endif
+
+   return true;
+}
+
+bool SlaveViewer::destroyedFunction(OSG::FieldContainerPtr& fcp,
+                                    OSG::RemoteAspect*)
+{
+#ifdef _DEBUG
+   if ( OSG::Node::getClassType() == fcp->getType() )
+   {
+      --mNodes;
+   }
+   else if ( OSG::Transform::getClassType() == fcp->getType() )
+   {
+      --mTransforms;
+   }
+   else if ( OSG::Geometry::getClassType() == fcp->getType() )
+   {
+      --mGeometries;
+   }
+#endif
+
+   return true;
 }
 
 void SlaveViewer::shutdown()
