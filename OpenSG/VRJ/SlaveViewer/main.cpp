@@ -8,6 +8,7 @@
 
 #include <vrj/Kernel/Kernel.h>
 
+#include <OpenSG/VRJ/SlaveViewer/exitcodes.h>
 #include <OpenSG/VRJ/SlaveViewer/SlaveViewer.h>
 
 #define IOSV_VERSION_MAJOR 0
@@ -19,10 +20,6 @@ namespace po = boost::program_options;
 
 int main(int argc, char* argv[])
 {
-   const int EXIT_ERR_MISSING_JCONF(1);
-   const int EXIT_ERR_MISSING_ADDR(2);
-   const int EXIT_ERR_EXCEPTION(-1);
-
    std::string master_addr;
    std::string root_name;
 
@@ -80,7 +77,7 @@ int main(int argc, char* argv[])
       if ( vm.count("addr") == 0 )
       {
          std::cout << "No address for master node given!" << std::endl;
-         return EXIT_ERR_MISSING_ADDR;
+         return inf::EXIT_ERR_MISSING_ADDR;
       }
 
       vrj::Kernel* kernel  = vrj::Kernel::instance();
@@ -88,7 +85,7 @@ int main(int argc, char* argv[])
       if ( vm.count("jconf") == 0 )
       {
          std::cout << "No VR Juggler configuration files given!" << std::endl;
-         return EXIT_ERR_MISSING_JCONF;
+         return inf::EXIT_ERR_MISSING_JCONF;
       }
       else
       {
@@ -114,7 +111,7 @@ int main(int argc, char* argv[])
    {
       std::cout << ex.what() << std::endl;
       std::cout << visible << std::endl;
-      return EXIT_ERR_EXCEPTION;
+      return inf::EXIT_ERR_EXCEPTION;
    }
 
    return EXIT_SUCCESS;

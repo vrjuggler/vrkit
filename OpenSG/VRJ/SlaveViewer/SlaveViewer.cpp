@@ -13,6 +13,7 @@
 #include <vpr/vpr.h>
 #include <vpr/Util/Debug.h>
 
+#include <OpenSG/VRJ/SlaveViewer/exitcodes.h>
 #include <OpenSG/VRJ/SlaveViewer/SlaveViewer.h>
 
 
@@ -130,8 +131,6 @@ namespace inf
 SlaveViewer::SlaveViewer(const std::string& masterAddr,
                          const std::string& rootNodeName)
    : vrj::OpenSGApp()
-   , EXIT_ERR_CONNECT_FAIL(256)
-   , EXIT_ERR_COMM(257)
    , mMasterAddr(masterAddr)
    , mRootNodeName(rootNodeName)
    , mConnection(NULL)
@@ -231,7 +230,7 @@ void SlaveViewer::initScene()
    {
       std::cerr << "ERROR: Failed to connect to master!" << std::endl;
       OSG::osgExit();
-      ::exit(EXIT_ERR_CONNECT_FAIL);
+      ::exit(inf::EXIT_ERR_CONNECT_FAIL);
    }
 }
 
@@ -265,7 +264,7 @@ void SlaveViewer::preFrame()
       shutdown();
 
       OSG::osgExit();
-      ::exit(EXIT_ERR_COMM);
+      ::exit(inf::EXIT_ERR_COMM);
    }
 }
 

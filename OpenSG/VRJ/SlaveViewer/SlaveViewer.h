@@ -37,9 +37,6 @@ public:
 private:
    void shutdown();
 
-   const int EXIT_ERR_CONNECT_FAIL;
-   const int EXIT_ERR_COMM;
-
    std::string mMasterAddr;
    std::string mRootNodeName;
 
