@@ -169,6 +169,7 @@ void Viewer::preFrame()
          mAspect->sendSync(*mConnection, OSG::Thread::getCurrentChangeList());
          mConnection->putValue(finish);
          mConnection->flush();
+         mConnection->wait();
 
          OSG::Thread::getCurrentChangeList()->clearAll();
       }

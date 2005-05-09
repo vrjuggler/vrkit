@@ -155,11 +155,13 @@ void SlaveViewer::preFrame()
    {
       OSG::UInt8 finish(false);
 
-      if ( mConnection->wait(0) )
+      if ( mConnection->wait() )
       {
          mAspect.receiveSync(*mConnection);
          OSG::Thread::getCurrentChangeList()->clearAll();
          mConnection->getValue(finish);
+         mConnection->signal();
+         mConnection->flush();
       }
 
       if ( finish )
