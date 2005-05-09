@@ -10,21 +10,34 @@
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGSimpleAttachments.h>
 
+#include <vpr/vpr.h>
+#include <vpr/Util/Debug.h>
+
 #include <OpenSG/VRJ/SlaveViewer/SlaveViewer.h>
 
 
 namespace
 {
 
+const vpr::DebugCategory infSLAVE_APP(
+   vpr::GUID("c141b39d-403e-4999-aac0-1102c1471a9f"), "INF_SLAVE_APP",
+   "SLAVE_APP:"
+);
+
 std::vector<OSG::AttachmentContainerPtr> gMaybeNamedFcs;
+
+#ifdef _DEBUG
 unsigned int gNodes(0);
 unsigned int gTransforms(0);
 unsigned int gGeometries(0);
+#endif
 
 bool changedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*)
 {
-   std::cout << "Changed: " << fcp->getType().getName().str() << " "
-             << fcp.getFieldContainerId() << std::endl;
+#ifdef _DEBUG
+   vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL)
+      << "Changed: " << fcp->getType().getName().str() << " "
+      << fcp.getFieldContainerId() << std::endl;
 
    OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
 
@@ -33,19 +46,22 @@ bool changedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*)
       const char* node_name = OSG::getName(acp);
       if ( NULL == node_name )
       {
-         std::cout << "<NULL>" << std::endl;
+         vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL) << "<NULL>" << std::endl;
       }
       else
       {
-         std::cout << "\tname: " << node_name << std::endl;
+         vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL) << "\tname: " << node_name
+                                                  << std::endl;
       }
    }
+#endif
 
    return true;
 }
 
 bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*)
 {
+#ifdef _DEBUG
    if ( OSG::Node::getClassType() == fcp->getType() )
    {
       ++gNodes;
@@ -61,11 +77,13 @@ bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*)
 
    std::cout << "Created: " << fcp->getType().getName().str() << " "
              << fcp.getFieldContainerId() << std::endl;
+#endif
 
    OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
 
    if ( OSG::NullFC != acp )
    {
+#ifdef _DEBUG
       const char* node_name = OSG::getName(acp);
 
       if ( NULL == node_name )
@@ -76,6 +94,7 @@ bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*)
       {
          std::cout << "\tname: " << node_name << std::endl;
       }
+#endif
 
       gMaybeNamedFcs.push_back(acp);
    }
@@ -85,6 +104,7 @@ bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*)
 
 bool destroyedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*)
 {
+#ifdef _DEBUG
    if ( OSG::Node::getClassType() == fcp->getType() )
    {
       --gNodes;
@@ -97,6 +117,7 @@ bool destroyedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*)
    {
       --gGeometries;
    }
+#endif
 
    return true;
 }
