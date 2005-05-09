@@ -90,28 +90,13 @@ void Viewer::init()
    {
       const std::string app_elt_type("infiscape_opensg_viewer");
       const std::string root_name_prop("root_name");
-      const std::string plugin_path_prop("plugin_path");
-      const std::string plugin_prop("plugin");
 
       std::vector<jccl::ConfigElementPtr> app_elts;
-
       cfg.getByType(app_elt_type, app_elts);
 
       if ( ! app_elts.empty() )
       {
          jccl::ConfigElementPtr app_cfg = app_elts[0];
-
-         std::vector<std::string> search_path;
-         search_path.push_back("plugins");
-
-         const unsigned int num_paths(app_cfg->getNum(plugin_path_prop));
-
-         for ( unsigned int i = 0; i < num_paths; ++i )
-         {
-            search_path.push_back(
-               app_cfg->getProperty<std::string>(plugin_path_prop, i)
-            );
-         }
 
          // Set ourselves up as a rendering master (or not depending on the
          // configuration).
@@ -134,69 +119,7 @@ void Viewer::init()
          all_elts.erase(std::remove(all_elts.begin(), all_elts.end(), app_cfg),
                         all_elts.end());
 
-         const unsigned int num_plugins(app_cfg->getNum(plugin_prop));
-
-         for ( unsigned int i = 0; i < num_plugins; ++i )
-         {
-            std::string plugin_name =
-               app_cfg->getProperty<std::string>(plugin_prop, i);
-            vpr::LibraryPtr dso = vpr::LibraryLoader::findDSO(plugin_name,
-                                                              search_path);
-
-            if ( dso.get() != NULL )
-            {
-               const std::string get_ver_func(PluginHandler::GET_VERSION_FUNC);
-               VersionCheckCallable version_functor;
-
-               vpr::ReturnStatus version_status =
-                  vpr::LibraryLoader::findEntryPoint(dso, get_ver_func,
-                                                     version_functor);
-
-               if ( ! version_status.success() )
-               {
-                  std::cerr << "Version mismatch!  Plug-in '" << plugin_name
-                            << "' cannot be used." << std::endl;
-               }
-               else
-               {
-                  const std::string get_creator_func(PluginHandler::GET_CREATOR_FUNC);
-                  inf::ViewerPtr viewer = shared_from_this();
-                  PluginCreateCallable<ViewerPtr> create_functor(viewer);
-
-                  vpr::ReturnStatus create_status =
-                     vpr::LibraryLoader::findEntryPoint(dso, get_creator_func,
-                                                        create_functor);
-
-                  if ( create_status.success() )
-                  {
-                     // At this point, the plug-in has been instantiated,
-                     // added to our collection of loaded plug-ins, and
-                     // initialized.
-
-                     mLoadedDsos.push_back(dso);
-
-                     // The newly created plug-in will be at the end of
-                     // mPlugins.
-                     // XXX: This is a bit dodgy...
-                     inf::PluginPtr plugin = mPlugins[mPlugins.size() -1 ];
-
-                     // Configure the newly loaded plug-in and remove all the
-                     // elements (if any) from all_elts that the plug-in
-                     // consumes.
-                     ElementRemovePredicate remove_pred(plugin);
-                     std::vector<jccl::ConfigElementPtr>::iterator new_end =
-                        std::remove_if(all_elts.begin(), all_elts.end(),
-                                       remove_pred);
-                     all_elts.erase(new_end, all_elts.end());
-                  }
-               }
-            }
-            else
-            {
-               std::cerr << "WARNING: Failed to load plug-in '" << plugin_name
-                         << "'!" << std::endl;
-            }
-         }
+         loadAndConfigPlugins(app_cfg, all_elts);
 
          if ( ! all_elts.empty() )
          {
@@ -310,6 +233,85 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
 
       std::cout << "All " << slave_count << " nodes have connected"
                 << std::endl;
+   }
+}
+
+void Viewer::loadAndConfigPlugins(jccl::ConfigElementPtr appCfg,
+                                  std::vector<jccl::ConfigElementPtr>& elts)
+{
+   const std::string plugin_path_prop("plugin_path");
+   const std::string plugin_prop("plugin");
+
+   std::vector<std::string> search_path;
+   search_path.push_back("plugins");
+
+   const unsigned int num_paths(appCfg->getNum(plugin_path_prop));
+
+   for ( unsigned int i = 0; i < num_paths; ++i )
+   {
+      search_path.push_back(
+         appCfg->getProperty<std::string>(plugin_path_prop, i)
+      );
+   }
+
+   const unsigned int num_plugins(appCfg->getNum(plugin_prop));
+
+   for ( unsigned int i = 0; i < num_plugins; ++i )
+   {
+      std::string plugin_name =
+         appCfg->getProperty<std::string>(plugin_prop, i);
+      vpr::LibraryPtr dso = vpr::LibraryLoader::findDSO(plugin_name,
+                                                        search_path);
+
+      if ( dso.get() != NULL )
+      {
+         const std::string get_ver_func(PluginHandler::GET_VERSION_FUNC);
+         VersionCheckCallable version_functor;
+
+         vpr::ReturnStatus version_status =
+            vpr::LibraryLoader::findEntryPoint(dso, get_ver_func,
+                                               version_functor);
+
+         if ( ! version_status.success() )
+         {
+            std::cerr << "Version mismatch!  Plug-in '" << plugin_name
+                      << "' cannot be used." << std::endl;
+         }
+         else
+         {
+            const std::string get_creator_func(PluginHandler::GET_CREATOR_FUNC);
+            inf::ViewerPtr viewer = shared_from_this();
+            PluginCreateCallable<ViewerPtr> create_functor(viewer);
+
+            vpr::ReturnStatus create_status =
+               vpr::LibraryLoader::findEntryPoint(dso, get_creator_func,
+                                                  create_functor);
+
+            if ( create_status.success() )
+            {
+               // At this point, the plug-in has been instantiated, added to
+               // our collection of loaded plug-ins, and initialized.
+
+               mLoadedDsos.push_back(dso);
+
+               // The newly created plug-in will be at the end of mPlugins.
+               // XXX: This is a bit dodgy...
+               inf::PluginPtr plugin = mPlugins[mPlugins.size() -1 ];
+
+               // Configure the newly loaded plug-in and remove all the
+               // elements (if any) from elts that the plug-in consumes.
+               ElementRemovePredicate remove_pred(plugin);
+               std::vector<jccl::ConfigElementPtr>::iterator new_end =
+                  std::remove_if(elts.begin(), elts.end(), remove_pred);
+               elts.erase(new_end, elts.end());
+            }
+         }
+      }
+      else
+      {
+         std::cerr << "WARNING: Failed to load plug-in '" << plugin_name
+                   << "'!" << std::endl;
+      }
    }
 }
 

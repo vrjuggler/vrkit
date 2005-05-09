@@ -115,7 +115,37 @@ protected:
    std::string mCfgFile;
 
 private:
+   /**
+    * Based on the given configuration, this method determines if this
+    * application object will act as a rendering master for an OpenSG
+    * cluster.  If we will act as a rendering master, this method blocks
+    * waiting for all the expected incoming connections.
+    *
+    * @post If we will act as a rendering master, mAspect and mConnection are
+    *       allocated memory from the heap and will be non-NULL thereafter.
+    *
+    * @param appCfg     the config element for the Infiscape OpenSG viewer
+    *                   application object (type infiscape_opensg_viewer).
+    */
    void configureNetwork(jccl::ConfigElementPtr appCfg);
+
+   /**
+    * Loads, initializes, and configures all plug-ins identified in the given
+    * config element \c appCfg.  Config elements consumed by those plug-ins
+    * as part of their configuration are removed from \c elts.
+    *
+    * @post Config elements consumed by plug-ins are removed from \c elts.
+    *
+    * @param appCfg     the config element for the Infiscape OpenSG viewer
+    *                   application object (type infiscape_opensg_viewer).
+    * @param elts       all the other config elements from the viewer
+    *                   application's configuration file that may be consumed
+    *                   by loaded plug-ins.
+    *
+    * @see setConfiguration()
+    */
+   void loadAndConfigPlugins(jccl::ConfigElementPtr appCfg,
+                             std::vector<jccl::ConfigElementPtr>& elts);
 
    /** The user for the viewer.
    * @link association */
