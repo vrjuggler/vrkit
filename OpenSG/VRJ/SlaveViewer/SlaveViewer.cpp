@@ -134,7 +134,6 @@ SlaveViewer::SlaveViewer(const std::string& masterAddr,
    , EXIT_ERR_COMM(257)
    , mMasterAddr(masterAddr)
    , mRootNodeName(rootNodeName)
-   , mAspect(new OSG::RemoteAspect())
    , mConnection(NULL)
 {
    mConnection = OSG::ConnectionFactory::the().createPoint("StreamSock");
@@ -160,9 +159,9 @@ void SlaveViewer::initScene()
          OSG::FieldContainerFactory::the()->findType(i);
       if ( NULL != fct )
       {
-         mAspect->registerChanged(*fct, changed);
-         mAspect->registerDestroyed(*fct, destroyed);
-         mAspect->registerCreated(*fct, created);
+         mAspect.registerChanged(*fct, changed);
+         mAspect.registerDestroyed(*fct, destroyed);
+         mAspect.registerCreated(*fct, created);
       }
    }
 
@@ -173,7 +172,7 @@ void SlaveViewer::initScene()
       mConnection->selectChannel();
 
       mConnection->wait();
-      mAspect->receiveSync(*mConnection);
+      mAspect.receiveSync(*mConnection);
 
       OSG::Thread::getCurrentChangeList()->clearAll();
       int finish(0);
@@ -244,7 +243,7 @@ void SlaveViewer::preFrame()
 
       if ( mConnection->wait(0) )
       {
-         mAspect->receiveSync(*mConnection);
+         mAspect.receiveSync(*mConnection);
          OSG::Thread::getCurrentChangeList()->clearAll();
          mConnection->getValue(finish);
       }
@@ -276,11 +275,6 @@ void SlaveViewer::shutdown()
    {
       mConnection->disconnect();
       delete mConnection;
-   }
-
-   if ( NULL != mAspect )
-   {
-      delete mAspect;
    }
 }
 

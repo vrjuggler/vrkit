@@ -45,7 +45,7 @@ private:
 
    CoredGroupPtr mSceneRoot;
 
-   OSG::RemoteAspect*       mAspect;
+   OSG::RemoteAspect        mAspect;
    OSG::PointConnection*    mConnection;
    OSG::Connection::Channel mChannel;
 };
