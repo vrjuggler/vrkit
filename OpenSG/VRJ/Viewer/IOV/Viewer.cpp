@@ -163,7 +163,7 @@ void Viewer::preFrame()
    {
       try
       {
-         int finish(0);
+         OSG::UInt8 finish(false);
 
          mConnection->signal();
          mAspect->sendSync(*mConnection, OSG::Thread::getCurrentChangeList());

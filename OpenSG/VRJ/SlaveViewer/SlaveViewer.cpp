@@ -89,7 +89,7 @@ void SlaveViewer::initScene()
       mAspect.receiveSync(*mConnection);
 
       OSG::Thread::getCurrentChangeList()->clearAll();
-      int finish(0);
+      OSG::UInt8 finish(false);
       mConnection->getValue(finish);
 
       std::cout << "--- Field Containers ---" << std::endl;
@@ -153,7 +153,7 @@ void SlaveViewer::preFrame()
 {
    try
    {
-      int finish(0);
+      OSG::UInt8 finish(false);
 
       if ( mConnection->wait(0) )
       {
@@ -162,7 +162,7 @@ void SlaveViewer::preFrame()
          mConnection->getValue(finish);
       }
 
-      if ( finish != 0 )
+      if ( finish )
       {
          mConnection->putValue(finish);
          mConnection->flush();
