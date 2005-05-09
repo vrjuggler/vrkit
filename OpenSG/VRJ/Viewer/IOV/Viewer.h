@@ -10,8 +10,12 @@
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
 
+#include <OpenSG/OSGRemoteAspect.h>
+#include <OpenSG/OSGGroupConnection.h>
+
 #include <vpr/vpr.h>
 #include <vpr/DynLoad/Library.h>
+#include <jccl/Config/ConfigElementPtr.h>
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
 
 #include <OpenSG/VRJ/Viewer/IOV/ViewerPtr.h>
@@ -44,8 +48,7 @@ public:
       return new_viewer;
    }
 
-   virtual ~Viewer()
-   {;}
+   virtual ~Viewer();
 
    void setConfiguration(const std::string& cfgFile)
    {
@@ -105,11 +108,14 @@ public:
 protected:
    Viewer()
       : vrj::OpenSGApp(NULL)
+      , mAspect(NULL)
+      , mConnection(NULL)
    {;}
 
    std::string mCfgFile;
 
 private:
+   void configureNetwork(jccl::ConfigElementPtr appCfg);
 
    /** The user for the viewer.
    * @link association */
@@ -121,6 +127,13 @@ private:
    * @supplierCardinality 1*/
    /*# Scene lnkScene; */
    ScenePtr    mScene;
+
+   /** @name Cluster Data Members */
+   //@{
+   OSG::RemoteAspect*                    mAspect;
+   OSG::GroupConnection*                 mConnection;
+   std::vector<OSG::Connection::Channel> mChannels;
+   //@}
 
    std::vector<vpr::LibraryPtr> mLoadedDsos;
 

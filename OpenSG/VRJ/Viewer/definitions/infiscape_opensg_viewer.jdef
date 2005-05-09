@@ -5,6 +5,10 @@
       <abstract>false</abstract>
       <help>Configuration for the Infiscape OpenSG viewer application.</help>
       <category>/Application-Specific/</category>
+      <property valuetype="string" variable="false" name="root_name">
+         <help>The name of the root node of the scene that may be shared through OpenSG's clustering feature.</help>
+         <value label="Scene Root Name" defaultvalue="RootNode"/>
+      </property>
       <property valuetype="string" variable="true" name="plugin_path">
          <help>Each value adds to the path where dynamically loadable plulg-ins can be found.  The path may make use of environment variables.  For example: &lt;tt&gt;${HOME}/inf-plugins&lt;/tt&gt;.  If no values are set for this property, the default search path will be &lt;tt&gt;${VJ_BASE_DIR}/lib{,32,64}/infiscape/viewer/plugins&lt;/tt&gt; depending on the compile-time application binary interface (ABI).</help>
          <value label="Plug-In Path" defaultvalue=""/>
@@ -19,6 +23,14 @@
             <enum label="SimpleNavPlugin" value="SimpleNavPlugin"/>
             <enum label="WandNavPlugin" value="WandNavPlugin"/>
          </enumeration>
+      </property>
+      <property valuetype="integer" variable="false" name="listen_port">
+         <help>The port on which we will listen for incoming connections from slave viewers (servers in OpenSG terminology). If the value of this property is 0, then no accepting socket will be opened for incoming connections from slave viewers.</help>
+         <value label="Listen Port" defaultvalue="34000"/>
+      </property>
+      <property valuetype="integer" variable="false" name="slave_count">
+         <help>The number of slaves that must connect to the master application before it can begin executing its frame loop. The value of this property must be greater than or equal to 0.</help>
+         <value label="Slave Count" defaultvalue="0"/>
       </property>
       <upgrade_transform />
    </definition_version>
