@@ -109,6 +109,9 @@ if not SConsAddons.Util.hasHelpFlag():
    # Add local directory to path and the "root" directory for this project
    vrj_options.updateEnv(baseEnv)
    opensg_options.updateEnv(baseEnv)
+   
+   if SCons.Util.WhereIs('distcc'):
+      baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")   
 
    lib_name = 'iov'
 
