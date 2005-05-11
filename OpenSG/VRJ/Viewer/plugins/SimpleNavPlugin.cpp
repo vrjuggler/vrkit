@@ -137,6 +137,8 @@ void SimpleNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
    {
       gmtl::Matrix44f cur_pos = viewPlatform.getCurPos();
 
+      const float scale_factor(viewer->getDrawScaleFactor());
+
       switch ( mNavState )
       {
          case RESET:
@@ -146,7 +148,9 @@ void SimpleNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
          // Handle rotations.
          case ROTATE:
             {
-               gmtl::Matrix44f rot_mat(mWandInterface->getWandPos()->getData());
+               gmtl::Matrix44f rot_mat(
+                  mWandInterface->getWandPos()->getData(scale_factor)
+               );
                gmtl::setTrans(rot_mat, gmtl::Vec3f(0.0f, 0.0f, 0.0f));
 
                if ( gmtl::MAT_IDENTITY44F != rot_mat )
@@ -175,7 +179,9 @@ void SimpleNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
                // Get the wand matrix
                // - Translation is in the real world (virtual platform)
                //   coordinate system
-               gmtl::Matrix44f wand_mat(mWandInterface->getWandPos()->getData());
+               gmtl::Matrix44f wand_mat(
+                  mWandInterface->getWandPos()->getData(scale_factor)
+               );
                gmtl::Vec3f z_dir = gmtl::Vec3f(0.0f, 0.0f, -mVelocity);
                gmtl::Vec3f trans = wand_mat * z_dir;
 

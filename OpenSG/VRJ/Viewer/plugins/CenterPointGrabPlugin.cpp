@@ -128,7 +128,9 @@ void CenterPointGrabPlugin::updateState(ViewerPtr viewer)
    const gmtl::Matrix44f& cur_pos(view_platform.getCurPos());
 
    // Get the wand transformation in virtual world coordinates.
-   const gmtl::Matrix44f wand_pos(mWandInterface->getWandPos()->getData());
+   const gmtl::Matrix44f wand_pos(
+      mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
+   );
    const gmtl::Matrix44f wand_xform_vw = cur_pos * wand_pos;
 
    // Perform intersection tests with all the grabbable objects if and only
@@ -255,7 +257,9 @@ void CenterPointGrabPlugin::run(inf::ViewerPtr viewer)
       const gmtl::Matrix44f& cur_pos(view_platform.getCurPos());
 
       // Get the wand transformation in virtual world coordinates.
-      const gmtl::Matrix44f wand_pos(mWandInterface->getWandPos()->getData());
+      const gmtl::Matrix44f wand_pos(
+         mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
+      );
       const gmtl::Matrix44f wand_xform_vw = cur_pos * wand_pos;
 
       osg::Matrix obj_mat;

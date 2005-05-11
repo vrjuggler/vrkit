@@ -131,7 +131,9 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
    const gmtl::Matrix44f& vw_M_vp(view_platform.getCurPos());
 
    // Get the wand transformation in virtual world coordinates.
-   const gmtl::Matrix44f vp_M_wand(mWandInterface->getWandPos()->getData());
+   const gmtl::Matrix44f vp_M_wand(
+      mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
+   );
    const gmtl::Matrix44f vw_M_wand = vw_M_vp * vp_M_wand;
 
    // Perform intersection tests with all the grabbable objects if and only
@@ -275,7 +277,9 @@ void PointGrabPlugin::run(inf::ViewerPtr viewer)
       const gmtl::Matrix44f& vw_M_vp(view_platform.getCurPos());
 
       // Get the wand transformation in virtual world coordinates.
-      const gmtl::Matrix44f vp_M_wand(mWandInterface->getWandPos()->getData());
+      const gmtl::Matrix44f vp_M_wand(
+         mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
+      );
       const gmtl::Matrix44f vw_M_wand = vw_M_vp * vp_M_wand;
 
       gmtl::Matrix44f cur_obj_mat;
