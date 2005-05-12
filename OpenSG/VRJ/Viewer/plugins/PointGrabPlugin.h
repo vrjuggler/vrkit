@@ -16,7 +16,6 @@
 #include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
 #include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
-#include <OpenSG/VRJ/Viewer/plugins/PointGrabPluginPtr.h>
 
 
 namespace inf
@@ -29,9 +28,9 @@ class PointGrabPlugin
    , public boost::enable_shared_from_this<PointGrabPlugin>
 {
 public:
-   static PointGrabPluginPtr create()
+   static inf::PluginPtr create()
    {
-      return PointGrabPluginPtr(new PointGrabPlugin);
+      return inf::PluginPtr(new PointGrabPlugin());
    }
 
    virtual ~PointGrabPlugin()

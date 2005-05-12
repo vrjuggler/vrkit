@@ -5,12 +5,10 @@
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
-
 #include <vpr/Util/Interval.h>
 
+#include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
 #include <OpenSG/VRJ/Viewer/plugins/NavPlugin.h>
-#include <OpenSG/VRJ/Viewer/plugins/WandNavPluginPtr.h>
 
 
 namespace inf
@@ -21,9 +19,9 @@ class WandNavPlugin
    , public boost::enable_shared_from_this<WandNavPlugin>
 {
 public:
-   static WandNavPluginPtr create()
+   static inf::PluginPtr create()
    {
-      WandNavPluginPtr new_strategy = WandNavPluginPtr(new WandNavPlugin);
+      inf::PluginPtr new_strategy = inf::PluginPtr(new WandNavPlugin());
       return new_strategy;
    }
 

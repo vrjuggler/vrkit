@@ -13,7 +13,6 @@
 #include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
 #include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
-#include <OpenSG/VRJ/Viewer/plugins/CenterPointGrabPluginPtr.h>
 
 
 namespace inf
@@ -26,9 +25,9 @@ class CenterPointGrabPlugin
    , public boost::enable_shared_from_this<CenterPointGrabPlugin>
 {
 public:
-   static CenterPointGrabPluginPtr create()
+   static inf::PluginPtr create()
    {
-      return CenterPointGrabPluginPtr(new CenterPointGrabPlugin);
+      return inf::PluginPtr(new CenterPointGrabPlugin());
    }
 
    virtual ~CenterPointGrabPlugin()

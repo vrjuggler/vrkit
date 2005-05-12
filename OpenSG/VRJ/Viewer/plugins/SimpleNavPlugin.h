@@ -8,7 +8,6 @@
 #include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
 #include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
 #include <OpenSG/VRJ/Viewer/plugins/NavPlugin.h>
-#include <OpenSG/VRJ/Viewer/plugins/SimpleNavPluginPtr.h>
 
 
 namespace inf
@@ -19,9 +18,9 @@ class SimpleNavPlugin
    , public boost::enable_shared_from_this<SimpleNavPlugin>
 {
 public:
-   static SimpleNavPluginPtr create()
+   static inf::PluginPtr create()
    {
-      SimpleNavPluginPtr new_strategy = SimpleNavPluginPtr(new SimpleNavPlugin);
+      inf::PluginPtr new_strategy = inf::PluginPtr(new SimpleNavPlugin());
       return new_strategy;
    }
 

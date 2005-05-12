@@ -14,7 +14,6 @@
 #include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
 #include <OpenSG/VRJ/Viewer/IOV/PluginFactoryPtr.h>
 #include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
-#include <OpenSG/VRJ/Viewer/plugins/ModeSwitchPluginPtr.h>
 
 
 namespace inf
@@ -25,9 +24,9 @@ class ModeSwitchPlugin
    , public boost::enable_shared_from_this<ModeSwitchPlugin>
 {
 public:
-   static ModeSwitchPluginPtr create()
+   static inf::PluginPtr create()
    {
-      return ModeSwitchPluginPtr(new ModeSwitchPlugin());
+      return inf::PluginPtr(new ModeSwitchPlugin());
    }
 
    virtual ~ModeSwitchPlugin()
