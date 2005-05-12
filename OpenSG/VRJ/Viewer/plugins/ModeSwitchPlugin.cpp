@@ -7,7 +7,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
 #include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginHandler.h>
+#include <OpenSG/VRJ/Viewer/IOV/PluginFactory.h>
 #include <OpenSG/VRJ/Viewer/plugins/ModeSwitchPlugin.h>
 
 
@@ -99,49 +99,51 @@ bool ModeSwitchPlugin::config(jccl::ConfigElementPtr elt)
          );
       }
 
+      mPluginFactory = inf::PluginFactory::create();
+      mPluginFactory->init(search_path);
+
       const unsigned int num_plugins(elt->getNum(plugin_prop));
 
       for ( unsigned int i = 0; i < num_plugins; ++i )
       {
          std::string plugin_name = elt->getProperty<std::string>(plugin_prop,
                                                                  i);
-         vpr::LibraryPtr dso = vpr::LibraryLoader::findDSO(plugin_name,
-                                                           search_path);
-
-         if ( dso.get() != NULL )
+         try
          {
-            const std::string get_ver_func(PluginHandler::GET_VERSION_FUNC);
-            VersionCheckCallable version_functor;
+            inf::PluginCreator* creator =
+               mPluginFactory->getPluginCreator(plugin_name);
 
-            vpr::ReturnStatus version_status =
-               vpr::LibraryLoader::findEntryPoint(dso, get_ver_func,
-                                                  version_functor);
-
-            if ( ! version_status.success() )
+            if ( NULL != creator )
             {
-               std::cerr << "Version mismatch!  Plug-in '" << plugin_name
-                         << "' cannot be used." << std::endl;
+               inf::PluginPtr plugin = creator->createPlugin();
+
+               // If this is the first plug-in being added, then it will be
+               // the one to get focus.
+               if ( mPlugins.empty() )
+               {
+                  plugin->setFocused(true);
+               }
+               // Otherwise, all other plug-ins remain unfocused until a
+               // plug-in switch is performed.
+               else
+               {
+                  plugin->setFocused(false);
+               }
+
+               plugin->init(mViewer);
+               mPlugins.push_back(plugin);
             }
             else
             {
-               const std::string get_creator_func(PluginHandler::GET_CREATOR_FUNC);
-               inf::ModeSwitchPluginPtr handler = shared_from_this();
-               PluginCreateCallable<ModeSwitchPluginPtr> create_functor(handler);
-
-               vpr::ReturnStatus create_status =
-                  vpr::LibraryLoader::findEntryPoint(dso, get_creator_func,
-                                                     create_functor);
-
-               if ( create_status.success() )
-               {
-                  mLoadedDsos.push_back(dso);
-               }
+               std::cerr << "[ModeSwitchPlugin] ERROR: Plug-in '"
+                         << plugin_name << "' has a NULL creator!"
+                         << std::endl;
             }
          }
-         else
+         catch (std::runtime_error& ex)
          {
-            std::cerr << "WARNING: Failed to load plug-in '" << plugin_name
-                      << "'!" << std::endl;
+            std::cerr << "WARNING: ModeSwitchPlugin failed to load plug-in '"
+                      << plugin_name << "': " << ex.what() << std::endl;
          }
       }
 
@@ -194,25 +196,6 @@ void ModeSwitchPlugin::run(inf::ViewerPtr viewer)
    {
       (*i)->run(viewer);
    }
-}
-
-void ModeSwitchPlugin::addPlugin(inf::PluginPtr plugin)
-{
-   // If this is the first plug-in being added, then it will be the one to
-   // get focus.
-   if ( mPlugins.empty() )
-   {
-      plugin->setFocused(true);
-   }
-   // Otherwise, all other plug-ins remain unfocused until a plug-in switch
-   // is performed.
-   else
-   {
-      plugin->setFocused(false);
-   }
-
-   plugin->init(mViewer);
-   mPlugins.push_back(plugin);
 }
 
 }

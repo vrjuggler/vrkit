@@ -12,6 +12,7 @@
 
 #include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/PluginFactoryPtr.h>
 #include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
 #include <OpenSG/VRJ/Viewer/plugins/ModeSwitchPluginPtr.h>
 
@@ -45,8 +46,6 @@ public:
    virtual void updateState(inf::ViewerPtr viewer);
 
    virtual void run(inf::ViewerPtr viewer);
-
-   void addPlugin(inf::PluginPtr plugin);
 
    /**
     * Invokes the global scope delete operator.  This is required for proper
@@ -84,7 +83,7 @@ protected:
    WandInterfacePtr mWandInterface;
    const int SWITCH_BUTTON;
 
-   std::vector<vpr::LibraryPtr> mLoadedDsos;
+   inf::PluginFactoryPtr mPluginFactory;
 
    int mCurrentMode;
    std::vector<inf::PluginPtr> mPlugins;

@@ -10,7 +10,8 @@
 
 #include <OpenSG/VRJ/Viewer/IOV/User.h>
 #include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginHandler.h>
+#include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
+#include <OpenSG/VRJ/Viewer/IOV/PluginFactory.h>
 #include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
 
 
@@ -187,13 +188,6 @@ void Viewer::preFrame()
    }
 }
 
-void Viewer::addPlugin(PluginPtr plugin)
-{
-   plugin->setFocused(true);
-   plugin->init(shared_from_this());
-   mPlugins.push_back(plugin);
-}
-
 void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
 {
    const std::string listen_port_prop("listen_port");
@@ -262,63 +256,47 @@ void Viewer::loadAndConfigPlugins(jccl::ConfigElementPtr appCfg,
       );
    }
 
+   mPluginFactory = PluginFactory::create();
+   mPluginFactory->init(search_path);
+
    const unsigned int num_plugins(appCfg->getNum(plugin_prop));
 
    for ( unsigned int i = 0; i < num_plugins; ++i )
    {
       std::string plugin_name =
          appCfg->getProperty<std::string>(plugin_prop, i);
-      vpr::LibraryPtr dso = vpr::LibraryLoader::findDSO(plugin_name,
-                                                        search_path);
 
-      if ( dso.get() != NULL )
+      try
       {
-         const std::string get_ver_func(PluginHandler::GET_VERSION_FUNC);
-         VersionCheckCallable version_functor;
+         inf::PluginCreator* creator =
+            mPluginFactory->getPluginCreator(plugin_name);
 
-         vpr::ReturnStatus version_status =
-            vpr::LibraryLoader::findEntryPoint(dso, get_ver_func,
-                                               version_functor);
-
-         if ( ! version_status.success() )
+         if ( NULL != creator )
          {
-            std::cerr << "Version mismatch!  Plug-in '" << plugin_name
-                      << "' cannot be used." << std::endl;
+            inf::PluginPtr plugin = creator->createPlugin();
+            plugin->setFocused(true);
+            plugin->init(shared_from_this());
+            mPlugins.push_back(plugin);
+
+            // Configure the newly loaded plug-in and remove all the
+            // elements (if any) from elts that the plug-in consumes.
+            ElementRemovePredicate remove_pred(plugin);
+            std::vector<jccl::ConfigElementPtr>::iterator new_end =
+               std::remove_if(elts.begin(), elts.end(), remove_pred);
+            elts.erase(new_end, elts.end());
+            vpr::LibraryPtr dso = vpr::LibraryLoader::findDSO(plugin_name,
+                                                              search_path);
          }
          else
          {
-            const std::string get_creator_func(PluginHandler::GET_CREATOR_FUNC);
-            inf::ViewerPtr viewer = shared_from_this();
-            PluginCreateCallable<ViewerPtr> create_functor(viewer);
-
-            vpr::ReturnStatus create_status =
-               vpr::LibraryLoader::findEntryPoint(dso, get_creator_func,
-                                                  create_functor);
-
-            if ( create_status.success() )
-            {
-               // At this point, the plug-in has been instantiated, added to
-               // our collection of loaded plug-ins, and initialized.
-
-               mLoadedDsos.push_back(dso);
-
-               // The newly created plug-in will be at the end of mPlugins.
-               // XXX: This is a bit dodgy...
-               inf::PluginPtr plugin = mPlugins[mPlugins.size() -1 ];
-
-               // Configure the newly loaded plug-in and remove all the
-               // elements (if any) from elts that the plug-in consumes.
-               ElementRemovePredicate remove_pred(plugin);
-               std::vector<jccl::ConfigElementPtr>::iterator new_end =
-                  std::remove_if(elts.begin(), elts.end(), remove_pred);
-               elts.erase(new_end, elts.end());
-            }
+            std::cerr << "[Viewer::init()] ERROR: Plug-in '" << plugin_name
+                      << "' has a NULL creator!" << std::endl;
          }
       }
-      else
+      catch (std::runtime_error& ex)
       {
-         std::cerr << "WARNING: Failed to load plug-in '" << plugin_name
-                   << "'!" << std::endl;
+         std::cerr << "[Viewer::init()] WARNING: Failed to load plug-in '"
+                   << plugin_name << "': " << ex.what() << std::endl;
       }
    }
 }

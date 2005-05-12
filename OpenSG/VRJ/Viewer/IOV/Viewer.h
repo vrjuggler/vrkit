@@ -14,7 +14,6 @@
 #include <OpenSG/OSGGroupConnection.h>
 
 #include <vpr/vpr.h>
-#include <vpr/DynLoad/Library.h>
 #include <jccl/Config/ConfigElementPtr.h>
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
 
@@ -23,6 +22,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/PluginPtr.h>
 #include <OpenSG/VRJ/Viewer/IOV/UserPtr.h>
 #include <OpenSG/VRJ/Viewer/IOV/ScenePtr.h>
+#include <OpenSG/VRJ/Viewer/IOV/PluginFactoryPtr.h>
 
 #include <OpenSG/VRJ/Viewer/IOV/Scene.h>
 
@@ -86,8 +86,6 @@ public:
    {
       return mScene;
    }
-
-   void addPlugin(PluginPtr plugin);
 
 public:
    UserPtr      getUser()
@@ -165,7 +163,7 @@ private:
    std::vector<OSG::Connection::Channel> mChannels;
    //@}
 
-   std::vector<vpr::LibraryPtr> mLoadedDsos;
+   inf::PluginFactoryPtr mPluginFactory;
 
    /** List of plugins
    * @link association
