@@ -31,7 +31,8 @@ plugins = [Plugin('SimpleNavPlugin', ['SimpleNavPlugin.cpp'], use_debug),
            Plugin('CenterPointGrabPlugin', ['CenterPointGrabPlugin.cpp'],
                   use_debug),
            Plugin('PointGrabPlugin', ['PointGrabPlugin.cpp'], use_debug),
-           Plugin('ModeSwitchPlugin', ['ModeSwitchPlugin.cpp'], use_debug)
+           Plugin('ModeSwitchPlugin', ['ModeSwitchPlugin.cpp'], use_debug),
+           Plugin('ViewpointsPlugin', ['ViewpointsPlugin.cpp'], use_debug)
           ]
 
 env.Append(CPPPATH = [os.path.join('..', '..', '..', '..')])

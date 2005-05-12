@@ -89,6 +89,8 @@ void OpenSgViewer::init()
 
    OSG::RefPtr<OSG::NodePtr> model_root;
 
+   mFileName = "data/test_scene.osb";
+   
    // Load the model to use
    if (mFileName.empty())
    {
