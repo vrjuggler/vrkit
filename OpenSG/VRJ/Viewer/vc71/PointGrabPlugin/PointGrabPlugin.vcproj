@@ -144,9 +144,6 @@
 			<File
 				RelativePath="..\..\plugins\PointGrabPlugin.h">
 			</File>
-			<File
-				RelativePath="..\..\plugins\PointGrabPluginPtr.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

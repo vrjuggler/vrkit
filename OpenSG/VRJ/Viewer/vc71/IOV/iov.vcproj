@@ -144,7 +144,7 @@
 				RelativePath="..\..\Iov\PluginCreator.cpp">
 			</File>
 			<File
-				RelativePath="..\..\Iov\PluginHandler.cpp">
+				RelativePath="..\..\Iov\PluginFactory.cpp">
 			</File>
 			<File
 				RelativePath="..\..\Iov\Scene.cpp">
@@ -178,6 +178,9 @@
 				RelativePath="..\..\Iov\DeviceInterface.h">
 			</File>
 			<File
+				RelativePath="..\..\Iov\Exceptions.h">
+			</File>
+			<File
 				RelativePath="..\..\Iov\Grabber.h">
 			</File>
 			<File
@@ -196,7 +199,10 @@
 				RelativePath="..\..\Iov\PluginCreator.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\PluginHandler.h">
+				RelativePath="..\..\Iov\PluginFactory.h">
+			</File>
+			<File
+				RelativePath="..\..\Iov\PluginFactoryPtr.h">
 			</File>
 			<File
 				RelativePath="..\..\Iov\PluginPtr.h">

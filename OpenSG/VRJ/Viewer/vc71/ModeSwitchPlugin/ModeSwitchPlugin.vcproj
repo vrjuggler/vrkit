@@ -142,9 +142,6 @@
 				RelativePath="..\..\plugins\ModeSwitchPlugin.h">
 			</File>
 			<File
-				RelativePath="..\..\plugins\ModeSwitchPluginPtr.h">
-			</File>
-			<File
 				RelativePath="..\..\plugins\PluginConfig.h">
 			</File>
 		</Filter>

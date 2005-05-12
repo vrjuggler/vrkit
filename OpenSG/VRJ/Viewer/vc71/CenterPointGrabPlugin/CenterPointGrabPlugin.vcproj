@@ -142,9 +142,6 @@
 				RelativePath="..\..\plugins\CenterPointGrabPlugin.h">
 			</File>
 			<File
-				RelativePath="..\..\plugins\CenterPointGrabPluginPtr.h">
-			</File>
-			<File
 				RelativePath="..\..\plugins\PluginConfig.h">
 			</File>
 		</Filter>
