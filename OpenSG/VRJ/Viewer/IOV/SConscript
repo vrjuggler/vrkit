@@ -1,7 +1,8 @@
 #!python
 
-import glob
+import glob, os
 import os.path
+pj = os.path.join
 
 Import('baseEnv optimize')
 Import('GetPlatform')
@@ -9,4 +10,8 @@ Import('GetPlatform')
 env = baseEnv.Copy()
 env.Append(CPPPATH = [os.path.join('..', '..', '..', '..')])
 
-env.SharedLibrary('iov', glob.glob('*.cpp'))
+src_files = []
+for path, dirs, files in os.walk('.'):
+   src_files += [pj(path,f) for f in files if f.endswith('.cpp')]
+
+env.SharedLibrary('iov', src_files)
