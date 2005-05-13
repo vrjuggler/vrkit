@@ -21,6 +21,7 @@
             <enum label="ModeSwitchPlugin" value="ModeSwitchPlugin"/>
             <enum label="PointGrabPlugin" value="PointGrabPlugin"/>
             <enum label="SimpleNavPlugin" value="SimpleNavPlugin"/>
+            <enum label="ViewpointsPlugin" value="ViewpointsPlugin"/>
             <enum label="WandNavPlugin" value="WandNavPlugin"/>
          </enumeration>
       </property>
