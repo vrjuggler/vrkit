@@ -6,7 +6,7 @@
          <root_name>RootNode</root_name>
          <plugin>ModeSwitchPlugin</plugin>
          <listen_port>34000</listen_port>
-         <slave_count>1</slave_count>
+         <slave_count>0</slave_count>
       </infiscape_opensg_viewer>
       <mode_switch_plugin name="Mode Switcher" version="1">
          <plugin>WandNavPlugin</plugin>
