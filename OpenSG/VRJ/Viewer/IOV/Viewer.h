@@ -146,7 +146,8 @@ private:
                              std::vector<jccl::ConfigElementPtr>& elts);
 
    /** The user for the viewer.
-   * @link association */
+   * @link association 
+   * @supplierCardinality 1*/
    /*# User lnkUser */
    UserPtr     mUser;
 
