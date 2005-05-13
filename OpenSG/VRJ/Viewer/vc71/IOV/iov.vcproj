@@ -166,9 +166,6 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
 			<File
-				RelativePath="..\..\Iov\CollideData.h">
-			</File>
-			<File
 				RelativePath="..\..\Iov\Config.h">
 			</File>
 			<File
@@ -178,10 +175,7 @@
 				RelativePath="..\..\Iov\DeviceInterface.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\Exceptions.h">
-			</File>
-			<File
-				RelativePath="..\..\Iov\Grabber.h">
+				RelativePath="..\..\Iov\Util\Exceptions.h">
 			</File>
 			<File
 				RelativePath="..\..\Iov\GrabData.h">
