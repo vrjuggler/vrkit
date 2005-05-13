@@ -11,7 +11,7 @@
 #include <vpr/vpr.h>
 #include <vpr/DynLoad/Library.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/Exceptions.h>
+#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
 #include <OpenSG/VRJ/Viewer/IOV/PluginFactoryPtr.h>
 
 
