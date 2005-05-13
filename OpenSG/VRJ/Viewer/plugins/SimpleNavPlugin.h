@@ -36,16 +36,6 @@ public:
 
    virtual void init(ViewerPtr viewer);
 
-   virtual bool canHandleElement(jccl::ConfigElementPtr elt)
-   {
-      return false;
-   }
-
-   virtual bool config(jccl::ConfigElementPtr elt)
-   {
-      return false;
-   }
-
    /**
     * Invokes the global scope delete operator.  This is required for proper
     * releasing of memory in DLLs on Win32.

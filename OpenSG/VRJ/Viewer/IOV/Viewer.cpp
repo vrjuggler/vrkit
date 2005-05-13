@@ -15,33 +15,6 @@
 #include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
 
 
-namespace
-{
-
-struct ElementRemovePredicate
-{
-   ElementRemovePredicate(inf::PluginPtr plugin)
-      : mPlugin(plugin)
-   {
-   }
-
-   bool operator()(jccl::ConfigElementPtr e)
-   {
-      if ( mPlugin->canHandleElement(e) && mPlugin->config(e) )
-      {
-         return true;
-      }
-      else
-      {
-         return false;
-      }
-   }
-
-   inf::PluginPtr mPlugin;
-};
-
-}
-
 namespace inf
 {
 
@@ -108,15 +81,9 @@ void Viewer::init()
          // configuration).
          configureNetwork(app_cfg);
 
-         std::vector<jccl::ConfigElementPtr> all_elts = mConfiguration.getAllConfigElements();
+         loadAndInitPlugins(app_cfg);
 
-         // Remove app_cfg from all_elts since we are the consumer for that
-         // element.
-         all_elts.erase(std::remove(all_elts.begin(), all_elts.end(), app_cfg),
-                        all_elts.end());
-
-         loadAndConfigPlugins(app_cfg, all_elts);
-
+         /*
          if ( ! all_elts.empty() )
          {
             std::cout << "Unconsumed config elements from viewer configuration: " << std::endl;
@@ -129,6 +96,7 @@ void Viewer::init()
 
             std::cout << std::flush;
          }
+         */
       }
    }
 }
@@ -232,9 +200,10 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
    }
 }
 
-void Viewer::loadAndConfigPlugins(jccl::ConfigElementPtr appCfg,
-                                  std::vector<jccl::ConfigElementPtr>& elts)
+void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
 {
+   std::cout << "Loading plugins" << std::endl;
+
    const std::string plugin_path_prop("plugin_path");
    const std::string plugin_prop("plugin");
 
@@ -262,6 +231,7 @@ void Viewer::loadAndConfigPlugins(jccl::ConfigElementPtr appCfg,
 
       try
       {
+         std::cout << "   Loading plugin: " << plugin_name << " .... " << std::endl;
          inf::PluginCreator* creator =
             mPluginFactory->getPluginCreator(plugin_name);
 
@@ -271,25 +241,17 @@ void Viewer::loadAndConfigPlugins(jccl::ConfigElementPtr appCfg,
             plugin->setFocused(true);
             plugin->init(shared_from_this());                     // Initialize the plugin, and configure it
             mPlugins.push_back(plugin);
-
-            // Configure the newly loaded plug-in and remove all the
-            // elements (if any) from elts that the plug-in consumes.
-            ElementRemovePredicate remove_pred(plugin);
-            std::vector<jccl::ConfigElementPtr>::iterator new_end =
-               std::remove_if(elts.begin(), elts.end(), remove_pred);
-            elts.erase(new_end, elts.end());
-            vpr::LibraryPtr dso = vpr::LibraryLoader::findDSO(plugin_name,
-                                                              search_path);
          }
          else
          {
-            std::cerr << "[Viewer::init()] ERROR: Plug-in '" << plugin_name
+            std::cout << "[ERROR]\n   Plug-in '" << plugin_name
                       << "' has a NULL creator!" << std::endl;
          }
+         std::cout << "[OK]" << std::endl;
       }
       catch (std::runtime_error& ex)
       {
-         std::cerr << "[Viewer::init()] WARNING: Failed to load plug-in '"
+         std::cout << "[FAILED]\n   WARNING: Failed to load plug-in '"
                    << plugin_name << "': " << ex.what() << std::endl;
       }
    }

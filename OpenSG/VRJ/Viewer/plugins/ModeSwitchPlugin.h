@@ -38,10 +38,6 @@ public:
 
    virtual void init(inf::ViewerPtr viewer);
 
-   virtual bool canHandleElement(jccl::ConfigElementPtr elt);
-
-   virtual bool config(jccl::ConfigElementPtr elt);
-
    virtual void updateState(inf::ViewerPtr viewer);
 
    virtual void run(inf::ViewerPtr viewer);
@@ -77,15 +73,13 @@ protected:
       return std::string("mode_switch_plugin");
    }
 
-   inf::ViewerPtr mViewer;
-
    WandInterfacePtr mWandInterface;
    const int SWITCH_BUTTON;
 
-   inf::PluginFactoryPtr mPluginFactory;
+   inf::PluginFactoryPtr mPluginFactory;     /**< Plugin factory that we are using to load plugins. */
 
-   int mCurrentMode;
-   std::vector<inf::PluginPtr> mPlugins;
+   unsigned                      mCurrentMode;     /**< Current active plugin. */
+   std::vector<inf::PluginPtr>   mPlugins;
 };
 
 }

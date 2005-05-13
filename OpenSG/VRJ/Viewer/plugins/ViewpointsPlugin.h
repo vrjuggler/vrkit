@@ -37,9 +37,6 @@ public:
 
    virtual void run(inf::ViewerPtr viewer);
 
-   virtual bool canHandleElement(jccl::ConfigElementPtr elt);
-
-   virtual bool config(jccl::ConfigElementPtr elt);
 
    /**
     * Invokes the global scope delete operator.  This is required for proper
@@ -51,8 +48,6 @@ public:
    }
 
 protected:
-   static std::string getElementType();
-
    /**
     * Deletes this object.  This is an implementation of the pure virtual
     * inf::Plugin::destroy() method.

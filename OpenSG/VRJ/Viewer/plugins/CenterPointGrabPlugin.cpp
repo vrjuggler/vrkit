@@ -15,6 +15,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
 #include <OpenSG/VRJ/Viewer/IOV/ViewPlatform.h>
 #include <OpenSG/VRJ/Viewer/plugins/CenterPointGrabPlugin.h>
+#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
 
 
 static inf::PluginCreator sPluginCreator(&inf::CenterPointGrabPlugin::create,
@@ -117,6 +118,19 @@ void CenterPointGrabPlugin::init(ViewerPtr viewer)
    OSG::addRefCP(geo);
 
    mCoredHighlightNode = inf::CoredGeomPtr(geo);
+
+
+   // Configure
+   std::string elt_type_name = getElementType();
+   jccl::ConfigElementPtr cfg_elt = viewer->getConfiguration().getConfigElement(elt_type_name);
+
+   if(!cfg_elt)
+   {
+      throw PluginException("CenterPointGrabPlugincould not find it's configuration.", IOV_LOCATION);
+   }
+
+   // Configure it
+   config(cfg_elt);
 }
 
 void CenterPointGrabPlugin::updateState(ViewerPtr viewer)
@@ -270,14 +284,9 @@ void CenterPointGrabPlugin::run(inf::ViewerPtr viewer)
    }
 }
 
-bool CenterPointGrabPlugin::canHandleElement(jccl::ConfigElementPtr elt)
-{
-   return elt->getID() == getElementType();
-}
-
 bool CenterPointGrabPlugin::config(jccl::ConfigElementPtr elt)
 {
-   vprASSERT(canHandleElement(elt));
+   vprASSERT(elt->getID() == getElementType());
 
    const std::string isect_prop("intersect_color");
    const std::string grab_prop("grab_color");

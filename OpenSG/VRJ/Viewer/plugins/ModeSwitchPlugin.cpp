@@ -9,6 +9,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
 #include <OpenSG/VRJ/Viewer/IOV/PluginFactory.h>
 #include <OpenSG/VRJ/Viewer/plugins/ModeSwitchPlugin.h>
+#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
 
 
 static inf::PluginCreator sPluginCreator(&inf::ModeSwitchPlugin::create,
@@ -54,115 +55,83 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
 
-   // Store this for initializing plug-ins when config() is invoked.
-   mViewer = viewer;
-}
+   // -- Configure -- //
+   std::string elt_type_name = getElementType();
+   jccl::ConfigElementPtr elt = viewer->getConfiguration().getConfigElement(elt_type_name);
 
-bool ModeSwitchPlugin::canHandleElement(jccl::ConfigElementPtr elt)
-{
-   bool can_handle(elt->getID() == getElementType());
-
-   if ( ! can_handle && ! mPlugins.empty() )
+   if(!elt)
    {
-      std::vector<PluginPtr>::iterator i;
-      for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
-      {
-         if ( (*i)->canHandleElement(elt) )
-         {
-            can_handle = true;
-            break;
-         }
-      }
+      throw PluginException("ModeSwitchPlugin not find it's configuration.", IOV_LOCATION);
    }
 
-   return can_handle;
-}
+   vprASSERT(elt->getID() == getElementType())
 
-bool ModeSwitchPlugin::config(jccl::ConfigElementPtr elt)
-{
-   bool status(false);
+   // Lookup details from config element
+   const std::string plugin_path_prop("plugin_path");
+   const std::string plugin_prop("plugin");
 
-   if ( elt->getID() == getElementType() )
+   // Setup search path
+   std::vector<std::string> search_path;
+   search_path.push_back("plugins");
+
+   const unsigned int num_paths(elt->getNum(plugin_path_prop));
+
+   for ( unsigned int i = 0; i < num_paths; ++i )
    {
-      const std::string plugin_path_prop("plugin_path");
-      const std::string plugin_prop("plugin");
+      search_path.push_back(
+         elt->getProperty<std::string>(plugin_path_prop, i)
+      );
+   }
 
-      std::vector<std::string> search_path;
-      search_path.push_back("plugins");
+   mPluginFactory = inf::PluginFactory::create();
+   mPluginFactory->init(search_path);
 
-      const unsigned int num_paths(elt->getNum(plugin_path_prop));
+   const unsigned int num_plugins(elt->getNum(plugin_prop));
 
-      for ( unsigned int i = 0; i < num_paths; ++i )
+   // Attempt to load each plugin
+   // - Get creator and create plugin
+   // - Push onto plugin list
+   for ( unsigned int i = 0; i < num_plugins; ++i )
+   {
+      std::string plugin_name = elt->getProperty<std::string>(plugin_prop, i);
+      try
       {
-         search_path.push_back(
-            elt->getProperty<std::string>(plugin_path_prop, i)
-         );
-      }
+         inf::PluginCreator* creator =
+            mPluginFactory->getPluginCreator(plugin_name);
 
-      mPluginFactory = inf::PluginFactory::create();
-      mPluginFactory->init(search_path);
-
-      const unsigned int num_plugins(elt->getNum(plugin_prop));
-
-      for ( unsigned int i = 0; i < num_plugins; ++i )
-      {
-         std::string plugin_name = elt->getProperty<std::string>(plugin_prop,
-                                                                 i);
-         try
+         if ( NULL != creator )
          {
-            inf::PluginCreator* creator =
-               mPluginFactory->getPluginCreator(plugin_name);
+            inf::PluginPtr plugin = creator->createPlugin();
 
-            if ( NULL != creator )
+            // If this is the first plug-in being added, then it will be
+            // the one to get focus.
+            if ( mPlugins.empty() )
             {
-               inf::PluginPtr plugin = creator->createPlugin();
-
-               // If this is the first plug-in being added, then it will be
-               // the one to get focus.
-               if ( mPlugins.empty() )
-               {
-                  plugin->setFocused(true);
-               }
-               // Otherwise, all other plug-ins remain unfocused until a
-               // plug-in switch is performed.
-               else
-               {
-                  plugin->setFocused(false);
-               }
-
-               plugin->init(mViewer);
-               mPlugins.push_back(plugin);
+               plugin->setFocused(true);
             }
+            // Otherwise, all other plug-ins remain unfocused until a
+            // plug-in switch is performed.
             else
             {
-               std::cerr << "[ModeSwitchPlugin] ERROR: Plug-in '"
-                         << plugin_name << "' has a NULL creator!"
-                         << std::endl;
+               plugin->setFocused(false);
             }
+
+            plugin->init(viewer);
+            mPlugins.push_back(plugin);
          }
-         catch (std::runtime_error& ex)
+         else
          {
-            std::cerr << "WARNING: ModeSwitchPlugin failed to load plug-in '"
-                      << plugin_name << "': " << ex.what() << std::endl;
+            std::cerr << "[ModeSwitchPlugin] ERROR: Plug-in '"
+                      << plugin_name << "' has a NULL creator!"
+                      << std::endl;
          }
       }
-
-      status = true;
-   }
-   else if ( ! mPlugins.empty() )
-   {
-      std::vector<PluginPtr>::iterator i;
-      for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+      catch (std::runtime_error& ex)
       {
-         if ( (*i)->canHandleElement(elt) )
-         {
-            status = (*i)->config(elt);
-            break;
-         }
+         std::cerr << "WARNING: ModeSwitchPlugin failed to load plug-in '"
+                   << plugin_name << "': " << ex.what() << std::endl;
       }
    }
-
-   return status;
 }
 
 void ModeSwitchPlugin::updateState(inf::ViewerPtr viewer)

@@ -55,22 +55,6 @@ public:
     */
    virtual void run(inf::ViewerPtr viewer) = 0;
 
-   virtual bool canHandleElement(jccl::ConfigElementPtr elt) = 0;
-
-   /**
-    * Configures this plug-in using the given config element.
-    *
-    * @pre \c canHandleElement() returned true.
-    *
-    * @return \c true is returned if this plug-in configured itself
-    *         successfully, indicating that the given config element has
-    *         been consumed.
-    * @return \c false is returned if this plug-in was unable to configure
-    *         itself using the given config element, indicating that the
-    *         config element has not been consumed.
-    */
-   virtual bool config(jccl::ConfigElementPtr elt) = 0;
-
    bool isFocused() const
    {
       return mIsFocused;

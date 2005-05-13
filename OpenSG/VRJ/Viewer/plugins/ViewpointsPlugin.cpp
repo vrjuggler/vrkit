@@ -6,8 +6,10 @@
 #include <OpenSG/VRJ/Viewer/IOV/InterfaceTrader.h>
 #include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
 #include <OpenSG/VRJ/Viewer/IOV/ViewPlatform.h>
+#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
 
 #include <boost/format.hpp>
+#include <sstream>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/Vec.h>
@@ -59,15 +61,61 @@ PluginPtr ViewpointsPlugin::create()
    return PluginPtr(new ViewpointsPlugin);
 }
 
-std::string ViewpointsPlugin::getElementType()
-{
-   return vp_plugin_elt_tkn;
-}
-
 void ViewpointsPlugin::init(inf::ViewerPtr viewer)
 {
+   // Get the wand interface
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
+
+   jccl::ConfigElementPtr elt = viewer->getConfiguration().getConfigElement(vp_plugin_elt_tkn);
+
+   if(!elt)
+   {
+      std::stringstream ex_msg;
+      ex_msg << "Viewpoint plugin could not find it's configuration.  Looking for type: " << vp_plugin_elt_tkn;
+      throw PluginException(ex_msg.str(), IOV_LOCATION);
+   }
+
+   // -- Read configuration -- //
+   vprASSERT(elt->getID() == vp_plugin_elt_tkn);
+
+   // Get the control button to use
+   mControlBtnNum = elt->getProperty<unsigned>(vp_control_button_num_tkn);
+
+   // Read in all the viewpoints
+   unsigned num_vps = elt->getNum(vp_viewpoints_tkn);
+   for(unsigned i=0;i<num_vps;i++)
+   {
+      jccl::ConfigElementPtr vp_elt =
+         elt->getProperty<jccl::ConfigElementPtr>(vp_viewpoints_tkn, i);
+      vprASSERT(vp_elt.get() != NULL);
+      float xt = vp_elt->getProperty<float>(vp_pos_elt_tkn, 0);
+      float yt = vp_elt->getProperty<float>(vp_pos_elt_tkn, 1);
+      float zt = vp_elt->getProperty<float>(vp_pos_elt_tkn, 2);
+
+      float xr = vp_elt->getProperty<float>(vp_rot_elt_tkn, 0);
+      float yr = vp_elt->getProperty<float>(vp_rot_elt_tkn, 1);
+      float zr = vp_elt->getProperty<float>(vp_rot_elt_tkn, 2);
+
+      gmtl::Coord3fXYZ vp_coord;
+      vp_coord.pos().set(xt,yt,zt);
+      vp_coord.rot().set(gmtl::Math::deg2Rad(xr),
+                         gmtl::Math::deg2Rad(yr),
+                         gmtl::Math::deg2Rad(zr));
+
+      Viewpoint vp;
+      vp.mXform = gmtl::make<gmtl::Matrix44f>(vp_coord); // Set at T*R
+      vp.mName = vp_elt->getName();
+      mViewpoints.push_back(vp);
+   }
+   vprASSERT(mViewpoints.size() == num_vps);
+
+   // Setup the internals
+   // - Setup the next viewpoint to use
+   if(num_vps > 0)
+   {
+      mNextViewpoint = 1;
+   }
 }
 
 //
@@ -109,54 +157,6 @@ void ViewpointsPlugin::run(inf::ViewerPtr viewer)
 {
 }
 
-bool ViewpointsPlugin::canHandleElement(jccl::ConfigElementPtr elt)
-{
-   return elt->getID() == getElementType();
-}
-
-bool ViewpointsPlugin::config(jccl::ConfigElementPtr elt)
-{
-   vprASSERT(canHandleElement(elt));
-
-   // Get the control button to use
-   mControlBtnNum = elt->getProperty<unsigned>(vp_control_button_num_tkn);
-   unsigned num_vps = elt->getNum(vp_viewpoints_tkn);
-
-   for(unsigned i=0;i<num_vps;i++)
-   {
-      jccl::ConfigElementPtr vp_elt =
-         elt->getProperty<jccl::ConfigElementPtr>(vp_viewpoints_tkn, i);
-      vprASSERT(vp_elt.get() != NULL);
-      float xt = vp_elt->getProperty<float>(vp_pos_elt_tkn, 0);
-      float yt = vp_elt->getProperty<float>(vp_pos_elt_tkn, 1);
-      float zt = vp_elt->getProperty<float>(vp_pos_elt_tkn, 2);
-
-      float xr = vp_elt->getProperty<float>(vp_rot_elt_tkn, 0);
-      float yr = vp_elt->getProperty<float>(vp_rot_elt_tkn, 1);
-      float zr = vp_elt->getProperty<float>(vp_rot_elt_tkn, 2);
-
-      gmtl::Coord3fXYZ vp_coord;
-      vp_coord.pos().set(xt,yt,zt);
-      vp_coord.rot().set(gmtl::Math::deg2Rad(xr),
-                         gmtl::Math::deg2Rad(yr),
-                         gmtl::Math::deg2Rad(zr));
-
-      Viewpoint vp;
-      vp.mXform = gmtl::make<gmtl::Matrix44f>(vp_coord); // Set at T*R
-      vp.mName = vp_elt->getName();
-      mViewpoints.push_back(vp);
-   }
-   vprASSERT(mViewpoints.size() == num_vps);
-
-   // Setup the internals
-   // - Setup the next viewpoint to use
-   if(num_vps > 0)
-   {
-      mNextViewpoint = 1;
-   }
-
-   return true;
-}
 
 } // namespace inf
 

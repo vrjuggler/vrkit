@@ -87,7 +87,7 @@ vpr::LibraryPtr PluginFactory::getPluginLibrary(const std::string& name) const
    {
       std::stringstream msg_stream;
       msg_stream << "No plug-in named '" << name << "' exists";
-      throw NoSuchPluginException(msg_stream.str());
+      throw NoSuchPluginException(msg_stream.str(), IOV_LOCATION);
    }
 }
 
@@ -120,7 +120,7 @@ inf::PluginCreator* PluginFactory::getPluginCreator(const std::string& name)
       {
          std::stringstream msg_stream;
          msg_stream << "Plug-in '" << name << "' failed to load";
-         throw PluginLoadException(msg_stream.str());
+         throw PluginLoadException(msg_stream.str(), IOV_LOCATION);
       }
    }
 
@@ -150,7 +150,7 @@ void PluginFactory::registerCreator(vpr::LibraryPtr pluginLib,
       msg_stream << "Plug-in '" << pluginLib->getName()
                  << "' has no entry point function named "
                  << get_creator_func;
-      throw inf::PluginInterfaceException(msg_stream.str());
+      throw inf::PluginInterfaceException(msg_stream.str(), IOV_LOCATION);
    }
 }
 
@@ -168,7 +168,7 @@ void PluginFactory::validatePluginInterface(vpr::LibraryPtr pluginLib)
       std::stringstream msg_stream;
       msg_stream << "Plug-in '" << pluginLib->getName()
                  << "' has no entry point function named " << get_version_func;
-      throw inf::PluginInterfaceException(msg_stream.str());
+      throw inf::PluginInterfaceException(msg_stream.str(), IOV_LOCATION);
    }
    else
    {
@@ -186,7 +186,7 @@ void PluginFactory::validatePluginInterface(vpr::LibraryPtr pluginLib)
                     << "compile-time plug-in setting ("
                     << INF_PLUGIN_API_MAJOR << "." << INF_PLUGIN_API_MINOR
                     << " != " << major_ver << "." << minor_ver << ")";
-         throw inf::PluginInterfaceException(msg_stream.str());
+         throw inf::PluginInterfaceException(msg_stream.str(), IOV_LOCATION);
       }
    }
 }

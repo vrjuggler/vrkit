@@ -16,6 +16,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/User.h>
 #include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
 #include <OpenSG/VRJ/Viewer/plugins/WandNavPlugin.h>
+#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
 
 
 static inf::PluginCreator sPluginCreator(&inf::WandNavPlugin::create,
@@ -62,12 +63,20 @@ void WandNavPlugin::init(ViewerPtr viewer)
 {
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
+
+   // Configure
+   std::string elt_type_name = getElementType();
+   jccl::ConfigElementPtr cfg_elt = viewer->getConfiguration().getConfigElement(elt_type_name);
+
+   if(!cfg_elt)
+   {
+      throw PluginException("WandNavPlugin not find it's configuration.", IOV_LOCATION);
+   }
+
+   // Configure it
+   config(cfg_elt);
 }
 
-bool WandNavPlugin::canHandleElement(jccl::ConfigElementPtr elt)
-{
-   return elt->getID() == getElementType();
-}
 
 bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
 {

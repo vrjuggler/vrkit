@@ -38,14 +38,9 @@ public:
    virtual void init(ViewerPtr viewer);
 
    /**
-    * @pre \c init() has been called.
-    */
-   virtual bool canHandleElement(jccl::ConfigElementPtr elt);
-
-   /**
     * @pre \c canHandleElement() returned true.
     */
-   virtual bool config(jccl::ConfigElementPtr elt);
+   bool config(jccl::ConfigElementPtr elt);
 
    /** @name Configuration methods */
    //@{

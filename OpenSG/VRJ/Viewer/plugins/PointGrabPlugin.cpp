@@ -15,6 +15,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
 #include <OpenSG/VRJ/Viewer/IOV/ViewPlatform.h>
 #include <OpenSG/VRJ/Viewer/plugins/PointGrabPlugin.h>
+#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
 
 
 static inf::PluginCreator sPluginCreator(&inf::PointGrabPlugin::create,
@@ -120,6 +121,18 @@ void PointGrabPlugin::init(ViewerPtr viewer)
 
    mIntersectSound.init("intersect");
    mGrabSound.init("grab");
+
+   // Configure
+   std::string elt_type_name = getElementType();
+   jccl::ConfigElementPtr cfg_elt = viewer->getConfiguration().getConfigElement(elt_type_name);
+
+   if(!cfg_elt)
+   {
+      throw PluginException("PointGrabPlugin not find it's configuration.", IOV_LOCATION);
+   }
+
+   // Configure it
+   config(cfg_elt);
 }
 
 void PointGrabPlugin::updateState(ViewerPtr viewer)
@@ -294,14 +307,9 @@ void PointGrabPlugin::run(inf::ViewerPtr viewer)
    }
 }
 
-bool PointGrabPlugin::canHandleElement(jccl::ConfigElementPtr elt)
-{
-   return elt->getID() == getElementType();
-}
-
 bool PointGrabPlugin::config(jccl::ConfigElementPtr elt)
 {
-   vprASSERT(canHandleElement(elt));
+   vprASSERT(elt->getID() == getElementType());
 
    const std::string isect_prop("intersect_color");
    const std::string grab_prop("grab_color");

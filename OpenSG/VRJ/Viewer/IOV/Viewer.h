@@ -133,22 +133,16 @@ private:
 
    /**
     * Loads, initializes, and configures all plug-ins identified in the given
-    * config element \c appCfg.  Config elements consumed by those plug-ins
-    * as part of their configuration are removed from \c elts.
-    *
-    * @post Config elements consumed by plug-ins are removed from \c elts.
+    * config element \c appCfg.
     *
     * @param appCfg     the config element for the Infiscape OpenSG viewer
     *                   application object (type infiscape_opensg_viewer).
-    * @param elts       all the other config elements from the viewer
-    *                   application's configuration file that may be consumed
-    *                   by loaded plug-ins.
     *
-    * @see setConfiguration()
+    * @see getConfiguration()
     */
-   void loadAndConfigPlugins(jccl::ConfigElementPtr appCfg,
-                             std::vector<jccl::ConfigElementPtr>& elts);
+   void loadAndInitPlugins(jccl::ConfigElementPtr appCfg);
 
+private:
    /** The user for the viewer.
    * @link association
    * @supplierCardinality 1*/

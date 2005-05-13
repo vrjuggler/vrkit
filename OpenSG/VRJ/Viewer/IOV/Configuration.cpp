@@ -1,5 +1,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/Configuration.h>
 
+#include <boost/format.hpp>
+
 namespace inf
 {
 
@@ -33,8 +35,13 @@ jccl::ConfigElementPtr Configuration::getConfigElement(std::string eltName)
    while((cur_list < mElementLists.size()) &&
          (ret_elt.get() == NULL))
    {
-      ret_elt = mElementLists[cur_list].get(eltName);
-      cur_list++;
+      std::vector<jccl::ConfigElementPtr> found_elts;
+      mElementLists[cur_list].getByType(eltName, found_elts);
+      if(!found_elts.empty())
+      {
+         ret_elt = found_elts.front();
+      }
+     cur_list++;
    }
 
    return ret_elt;

@@ -16,6 +16,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/User.h>
 #include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
 #include <OpenSG/VRJ/Viewer/plugins/SimpleNavPlugin.h>
+#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
 
 
 static inf::PluginCreator sPluginCreator(&inf::SimpleNavPlugin::create,
