@@ -31,7 +31,7 @@ def BuildLinuxEnvironment():
    if optimize != 'no':
       CXXFLAGS.extend(['-DNDEBUG', '-O2'])
    else:
-      CXXFLAGS.extend(['-D_DEBUG', '-g', '-fno-inline', '-fno-default-inline'])
+      CXXFLAGS.extend(['-D_DEBUG', '-gdwarf-2', '-fno-inline', '-fno-default-inline'])
    
    env.Append(
       CXXFLAGS    = CXXFLAGS,
