@@ -66,17 +66,11 @@ void Viewer::init()
 
    vrj::OpenSGApp::init();
 
-   bool cfg_loaded(false);
-   jccl::Configuration cfg;
-
-   if ( ! mCfgFile.empty() )
+   // Verify configuration has been loaded
+   bool have_config = (mConfiguration.getAllConfigElements().size() > 0);
+   if (!have_config)
    {
-      cfg_loaded = cfg.load(mCfgFile);
-   }
-
-   if ( ! cfg_loaded )
-   {
-      std::cerr << "WARNING: Failed to load our configuration!" << std::endl;
+      std::cerr << "WARNING: System has no configuration files loaded!" << std::endl;
    }
 
    // Create an initialize the user
@@ -87,18 +81,19 @@ void Viewer::init()
    mScene = Scene::create();
    mScene->init();
 
-   if ( cfg_loaded )
+   // Load the app configuration and then...
+   // - Setup scene root for networking
+   // - Configure the networking
+   // - Load and initialize the plugins
+   if ( have_config )
    {
       const std::string app_elt_type("infiscape_opensg_viewer");
       const std::string root_name_prop("root_name");
 
-      std::vector<jccl::ConfigElementPtr> app_elts;
-      cfg.getByType(app_elt_type, app_elts);
+      jccl::ConfigElementPtr app_cfg = mConfiguration.getConfigElement(app_elt_type);
 
-      if ( ! app_elts.empty() )
+      if ( app_cfg )
       {
-         jccl::ConfigElementPtr app_cfg = app_elts[0];
-
          std::string root_name =
             app_cfg->getProperty<std::string>(root_name_prop);
 
@@ -113,7 +108,7 @@ void Viewer::init()
          // configuration).
          configureNetwork(app_cfg);
 
-         std::vector<jccl::ConfigElementPtr> all_elts = cfg.vec();
+         std::vector<jccl::ConfigElementPtr> all_elts = mConfiguration.getAllConfigElements();
 
          // Remove app_cfg from all_elts since we are the consumer for that
          // element.
@@ -124,8 +119,7 @@ void Viewer::init()
 
          if ( ! all_elts.empty() )
          {
-            std::cout << "Unconsumed config elements from "
-                      << cfg.getFileName() << ":\n";
+            std::cout << "Unconsumed config elements from viewer configuration: " << std::endl;
 
             std::vector<jccl::ConfigElementPtr>::iterator i;
             for ( i = all_elts.begin(); i != all_elts.end(); ++i )
@@ -275,7 +269,7 @@ void Viewer::loadAndConfigPlugins(jccl::ConfigElementPtr appCfg,
          {
             inf::PluginPtr plugin = creator->createPlugin();
             plugin->setFocused(true);
-            plugin->init(shared_from_this());
+            plugin->init(shared_from_this());                     // Initialize the plugin, and configure it
             mPlugins.push_back(plugin);
 
             // Configure the newly loaded plug-in and remove all the

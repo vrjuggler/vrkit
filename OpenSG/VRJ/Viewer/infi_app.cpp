@@ -90,7 +90,7 @@ void OpenSgViewer::init()
    OSG::RefPtr<OSG::NodePtr> model_root;
 
    mFileName = "data/test_scene.osb";
-   
+
    // Load the model to use
    if (mFileName.empty())
    {
@@ -221,8 +221,8 @@ int main(int argc, char* argv[])
    vrj::Kernel* kernel = vrj::Kernel::instance();     // Get the kernel
    kernel->scanForConfigDefinitions("definitions");
 
-   OpenSgViewerPtr app = OpenSgViewer::create();      // Create the app object
-   app->setConfiguration("viewer.jconf");
+   OpenSgViewerPtr app = OpenSgViewer::create();               // Create the app object
+   app->getConfiguration().loadConfigEltFile("viewer.jconf");  // Load default configuration file
 
    for ( int i = 1; i < argc; ++i )
    {
@@ -230,7 +230,7 @@ int main(int argc, char* argv[])
    }
 
    kernel->start();                         // Start the kernel thread
-   kernel->setApplication(app.get());             // Give application to kernel
+   kernel->setApplication(app.get());       // Give application to kernel
    kernel->waitForKernelStop();             // Block until kernel stops
 
    return 0;

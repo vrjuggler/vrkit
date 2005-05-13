@@ -25,6 +25,7 @@
 #include <OpenSG/VRJ/Viewer/IOV/PluginFactoryPtr.h>
 
 #include <OpenSG/VRJ/Viewer/IOV/Scene.h>
+#include <OpenSG/VRJ/Viewer/IOV/Configuration.h>
 
 
 namespace inf
@@ -50,14 +51,9 @@ public:
 
    virtual ~Viewer();
 
-   void setConfiguration(const std::string& cfgFile)
-   {
-      mCfgFile = cfgFile;
-   }
-
    /** Initialize (build) the viewer
     * @post: All objects managed by the viewer are initialized
-    *        and setup.
+    *        and setup.  (including the plugins)
     * @note: Derived class implementations <b>MUST</b> call up to this method.
     */
    virtual void init();
@@ -97,6 +93,15 @@ public:
       return getSceneObj()->getSceneRoot().node();
    }
 
+   /** Return reference to the current configuration.
+    * This can be used to add to the configuration.
+    * For example:  getConfiguration().loadConfigEltFile("file.jconf")
+    */
+   inf::Configuration& getConfiguration()
+   {
+      return mConfiguration;
+   }
+
    /** Dummied init scene method.  It is pure virtual in base so we have
     * to provide an implementation.
     */
@@ -110,7 +115,6 @@ protected:
       , mConnection(NULL)
    {;}
 
-   std::string mCfgFile;
 
 private:
    /**
@@ -146,7 +150,7 @@ private:
                              std::vector<jccl::ConfigElementPtr>& elts);
 
    /** The user for the viewer.
-   * @link association 
+   * @link association
    * @supplierCardinality 1*/
    /*# User lnkUser */
    UserPtr     mUser;
@@ -171,6 +175,9 @@ private:
    * @supplierCardinality 0..**/
    /*# Plugin lnkPlugin; */
    std::vector<PluginPtr> mPlugins;
+
+   /** The configuration for the system (and the viewer). */
+   inf::Configuration  mConfiguration;
 };
 
 }

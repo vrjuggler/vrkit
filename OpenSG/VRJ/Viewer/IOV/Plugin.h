@@ -30,6 +30,11 @@ public:
     */
    virtual std::string getDescription() = 0;
 
+   /** Intialize the plugin.
+    * This method is called as part of the setup in the Viewer init method.
+    * The plugin should read configuration from the Viewer configuration object
+    * and take care of any setup needed.
+    */
    virtual void init(inf::ViewerPtr viewer) = 0;
 
    /**
