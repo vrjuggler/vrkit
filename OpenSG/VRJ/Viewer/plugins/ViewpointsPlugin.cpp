@@ -72,7 +72,8 @@ void ViewpointsPlugin::init(inf::ViewerPtr viewer)
    if(!elt)
    {
       std::stringstream ex_msg;
-      ex_msg << "Viewpoint plugin could not find it's configuration.  Looking for type: " << vp_plugin_elt_tkn;
+      ex_msg << "Viewpoint plugin could not find its configuration.  "
+             << "Looking for type: " << vp_plugin_elt_tkn;
       throw PluginException(ex_msg.str(), IOV_LOCATION);
    }
 

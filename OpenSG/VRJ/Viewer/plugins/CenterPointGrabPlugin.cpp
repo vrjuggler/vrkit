@@ -126,7 +126,8 @@ void CenterPointGrabPlugin::init(ViewerPtr viewer)
 
    if(!cfg_elt)
    {
-      throw PluginException("CenterPointGrabPlugincould not find it's configuration.", IOV_LOCATION);
+      throw PluginException("CenterPointGrabPlugincould not find its configuration.",
+                            IOV_LOCATION);
    }
 
    // Configure it

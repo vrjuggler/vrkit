@@ -128,7 +128,8 @@ void PointGrabPlugin::init(ViewerPtr viewer)
 
    if(!cfg_elt)
    {
-      throw PluginException("PointGrabPlugin not find it's configuration.", IOV_LOCATION);
+      throw PluginException("PointGrabPlugin not find its configuration.",
+                            IOV_LOCATION);
    }
 
    // Configure it

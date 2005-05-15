@@ -61,7 +61,8 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
 
    if(!elt)
    {
-      throw PluginException("ModeSwitchPlugin not find it's configuration.", IOV_LOCATION);
+      throw PluginException("ModeSwitchPlugin not find its configuration.",
+                            IOV_LOCATION);
    }
 
    vprASSERT(elt->getID() == getElementType())

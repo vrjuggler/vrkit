@@ -70,7 +70,8 @@ void WandNavPlugin::init(ViewerPtr viewer)
 
    if(!cfg_elt)
    {
-      throw PluginException("WandNavPlugin not find it's configuration.", IOV_LOCATION);
+      throw PluginException("WandNavPlugin not find its configuration.",
+                            IOV_LOCATION);
    }
 
    // Configure it
