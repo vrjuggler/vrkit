@@ -34,6 +34,11 @@ public:
 
    virtual void preFrame();
 
+   virtual float getDrawScaleFactor()
+   {
+      return mDrawScaleFactor;
+   }
+
 private:
    bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
 
@@ -42,6 +47,8 @@ private:
    bool destroyedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
 
    void shutdown();
+
+   float mDrawScaleFactor;
 
    std::string mMasterAddr;
    std::string mRootNodeName;

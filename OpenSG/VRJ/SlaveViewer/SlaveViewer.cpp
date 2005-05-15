@@ -12,6 +12,7 @@
 
 #include <vpr/vpr.h>
 #include <vpr/Util/Debug.h>
+#include <gadget/Type/Position/PositionUnitConversion.h>
 
 #include <OpenSG/VRJ/SlaveViewer/exitcodes.h>
 #include <OpenSG/VRJ/SlaveViewer/SlaveViewer.h>
@@ -33,6 +34,7 @@ namespace inf
 SlaveViewer::SlaveViewer(const std::string& masterAddr,
                          const std::string& rootNodeName)
    : vrj::OpenSGApp()
+   , mDrawScaleFactor(gadget::PositionUnitConversion::ConvertToFeet)
    , mMasterAddr(masterAddr)
    , mRootNodeName(rootNodeName)
    , mConnection(NULL)
@@ -86,6 +88,7 @@ void SlaveViewer::initScene()
       mConnection->selectChannel();
 
       mConnection->wait();
+      mConnection->getValue(mDrawScaleFactor);
       mAspect.receiveSync(*mConnection);
 
       OSG::Thread::getCurrentChangeList()->clearAll();

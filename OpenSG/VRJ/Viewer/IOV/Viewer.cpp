@@ -186,7 +186,11 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
 
       OSG::UInt8 finish(false);
 
+      // Signal the slave nodes that we are about to send the initial sync.
       mConnection->signal();
+
+      // Provide the slave nodes with a consistent rendering scale factor.
+      mConnection->putValue(getDrawScaleFactor());
       mAspect->sendSync(*mConnection, OSG::Thread::getCurrentChangeList());
       mConnection->putValue(finish);
       mConnection->flush();
