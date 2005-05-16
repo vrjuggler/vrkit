@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings configuration.version="3.0"?>
+<configuration xmlns="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" name="/home/patrick/src/pro/Assembly/src/external/common/OpenSG/VRJ/Viewer/viewer.jconf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.0/configuration http://www.vrjuggler.org/jccl/xsd/3.0/configuration.xsd">
+   <elements>
+      <infiscape_opensg_viewer name="Viewer" version="1">
+         <root_name>RootNode</root_name>
+         <plugin>ViewpointsPlugin</plugin>
+         <listen_port>34000</listen_port>
+         <slave_count>0</slave_count>
+      </infiscape_opensg_viewer>
+      <mode_switch_plugin name="Mode Switcher" version="1">
+         <plugin>WandNavPlugin</plugin>
+         <plugin>PointGrabPlugin</plugin>
+      </mode_switch_plugin>
+      <wand_nav_plugin name="Viewer Wand Nav" version="1">
+         <max_velocity>5.0</max_velocity>
+         <acceleration>0.05</acceleration>
+      </wand_nav_plugin>
+      <viewpoints_plugin name="ViewpointsPlugin" version="1">
+         <control_button_name>VJButton1</control_button_name>
+         <viewpoints>
+            <viewpoints_vp name="Position 1" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 2" version="1">
+               <position>20.0</position>
+               <position>0.0</position>
+               <position>-10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>-90.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 3" version="1">
+               <position>-20.0</position>
+               <position>0.0</position>
+               <position>-10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>90.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 4" version="1">
+               <position>10.0</position>
+               <position>0.0</position>
+               <position>10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>10.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 30" version="1">
+               <position>0.0</position><position>0.0</position><position>0.0</position>
+               <rotation>0.0</rotation><rotation>30.0</rotation><rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+                  <viewpoints>
+            <viewpoints_vp name="L 60" version="1">
+               <position>0.0</position><position>0.0</position><position>0.0</position>
+               <rotation>0.0</rotation><rotation>60.0</rotation><rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 90" version="1">
+               <position>0.0</position><position>0.0</position><position>0.0</position>
+               <rotation>0.0</rotation><rotation>90.0</rotation><rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 120" version="1">
+               <position>0.0</position><position>0.0</position><position>0.0</position>
+               <rotation>0.0</rotation><rotation>120.0</rotation><rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 150" version="1">
+               <position>0.0</position><position>0.0</position><position>0.0</position>
+               <rotation>0.0</rotation><rotation>150.0</rotation><rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 180" version="1">
+               <position>0.0</position><position>0.0</position><position>0.0</position>
+               <rotation>0.0</rotation><rotation>180.0</rotation><rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+
+
+      </viewpoints_plugin>
+   </elements>
+</configuration>
+

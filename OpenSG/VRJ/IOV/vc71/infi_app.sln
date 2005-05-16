@@ -1,0 +1,83 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "infi_app", "infi_app.vcproj", "{C62950FE-F583-4C1F-83F4-4F106EFD52F4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wand Nav Plug-in", "WandNavPlugin\WandNavPlugin.vcproj", "{FC564DE2-E448-47FD-841E-9A6CB4E38AB0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Simple Nav Plug-in", "SimpleNavPlugin\SimpleNavPlugin.vcproj", "{D7095554-E63D-44C2-B944-116EB7458306}"
+	ProjectSection(ProjectDependencies) = postProject
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IOV DLL", "IOV\iov.vcproj", "{624282D0-8169-423E-B330-0C7CBD4C9254}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Center Point Grab Plug-in", "CenterPointGrabPlugin\CenterPointGrabPlugin.vcproj", "{84D25702-83BA-4AB0-8BAB-C9ACD7C425C5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mode Switch Plug-in", "ModeSwitchPlugin\ModeSwitchPlugin.vcproj", "{AD7EA7CC-5C2B-4409-AF41-AD23E51E5538}"
+	ProjectSection(ProjectDependencies) = postProject
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Point Grab Plug-in", "PointGrabPlugin\PointGrabPlugin.vcproj", "{609FF498-5686-4CF6-A9E6-EC801A07C8B1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Viewpoints Plug-in", "ViewpointsPlugin\ViewpointsPlugin.vcproj", "{48518067-B66C-4BD2-813F-FDDF290A056B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{C62950FE-F583-4C1F-83F4-4F106EFD52F4}.Debug.ActiveCfg = Debug|Win32
+		{C62950FE-F583-4C1F-83F4-4F106EFD52F4}.Debug.Build.0 = Debug|Win32
+		{C62950FE-F583-4C1F-83F4-4F106EFD52F4}.Release.ActiveCfg = Release|Win32
+		{C62950FE-F583-4C1F-83F4-4F106EFD52F4}.Release.Build.0 = Release|Win32
+		{FC564DE2-E448-47FD-841E-9A6CB4E38AB0}.Debug.ActiveCfg = Debug|Win32
+		{FC564DE2-E448-47FD-841E-9A6CB4E38AB0}.Debug.Build.0 = Debug|Win32
+		{FC564DE2-E448-47FD-841E-9A6CB4E38AB0}.Release.ActiveCfg = Release|Win32
+		{FC564DE2-E448-47FD-841E-9A6CB4E38AB0}.Release.Build.0 = Release|Win32
+		{D7095554-E63D-44C2-B944-116EB7458306}.Debug.ActiveCfg = Debug|Win32
+		{D7095554-E63D-44C2-B944-116EB7458306}.Debug.Build.0 = Debug|Win32
+		{D7095554-E63D-44C2-B944-116EB7458306}.Release.ActiveCfg = Release|Win32
+		{D7095554-E63D-44C2-B944-116EB7458306}.Release.Build.0 = Release|Win32
+		{624282D0-8169-423E-B330-0C7CBD4C9254}.Debug.ActiveCfg = Debug|Win32
+		{624282D0-8169-423E-B330-0C7CBD4C9254}.Debug.Build.0 = Debug|Win32
+		{624282D0-8169-423E-B330-0C7CBD4C9254}.Release.ActiveCfg = Release|Win32
+		{624282D0-8169-423E-B330-0C7CBD4C9254}.Release.Build.0 = Release|Win32
+		{84D25702-83BA-4AB0-8BAB-C9ACD7C425C5}.Debug.ActiveCfg = Debug|Win32
+		{84D25702-83BA-4AB0-8BAB-C9ACD7C425C5}.Debug.Build.0 = Debug|Win32
+		{84D25702-83BA-4AB0-8BAB-C9ACD7C425C5}.Release.ActiveCfg = Release|Win32
+		{84D25702-83BA-4AB0-8BAB-C9ACD7C425C5}.Release.Build.0 = Release|Win32
+		{AD7EA7CC-5C2B-4409-AF41-AD23E51E5538}.Debug.ActiveCfg = Debug|Win32
+		{AD7EA7CC-5C2B-4409-AF41-AD23E51E5538}.Debug.Build.0 = Debug|Win32
+		{AD7EA7CC-5C2B-4409-AF41-AD23E51E5538}.Release.ActiveCfg = Release|Win32
+		{AD7EA7CC-5C2B-4409-AF41-AD23E51E5538}.Release.Build.0 = Release|Win32
+		{609FF498-5686-4CF6-A9E6-EC801A07C8B1}.Debug.ActiveCfg = Debug|Win32
+		{609FF498-5686-4CF6-A9E6-EC801A07C8B1}.Debug.Build.0 = Debug|Win32
+		{609FF498-5686-4CF6-A9E6-EC801A07C8B1}.Release.ActiveCfg = Release|Win32
+		{609FF498-5686-4CF6-A9E6-EC801A07C8B1}.Release.Build.0 = Release|Win32
+		{48518067-B66C-4BD2-813F-FDDF290A056B}.Debug.ActiveCfg = Debug|Win32
+		{48518067-B66C-4BD2-813F-FDDF290A056B}.Debug.Build.0 = Debug|Win32
+		{48518067-B66C-4BD2-813F-FDDF290A056B}.Release.ActiveCfg = Release|Win32
+		{48518067-B66C-4BD2-813F-FDDF290A056B}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

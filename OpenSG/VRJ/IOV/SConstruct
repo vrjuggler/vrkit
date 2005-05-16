@@ -1,0 +1,133 @@
+#!python
+#
+
+# Import the stuff we need
+import SCons;
+import SConsAddons.Options;   # Get the modular options stuff
+import SConsAddons.Options.VRJuggler.VRJ
+import SConsAddons.Options.OpenSG
+import SConsAddons.Util       # Get the utils
+import sys, os, re, string, glob
+pj = os.path.join
+
+# Setup base scons options and settings
+EnsureSConsVersion(0,96)
+SetOption('max_drift',30)           # 30 second drift on MD5 Files
+SetOption('implicit_cache',1)
+SConsignFile()                      # Store all .sconsign stuff in single file
+
+####  Local Helper methods ###
+GetPlatform = SConsAddons.Util.GetPlatform;
+
+def BuildLinuxEnvironment():
+   "Builds a base environment for other modules to build on set up for linux"
+   env = Environment( ENV=os.environ)
+
+   CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions', '-Wunused',
+               '-Wno-conversion']
+   LINKFLAGS = []
+   LIBPATH = []
+
+   if optimize != 'no':
+      CXXFLAGS.extend(['-DNDEBUG', '-O2'])
+   else:
+      CXXFLAGS.extend(['-D_DEBUG', '-gdwarf-2', '-fno-inline', '-fno-default-inline'])
+   
+   env.Append(
+      CXXFLAGS    = CXXFLAGS,
+      LINKFLAGS   = LINKFLAGS,
+      LIBPATH     = LIBPATH
+   )
+
+   return env
+
+def BuildDarwinEnvironment():
+   "Builds a base environment for other modules to build on set up for Darwin"
+   global optimize, profile, builders
+
+   CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions', '-Wunused',
+               '-Wno-conversion', '-Ddarwin', '-Wno-long-double']
+   LINKFLAGS = []
+
+   # Enable profiling?
+#   if profile != 'no':
+#      CXXFLAGS.extend(['-pg'])
+#      LINKFLAGS.extend(['-pg'])
+
+   # Debug or optimize build?
+   if optimize != 'no':
+      CXXFLAGS.extend(['-DNDEBUG', '-O2'])
+   else:
+      CXXFLAGS.extend(['-D_DEBUG', '-g', '-fno-inline'])
+
+   return Environment(
+      ENV         = os.environ,
+      CXXFLAGS    = CXXFLAGS,
+      LINKFLAGS   = LINKFLAGS
+   )
+
+optimize = ARGUMENTS.get('optimize', 'no')
+Export('optimize')
+
+# --- Main Build --- #
+help_text = "\n---- Build system ----\n";
+if GetPlatform() == 'linux' or GetPlatform() == 'freebsd':
+   baseEnv = BuildLinuxEnvironment()
+elif GetPlatform() == 'mac':
+   baseEnv = BuildDarwinEnvironment()
+
+# Export symbols for use by SConscript files in subdirectories.
+Export('GetPlatform')
+Export('baseEnv')
+
+build_dir = "build." + GetPlatform();
+   
+# ---------- Options ------------ #
+options_cache_filename = 'options.cache.' + GetPlatform()
+opts = SConsAddons.Options.Options(files = [options_cache_filename, 'options.custom'], 
+                                   args= ARGUMENTS);
+vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("vapor", "1.1.169", required=True);
+opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.3.0", required=False)                                                
+opts.AddOption( vrj_options )
+opts.AddOption( opensg_options )
+
+help_text += opts.GenerateHelpText(baseEnv)
+
+# ----- Application Setup ------------ #
+if not SConsAddons.Util.hasHelpFlag():
+   opts.Update(baseEnv)
+   opts.Save(options_cache_filename, baseEnv)
+
+   # XXX: Hack around SConsAddons.Options.OpenSG.OpenSG not letting us provide
+   # extra arguments to osg-config.  (Of course, if osg-config wasn't totally
+   # braindead on Mac OS X, this wouldn't be such a problem.)
+   if GetPlatform() == 'mac':
+      mac_opts = os.popen(opensg_options.osgconfig_cmd + " --cflags System").read()
+      opensg_options.found_cflags = mac_opts.strip().split(" ")
+
+   # Setup the build environment
+   # Add local directory to path and the "root" directory for this project
+   vrj_options.updateEnv(baseEnv)
+   opensg_options.updateEnv(baseEnv)
+   
+   if SCons.Util.WhereIs('distcc'):
+      baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")   
+
+   lib_name = 'iov'
+
+   env = baseEnv.Copy()
+   env.Prepend(CPPPATH = ['.', pj('..','..','..')])
+   env.Append(LIBPATH = ['IOV'])
+   env.Prepend(LIBS = [lib_name])
+
+   SConscript(dirs = ['IOV', 'plugins'])
+
+   # XXX: There has to be a better way to do this.
+   if GetPlatform() == 'mac':
+      env.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
+
+   env.Program('infi_app', glob.glob('*.cpp'))
+
+Help(help_text)
+
+# end   

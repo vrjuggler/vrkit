@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="wand_nav_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="Infiscape Wand Navigation Plug-In">
+      <abstract>false</abstract>
+      <help />
+      <parent />
+      <category>/Application-Specific/</category>
+      <property valuetype="float" variable="false" name="max_velocity">
+         <help>Maximum velocity for navigation.</help>
+         <value label="Maximum Velocity" defaultvalue="0.5" />
+      </property>
+      <property valuetype="float" variable="false" name="acceleration">
+         <help>Acceleration value used when navigating.</help>
+         <value label="Acceleration" defaultvalue="0.005" />
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>
+
