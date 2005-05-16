@@ -65,7 +65,7 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
                             IOV_LOCATION);
    }
 
-   vprASSERT(elt->getID() == getElementType())
+   vprASSERT(elt->getID() == getElementType());
 
    // Lookup details from config element
    const std::string plugin_path_prop("plugin_path");
