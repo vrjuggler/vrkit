@@ -1,10 +1,13 @@
 #ifndef INF_CONFIGURATION_H
 #define INF_CONFIGURATION_H
 
-#include <jccl/Config/Configuration.h>
-#include <jccl/Config/ConfigElement.h>
+#include <OpenSG/VRJ/Viewer/IOV/Config.h>
+
 #include <string>
 #include <vector>
+#include <jccl/Config/Configuration.h>
+#include <jccl/Config/ConfigElement.h>
+
 
 namespace inf
 {
@@ -15,7 +18,7 @@ namespace inf
  * configuration.  It could also be extended in the future to support other
  * configuration information that could be shared.
  */
-class Configuration
+class IOV_CLASS_API Configuration
 {
 public:
    /** Load the name configuration element file and adds it to the list of elts.

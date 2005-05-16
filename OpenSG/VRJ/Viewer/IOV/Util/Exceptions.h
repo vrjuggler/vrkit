@@ -1,6 +1,8 @@
 #ifndef _INF_IOV_EXCEPTIONS_H_
 #define _INF_IOV_EXCEPTIONS_H_
 
+#include <OpenSG/VRJ/Viewer/IOV/Config.h>
+
 #include <stdexcept>
 
 //#include <boost/preprocessor/cat.hpp>
@@ -22,7 +24,7 @@ namespace inf
 
 /** Base exception for all IOV exceptions.
  */
-class Exception : public std::runtime_error
+class IOV_CLASS_API Exception : public std::runtime_error
 {
 public:
    Exception(std::string desc, std::string location) throw();
