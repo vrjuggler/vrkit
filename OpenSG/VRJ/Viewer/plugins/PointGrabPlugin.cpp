@@ -344,8 +344,7 @@ bool PointGrabPlugin::config(jccl::ConfigElementPtr elt)
         grab_color[1] >= 0.0f && grab_color[1] <= 1.0f &&
         grab_color[2] >= 0.0f && grab_color[2] <= 1.0f )
    {
-      mIntersectColor.setValuesRGB(grab_color[0], grab_color[1],
-                                   grab_color[2]);
+      mGrabColor.setValuesRGB(grab_color[0], grab_color[1], grab_color[2]);
    }
    else
    {
