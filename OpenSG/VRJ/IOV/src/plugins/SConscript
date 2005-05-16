@@ -1,43 +1,30 @@
 #!python
 
 import os.path
+import SConsAddons.Util as sca_util
 
-Import('baseEnv optimize')
-Import('GetPlatform')
+Import('*')
 
-class Plugin:
-   def __init__(self, name, srcs, useDebug = False):
-      self.name = name
+src_dir = sca_util.getFullSrcPath(env=SCons.Environment.Environment()):
+plugin_dirs = [d for d in os.listdir(src_dir) if (os.path.isdir(pj(src_dir,f)) and not d.startswith('.'))]
 
-      if useDebug:
-         self.name += '_d'
 
-      self.srcs = srcs
+#env.Append(CPPPATH = [os.path.join('..', '..', '..', '..')])
+#env.Append(LIBPATH = [os.path.join('..', 'IOV')])
+#env.Prepend(LIBS = ['iov'])
 
-   def getName(self):
-      return self.name
-
-   def getSources(self):
-      return self.srcs
-
-env = baseEnv.Copy()
-
-if GetPlatform() == 'mac':
-   env.Replace(SHLINKFLAGS = '-bundle')
-
-use_debug = (optimize != 'yes')
-plugins = [Plugin('SimpleNavPlugin', ['SimpleNavPlugin.cpp'], use_debug),
-           Plugin('WandNavPlugin', ['WandNavPlugin.cpp'], use_debug),
-           Plugin('CenterPointGrabPlugin', ['CenterPointGrabPlugin.cpp'],
-                  use_debug),
-           Plugin('PointGrabPlugin', ['PointGrabPlugin.cpp'], use_debug),
-           Plugin('ModeSwitchPlugin', ['ModeSwitchPlugin.cpp'], use_debug),
-           Plugin('ViewpointsPlugin', ['ViewpointsPlugin.cpp'], use_debug)
-          ]
-
-env.Append(CPPPATH = [os.path.join('..', '..', '..', '..')])
-env.Append(LIBPATH = [os.path.join('..', 'IOV')])
-env.Prepend(LIBS = ['iov'])
+for plugin_name in plugin_dirs:
+   plugin_srcs = []
+   def_files = []
+   for p, d, files in sca_util.WalkBuildFromSource('plugin_name',env):
+      plugin_srcs += [pj(path,f) for f in files if f.endswith('.cpp')]
+      def_files += [pj(path,f) for f in files if f.endswith('.jdef')]
+   print "Plugin: ", plugin_name
+   print "   srcs:", plugin_srcs
+   print "   defs:", def_files
+   lib_name = plugin_name
+   if (optimize != 'yes'):
+      lib_name += '_d'
 
 for p in plugins:
    env.SharedLibrary(p.getName(), p.getSources(), SHLIBPREFIX = '')
