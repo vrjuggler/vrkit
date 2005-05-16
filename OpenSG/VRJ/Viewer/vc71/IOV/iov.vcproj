@@ -135,6 +135,12 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
+				RelativePath="..\..\Iov\Configuration.cpp">
+			</File>
+			<File
+				RelativePath="..\..\Iov\Util\Exceptions.cpp">
+			</File>
+			<File
 				RelativePath="..\..\Iov\GrabData.cpp">
 			</File>
 			<File
