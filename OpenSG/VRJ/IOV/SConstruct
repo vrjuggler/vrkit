@@ -76,12 +76,21 @@ if GetPlatform() == 'linux' or GetPlatform() == 'freebsd':
 elif GetPlatform() == 'mac':
    baseEnv = BuildDarwinEnvironment()
 
+build_dir = "build." + GetPlatform()
+
+# Setup a map with the paths that we will install everything to
+# - Note: this is used throughout the build to keep things consistent
+inst_paths = {}
+inst_paths['base'] = os.path.abspath(pj(build_dir, 'instlinks'))
+inst_paths['lib'] = pj(inst_paths['base'],'lib')
+inst_paths['lib_plugin'] = pj(inst_paths['lib'],'IOV','plugins')
+inst_paths['include'] = pj(inst_paths['base'],'include')
+inst_paths['share'] = pj(inst_paths['base'],'share','IOV')
+inst_paths['definitions'] = pj(inst_paths['share'],'definitions')
+
 # Export symbols for use by SConscript files in subdirectories.
 Export('GetPlatform')
-Export('baseEnv')
-
-build_dir = "build." + GetPlatform()
-inst_prefix = pj(build_dir, 'instlinks')
+Export('baseEnv', 'build_dir', 'inst_paths')
    
 # ---------- Options ------------ #
 options_cache_filename = 'options.cache.' + GetPlatform()
@@ -119,7 +128,13 @@ if not SConsAddons.Util.hasHelpFlag():
    #env.Append(LIBPATH = ['IOV'])
    #env.Prepend(LIBS = [lib_name])
 
-   SConscript(pj(src, SConscript),)
+   SConscript(dirs=['src',], build_dir=build_dir, duplicate=0)
+   
+   # Install the contents of the data directory
+   for p, d, files in os.walk('data'):
+      if not p.count('.svn'):
+         for fname in [pj(p,f) for f in files]:
+            baseEnv.InstallAs(pj(inst_paths['share'],fname), fname)
 
 Help(help_text)
 

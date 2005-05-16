@@ -1,8 +1,8 @@
 #ifndef _INTERFACE_TRADER_H
 #define _INTERFACE_TRADER_H
 
-#include <OpenSG/VRJ/Viewer/IOV/DeviceInterface.h>
-#include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
+#include <IOV/DeviceInterface.h>
+#include <IOV/WandInterface.h>
 
 
 namespace inf

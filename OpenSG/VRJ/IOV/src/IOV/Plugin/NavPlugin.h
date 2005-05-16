@@ -1,8 +1,8 @@
 #ifndef _INF_NAV_PLUGIN_H_
 #define _INF_NAV_PLUGIN_H_
 
-#include <OpenSG/VRJ/Viewer/IOV/ViewerPtr.h>
-#include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
+#include <IOV/ViewerPtr.h>
+#include <IOV/Plugin.h>
 
 
 namespace inf

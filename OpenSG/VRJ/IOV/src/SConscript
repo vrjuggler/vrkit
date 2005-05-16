@@ -13,6 +13,8 @@ pj = os.path.join
 Import('*')
 
 env = baseEnv.Copy()
+
+Export('env')
 #env.Prepend(CPPPATH = ['.', pj('..','..','..')])
 #env.Append(LIBPATH = ['IOV'])
 #env.Prepend(LIBS = [lib_name])

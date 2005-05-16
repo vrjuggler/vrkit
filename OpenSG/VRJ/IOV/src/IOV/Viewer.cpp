@@ -8,11 +8,11 @@
 #include <vpr/IO/Socket/InetAddr.h>
 #include <jccl/Config/Configuration.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/User.h>
-#include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginFactory.h>
-#include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
+#include <IOV/User.h>
+#include <IOV/Plugin.h>
+#include <IOV/PluginCreator.h>
+#include <IOV/PluginFactory.h>
+#include <IOV/Viewer.h>
 
 
 namespace inf

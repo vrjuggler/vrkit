@@ -1,6 +1,6 @@
 #include <sstream>
 
-#include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
+#include <IOV/PluginCreator.h>
 
 
 namespace inf

@@ -2,14 +2,14 @@
 #include <vpr/DynLoad/LibraryLoader.h>
 #include <jccl/Config/ConfigElement.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/InterfaceTrader.h>
-#include <OpenSG/VRJ/Viewer/IOV/User.h>
-#include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
-#include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginFactory.h>
-#include <OpenSG/VRJ/Viewer/plugins/ModeSwitchPlugin.h>
-#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
+#include <IOV/InterfaceTrader.h>
+#include <IOV/User.h>
+#include <IOV/Viewer.h>
+#include <IOV/WandInterface.h>
+#include <IOV/PluginCreator.h>
+#include <IOV/PluginFactory.h>
+#include "ModeSwitchPlugin.h"
+#include <IOV/Util/Exceptions.h>
 
 
 static inf::PluginCreator sPluginCreator(&inf::ModeSwitchPlugin::create,

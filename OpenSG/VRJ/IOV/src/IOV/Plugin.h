@@ -1,13 +1,13 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-#include <OpenSG/VRJ/Viewer/IOV/Config.h>
+#include <IOV/Config.h>
 
 #include <string>
 #include <jccl/Config/ConfigElementPtr.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/ViewerPtr.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginPtr.h>
+#include <IOV/ViewerPtr.h>
+#include <IOV/PluginPtr.h>
 
 #define INF_PLUGIN_API_MAJOR    1
 #define INF_PLUGIN_API_MINOR    0

@@ -1,4 +1,4 @@
-#include <OpenSG/VRJ/Viewer/IOV/Configuration.h>
+#include <IOV/Configuration.h>
 
 #include <boost/format.hpp>
 

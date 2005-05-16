@@ -1,13 +1,13 @@
 #ifndef SIMPLE_NAV_PLUGIN_H
 #define SIMPLE_NAV_PLUGIN_H
 
-#include <OpenSG/VRJ/Viewer/plugins/PluginConfig.h>
+#include <IOV/Plugin/PluginConfig.h>
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
-#include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
-#include <OpenSG/VRJ/Viewer/plugins/NavPlugin.h>
+#include <IOV/WandInterfacePtr.h>
+#include <IOV/Plugin.h>
+#include <IOV/Plugin/NavPlugin.h>
 
 
 namespace inf

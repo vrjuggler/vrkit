@@ -1,15 +1,15 @@
 #ifndef _INF_VIEWPOINTS_PLUGIN_H_
 #define _INF_VIEWPOINTS_PLUGIN_H_
 
-#include <OpenSG/VRJ/Viewer/plugins/PluginConfig.h>
+#include <IOV/Plugin/PluginConfig.h>
 
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 #include <gmtl/Matrix.h>
 #include <vector>
 
-#include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
-#include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
+#include <IOV/Plugin.h>
+#include <IOV/WandInterfacePtr.h>
 
 namespace inf
 {

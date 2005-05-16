@@ -1,13 +1,13 @@
 #ifndef _INF_PLUGIN_CREATOR_H_
 #define _INF_PLUGIN_CREATOR_H_
 
-#include <OpenSG/VRJ/Viewer/IOV/Config.h>
+#include <IOV/Config.h>
 
 #include <string>
 #include <boost/function.hpp>
 #include <vpr/vpr.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/PluginPtr.h>
+#include <IOV/PluginPtr.h>
 
 
 namespace inf

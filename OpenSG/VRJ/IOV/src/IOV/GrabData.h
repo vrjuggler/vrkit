@@ -1,7 +1,7 @@
 #ifndef _INF_GRAB_DATA_H_
 #define _INF_GRAB_DATA_H_
 
-#include <OpenSG/VRJ/Viewer/IOV/Config.h>
+#include <IOV/Config.h>
 
 #include <OpenSG/OSGCoredNodePtr.h>
 #include <OpenSG/OSGNode.h>
@@ -10,8 +10,8 @@
 #include <vpr/vpr.h>
 #include <vpr/Util/GUID.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/SceneData.h>
-#include <OpenSG/VRJ/Viewer/IOV/GrabDataPtr.h>
+#include <IOV/SceneData.h>
+#include <IOV/GrabDataPtr.h>
 
 
 namespace inf

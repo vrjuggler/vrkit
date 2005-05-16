@@ -1,4 +1,4 @@
-#include <OpenSG/VRJ/Viewer/IOV/GrabData.h>
+#include <IOV/GrabData.h>
 
 
 namespace inf

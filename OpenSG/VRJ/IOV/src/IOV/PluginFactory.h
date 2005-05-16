@@ -1,7 +1,7 @@
 #ifndef _INF_PLUGIN_FACTORY_H_
 #define _INF_PLUGIN_FACTORY_H_
 
-#include <OpenSG/VRJ/Viewer/IOV/Config.h>
+#include <IOV/Config.h>
 
 #include <string>
 #include <map>
@@ -11,8 +11,8 @@
 #include <vpr/vpr.h>
 #include <vpr/DynLoad/Library.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginFactoryPtr.h>
+#include <IOV/Util/Exceptions.h>
+#include <IOV/PluginFactoryPtr.h>
 
 
 namespace inf

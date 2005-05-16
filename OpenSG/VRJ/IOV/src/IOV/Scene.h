@@ -1,7 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include <OpenSG/VRJ/Viewer/IOV/Config.h>
+#include <IOV/Config.h>
 
 #include <boost/concept_check.hpp>
 #include <boost/static_assert.hpp>
@@ -16,8 +16,8 @@
 
 #include <vpr/Util/GUID.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/SceneData.h>
-#include <OpenSG/VRJ/Viewer/IOV/ScenePtr.h>
+#include <IOV/SceneData.h>
+#include <IOV/ScenePtr.h>
 
 
 namespace inf

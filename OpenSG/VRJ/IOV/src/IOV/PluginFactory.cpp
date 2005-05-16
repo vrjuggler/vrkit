@@ -7,8 +7,8 @@
 #include <vpr/DynLoad/LibraryFinder.h>
 #include <vpr/Util/Assert.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginFactory.h>
+#include <IOV/Plugin.h>
+#include <IOV/PluginFactory.h>
 
 
 namespace fs = boost::filesystem;

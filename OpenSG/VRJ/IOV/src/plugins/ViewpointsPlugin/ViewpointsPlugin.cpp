@@ -1,12 +1,12 @@
-#include <OpenSG/VRJ/Viewer/plugins/ViewpointsPlugin.h>
+#include "ViewpointsPlugin.h"
 
-#include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
-#include <OpenSG/VRJ/Viewer/IOV/User.h>
-#include <OpenSG/VRJ/Viewer/IOV/InterfaceTrader.h>
-#include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
-#include <OpenSG/VRJ/Viewer/IOV/ViewPlatform.h>
-#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
+#include <IOV/Viewer.h>
+#include <IOV/PluginCreator.h>
+#include <IOV/User.h>
+#include <IOV/InterfaceTrader.h>
+#include <IOV/WandInterface.h>
+#include <IOV/ViewPlatform.h>
+#include <IOV/Util/Exceptions.h>
 
 #include <boost/format.hpp>
 #include <sstream>

@@ -1,7 +1,7 @@
 #ifndef VIEWPLATFORM_H
 #define VIEWPLATFORM_H
 
-#include <OpenSG/VRJ/Viewer/IOV/ViewerPtr.h>
+#include <IOV/ViewerPtr.h>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>

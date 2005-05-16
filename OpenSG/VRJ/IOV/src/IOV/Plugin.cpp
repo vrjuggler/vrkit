@@ -1,4 +1,4 @@
-#include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
+#include <IOV/Plugin.h>
 
 
 namespace inf

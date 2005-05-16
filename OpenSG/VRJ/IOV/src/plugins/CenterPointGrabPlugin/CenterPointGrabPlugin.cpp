@@ -6,16 +6,16 @@
 
 #include <vpr/vpr.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
-#include <OpenSG/VRJ/Viewer/IOV/GrabData.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginCreator.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginPtr.h>
-#include <OpenSG/VRJ/Viewer/IOV/User.h>
-#include <OpenSG/VRJ/Viewer/IOV/InterfaceTrader.h>
-#include <OpenSG/VRJ/Viewer/IOV/WandInterface.h>
-#include <OpenSG/VRJ/Viewer/IOV/ViewPlatform.h>
-#include <OpenSG/VRJ/Viewer/plugins/CenterPointGrabPlugin.h>
-#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
+#include <IOV/Viewer.h>
+#include <IOV/GrabData.h>
+#include <IOV/PluginCreator.h>
+#include <IOV/PluginPtr.h>
+#include <IOV/User.h>
+#include <IOV/InterfaceTrader.h>
+#include <IOV/WandInterface.h>
+#include <IOV/ViewPlatform.h>
+#include "CenterPointGrabPlugin.h"
+#include <IOV/Util/Exceptions.h>
 
 
 static inf::PluginCreator sPluginCreator(&inf::CenterPointGrabPlugin::create,

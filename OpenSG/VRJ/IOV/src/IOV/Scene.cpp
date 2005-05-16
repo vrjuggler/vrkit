@@ -1,4 +1,4 @@
-#include <OpenSG/VRJ/Viewer/IOV/Scene.h>
+#include <IOV/Scene.h>
 
 namespace inf
 {

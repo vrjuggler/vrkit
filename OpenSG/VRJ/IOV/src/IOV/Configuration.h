@@ -1,7 +1,7 @@
 #ifndef INF_CONFIGURATION_H
 #define INF_CONFIGURATION_H
 
-#include <OpenSG/VRJ/Viewer/IOV/Config.h>
+#include <IOV/Config.h>
 
 #include <string>
 #include <vector>

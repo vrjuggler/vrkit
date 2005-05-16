@@ -1,7 +1,7 @@
 #ifndef _INF_MODE_SWITCH_PLUGIN_H_
 #define _INF_MODE_SWITCH_PLUGIN_H_
 
-#include <OpenSG/VRJ/Viewer/plugins/PluginConfig.h>
+#include <IOV/Plugin/PluginConfig.h>
 
 #include <string>
 #include <vector>
@@ -10,10 +10,10 @@
 #include <vpr/vpr.h>
 #include <vpr/DynLoad/Library.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
-#include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
-#include <OpenSG/VRJ/Viewer/IOV/PluginFactoryPtr.h>
-#include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
+#include <IOV/Plugin.h>
+#include <IOV/WandInterfacePtr.h>
+#include <IOV/PluginFactoryPtr.h>
+#include <IOV/Plugin/Buttons.h>
 
 
 namespace inf

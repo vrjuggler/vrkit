@@ -1,4 +1,4 @@
-#include <OpenSG/VRJ/Viewer/IOV/Util/Exceptions.h>
+#include <IOV/Util/Exceptions.h>
 #include <iostream>
 #include <vpr/System.h>
 

@@ -1,8 +1,8 @@
 #include <gmtl/External/OpenSGConvert.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/ViewPlatform.h>
-#include <OpenSG/VRJ/Viewer/IOV/Scene.h>
-#include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
+#include <IOV/ViewPlatform.h>
+#include <IOV/Scene.h>
+#include <IOV/Viewer.h>
 
 namespace inf
 {

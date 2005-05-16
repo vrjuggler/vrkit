@@ -17,10 +17,10 @@
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/Viewer.h>
-#include <OpenSG/VRJ/Viewer/IOV/User.h>
-#include <OpenSG/VRJ/Viewer/IOV/Scene.h>
-#include <OpenSG/VRJ/Viewer/IOV/GrabData.h>
+#include <IOV/Viewer.h>
+#include <IOV/User.h>
+#include <IOV/Scene.h>
+#include <IOV/GrabData.h>
 
 
 class OpenSgViewer;

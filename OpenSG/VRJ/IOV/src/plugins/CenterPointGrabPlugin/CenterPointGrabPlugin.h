@@ -1,7 +1,7 @@
 #ifndef _CENTER_POINT_GRAB_H_
 #define _CENTER_POINT_GRAB_H_
 
-#include <OpenSG/VRJ/Viewer/plugins/PluginConfig.h>
+#include <IOV/Plugin/PluginConfig.h>
 
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
@@ -10,9 +10,9 @@
 #include <OpenSG/OSGSimpleGeometry.h>
 #include <OpenSG/OSGSimpleMaterial.h>
 
-#include <OpenSG/VRJ/Viewer/IOV/Plugin.h>
-#include <OpenSG/VRJ/Viewer/IOV/WandInterfacePtr.h>
-#include <OpenSG/VRJ/Viewer/plugins/Buttons.h>
+#include <IOV/Plugin.h>
+#include <IOV/WandInterfacePtr.h>
+#include <IOV/Plugin/Buttons.h>
 
 
 namespace inf
