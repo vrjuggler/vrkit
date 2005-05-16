@@ -32,6 +32,8 @@ public:
       return mSceneRoot.node();
    }
 
+   virtual void contextInit();
+
    virtual void preFrame();
 
    virtual float getDrawScaleFactor()
@@ -40,6 +42,8 @@ public:
    }
 
 private:
+   void initGl();
+
    bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
 
    bool changedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
