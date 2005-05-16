@@ -5,7 +5,7 @@
 namespace inf
 {
 
-void Configuration::loadConfigEltFile(std::string filename)
+void Configuration::loadConfigEltFile(const std::string& filename)
 {
    bool cfg_loaded(false);
    jccl::Configuration cfg;
@@ -25,7 +25,7 @@ void Configuration::loadConfigEltFile(std::string filename)
    }
 }
 
-jccl::ConfigElementPtr Configuration::getConfigElement(std::string eltName)
+jccl::ConfigElementPtr Configuration::getConfigElement(const std::string& eltName)
 {
    jccl::ConfigElementPtr ret_elt;
 
@@ -47,7 +47,7 @@ jccl::ConfigElementPtr Configuration::getConfigElement(std::string eltName)
    return ret_elt;
 }
 
-std::vector<jccl::ConfigElementPtr> Configuration::getAllConfigElements(std::string eltName)
+std::vector<jccl::ConfigElementPtr> Configuration::getAllConfigElements(const std::string& eltName)
 {
    std::vector<jccl::ConfigElementPtr> ret_elts;
 
@@ -74,5 +74,3 @@ std::vector<jccl::ConfigElementPtr> Configuration::getAllConfigElements(std::str
 }
 
 }
-
-
