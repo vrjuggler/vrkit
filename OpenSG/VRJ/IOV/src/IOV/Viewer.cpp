@@ -4,6 +4,7 @@
 #include <OpenSG/OSGSimpleAttachments.h>
 
 #include <vpr/vpr.h>
+#include <vpr/System.h>
 #include <vpr/DynLoad/LibraryLoader.h>
 #include <vpr/IO/Socket/InetAddr.h>
 #include <jccl/Config/Configuration.h>
@@ -13,6 +14,11 @@
 #include <IOV/PluginCreator.h>
 #include <IOV/PluginFactory.h>
 #include <IOV/Viewer.h>
+
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+
+namespace fs = boost::filesystem;
 
 
 namespace inf
@@ -211,8 +217,31 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
    const std::string plugin_path_prop("plugin_path");
    const std::string plugin_prop("plugin");
 
+   const std::string iov_base_dir_tkn("IOV_BASE_DIR");
+
    std::vector<std::string> search_path;
+
+   // Setup 2 default search paths
+   // - Relative path to './plugins'
+   // - IOV_BASE_DIR/lib/IOV/plugins
    search_path.push_back("plugins");
+
+   std::string iov_base_dir;
+   if ( vpr::System::getenv(iov_base_dir_tkn, iov_base_dir).success() )
+   {
+      fs::path iov_base_path(iov_base_dir, fs::native);
+      fs::path def_iov_plugin_path = iov_base_path / "lib/IOV/plugins";
+      if(fs::exists(def_iov_plugin_path))
+      {
+         std::string def_search_path = def_iov_plugin_path.native_directory_string();
+         std::cout << "Setting default IOV plugin path: " << def_search_path << std::endl;
+         search_path.push_back(def_search_path);
+      }
+      else
+      {
+         std::cerr << "Default IOV plugin path does not exist: " << def_iov_plugin_path.native_directory_string() << std::endl;
+      }
+   }
 
    const unsigned int num_paths(appCfg->getNum(plugin_path_prop));
 
