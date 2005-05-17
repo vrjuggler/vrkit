@@ -125,6 +125,7 @@ if not SConsAddons.Util.hasHelpFlag():
    inst_paths['app_base'] = pj(inst_paths['share'],'apps')
    
    print "Using prefix: ", inst_paths["base"]
+   baseEnv.Alias('install', inst_paths['base'])
 
    # XXX: Hack around SConsAddons.Options.OpenSG.OpenSG not letting us provide
    # extra arguments to osg-config.  (Of course, if osg-config wasn't totally
