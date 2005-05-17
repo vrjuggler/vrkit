@@ -8,7 +8,6 @@
 
 #include <OpenSG/OSGConnection.h>
 
-#include <vpr/vpr.h>
 #include <jccl/Config/ConfigElementPtr.h>
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
 

@@ -1,3 +1,5 @@
+#include <OpenSG/OSGConfig.h>
+
 #include <vpr/vpr.h>
 #include <vpr/DynLoad/LibraryLoader.h>
 #include <jccl/Config/ConfigElement.h>
@@ -8,8 +10,9 @@
 #include <IOV/WandInterface.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/PluginFactory.h>
-#include "ModeSwitchPlugin.h"
 #include <IOV/Util/Exceptions.h>
+
+#include "ModeSwitchPlugin.h"
 
 
 static inf::PluginCreator sPluginCreator(&inf::ModeSwitchPlugin::create,

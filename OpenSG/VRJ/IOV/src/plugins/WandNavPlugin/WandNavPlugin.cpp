@@ -1,4 +1,4 @@
-#include <vpr/Util/Assert.h>
+#include <OpenSG/OSGConfig.h>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
@@ -9,14 +9,17 @@
 #include <gmtl/Xforms.h>
 #include <gmtl/Generate.h>
 
+#include <vpr/Util/Assert.h>
+
 #include <IOV/InterfaceTrader.h>
 #include <IOV/Viewer.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/WandInterface.h>
 #include <IOV/User.h>
 #include <IOV/Plugin/Buttons.h>
-#include "WandNavPlugin.h"
 #include <IOV/Util/Exceptions.h>
+
+#include "WandNavPlugin.h"
 
 
 static inf::PluginCreator sPluginCreator(&inf::WandNavPlugin::create,
