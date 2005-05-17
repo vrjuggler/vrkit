@@ -3,15 +3,10 @@
 
 #include <IOV/Config.h>
 
-#ifdef WIN32
-#include <winsock.h>
-#endif
-
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/OSGRemoteAspect.h>
-#include <OpenSG/OSGGroupConnection.h>
+#include <OpenSG/OSGConnection.h>
 
 #include <vpr/vpr.h>
 #include <jccl/Config/ConfigElementPtr.h>
@@ -27,6 +22,12 @@
 #include <IOV/Scene.h>
 #include <IOV/Configuration.h>
 
+
+namespace OSG
+{
+   class RemoteAspect;
+   class GroupConnection;
+}
 
 namespace inf
 {

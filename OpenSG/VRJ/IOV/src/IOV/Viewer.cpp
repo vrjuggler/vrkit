@@ -6,6 +6,8 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 
+#include <OpenSG/OSGRemoteAspect.h>
+#include <OpenSG/OSGGroupConnection.h>
 #include <OpenSG/OSGConnectionFactory.h>
 #include <OpenSG/OSGSimpleAttachments.h>
 
