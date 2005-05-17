@@ -3,17 +3,15 @@
 
 # Import the stuff we need
 
-import sys
+import sys, os, re, string, glob
+pj = os.path.join
 
-sys.path.append('deps/scons-addons/src')
-
+sys.path.insert(0,pj('deps','scons-addons','src'))
 import SCons;
 import SConsAddons.Options;   # Get the modular options stuff
 import SConsAddons.Options.VRJuggler.VRJ
 import SConsAddons.Options.OpenSG
 import SConsAddons.Util       # Get the utils
-import os, re, string, glob
-pj = os.path.join
 
 # Setup base scons options and settings
 EnsureSConsVersion(0,96)
