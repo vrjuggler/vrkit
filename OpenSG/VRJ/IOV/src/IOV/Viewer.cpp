@@ -1,4 +1,10 @@
+#ifdef WIN32
+#include <winsock2.h>
+#endif
+
 #include <algorithm>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 
 #include <OpenSG/OSGConnectionFactory.h>
 #include <OpenSG/OSGSimpleAttachments.h>
@@ -15,8 +21,6 @@
 #include <IOV/PluginFactory.h>
 #include <IOV/Viewer.h>
 
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
 
 namespace fs = boost::filesystem;
 
