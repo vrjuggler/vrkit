@@ -19,6 +19,11 @@ SConsignFile()                      # Store all .sconsign stuff in single file
 ####  Local Helper methods ###
 GetPlatform = SConsAddons.Util.GetPlatform;
 
+def symlinkInstallFunc(dest, source, env):
+    """Install a source file into a destination by sym linking it."""
+    os.symlink(pj(os.getcwd(), source), dest)
+    return 0
+
 def BuildLinuxEnvironment():
    "Builds a base environment for other modules to build on set up for linux"
    env = Environment( ENV=os.environ)
@@ -76,21 +81,8 @@ if GetPlatform() == 'linux' or GetPlatform() == 'freebsd':
 elif GetPlatform() == 'mac':
    baseEnv = BuildDarwinEnvironment()
 
-build_dir = "build." + GetPlatform()
-
-# Setup a map with the paths that we will install everything to
-# - Note: this is used throughout the build to keep things consistent
-inst_paths = {}
-inst_paths['base'] = os.path.abspath(pj(build_dir, 'instlinks'))
-inst_paths['lib'] = pj(inst_paths['base'],'lib')
-inst_paths['lib_plugin'] = pj(inst_paths['lib'],'IOV','plugins')
-inst_paths['include'] = pj(inst_paths['base'],'include')
-inst_paths['share'] = pj(inst_paths['base'],'share','IOV')
-inst_paths['definitions'] = pj(inst_paths['share'],'definitions')
-
 # Export symbols for use by SConscript files in subdirectories.
 Export('GetPlatform')
-Export('baseEnv', 'build_dir', 'inst_paths')
    
 # ---------- Options ------------ #
 options_cache_filename = 'options.cache.' + GetPlatform()
@@ -101,12 +93,38 @@ opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.3.0", required=F
 opts.AddOption( vrj_options )
 opts.AddOption( opensg_options )
 
+# Setup build dir and prefix settings
+build_dir = "build." + GetPlatform()
+def_prefix = pj( Dir('.').get_abspath(), build_dir, 'instlinks')
+unspecified_prefix = "use-instlinks"
+opts.Add('prefix', 'Installation prefix: def:' + unspecified_prefix, unspecified_prefix)
+
 help_text += opts.GenerateHelpText(baseEnv)
 
 # ----- Application Setup ------------ #
 if not SConsAddons.Util.hasHelpFlag():
    opts.Update(baseEnv)
    opts.Save(options_cache_filename, baseEnv)
+
+   # If defaulting to instlinks prefix:
+   #  - Use symlinks
+   #  - Manually set the used prefix to the instlinks of the build dir
+   if baseEnv['prefix'] == unspecified_prefix:
+      baseEnv['INSTALL'] = symlinkInstallFunc
+      baseEnv['prefix'] = def_prefix
+
+   # Setup a map with the paths that we will install everything to
+   # - Note: this is used throughout the build to keep things consistent
+   inst_paths = {}
+   inst_paths['base'] = baseEnv['prefix']
+   inst_paths['lib'] = pj(inst_paths['base'],'lib')
+   inst_paths['lib_plugin'] = pj(inst_paths['lib'],'IOV','plugins')
+   inst_paths['include'] = pj(inst_paths['base'],'include')
+   inst_paths['share'] = pj(inst_paths['base'],'share','IOV')
+   inst_paths['definitions'] = pj(inst_paths['share'],'definitions')
+   inst_paths['app_base'] = pj(inst_paths['share'],'apps')
+   
+   print "Using prefix: ", inst_paths["base"]
 
    # XXX: Hack around SConsAddons.Options.OpenSG.OpenSG not letting us provide
    # extra arguments to osg-config.  (Of course, if osg-config wasn't totally
@@ -123,10 +141,7 @@ if not SConsAddons.Util.hasHelpFlag():
    if SCons.Util.WhereIs('distcc'):
       baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")   
 
-   #env = baseEnv.Copy()
-   #env.Prepend(CPPPATH = ['.', pj('..','..','..')])
-   #env.Append(LIBPATH = ['IOV'])
-   #env.Prepend(LIBS = [lib_name])
+   Export('baseEnv', 'build_dir', 'inst_paths')
 
    SConscript(dirs=['src',], build_dir=build_dir, duplicate=0)
    

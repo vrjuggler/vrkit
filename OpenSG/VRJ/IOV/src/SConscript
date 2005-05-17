@@ -1,29 +1,8 @@
 #!python
 #
-
-# Import the stuff we need
-import SCons;
-import SConsAddons.Options;   # Get the modular options stuff
-import SConsAddons.Options.VRJuggler.VRJ
-import SConsAddons.Options.OpenSG
-import SConsAddons.Util       # Get the utils
-import sys, os, re, string, glob
-pj = os.path.join
-
 Import('*')
-
 env = baseEnv.Copy()
-
 Export('env')
-#env.Prepend(CPPPATH = ['.', pj('..','..','..')])
-#env.Append(LIBPATH = ['IOV'])
-#env.Prepend(LIBS = [lib_name])
 
-SConscript(dirs = ['IOV', 'plugins'])
-
-# XXX: There has to be a better way to do this.
-#if GetPlatform() == 'mac':
-#   env.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
-
-#env.Program('infi_app', glob.glob('*.cpp'))
+SConscript(dirs = ['IOV', 'plugins', 'Viewer'])
 

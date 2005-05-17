@@ -1,0 +1,24 @@
+#!python
+#
+import SConsAddons.Util       # Get the utils
+import sys, os, re, string, glob
+pj = os.path.join
+GetPlatform = SConsAddons.Util.GetPlatform;
+
+Import('*')
+
+viewerEnv = baseEnv.Copy()
+
+viewerEnv.Prepend(CPPPATH = inst_paths['include'],
+                  LIBPATH = inst_paths['lib'],
+		  LIBS = 'iov')
+# XXX: There has to be a better way to do this.
+if GetPlatform() == 'mac':
+   env.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
+
+jconf_files = ['viewer-nav.jconf', 'viewer-vp.jconf']
+infi_app_prog = viewerEnv.Program('infi_app', ['infi_app.cpp',])
+viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), infi_app_prog)
+viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), jconf_files)
+
+
