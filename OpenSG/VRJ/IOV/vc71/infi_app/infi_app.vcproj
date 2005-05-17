@@ -44,17 +44,17 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="iov_d.lib vrj_d.lib vrj_ogl_d.lib gadget_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
-				OutputFile="$(OutDir)/infi_app.exe"
+				OutputFile="$(OutDir)/infi_appD.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\IOV\DebugDLL;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/infi_app.pdb"
+				ProgramDatabaseFile="$(OutDir)/infi_appD.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName="$(OutDir)/infi_app.tlb"/>
+				TypeLibraryName="$(OutDir)/infi_appD.tlb"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
