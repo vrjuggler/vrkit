@@ -67,6 +67,7 @@ public:
    }
 
    /** Called at the beginning of each frame.
+    * Updates the plugins and then updates the scene graph over the network.
     * @note: Derived class implementations <b>MUST</b> call up to this method.
     */
    virtual void preFrame();
