@@ -42,33 +42,41 @@ void PluginFactory::init(const std::vector<std::string>& scanPath)
    std::vector<std::string>::const_iterator i;
    for ( i = scanPath.begin(); i != scanPath.end(); ++i )
    {
-      vpr::LibraryFinder finder(*i, driver_ext);
-      vpr::LibraryFinder::LibraryList libs = finder.getLibraries();
-
-      for ( unsigned int j = 0; j < libs.size(); ++j )
+      try
       {
-         // Construct the platform-agnostic plug-in name by getting the name
-         // of the plug-in file (leading path information is removed) and
-         // then stripping off strip_str.
-         fs::path lib_path(libs[j]->getName(), fs::native);
-         const std::string lib_name(lib_path.leaf());
-         const std::string::size_type strip_pos = lib_name.find(strip_str);
+         vpr::LibraryFinder finder(*i, driver_ext);
+         vpr::LibraryFinder::LibraryList libs = finder.getLibraries();
 
-         if ( strip_pos != std::string::npos )
+         for ( unsigned int j = 0; j < libs.size(); ++j )
          {
-            const std::string plugin_name(lib_name.substr(0, strip_pos));
+            // Construct the platform-agnostic plug-in name by getting the name
+            // of the plug-in file (leading path information is removed) and
+            // then stripping off strip_str.
+            fs::path lib_path(libs[j]->getName(), fs::native);
+            const std::string lib_name(lib_path.leaf());
+            const std::string::size_type strip_pos = lib_name.find(strip_str);
 
-            // Register the vpr::LibraryPtr object using the platform-agnostic
-            // name so that callers of getPluginLibrary() and
-            // getPluginCreator() do not have to worry about platform-specific
-            // naming issues.
-            mPluginLibs[plugin_name] = libs[j];
+            if ( strip_pos != std::string::npos )
+            {
+               const std::string plugin_name(lib_name.substr(0, strip_pos));
+
+               // Register the vpr::LibraryPtr object using the platform-agnostic
+               // name so that callers of getPluginLibrary() and
+               // getPluginCreator() do not have to worry about platform-specific
+               // naming issues.
+               mPluginLibs[plugin_name] = libs[j];
+            }
+            else
+            {
+               std::cout << "WARNING: Invalid plug-in library name encountered: '"
+                         << libs[j]->getName() << "'" << std::endl;
+            }
          }
-         else
-         {
-            std::cout << "WARNING: Invalid plug-in library name encountered: '"
-                      << libs[j]->getName() << "'" << std::endl;
-         }
+      }
+      catch(std::exception& ex)
+      {
+         std::cout << "Exception scanning plugin path: " << (*i) << std::endl
+                   << ex.what() << std::endl;
       }
    }
 }
