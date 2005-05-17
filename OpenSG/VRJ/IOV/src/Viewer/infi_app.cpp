@@ -1,9 +1,13 @@
-#include <vrj/Kernel/Kernel.h>
-#include <vrj/Draw/OpenSG/OpenSGApp.h>
+#ifdef WIN32
+#  include <winsock2.h>
+#  include <windows.h>
+#endif
+
+#include <stdlib.h>
+#include <boost/program_options.hpp>
 
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGTransform.h>
-
 
 #include <OpenSG/OSGMatrix.h>
 #include <OpenSG/OSGSimpleGeometry.h>
@@ -16,6 +20,11 @@
 #include <gmtl/Coord.h>
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
+
+#include <vpr/vpr.h>
+#include <vpr/System.h>
+#include <vrj/Kernel/Kernel.h>
+#include <vrj/Draw/OpenSG/OpenSGApp.h>
 
 #include <IOV/Viewer.h>
 #include <IOV/User.h>
@@ -209,29 +218,117 @@ void OpenSgViewer::initGl()
    glShadeModel(GL_SMOOTH);
 }
 
-
+namespace po = boost::program_options;
 
 int main(int argc, char* argv[])
 {
-   if(argc < 2)
+   const int EXIT_ERR_MISSING_JCONF(1);
+   const int EXIT_ERR_MISSING_APP_CONF(2);
+   const int EXIT_ERR_EXCEPTION(-1);
+
+   try
    {
-      std::cerr << "Not enough arguments:  app config-file(s)" << std::endl;
+      po::options_description generic("General options");
+      generic.add_options()
+         ("help", "produce help message")
+         ;
+
+      std::string infi_cfg;
+      std::string jdef_dir;
+
+      po::options_description config("Configuration");
+      config.add_options()
+         ("jconf,j", po::value< std::vector<std::string> >()->composing(),
+          "VR Juggler config file")
+         ("app,a",
+          po::value<std::string>(&infi_cfg)->default_value("viewer.jconf"),
+          "Viewer configuration file")
+         ("defs,d", po::value<std::string>(&jdef_dir),
+          "Path to custom config definition (.jdef) files")
+      ;
+
+      po::options_description cmdline_options;
+      cmdline_options.add(generic).add(config);
+
+      po::options_description config_file_options;
+      config_file_options.add(config);
+
+      po::variables_map vm;
+      store(po::command_line_parser(argc, argv).options(cmdline_options).run(),
+            vm);
+
+      std::ifstream cfg_file("viewer.cfg");
+      store(parse_config_file(cfg_file, config_file_options), vm);
+      notify(vm);
+
+      if ( vm.count("help") > 0 )
+      {
+         std::cout << cmdline_options << std::endl;
+         return EXIT_SUCCESS;
+      }
+
+      vrj::Kernel* kernel = vrj::Kernel::instance();  // Get the kernel
+      OpenSgViewerPtr app = OpenSgViewer::create();   // Create the app object
+
+      if ( vm.count("defs") == 0 )
+      {
+         std::string iov_base_dir;
+         vpr::System::getenv("IOV_BASE_DIR", iov_base_dir);
+
+         if ( iov_base_dir.empty() )
+         {
+            std::cerr << "WARNING: Environment variable IOV_BASE_DIR is not\n"
+                      << "         set or is set to an empty value.  Expect\n"
+                      << "         problems later." << std::endl;
+         }
+         else
+         {
+            jdef_dir = iov_base_dir + std::string("/share/IOV/definitions");
+         }
+      }
+
+      if ( ! jdef_dir.empty() )
+      {
+         kernel->scanForConfigDefinitions(jdef_dir);
+      }
+
+      if ( vm.count("jconf") == 0 )
+      {
+         std::cout << "No VR Juggler configuration files given!" << std::endl;
+         return EXIT_ERR_MISSING_JCONF;
+      }
+      else
+      {
+         std::vector<std::string> jconfs =
+            vm["jconf"].as< std::vector<std::string> >();
+
+         std::vector<std::string>::iterator i;
+         for ( i = jconfs.begin(); i != jconfs.end(); ++i )
+         {
+            kernel->loadConfigFile(*i);
+         }
+      }
+
+      if ( vm.count("app") == 0 )
+      {
+         std::cout << "No application configuration file given!" << std::endl;
+         return EXIT_ERR_MISSING_APP_CONF;
+      }
+      else
+      {
+         // Load named configuration file.
+         app->getConfiguration().loadConfigEltFile(infi_cfg);
+      }
+
+      kernel->start();                         // Start the kernel thread
+      kernel->setApplication(app.get());       // Give application to kernel
+      kernel->waitForKernelStop();             // Block until kernel stops
+   }
+   catch (std::exception& ex)
+   {
+      std::cout << ex.what() << std::endl;
+      return EXIT_ERR_EXCEPTION;
    }
 
-   vrj::Kernel* kernel = vrj::Kernel::instance();     // Get the kernel
-   kernel->scanForConfigDefinitions("definitions");
-
-   OpenSgViewerPtr app = OpenSgViewer::create();               // Create the app object
-   app->getConfiguration().loadConfigEltFile("viewer.jconf");  // Load default configuration file
-
-   for ( int i = 1; i < argc; ++i )
-   {
-      kernel->loadConfigFile(argv[i]);      // Configure the kernel
-   }
-
-   kernel->start();                         // Start the kernel thread
-   kernel->setApplication(app.get());       // Give application to kernel
-   kernel->waitForKernelStop();             // Block until kernel stops
-
-   return 0;
+   return EXIT_SUCCESS;
 }

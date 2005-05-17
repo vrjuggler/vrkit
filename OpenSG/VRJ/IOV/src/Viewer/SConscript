@@ -9,16 +9,25 @@ Import('*')
 
 viewerEnv = baseEnv.Copy()
 
-viewerEnv.Prepend(CPPPATH = inst_paths['include'],
-                  LIBPATH = inst_paths['lib'],
-		  LIBS = 'iov')
-# XXX: There has to be a better way to do this.
-if GetPlatform() == 'mac':
-   env.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
+boost_options.updateEnv(env)
 
-jconf_files = ['viewer-nav.jconf', 'viewer-vp.jconf']
-infi_app_prog = viewerEnv.Program('infi_app', ['infi_app.cpp',])
-viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), infi_app_prog)
-viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), jconf_files)
+if boost_options.isAvailable():
+   viewerEnv.Prepend(CPPPATH = inst_paths['include'],
+                     LIBPATH = inst_paths['lib'],
+                     LIBS = 'iov')
 
+   # XXX: There has to be a better way to do this.
+   if GetPlatform() == 'mac':
+      env.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
+      # XXX: What a hack...
+      env.Prepend(LIBS = ['boost_program_options-1_33'])
+   else:
+      po_lib = boost_options.buildFullLibName('program_options')
+      env.Prepend(LIBS = [po_lib])
 
+   jconf_files = ['viewer-nav.jconf', 'viewer-vp.jconf']
+   infi_app_prog = viewerEnv.Program('infi_app', ['infi_app.cpp',])
+   viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), infi_app_prog)
+   viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), jconf_files)
+else:
+   print "NOTE: Cannot build infi_app without Boost.program_options"
