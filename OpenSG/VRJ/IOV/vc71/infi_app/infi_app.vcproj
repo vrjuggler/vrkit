@@ -13,7 +13,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\Debug"
+			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="1"
 			UseOfMFC="0"
@@ -22,7 +22,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/Zm800"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
+				AdditionalIncludeDirectories="..\..\src;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
 				PreprocessorDefinitions="WIN32,_WINDOWS,WINVER=0x0400,_WIN32_WINDOWS=0x0410,_WIN32_WINNT=0x0400,_OSG_HAVE_CONFIGURED_H_,OSG_BUILD_DLL,_DEBUG,OSG_DEBUG,OSG_WITH_GLUT,OSG_WITH_GIF,OSG_WITH_TIF,OSG_WITH_JPG"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -47,7 +47,7 @@
 				OutputFile="$(OutDir)/infi_app.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\Debug;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
+				AdditionalLibraryDirectories="..\IOV\DebugDLL;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/infi_app.pdb"
 				SubSystem="1"
@@ -78,7 +78,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\Release"
+			OutputDirectory="Release"
 			IntermediateDirectory="Release"
 			ConfigurationType="1"
 			UseOfMFC="0"
@@ -88,7 +88,7 @@
 				AdditionalOptions="/Zm800"
 				InlineFunctionExpansion="1"
 				OmitFramePointers="FALSE"
-				AdditionalIncludeDirectories="..\..\..\..;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
+				AdditionalIncludeDirectories="..\..\src;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
 				PreprocessorDefinitions="_OPT;NDEBUG;WIN32,_WINDOWS,WINVER=0x0400,_WIN32_WINDOWS=0x0410,_WIN32_WINNT=0x0400,_OSG_HAVE_CONFIGURED_H_,OSG_BUILD_DLL,OSG_WITH_GLUT,OSG_WITH_GIF,OSG_WITH_TIF,OSG_WITH_JPG"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -114,7 +114,7 @@
 				OutputFile="$(OutDir)/infi_app.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\Release;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
+				AdditionalLibraryDirectories="..\IOV\ReleaseDLL;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				ProgramDatabaseFile="$(OutDir)/infi_app.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
@@ -150,7 +150,7 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
-				RelativePath="..\infi_app.cpp">
+				RelativePath="..\..\src\Viewer\infi_app.cpp">
 			</File>
 		</Filter>
 		<Filter

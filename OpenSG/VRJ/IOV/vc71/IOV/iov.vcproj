@@ -12,14 +12,14 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\Debug"
+			OutputDirectory="DebugDLL"
 			IntermediateDirectory="DebugDLL"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\..;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
+				AdditionalIncludeDirectories="..\..\src;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;WINVER=0x0400;_WIN32_WINDOWS=0x0410;_WIN32_WINNT=0x0400;_OSG_HAVE_CONFIGURED_H_;OSG_BUILD_DLL;_DEBUG;OSG_DEBUG;OSG_WITH_GLUT;OSG_WITH_GIF;OSG_WITH_TIF;OSG_WITH_JPG;_CONSOLE;_USRDLL;_IOV_BUILD_;WININC"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -69,7 +69,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\Release"
+			OutputDirectory="ReleaseDLL"
 			IntermediateDirectory="ReleaseDLL"
 			ConfigurationType="2"
 			CharacterSet="2">
@@ -78,7 +78,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="..\..\..\..\..;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
+				AdditionalIncludeDirectories="..\..\src;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
 				PreprocessorDefinitions="_OPT;NDEBUG;WIN32;_WINDOWS;WINVER=0x0400;_WIN32_WINDOWS=0x0410;_WIN32_WINNT=0x0400;_OSG_HAVE_CONFIGURED_H_;OSG_BUILD_DLL;OSG_WITH_GLUT;OSG_WITH_GIF;OSG_WITH_TIF;OSG_WITH_JPG;_CONSOLE;_USRDLL;_IOV_BUILD_;WININC"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -135,113 +135,125 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
-				RelativePath="..\..\Iov\Configuration.cpp">
+				RelativePath="..\..\src\Iov\Configuration.cpp">
 			</File>
 			<File
-				RelativePath="..\..\Iov\Util\Exceptions.cpp">
+				RelativePath="..\..\src\Iov\Util\Exceptions.cpp">
 			</File>
 			<File
-				RelativePath="..\..\Iov\GrabData.cpp">
+				RelativePath="..\..\src\Iov\GrabData.cpp">
 			</File>
 			<File
-				RelativePath="..\..\Iov\Plugin.cpp">
+				RelativePath="..\..\src\Iov\Plugin.cpp">
 			</File>
 			<File
-				RelativePath="..\..\Iov\PluginCreator.cpp">
+				RelativePath="..\..\src\Iov\PluginCreator.cpp">
 			</File>
 			<File
-				RelativePath="..\..\Iov\PluginFactory.cpp">
+				RelativePath="..\..\src\Iov\PluginFactory.cpp">
 			</File>
 			<File
-				RelativePath="..\..\Iov\Scene.cpp">
+				RelativePath="..\..\src\Iov\Scene.cpp">
 			</File>
 			<File
-				RelativePath="..\..\Iov\SceneData.cpp">
+				RelativePath="..\..\src\Iov\SceneData.cpp">
 			</File>
 			<File
-				RelativePath="..\..\Iov\User.cpp">
+				RelativePath="..\..\src\Iov\User.cpp">
 			</File>
 			<File
-				RelativePath="..\..\Iov\Viewer.cpp">
+				RelativePath="..\..\src\Iov\Viewer.cpp">
 			</File>
 			<File
-				RelativePath="..\..\Iov\ViewPlatform.cpp">
+				RelativePath="..\..\src\Iov\ViewPlatform.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
 			<File
-				RelativePath="..\..\Iov\Config.h">
+				RelativePath="..\..\src\Iov\Plugin\Buttons.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\Configuration.h">
+				RelativePath="..\..\src\Iov\Buttons.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\DeviceInterface.h">
+				RelativePath="..\..\src\Iov\Config.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\Util\Exceptions.h">
+				RelativePath="..\..\src\Iov\Configuration.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\GrabData.h">
+				RelativePath="..\..\src\Iov\DeviceInterface.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\GrabDataPtr.h">
+				RelativePath="..\..\src\Iov\Util\Exceptions.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\InterfaceTrader.h">
+				RelativePath="..\..\src\Iov\GrabData.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\Plugin.h">
+				RelativePath="..\..\src\Iov\GrabDataPtr.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\PluginCreator.h">
+				RelativePath="..\..\src\Iov\InterfaceTrader.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\PluginFactory.h">
+				RelativePath="..\..\src\Iov\Plugin\NavPlugin.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\PluginFactoryPtr.h">
+				RelativePath="..\..\src\Iov\Plugin.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\PluginPtr.h">
+				RelativePath="..\..\src\Iov\Plugin\PluginConfig.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\ResourceMgr.h">
+				RelativePath="..\..\src\Iov\PluginCreator.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\Scene.h">
+				RelativePath="..\..\src\Iov\PluginFactory.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\SceneData.h">
+				RelativePath="..\..\src\Iov\PluginFactoryPtr.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\SceneDataPtr.h">
+				RelativePath="..\..\src\Iov\PluginPtr.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\ScenePtr.h">
+				RelativePath="..\..\src\Iov\ResourceMgr.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\User.h">
+				RelativePath="..\..\src\Iov\Scene.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\UserPtr.h">
+				RelativePath="..\..\src\Iov\SceneData.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\Viewer.h">
+				RelativePath="..\..\src\Iov\SceneDataPtr.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\ViewerPtr.h">
+				RelativePath="..\..\src\Iov\ScenePtr.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\ViewPlatform.h">
+				RelativePath="..\..\src\Iov\User.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\WandInterface.h">
+				RelativePath="..\..\src\Iov\UserPtr.h">
 			</File>
 			<File
-				RelativePath="..\..\Iov\WandInterfacePtr.h">
+				RelativePath="..\..\src\Iov\Viewer.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\ViewerPtr.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\ViewPlatform.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\WandInterface.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\WandInterfacePtr.h">
 			</File>
 		</Filter>
 		<Filter
