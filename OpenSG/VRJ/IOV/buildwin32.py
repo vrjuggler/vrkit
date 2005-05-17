@@ -103,8 +103,8 @@ def processInput(optionDict, envVar, inputDesc, required = False):
    else:
       value_str = input_str
 
-      optionDict[envVar] = value_str
-      os.environ[envVar] = value_str
+   optionDict[envVar] = value_str
+   os.environ[envVar] = value_str
 
    return value_str
 
