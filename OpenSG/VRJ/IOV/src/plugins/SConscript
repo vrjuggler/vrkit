@@ -12,8 +12,8 @@ plugin_dirs = [d for d in os.listdir(src_dir) if (os.path.isdir(pj(src_dir,d)) a
 # to the IOV library we built and installed
 plugin_env = baseEnv.Copy()
 plugin_env.Append(CPPPATH = inst_paths['include'],
-                  LIBPATH = inst_paths['lib'],
-                  LIBS = ['iov'])
+                  LIBPATH = inst_paths['lib'])
+plugin_env.Prepend(LIBS = ['iov'])
 
 for plugin_name in plugin_dirs:
    plugin_srcs = []
