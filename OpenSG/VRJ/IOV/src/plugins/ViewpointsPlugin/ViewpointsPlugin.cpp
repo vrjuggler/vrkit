@@ -1,12 +1,4 @@
-#include "ViewpointsPlugin.h"
-
-#include <IOV/Viewer.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/User.h>
-#include <IOV/InterfaceTrader.h>
-#include <IOV/WandInterface.h>
-#include <IOV/ViewPlatform.h>
-#include <IOV/Util/Exceptions.h>
+#include <OpenSG/OSGConfig.h>
 
 #include <boost/format.hpp>
 #include <sstream>
@@ -17,6 +9,17 @@
 #include <gmtl/VecOps.h>
 #include <gmtl/Output.h>
 #include <gmtl/Generate.h>
+
+#include <IOV/Viewer.h>
+#include <IOV/PluginCreator.h>
+#include <IOV/User.h>
+#include <IOV/InterfaceTrader.h>
+#include <IOV/WandInterface.h>
+#include <IOV/ViewPlatform.h>
+#include <IOV/Util/Exceptions.h>
+
+#include "ViewpointsPlugin.h"
+
 
 namespace
 {
