@@ -5,15 +5,16 @@
       <abstract>false</abstract>
       <help />
       <category>/Application-Specific/</category>
+      <category>/Infiscape/</category>
       <property valuetype="integer" variable="false" name="control_button_num">
          <help>Select the number of the button that should control viewpoint toggling.</help>
          <value label="Control Button" defaultvalue="0" />
       </property>
       <property valuetype="configelement" variable="true" name="viewpoints">
          <help>Select list of predefined viewpoints.</help>
-         <value label="Viewpoint"/>
+         <value label="Viewpoint" />
          <allowed_type>viewpoints_vp</allowed_type>
-      </property>      
+      </property>
       <upgrade_transform />
    </definition_version>
 </definition>

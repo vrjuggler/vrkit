@@ -6,6 +6,7 @@
       <help />
       <parent />
       <category>/Application-Specific/</category>
+      <category>/Infiscape/</category>
       <property valuetype="float" variable="false" name="intersect_color">
          <help>Red/green/blue color for the object intersection highlight.</help>
          <value label="Red" defaultvalue="1.0" />

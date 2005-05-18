@@ -6,6 +6,7 @@
       <help />
       <parent />
       <category>/Application-Specific/</category>
+      <category>/Infiscape/</category>
       <property valuetype="float" variable="false" name="max_velocity">
          <help>Maximum velocity for navigation.</help>
          <value label="Maximum Velocity" defaultvalue="0.5" />

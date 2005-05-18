@@ -5,6 +5,7 @@
       <abstract>false</abstract>
       <help>Configuration for the Infiscape OpenSG viewer application.</help>
       <category>/Application-Specific/</category>
+      <category>/Infiscape/</category>
       <property valuetype="string" variable="false" name="root_name">
          <help>The name of the root node of the scene that may be shared through OpenSG's clustering feature.</help>
          <value label="Scene Root Name" defaultvalue="RootNode"/>

@@ -5,6 +5,7 @@
       <abstract>false</abstract>
       <help />
       <category>/Application-Specific/</category>
+      <category>/Infiscape/</category>
       <property valuetype="float" variable="false" name="position">
          <help>Viewpoint position</help>
          <value label="X" defaultvalue="0.0"/>
