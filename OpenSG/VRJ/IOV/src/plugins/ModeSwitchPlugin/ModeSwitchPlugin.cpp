@@ -1,7 +1,10 @@
 #include <OpenSG/OSGConfig.h>
 
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+
 #include <vpr/vpr.h>
-#include <vpr/DynLoad/LibraryLoader.h>
+#include <vpr/System.h>
 #include <jccl/Config/ConfigElement.h>
 
 #include <IOV/InterfaceTrader.h>
@@ -14,6 +17,8 @@
 
 #include "ModeSwitchPlugin.h"
 
+
+namespace fs = boost::filesystem;
 
 static inf::PluginCreator sPluginCreator(&inf::ModeSwitchPlugin::create,
                                          "Mode Switch Plug-in");
@@ -76,7 +81,33 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
 
    // Setup search path
    std::vector<std::string> search_path;
+
+   // Set up two default search paths:
+   //    1. Relative path to './plugins'
+   //    2. IOV_BASE_DIR/lib/IOV/plugins
    search_path.push_back("plugins");
+
+   std::string iov_base_dir;
+   if ( vpr::System::getenv("IOV_BASE_DIR", iov_base_dir).success() )
+   {
+      fs::path iov_base_path(iov_base_dir, fs::native);
+      fs::path def_iov_plugin_path = iov_base_path / "lib/IOV/plugins";
+
+      if ( fs::exists(def_iov_plugin_path) )
+      {
+         std::string def_search_path =
+            def_iov_plugin_path.native_directory_string();
+         std::cout << "Setting default IOV plug-in path: " << def_search_path
+                   << std::endl;
+         search_path.push_back(def_search_path);
+      }
+      else
+      {
+         std::cerr << "Default IOV plug-in path does not exist: "
+                   << def_iov_plugin_path.native_directory_string()
+                   << std::endl;
+      }
+   }
 
    const unsigned int num_paths(elt->getNum(plugin_path_prop));
 
