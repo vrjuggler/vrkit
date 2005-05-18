@@ -227,9 +227,9 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
 
    std::vector<std::string> search_path;
 
-   // Setup 2 default search paths
-   // - Relative path to './plugins'
-   // - IOV_BASE_DIR/lib/IOV/plugins
+   // Set up two default search paths:
+   //    1. Relative path to './plugins'
+   //    2. IOV_BASE_DIR/lib/IOV/plugins
    search_path.push_back("plugins");
 
    std::string iov_base_dir;
@@ -237,15 +237,20 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
    {
       fs::path iov_base_path(iov_base_dir, fs::native);
       fs::path def_iov_plugin_path = iov_base_path / "lib/IOV/plugins";
-      if(fs::exists(def_iov_plugin_path))
+
+      if ( fs::exists(def_iov_plugin_path) )
       {
-         std::string def_search_path = def_iov_plugin_path.native_directory_string();
-         std::cout << "Setting default IOV plugin path: " << def_search_path << std::endl;
+         std::string def_search_path =
+            def_iov_plugin_path.native_directory_string();
+         std::cout << "Setting default IOV plug-in path: " << def_search_path
+                   << std::endl;
          search_path.push_back(def_search_path);
       }
       else
       {
-         std::cerr << "Default IOV plugin path does not exist: " << def_iov_plugin_path.native_directory_string() << std::endl;
+         std::cerr << "Default IOV plug-in path does not exist: "
+                   << def_iov_plugin_path.native_directory_string()
+                   << std::endl;
       }
    }
 

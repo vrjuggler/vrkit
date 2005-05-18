@@ -42,6 +42,11 @@ void PluginFactory::init(const std::vector<std::string>& scanPath)
    std::vector<std::string>::const_iterator i;
    for ( i = scanPath.begin(); i != scanPath.end(); ++i )
    {
+      std::cout << *i << ", " << std::endl;
+   }
+
+   for ( i = scanPath.begin(); i != scanPath.end(); ++i )
+   {
       try
       {
          vpr::LibraryFinder finder(*i, driver_ext);
@@ -60,10 +65,10 @@ void PluginFactory::init(const std::vector<std::string>& scanPath)
             {
                const std::string plugin_name(lib_name.substr(0, strip_pos));
 
-               // Register the vpr::LibraryPtr object using the platform-agnostic
-               // name so that callers of getPluginLibrary() and
-               // getPluginCreator() do not have to worry about platform-specific
-               // naming issues.
+               // Register the vpr::LibraryPtr object using the
+               // platform-agnostic name so that callers of getPluginLibrary()
+               // and getPluginCreator() do not have to worry about
+               // platform-specific naming issues.
                mPluginLibs[plugin_name] = libs[j];
             }
             else
@@ -73,9 +78,9 @@ void PluginFactory::init(const std::vector<std::string>& scanPath)
             }
          }
       }
-      catch(std::exception& ex)
+      catch (std::exception& ex)
       {
-         std::cout << "Exception scanning plugin path: " << (*i) << std::endl
+         std::cout << "Exception scanning plug-in path: " << (*i) << std::endl
                    << ex.what() << std::endl;
       }
    }
