@@ -1,7 +1,3 @@
-#ifdef WIN32
-#include <winsock2.h>
-#endif
-
 #include <algorithm>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>

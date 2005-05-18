@@ -1,8 +1,3 @@
-#ifdef WIN32
-#  include <winsock2.h>
-#  include <windows.h>
-#endif
-
 #include <stdlib.h>
 #include <boost/program_options.hpp>
 

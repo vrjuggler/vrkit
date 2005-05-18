@@ -1,4 +1,6 @@
-#include <OpenSG/OSGConfig.h>
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>

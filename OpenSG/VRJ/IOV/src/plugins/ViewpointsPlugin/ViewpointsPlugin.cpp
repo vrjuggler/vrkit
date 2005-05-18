@@ -1,5 +1,3 @@
-#include <OpenSG/OSGConfig.h>
-
 #include <boost/format.hpp>
 #include <sstream>
 
