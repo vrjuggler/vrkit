@@ -1,3 +1,10 @@
+// XXX: ARGH!  This shouldn't be necessary, but IOV/Viewer.h includes
+// OpenSG/OSGConnection.h.  Without this bit, this file will not compile
+// on Windows.
+#ifdef WIN32
+#  include <winsock2.h>
+#endif
+
 #include <OpenSG/OSGConfig.h>
 
 #include <boost/filesystem/path.hpp>
