@@ -15,7 +15,6 @@
 #include <IOV/WandInterface.h>
 #include <IOV/ViewPlatform.h>
 #include "PointGrabPlugin.h"
-#include <IOV/Util/Exceptions.h>
 
 
 static inf::PluginCreator sPluginCreator(&inf::PointGrabPlugin::create,
@@ -124,16 +123,14 @@ void PointGrabPlugin::init(ViewerPtr viewer)
 
    // Configure
    std::string elt_type_name = getElementType();
-   jccl::ConfigElementPtr cfg_elt = viewer->getConfiguration().getConfigElement(elt_type_name);
+   jccl::ConfigElementPtr cfg_elt =
+      viewer->getConfiguration().getConfigElement(elt_type_name);
 
-   if(!cfg_elt)
+   if ( cfg_elt )
    {
-      throw PluginException("PointGrabPlugin not find its configuration.",
-                            IOV_LOCATION);
+      // Configure it
+      config(cfg_elt);
    }
-
-   // Configure it
-   config(cfg_elt);
 }
 
 void PointGrabPlugin::updateState(ViewerPtr viewer)
