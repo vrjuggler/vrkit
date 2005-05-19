@@ -53,12 +53,24 @@ void PointGrabPlugin::init(ViewerPtr viewer)
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
 
-   // Set up the highlight material.
-   mHighlightMaterial = OSG::SimpleMaterial::create();
+   // Set up the highlight materials.
+   OSG::SimpleMaterialPtr isect_highlight_mat = OSG::SimpleMaterial::create();
 
-   OSG::beginEditCP(mHighlightMaterial);
-      mHighlightMaterial->setLit(false);
-   OSG::endEditCP(mHighlightMaterial);
+   OSG::beginEditCP(isect_highlight_mat);
+      isect_highlight_mat->setLit(false);
+      isect_highlight_mat->setDiffuse(mIntersectColor);
+   OSG::endEditCP(isect_highlight_mat);
+
+   mIsectHighlightMaterial = isect_highlight_mat;
+
+   OSG::SimpleMaterialPtr grab_highlight_mat = OSG::SimpleMaterial::create();
+
+   OSG::beginEditCP(grab_highlight_mat);
+      grab_highlight_mat->setLit(false);
+      grab_highlight_mat->setDiffuse(mGrabColor);
+   OSG::endEditCP(grab_highlight_mat);
+
+   mGrabHighlightMaterial = grab_highlight_mat;
 
    // Set up the highlight bounding box.
    OSG::GeoPTypesPtr type = OSG::GeoPTypesUI8::create();
@@ -112,7 +124,6 @@ void PointGrabPlugin::init(ViewerPtr viewer)
       geo->setLengths(lens);
       geo->setIndices(index);
       geo->setPositions(mHighlightPoints);
-      geo->setMaterial(mHighlightMaterial);
    OSG::endEditCP(geo);
    OSG::addRefCP(geo);
 
@@ -199,11 +210,11 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
 
             OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
 
-            OSG::beginEditCP(mHighlightMaterial,
-                             OSG::SimpleMaterial::DiffuseFieldMask);
-               mHighlightMaterial->setDiffuse(mIntersectColor);
-            OSG::endEditCP(mHighlightMaterial,
-                           OSG::SimpleMaterial::DiffuseFieldMask);
+            OSG::beginEditCP(mCoredHighlightNode,
+                             OSG::Geometry::MaterialFieldMask);
+               mCoredHighlightNode->setMaterial(mIsectHighlightMaterial);
+            OSG::endEditCP(mCoredHighlightNode,
+                           OSG::Geometry::MaterialFieldMask);
 
             OSG::beginEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
                mIntersectedObj.node()->addChild(mCoredHighlightNode);
@@ -232,11 +243,11 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       mGrabbing   = true;
       mGrabbedObj = mIntersectedObj;
 
-      OSG::beginEditCP(mHighlightMaterial,
-                       OSG::SimpleMaterial::DiffuseFieldMask);
-         mHighlightMaterial->setDiffuse(mGrabColor);
-      OSG::endEditCP(mHighlightMaterial,
-                     OSG::SimpleMaterial::DiffuseFieldMask);
+      OSG::beginEditCP(mCoredHighlightNode,
+                       OSG::Geometry::MaterialFieldMask);
+         mCoredHighlightNode->setMaterial(mGrabHighlightMaterial);
+      OSG::endEditCP(mCoredHighlightNode,
+                     OSG::Geometry::MaterialFieldMask);
 
       // m_wand_M_obj is the offset between the wand and the grabbed object's
       // center point:
@@ -264,11 +275,11 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       // intersecting state and clear mGrabbedObj.
       if ( mGrabbedObj.node() != OSG::NullFC )
       {
-         OSG::beginEditCP(mHighlightMaterial,
-                          OSG::SimpleMaterial::DiffuseFieldMask);
-            mHighlightMaterial->setDiffuse(mIntersectColor);
-         OSG::endEditCP(mHighlightMaterial,
-                        OSG::SimpleMaterial::DiffuseFieldMask);
+         OSG::beginEditCP(mCoredHighlightNode,
+                          OSG::Geometry::MaterialFieldMask);
+            mCoredHighlightNode->setMaterial(mIsectHighlightMaterial);
+         OSG::endEditCP(mCoredHighlightNode,
+                        OSG::Geometry::MaterialFieldMask);
 
          mGrabbedObj = sEmptyCoredXformNode;
          gmtl::identity(m_wand_M_obj);

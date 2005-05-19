@@ -104,9 +104,10 @@ private:
    OSG::Color3f mIntersectColor;
    OSG::Color3f mGrabColor;
 
-   inf::CoredGeomPtr      mCoredHighlightNode;
-   OSG::GeoPositions3fPtr mHighlightPoints;
-   OSG::SimpleMaterialPtr mHighlightMaterial;
+   inf::CoredGeomPtr                  mCoredHighlightNode;
+   OSG::GeoPositions3fPtr             mHighlightPoints;
+   OSG::RefPtr<OSG::ChunkMaterialPtr> mIsectHighlightMaterial;
+   OSG::RefPtr<OSG::ChunkMaterialPtr> mGrabHighlightMaterial;
 
    gmtl::Matrix44f m_wand_M_obj;
 
