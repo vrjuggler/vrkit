@@ -5,6 +5,7 @@
 
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/filesystem/path.hpp>
 #include <gmtl/Matrix.h>
 
 #include <OpenSG/OSGGeoPropPtrs.h>
@@ -76,6 +77,7 @@ protected:
       , mGrabbing(false)
       , mIntersectColor(1.0f, 1.0f, 0.0f)
       , mGrabColor(1.0f, 0.0f, 1.0f)
+      , mUsingShader(false)
    {
       /* Do nothing. */ ;
    }
@@ -92,6 +94,8 @@ private:
 
    static const inf::CoredTransformPtr sEmptyCoredXformNode;
 
+   boost::filesystem::path mShaderDir;
+
    inf::GrabDataPtr mGrabData;
 
    WandInterfacePtr mWandInterface;
@@ -104,6 +108,7 @@ private:
    OSG::Color3f mIntersectColor;
    OSG::Color3f mGrabColor;
 
+   bool mUsingShader;
    inf::CoredGeomPtr                  mCoredHighlightNode;
    OSG::GeoPositions3fPtr             mHighlightPoints;
    OSG::RefPtr<OSG::ChunkMaterialPtr> mIsectHighlightMaterial;
