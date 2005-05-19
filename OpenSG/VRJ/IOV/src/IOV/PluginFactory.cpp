@@ -42,11 +42,6 @@ void PluginFactory::init(const std::vector<std::string>& scanPath)
    std::vector<std::string>::const_iterator i;
    for ( i = scanPath.begin(); i != scanPath.end(); ++i )
    {
-      std::cout << *i << ", " << std::endl;
-   }
-
-   for ( i = scanPath.begin(); i != scanPath.end(); ++i )
-   {
       try
       {
          vpr::LibraryFinder finder(*i, driver_ext);
