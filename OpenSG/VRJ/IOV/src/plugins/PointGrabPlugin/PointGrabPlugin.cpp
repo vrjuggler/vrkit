@@ -1,5 +1,3 @@
-//#include <stdio.h>      /* For EOF */
-//#include <sstream>
 #include <stdexcept>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
