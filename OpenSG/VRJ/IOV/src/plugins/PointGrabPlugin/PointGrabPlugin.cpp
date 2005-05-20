@@ -357,7 +357,6 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
    {
       mGrabSound.trigger();
       mGrabbing   = true;
-      mGrabbedObj = mIntersectedObj;
 
       OSG::beginEditCP(mCoredHighlightNode, OSG::Geometry::MaterialFieldMask);
          mCoredHighlightNode->setMaterial(mGrabHighlightMaterial);
@@ -373,7 +372,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
 
       gmtl::invert(wand_M_vp, vp_M_wand);
       gmtl::invert(vp_M_vw, vw_M_vp);
-      gmtl::set(vw_M_obj, mGrabbedObj->getMatrix());
+      gmtl::set(vw_M_obj, mIntersectedObj->getMatrix());
 
       m_wand_M_obj = wand_M_vp * vp_M_vw * vw_M_obj;
    }
@@ -384,10 +383,10 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
    {
       mGrabbing = false;
 
-      // If mGrabbedObj's node is non-NULL, then we have just let go of the
-      // object we were grabbing.  Set the bounding box state back to the
-      // intersecting state and clear mGrabbedObj.
-      if ( mGrabbedObj.node() != OSG::NullFC )
+      // We have just released the grabbed object, but we are still
+      // intersecting it.  Set the bounding box state back to the
+      // intersecting state and clear mIntersectedObj.
+      if ( mIntersectedObj.node() != OSG::NullFC )
       {
          OSG::beginEditCP(mCoredHighlightNode,
                           OSG::Geometry::MaterialFieldMask);
@@ -417,14 +416,14 @@ void PointGrabPlugin::run(inf::ViewerPtr viewer)
       const gmtl::Matrix44f vw_M_wand = vw_M_vp * vp_M_wand;
 
       gmtl::Matrix44f cur_obj_mat;
-      gmtl::set(cur_obj_mat, mGrabbedObj->getMatrix());
+      gmtl::set(cur_obj_mat, mIntersectedObj->getMatrix());
       gmtl::Matrix44f new_obj_mat = vw_M_wand * m_wand_M_obj;
 
       osg::Matrix obj_mat_osg;
       gmtl::set(obj_mat_osg, new_obj_mat);
-      OSG::beginEditCP(mGrabbedObj, OSG::Transform::MatrixFieldMask);
-         mGrabbedObj->setMatrix(obj_mat_osg);
-      OSG::endEditCP(mGrabbedObj, OSG::Transform::MatrixFieldMask);
+      OSG::beginEditCP(mIntersectedObj, OSG::Transform::MatrixFieldMask);
+         mIntersectedObj->setMatrix(obj_mat_osg);
+      OSG::endEditCP(mIntersectedObj, OSG::Transform::MatrixFieldMask);
    }
 }
 

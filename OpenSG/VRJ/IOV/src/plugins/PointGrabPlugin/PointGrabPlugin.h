@@ -101,7 +101,6 @@ private:
    bool mIntersecting;
    bool mGrabbing;
    inf::CoredTransformPtr mIntersectedObj;
-   inf::CoredTransformPtr mGrabbedObj;
 
    OSG::Color3f mIntersectColor;
    OSG::Color3f mGrabColor;
