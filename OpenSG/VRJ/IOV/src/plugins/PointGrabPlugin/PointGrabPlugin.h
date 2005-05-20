@@ -92,8 +92,6 @@ private:
 
    const int GRAB_BUTTON;
 
-   static const inf::CoredTransformPtr sEmptyCoredXformNode;
-
    boost::filesystem::path mShaderDir;
 
    inf::GrabDataPtr mGrabData;

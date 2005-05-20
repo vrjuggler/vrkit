@@ -53,8 +53,6 @@ IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
 namespace inf
 {
 
-const inf::CoredTransformPtr PointGrabPlugin::sEmptyCoredXformNode;
-
 void PointGrabPlugin::init(ViewerPtr viewer)
 {
    mGrabData =
@@ -285,13 +283,19 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       // the application and scene state.
       if ( intersect_obj.node() != mIntersectedObj.node() )
       {
-         // If mIntersectedObj's node is non-NULL, then we need to detach
+         // If mIntersectedObj's node is non-NULL, then we may need to detach
          // the highlight node from mIntersectedObj.
          if ( mIntersectedObj.node() != OSG::NullFC )
          {
-            OSG::beginEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
-               mIntersectedObj.node()->subChild(mCoredHighlightNode);
-            OSG::endEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
+            OSG::Int32 highlight_index =
+               mIntersectedObj.node()->findChild(mCoredHighlightNode);
+
+            if ( highlight_index != -1 )
+            {
+               OSG::beginEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
+                  mIntersectedObj.node()->subChild(highlight_index);
+               OSG::endEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
+            }
          }
 
          // Change the intersected object to the one we found above.
@@ -339,7 +343,6 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
          else
          {
             mIntersecting = false;
-            mIntersectedObj = sEmptyCoredXformNode;
          }
       }
    }
@@ -391,7 +394,6 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
             mCoredHighlightNode->setMaterial(mIsectHighlightMaterial);
          OSG::endEditCP(mCoredHighlightNode, OSG::Geometry::MaterialFieldMask);
 
-         mGrabbedObj = sEmptyCoredXformNode;
          gmtl::identity(m_wand_M_obj);
       }
    }
