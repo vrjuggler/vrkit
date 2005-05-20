@@ -326,7 +326,7 @@ def main():
 
       if not skip_vs:
          devenv_cmd    = getVSCmd()
-         solution_file = r'%s' % os.path.join(gProjectDir, 'vc71',
+         solution_file = r'"%s"' % os.path.join(gProjectDir, 'vc71',
                                               'Viewer.sln')
          status = os.spawnl(os.P_WAIT, devenv_cmd, 'devenv', solution_file)
 
