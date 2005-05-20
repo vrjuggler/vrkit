@@ -28,15 +28,6 @@ namespace inf
 
 Viewer::~Viewer()
 {
-   if ( NULL != mAspect )
-   {
-      delete mAspect;
-   }
-
-   if ( NULL != mConnection )
-   {
-      delete mConnection;
-   }
 }
 
 void Viewer::init()
@@ -156,6 +147,35 @@ void Viewer::preFrame()
          mConnection = NULL;
       }
    }
+}
+
+void Viewer::exit()
+{
+   // First we free up all the OpenSG resources that have been allocated
+   // for this application.
+   deallocate();
+
+   // Then we call up to the base class implementation of this method, which
+   // in turn tells OpenSG to exit.
+   vrj::OpenSGApp::exit();
+}
+
+void Viewer::deallocate()
+{
+   if ( NULL != mAspect )
+   {
+      delete mAspect;
+   }
+
+   if ( NULL != mConnection )
+   {
+      delete mConnection;
+   }
+
+   mUser.reset();
+   mScene.reset();
+   mPlugins.clear();
+   mPluginFactory.reset();
 }
 
 void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)

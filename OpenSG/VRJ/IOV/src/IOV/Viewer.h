@@ -84,6 +84,8 @@ public:
       return mScene;
    }
 
+   virtual void exit();
+
 public:
    UserPtr      getUser()
    { return mUser; }
@@ -116,6 +118,13 @@ protected:
       , mConnection(NULL)
    {;}
 
+   /**
+    * Override this method to deallocate OpenSG resources when the
+    * application is being removed from the VR Juggler kernel.  The
+    * overriding implementation must call the base class implementation
+    * as its last step.
+    */
+   virtual void deallocate();
 
 private:
    /**
