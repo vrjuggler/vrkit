@@ -309,6 +309,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
             mIntersectSound.trigger();
             mIntersecting = true;
 
+            // XXX: Is there any cleaner way to do this?
             OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
 
             if ( mUsingShader )
@@ -318,9 +319,11 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
 
                if ( highlight_parent != mIntersectedObj.node() )
                {
-                  // XXX: Is there any cleaner way to do this?
-                  mCoredHighlightNode =
-                     mIntersectedObj.node()->getChild(0)->clone();
+                  // XXX: Is there a cleaner (or shorter) way to do this?
+                  OSG::NodeCorePtr lit_node_core = lit_node->getCore();
+                  OSG::GeometryPtr geo =
+                     OSG::GeometryPtr::dcast(lit_node_core);
+                  mCoredHighlightNode = geo->clone();
                }
             }
 
