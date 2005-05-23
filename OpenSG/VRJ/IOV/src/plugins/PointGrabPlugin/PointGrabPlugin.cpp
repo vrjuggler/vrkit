@@ -325,10 +325,9 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
                if ( highlight_parent != mIntersectedObj.node() )
                {
                   // XXX: Is there a cleaner (or shorter) way to do this?
-                  OSG::UInt32 c = mCoredHighlightNode.node()->getNChildren();
-                  for ( ; c > 0; --c )
+                  while ( mCoredHighlightNode.node()->getNChildren() > 0 )
                   {
-                     mCoredHighlightNode.node()->subChild(c);
+                     mCoredHighlightNode.node()->subChild(0);
                   }
                   mCoredHighlightNode.node()->addChild(
                      OSG::deepCloneTree(lit_node)
