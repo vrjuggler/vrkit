@@ -147,9 +147,8 @@ void PointGrabPlugin::init(ViewerPtr viewer)
             mGrabHighlightMaterial->addChunk(blend_chunk);
          OSG::endEditCP(mGrabHighlightMaterial);
 
-         // Give mCoredHighlightNode a node with no core.  The core will come
-         // in later.
-         mCoredHighlightNode = inf::CoredGeomPtr(OSG::Node::create());
+         mCoredHighlightNode =
+            inf::CoredMatGroupPtr(OSG::MaterialGroup::create());
          mUsingShader = true;
       }
    }
@@ -235,7 +234,13 @@ void PointGrabPlugin::init(ViewerPtr viewer)
       OSG::endEditCP(geo);
       OSG::addRefCP(geo);
 
-      mCoredHighlightNode = inf::CoredGeomPtr(geo);
+      inf::CoredGeomPtr geom_node = inf::CoredGeomPtr(geo);
+
+      mCoredHighlightNode =
+         inf::CoredMatGroupPtr(OSG::MaterialGroup::create());
+      OSG::beginEditCP(mCoredHighlightNode);
+         mCoredHighlightNode.node()->addChild(geom_node);
+      OSG::endEditCP(mCoredHighlightNode);
    }
 }
 
@@ -320,13 +325,18 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
                if ( highlight_parent != mIntersectedObj.node() )
                {
                   // XXX: Is there a cleaner (or shorter) way to do this?
-                  OSG::NodeCorePtr lit_node_core = lit_node->getCore();
-                  OSG::GeometryPtr geo =
-                     OSG::GeometryPtr::dcast(lit_node_core);
-                  mCoredHighlightNode = geo->clone();
+                  OSG::UInt32 c = mCoredHighlightNode.node()->getNChildren();
+                  for ( ; c > 0; --c )
+                  {
+                     mCoredHighlightNode.node()->subChild(c);
+                  }
+                  mCoredHighlightNode.node()->addChild(
+                     OSG::deepCloneTree(lit_node)
+                  );
                }
             }
 
+            std::cout << mCoredHighlightNode.core() << std::endl;
             OSG::beginEditCP(mCoredHighlightNode,
                              OSG::Geometry::MaterialFieldMask);
                mCoredHighlightNode->setMaterial(mIsectHighlightMaterial);

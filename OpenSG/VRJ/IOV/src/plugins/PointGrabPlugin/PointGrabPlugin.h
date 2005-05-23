@@ -11,6 +11,7 @@
 #include <OpenSG/OSGGeoPropPtrs.h>
 #include <OpenSG/OSGSimpleGeometry.h>
 #include <OpenSG/OSGSimpleMaterial.h>
+#include <OpenSG/OSGMaterialGroup.h>
 
 #include <snx/SoundHandle.h>
 
@@ -22,7 +23,8 @@
 namespace inf
 {
 
-typedef OSG::CoredNodePtr<OSG::Geometry> CoredGeomPtr;
+typedef OSG::CoredNodePtr<OSG::Geometry>      CoredGeomPtr;
+typedef OSG::CoredNodePtr<OSG::MaterialGroup> CoredMatGroupPtr;
 
 class PointGrabPlugin
    : public inf::Plugin
@@ -106,7 +108,7 @@ private:
    OSG::Color3f mGrabColor;
 
    bool mUsingShader;
-   inf::CoredGeomPtr                  mCoredHighlightNode;
+   inf::CoredMatGroupPtr              mCoredHighlightNode;
    OSG::GeoPositions3fPtr             mHighlightPoints;
    OSG::RefPtr<OSG::ChunkMaterialPtr> mIsectHighlightMaterial;
    OSG::RefPtr<OSG::ChunkMaterialPtr> mGrabHighlightMaterial;
