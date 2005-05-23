@@ -8,7 +8,7 @@ void main(void)
    alpha = 1.0 - abs(vsNormal.z);
 
    // move vertex out along normal
-   const vec4 new_vert = gl_Vertex + vec4(gl_Normal, 1.0);
+   const vec4 new_vert = gl_Vertex + vec4(gl_Normal, 0.0);
 
    gl_Position = gl_ModelViewProjectionMatrix * new_vert;
 }
