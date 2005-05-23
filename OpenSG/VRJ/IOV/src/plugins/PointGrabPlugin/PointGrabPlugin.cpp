@@ -336,7 +336,6 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
                }
             }
 
-            std::cout << mCoredHighlightNode.core() << std::endl;
             OSG::beginEditCP(mCoredHighlightNode,
                              OSG::Geometry::MaterialFieldMask);
                mCoredHighlightNode->setMaterial(mIsectHighlightMaterial);
