@@ -2,6 +2,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/filesystem/exception.hpp>
 
 #include <OpenSG/OSGSHLChunk.h>
 
@@ -13,6 +14,7 @@
 
 #include <vpr/vpr.h>
 #include <vpr/System.h>
+#include <vpr/Util/FileUtils.h>
 
 #include <IOV/Viewer.h>
 #include <IOV/GrabData.h>
@@ -70,7 +72,7 @@ void PointGrabPlugin::init(ViewerPtr viewer)
    {
       fs::path iov_base_dir_path(iov_base_dir, fs::native);
       fs::path shader_subdir_path("share/IOV/data/shaders");
-      mShaderDir = iov_base_dir_path / shader_subdir_path;
+      mShaderSearchPath.push_back(iov_base_dir_path / shader_subdir_path);
    }
 
    // Configure
@@ -84,78 +86,33 @@ void PointGrabPlugin::init(ViewerPtr viewer)
       config(cfg_elt);
    }
 
-   std::cout << "Shader directory: " << mShaderDir.string() << std::endl;
+   bool use_bbox(false);
 
-   try
+   if ( mEnableShaders )
    {
-      fs::path vs_file_path(mShaderDir / "highlight.vs");
-      fs::ifstream vs_file(vs_file_path);
-      fs::path fs_file_path(mShaderDir / "highlight.fs");
-      fs::ifstream fs_file(fs_file_path);
-
-      if ( ! vs_file || ! fs_file )
+      try
       {
-         if ( ! vs_file )
-         {
-            std::cerr << "WARNING: Could not open '" << vs_file_path.string()
-                      << "'" << std::endl;
-         }
-
-         if ( ! fs_file )
-         {
-            std::cerr << "WARNING: Could not open '" << fs_file_path.string()
-                      << "'" << std::endl;
-         }
-
-         throw std::runtime_error("Failed to find shader programs");
+         mIsectHighlightMaterial = createShader(mIsectVertexShaderFile,
+                                                mIsectFragmentShaderFile);
+         mGrabHighlightMaterial = createShader(mGrabVertexShaderFile,
+                                               mGrabFragmentShaderFile);
       }
-      else
+      catch (std::exception& ex)
       {
-         OSG::RefPtr<OSG::SHLChunkPtr> shl_chunk;
-         shl_chunk = OSG::SHLChunk::create();
-         {
-            OSG::CPEdit(shl_chunk, OSG::ShaderChunk::VertexProgramFieldMask |
-                                   OSG::ShaderChunk::FragmentProgramFieldMask);
-
-            if ( ! shl_chunk->readVertexProgram(vs_file) )
-            {
-               throw std::runtime_error("Failed to read vertex program");
-            }
-
-            if ( ! shl_chunk->readFragmentProgram(fs_file) )
-            {
-               throw std::runtime_error("Failed to read fragment program");
-            }
-         }
-
-         OSG::RefPtr<OSG::BlendChunkPtr> blend_chunk;
-         blend_chunk = OSG::BlendChunk::create();
-         OSG::beginEditCP(blend_chunk);
-            blend_chunk->setSrcFactor(GL_SRC_ALPHA);
-            blend_chunk->setDestFactor(GL_ONE);
-         OSG::endEditCP(blend_chunk);
-
-         mIsectHighlightMaterial = OSG::ChunkMaterial::create();
-         OSG::beginEditCP(mIsectHighlightMaterial);
-            mIsectHighlightMaterial->addChunk(shl_chunk);
-            mIsectHighlightMaterial->addChunk(blend_chunk);
-         OSG::endEditCP(mIsectHighlightMaterial);
-
-         mGrabHighlightMaterial = OSG::ChunkMaterial::create();
-         OSG::beginEditCP(mGrabHighlightMaterial);
-            mGrabHighlightMaterial->addChunk(shl_chunk);
-            mGrabHighlightMaterial->addChunk(blend_chunk);
-         OSG::endEditCP(mGrabHighlightMaterial);
-
-         mCoredHighlightNode =
-            inf::CoredMatGroupPtr(OSG::MaterialGroup::create());
-         mUsingShader = true;
+         std::cerr << ex.what() << std::endl;
+         std::cout << "Falling back on bounding box highlighting."
+                   << std::endl;
+         use_bbox = true;
       }
    }
-   catch (std::exception& ex)
+   else
    {
-      std::cerr << ex.what() << std::endl;
-      std::cout << "Falling back on bounding box highlighting." << std::endl;
+      use_bbox = true;
+   }
+
+   if ( use_bbox )
+   {
+      mUsingShader = false;
 
       // Set up the highlight materials.
       OSG::SimpleMaterialPtr isect_highlight_mat =
@@ -483,7 +440,50 @@ bool PointGrabPlugin::config(jccl::ConfigElementPtr elt)
                 << grab_color[2] << ">" << std::endl;
    }
 
+   const unsigned int num_paths = elt->getNum("shader_search_path");
+   for ( unsigned int i = 0; i < num_paths; ++i )
+   {
+      std::string path =
+         vpr::replaceEnvVars(elt->getProperty<std::string>("shader_search_path", i));
+
+      try
+      {
+         mShaderSearchPath.push_back(fs::path(path, fs::native));
+      }
+      catch (fs::filesystem_error& ex)
+      {
+         std::cerr << ex.what() << std::endl;
+      }
+   }
+
+   mEnableShaders = elt->getProperty<bool>("enable_highlight_shaders");
+   mIsectVertexShaderFile =
+      vpr::replaceEnvVars(elt->getProperty<std::string>("intersect_shader", 0));
+   mIsectFragmentShaderFile =
+      vpr::replaceEnvVars(elt->getProperty<std::string>("intersect_shader", 1));
+
+   mGrabVertexShaderFile =
+      vpr::replaceEnvVars(elt->getProperty<std::string>("grab_shader", 0));
+   mGrabFragmentShaderFile =
+      vpr::replaceEnvVars(elt->getProperty<std::string>("grab_shader", 1));
+
    return true;
+}
+
+PointGrabPlugin::PointGrabPlugin()
+   : GRAB_BUTTON(inf::buttons::GRAB_TOGGLE_BUTTON)
+   , mEnableShaders(true)
+   , mIsectVertexShaderFile("highlight.vs")
+   , mIsectFragmentShaderFile("highlight.vs")
+   , mGrabVertexShaderFile("highlight.vs")
+   , mGrabFragmentShaderFile("highlight.vs")
+   , mIntersecting(false)
+   , mGrabbing(false)
+   , mIntersectColor(1.0f, 1.0f, 0.0f)
+   , mGrabColor(1.0f, 0.0f, 1.0f)
+   , mUsingShader(false)
+{
+   /* Do nothing. */ ;
 }
 
 // The implementation of this helper method is adapted from
@@ -513,6 +513,102 @@ void PointGrabPlugin::updateHighlight(OSG::NodePtr highlightNode)
 
    OSG::beginEditCP(mCoredHighlightNode, OSG::Geometry::PositionsFieldMask);
    OSG::endEditCP(mCoredHighlightNode, OSG::Geometry::PositionsFieldMask);
+}
+
+OSG::RefPtr<OSG::ChunkMaterialPtr>
+PointGrabPlugin::createShader(const std::string& vertexShader,
+                              const std::string& fragmentShader)
+   throw(std::exception)
+{
+   fs::path vs_file_path(getCompleteShaderFile(vertexShader));
+   fs::path fs_file_path(getCompleteShaderFile(fragmentShader));
+
+   fs::ifstream vs_file(vs_file_path);
+   fs::ifstream fs_file(fs_file_path);
+
+   if ( ! vs_file || ! fs_file )
+   {
+      if ( ! vs_file )
+      {
+         std::cerr << "WARNING: Could not open '"
+                   << vs_file_path.string() << "'" << std::endl;
+      }
+
+      if ( ! fs_file )
+      {
+         std::cerr << "WARNING: Could not open '"
+                   << fs_file_path.string() << "'" << std::endl;
+      }
+
+      throw std::runtime_error("Failed to find shader programs");
+   }
+   else
+   {
+      OSG::RefPtr<OSG::SHLChunkPtr> shl_chunk;
+      shl_chunk = OSG::SHLChunk::create();
+      {
+         OSG::CPEdit(shl_chunk, OSG::ShaderChunk::VertexProgramFieldMask |
+                                OSG::ShaderChunk::FragmentProgramFieldMask);
+
+         if ( ! shl_chunk->readVertexProgram(vs_file) )
+         {
+            throw std::runtime_error("Failed to read vertex program");
+         }
+
+         if ( ! shl_chunk->readFragmentProgram(fs_file) )
+         {
+            throw std::runtime_error("Failed to read fragment program");
+         }
+      }
+
+      OSG::RefPtr<OSG::BlendChunkPtr> blend_chunk;
+      blend_chunk = OSG::BlendChunk::create();
+      OSG::beginEditCP(blend_chunk);
+         blend_chunk->setSrcFactor(GL_SRC_ALPHA);
+         blend_chunk->setDestFactor(GL_ONE);
+      OSG::endEditCP(blend_chunk);
+
+      OSG::RefPtr<OSG::ChunkMaterialPtr> material(OSG::ChunkMaterial::create());
+      OSG::beginEditCP(material);
+         material->addChunk(shl_chunk);
+         material->addChunk(blend_chunk);
+      OSG::endEditCP(material);
+
+      mCoredHighlightNode =
+         inf::CoredMatGroupPtr(OSG::MaterialGroup::create());
+      mUsingShader = true;
+
+      return material;
+   }
+}
+
+fs::path PointGrabPlugin::getCompleteShaderFile(const std::string& filename)
+{
+   fs::path file_path(filename, fs::native);
+
+   if ( ! file_path.is_complete() )
+   {
+      for ( std::vector<fs::path>::iterator i = mShaderSearchPath.begin();
+            i != mShaderSearchPath.end();
+            ++i )
+      {
+         try
+         {
+            fs::path cur_path(*i / filename);
+            if ( fs::exists(cur_path) )
+            {
+               file_path = cur_path;
+               break;
+            }
+         }
+         catch (fs::filesystem_error& ex)
+         {
+            std::cerr << ex.what() << std::endl;
+         }
+      }
+   }
+
+   return file_path;
 }
 
 }

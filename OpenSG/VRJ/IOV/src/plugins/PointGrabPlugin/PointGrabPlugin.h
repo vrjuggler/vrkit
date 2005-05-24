@@ -4,6 +4,7 @@
 #include <IOV/Plugin/PluginConfig.h>
 
 #include <string>
+#include <exception>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/filesystem/path.hpp>
 #include <gmtl/Matrix.h>
@@ -73,19 +74,16 @@ protected:
       delete this;
    }
 
-   PointGrabPlugin()
-      : GRAB_BUTTON(inf::buttons::GRAB_TOGGLE_BUTTON)
-      , mIntersecting(false)
-      , mGrabbing(false)
-      , mIntersectColor(1.0f, 1.0f, 0.0f)
-      , mGrabColor(1.0f, 0.0f, 1.0f)
-      , mUsingShader(false)
-   {
-      /* Do nothing. */ ;
-   }
+   PointGrabPlugin();
 
 private:
    void updateHighlight(OSG::NodePtr highlightNode);
+
+   OSG::RefPtr<OSG::ChunkMaterialPtr> createShader(const std::string& vertexShader,
+                                                   const std::string& fragmentShader)
+      throw(std::exception);
+
+   boost::filesystem::path getCompleteShaderFile(const std::string& filename);
 
    static std::string getElementType()
    {
@@ -94,7 +92,12 @@ private:
 
    const int GRAB_BUTTON;
 
-   boost::filesystem::path mShaderDir;
+   std::vector<boost::filesystem::path> mShaderSearchPath;
+   bool mEnableShaders;
+   std::string mIsectVertexShaderFile;
+   std::string mIsectFragmentShaderFile;
+   std::string mGrabVertexShaderFile;
+   std::string mGrabFragmentShaderFile;
 
    inf::GrabDataPtr mGrabData;
 

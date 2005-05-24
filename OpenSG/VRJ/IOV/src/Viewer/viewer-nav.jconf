@@ -16,6 +16,19 @@
          <max_velocity>5.0</max_velocity>
          <acceleration>0.05</acceleration>
       </wand_nav_plugin>
+      <point_grab_plugin name="Point Grab Plug-In" version="1">
+         <intersect_color>1.0</intersect_color>
+         <intersect_color>1.0</intersect_color>
+         <intersect_color>0.0</intersect_color>
+         <grab_color>1.0</grab_color>
+         <grab_color>0.0</grab_color>
+         <grab_color>1.0</grab_color>
+         <enable_highlight_shaders>true</enable_highlight_shaders>
+         <intersect_shader>highlight.vs</intersect_shader>
+         <intersect_shader>highlight.fs</intersect_shader>
+         <grab_shader>highlight.vs</grab_shader>
+         <grab_shader>highlight.fs</grab_shader>
+      </point_grab_plugin>
    </elements>
 </configuration>
 
