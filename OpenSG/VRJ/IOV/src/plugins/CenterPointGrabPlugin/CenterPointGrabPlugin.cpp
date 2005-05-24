@@ -241,7 +241,7 @@ void CenterPointGrabPlugin::updateState(ViewerPtr viewer)
    }
    // If we are grabbing an object and the grab button has just been pressed
    // again, release the grabbed object.
-   else if ( mGrabbing && grab_button->getData() != gadget::Digital::TOGGLE_ON )
+   else if ( mGrabbing && grab_button->getData() == gadget::Digital::TOGGLE_ON )
    {
       mGrabbing = false;
 
