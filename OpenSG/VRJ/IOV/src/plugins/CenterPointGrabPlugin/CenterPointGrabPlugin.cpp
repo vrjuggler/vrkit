@@ -138,24 +138,14 @@ void CenterPointGrabPlugin::updateState(ViewerPtr viewer)
 {
    const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
 
-   // cur_pos is the position of the view platform in the virtual world:
-   // vw_M_vp
-   const gmtl::Matrix44f& cur_pos(view_platform.getCurPos());
-
-   // Get the wand transformation in virtual world coordinates.
-   const gmtl::Matrix44f wand_pos(
-      mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
-   );
-   const gmtl::Matrix44f wand_xform_vw = cur_pos * wand_pos;
-
    // Perform intersection tests with all the grabbable objects if and only
    // if we are not already grabbing an object.
    if ( ! mGrabbing )
    {
-      const gmtl::Vec3f wand_pos_vw =
-         gmtl::makeTrans<gmtl::Vec3f>(wand_xform_vw);
-      const OSG::Pnt3f wand_point(wand_pos_vw[0], wand_pos_vw[1],
-                                  wand_pos_vw[2]);
+      // Get the wand transformation in virtual platform coordinates.
+      const gmtl::Matrix44f vp_M_wand(
+         mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
+      );
 
       inf::CoredTransformPtr intersect_obj;
 
@@ -165,6 +155,20 @@ void CenterPointGrabPlugin::updateState(ViewerPtr viewer)
       GrabData::object_list_t::const_iterator o;
       for ( o = objects.begin(); o != objects.end(); ++o )
       {
+         OSG::Matrix world_xform;
+         (*o).node()->getParent()->getToWorld(world_xform);
+         gmtl::Matrix44f sg_M_vp;
+         gmtl::set(sg_M_vp, world_xform);
+         gmtl::invert(sg_M_vp);
+
+         // Get the wand transformation in virtual world coordinates,
+         // including any transformations in the scene graph below the
+         // transformation root.
+         const gmtl::Matrix44f sg_M_wand = sg_M_vp * vp_M_wand;
+         const gmtl::Vec3f wand_pos_vw(gmtl::makeTrans<gmtl::Vec3f>(sg_M_wand));
+         const OSG::Pnt3f wand_point(wand_pos_vw[0], wand_pos_vw[1],
+                                     wand_pos_vw[2]);
+
          const OSG::DynamicVolume& bbox = (*o).node()->getVolume();
 
          if ( bbox.intersect(wand_point) )
@@ -267,18 +271,22 @@ void CenterPointGrabPlugin::run(inf::ViewerPtr viewer)
    {
       const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
 
-      // cur_pos is the position of the view platform in the virtual world:
-      // vw_M_vp
-      const gmtl::Matrix44f& cur_pos(view_platform.getCurPos());
+      // vw_M_vp is the current position of the view platform in the virtual
+      // world.
+      OSG::Matrix world_xform;
+      mIntersectedObj.node()->getParent()->getToWorld(world_xform);
+      gmtl::Matrix44f vw_M_vp;
+      gmtl::set(vw_M_vp, world_xform);
+      gmtl::invert(vw_M_vp);
 
       // Get the wand transformation in virtual world coordinates.
-      const gmtl::Matrix44f wand_pos(
+      const gmtl::Matrix44f vp_M_wand(
          mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
       );
-      const gmtl::Matrix44f wand_xform_vw = cur_pos * wand_pos;
+      const gmtl::Matrix44f vw_M_wand = vw_M_vp * vp_M_wand;
 
       osg::Matrix obj_mat;
-      gmtl::set(obj_mat, wand_xform_vw);
+      gmtl::set(obj_mat, vw_M_wand);
       OSG::beginEditCP(mGrabbedObj, OSG::Transform::MatrixFieldMask);
          mGrabbedObj->setMatrix(obj_mat);
       OSG::endEditCP(mGrabbedObj, OSG::Transform::MatrixFieldMask);
