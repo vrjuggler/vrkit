@@ -119,19 +119,16 @@ void CenterPointGrabPlugin::init(ViewerPtr viewer)
 
    mCoredHighlightNode = inf::CoredGeomPtr(geo);
 
-
    // Configure
    std::string elt_type_name = getElementType();
-   jccl::ConfigElementPtr cfg_elt = viewer->getConfiguration().getConfigElement(elt_type_name);
+   jccl::ConfigElementPtr cfg_elt =
+      viewer->getConfiguration().getConfigElement(elt_type_name);
 
-   if(!cfg_elt)
+   if ( cfg_elt )
    {
-      throw PluginException("CenterPointGrabPlugincould not find its configuration.",
-                            IOV_LOCATION);
+      // Configure it
+      config(cfg_elt);
    }
-
-   // Configure it
-   config(cfg_elt);
 }
 
 void CenterPointGrabPlugin::updateState(ViewerPtr viewer)
@@ -329,8 +326,7 @@ bool CenterPointGrabPlugin::config(jccl::ConfigElementPtr elt)
         grab_color[1] >= 0.0f && grab_color[1] <= 1.0f &&
         grab_color[2] >= 0.0f && grab_color[2] <= 1.0f )
    {
-      mIntersectColor.setValuesRGB(grab_color[0], grab_color[1],
-                                   grab_color[2]);
+      mGrabColor.setValuesRGB(grab_color[0], grab_color[1], grab_color[2]);
    }
    else
    {
