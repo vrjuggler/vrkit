@@ -12,13 +12,17 @@
 
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
-#include <IOV/PluginFactoryPtr.h>
 #include <IOV/Plugin/Buttons.h>
 
 
 namespace inf
 {
 
+/** Mode switching plugin.
+ *
+ * This plugin manages a set of other plugins and switches among them
+ * when the user changes "modes" in the application.
+ */
 class ModeSwitchPlugin
    : public inf::Plugin
    , public boost::enable_shared_from_this<ModeSwitchPlugin>
@@ -62,7 +66,7 @@ protected:
    }
 
    ModeSwitchPlugin()
-      : SWITCH_BUTTON(inf::buttons::MODE_SWITCH_BUTTON)
+      : mSwitchButton(-1)
       , mCurrentMode(0)
    {
       /* Do nothing. */ ;
@@ -74,9 +78,7 @@ protected:
    }
 
    WandInterfacePtr mWandInterface;
-   const int SWITCH_BUTTON;
-
-   inf::PluginFactoryPtr mPluginFactory;     /**< Plugin factory that we are using to load plugins. */
+   int              mSwitchButton;
 
    unsigned                      mCurrentMode;     /**< Current active plugin. */
    std::vector<inf::PluginPtr>   mPlugins;

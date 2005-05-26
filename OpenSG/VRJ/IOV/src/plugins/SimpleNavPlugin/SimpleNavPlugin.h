@@ -77,6 +77,11 @@ protected:
 
    virtual void runNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
+   static std::string getElementType()
+   {
+      return std::string("simple_nav_plugin");
+   }
+
    WandInterfacePtr mWandInterface;
 
    bool mCanNavigate;
@@ -85,9 +90,10 @@ protected:
    float mVelocity;
    NavMode mNavMode;
 
-   const int ACCEL_BUTTON;
-   const int ROTATE_BUTTON;
-   const int MODE_BUTTON;
+   int mForBtn;      /**< Button for forward motion. */
+   int mRevBtn;      /**< Button for reverse. */
+   int mRotateBtn;   /**< Button for rotate. */
+   int mModeBtn;     /**< Button for swapping mode. */
 };
 
 }

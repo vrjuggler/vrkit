@@ -2,6 +2,9 @@
 #include <windows.h>
 #endif
 
+#include <iostream>
+#include <sstream>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 
@@ -62,6 +65,11 @@ std::string ModeSwitchPlugin::getDescription()
 
 void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
 {
+   const std::string plugin_path_prop("plugin_path");
+   const std::string plugin_prop("plugin");
+   const std::string swap_button_prop("swap_button_num");
+   const unsigned int req_cfg_version(1);
+
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
 
@@ -77,40 +85,20 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
 
    vprASSERT(elt->getID() == getElementType());
 
-   // Lookup details from config element
-   const std::string plugin_path_prop("plugin_path");
-   const std::string plugin_prop("plugin");
-
-   // Setup search path
-   std::vector<std::string> search_path;
-
-   // Set up two default search paths:
-   //    1. Relative path to './plugins'
-   //    2. IOV_BASE_DIR/lib/IOV/plugins
-   search_path.push_back("plugins");
-
-   std::string iov_base_dir;
-   if ( vpr::System::getenv("IOV_BASE_DIR", iov_base_dir).success() )
+   // Check for correct version of plugin configuration
+   if(elt->getVersion() < req_cfg_version)
    {
-      fs::path iov_base_path(iov_base_dir, fs::native);
-      fs::path def_iov_plugin_path = iov_base_path / "lib/IOV/plugins";
-
-      if ( fs::exists(def_iov_plugin_path) )
-      {
-         std::string def_search_path =
-            def_iov_plugin_path.native_directory_string();
-         std::cout << "Setting default IOV plug-in path: " << def_search_path
-                   << std::endl;
-         search_path.push_back(def_search_path);
-      }
-      else
-      {
-         std::cerr << "Default IOV plug-in path does not exist: "
-                   << def_iov_plugin_path.native_directory_string()
-                   << std::endl;
-      }
+      std::stringstream msg;
+      msg << "ModeSwitchPlugin: Configuration failed. Required cfg version: " << req_cfg_version
+          << " found:" << elt->getVersion();
+      throw PluginException(msg.str(), IOV_LOCATION);
    }
 
+   // Get the button for swapping
+   mSwitchButton = elt->getProperty<int>(swap_button_prop);
+
+   // -- Setup the plugin search path -- //
+   std::vector<std::string> search_path;
    const unsigned int num_paths(elt->getNum(plugin_path_prop));
 
    for ( unsigned int i = 0; i < num_paths; ++i )
@@ -120,9 +108,13 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
       );
    }
 
-   mPluginFactory = inf::PluginFactory::create();
-   mPluginFactory->init(search_path);
+   inf::PluginFactoryPtr plugin_factory = viewer->getPluginFactory();
+   if(!search_path.empty())
+   {
+      plugin_factory->addScanPath(search_path);
+   }
 
+   // --- Load the managed plugins --- //
    const unsigned int num_plugins(elt->getNum(plugin_prop));
 
    // Attempt to load each plugin
@@ -134,7 +126,7 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
       try
       {
          inf::PluginCreator* creator =
-            mPluginFactory->getPluginCreator(plugin_name);
+            plugin_factory->getPluginCreator(plugin_name);
 
          if ( NULL != creator )
          {
@@ -174,7 +166,7 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
 void ModeSwitchPlugin::updateState(inf::ViewerPtr viewer)
 {
    gadget::DigitalInterface& switch_button =
-      mWandInterface->getButton(SWITCH_BUTTON);
+      mWandInterface->getButton(mSwitchButton);
 
    if ( switch_button->getData() == gadget::Digital::TOGGLE_ON )
    {

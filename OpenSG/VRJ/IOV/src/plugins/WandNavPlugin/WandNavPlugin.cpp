@@ -2,6 +2,8 @@
 #include <windows.h>
 #endif
 
+#include <sstream>
+
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
 #include <gmtl/Quat.h>
@@ -57,9 +59,10 @@ WandNavPlugin::WandNavPlugin()
    , mMaxVelocity(0.5f)
    , mAcceleration(0.005f)
    , mNavMode(WALK)
-   , ACCEL_BUTTON(inf::buttons::NAV_GO_BUTTON)
-   , ROTATE_BUTTON(inf::buttons::NAV_ROTATE_BUTTON)
-   , MODE_BUTTON(inf::buttons::NAV_TOGGLE_BUTTON)
+   , mForBtn(-1)
+   , mRevBtn(-1)
+   , mRotateBtn(-1)
+   , mModeBtn(-1)
 {
    mCanNavigate = isFocused();
 }
@@ -86,8 +89,23 @@ void WandNavPlugin::init(ViewerPtr viewer)
 
 bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
 {
+   const std::string for_btn_prop("forward_button_num");
+   const std::string rev_btn_prop("reverse_button_num");
+   const std::string rot_btn_prop("rotate_button_num");
+   const std::string mode_btn_prop("nav_mode_button_num");
+   const int unsigned req_cfg_version(1);
+
    vprASSERT(elt->getID() == getElementType() &&
              "Got unexpected config element type");
+
+   // Check for correct version of plugin configuration
+   if(elt->getVersion() < req_cfg_version)
+   {
+      std::stringstream msg;
+      msg << "SimpleNavPlugin: Configuration failed. Required cfg version: " << req_cfg_version
+          << " found:" << elt->getVersion();
+      throw PluginException(msg.str(), IOV_LOCATION);
+   }
 
    float max_velocity = elt->getProperty<float>("max_velocity");
    float accel        = elt->getProperty<float>("acceleration");
@@ -101,6 +119,12 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    {
       setAcceleration(accel);
    }
+
+   // Get the button for navigation
+   mForBtn = elt->getProperty<int>(for_btn_prop);
+   mRevBtn = elt->getProperty<int>(rev_btn_prop);
+   mRotateBtn = elt->getProperty<int>(rot_btn_prop);
+   mModeBtn = elt->getProperty<int>(mode_btn_prop);
 
    return true;
 }
@@ -122,26 +146,32 @@ void WandNavPlugin::updateNavState(ViewerPtr viewer,
    vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
 
    gadget::DigitalInterface& accel_button =
-      mWandInterface->getButton(ACCEL_BUTTON);
+      mWandInterface->getButton(mForBtn);
+   gadget::DigitalInterface& deccel_button =
+      mWandInterface->getButton(mRevBtn);
    gadget::DigitalInterface& rotate_button =
-      mWandInterface->getButton(ROTATE_BUTTON);
+      mWandInterface->getButton(mRotateBtn);
    gadget::DigitalInterface& mode_button =
-      mWandInterface->getButton(MODE_BUTTON);
+      mWandInterface->getButton(mModeBtn);
 
    // Update velocity
    if ( accel_button->getData() == gadget::Digital::ON )
    {
       mVelocity += mAcceleration;
    }
-   else if ( mVelocity > 0.0f )
+   else if ( deccel_button->getData() == gadget::Digital::ON )
+   {
+      mVelocity -= mAcceleration;
+   }
+   else if ( mVelocity != 0.0f )
    {
       mVelocity = 0.0f;
    }
 
    // Restrict velocity range to [0.0,max_vel].
-   if ( mVelocity < 0.0f )
+   if ( mVelocity < -mMaxVelocity )
    {
-      mVelocity = 0.0f;
+      mVelocity = -mMaxVelocity;
    }
    if ( mVelocity > mMaxVelocity )
    {

@@ -18,6 +18,11 @@ namespace inf
 
 void PluginFactory::init(const std::vector<std::string>& scanPath)
 {
+   addScanPath(scanPath);
+}
+
+void PluginFactory::addScanPath(const std::vector<std::string>& scanPath)
+{
    // Determine the platform-specific file extension used for dynamically
    // loadable code.
 #if defined(VPR_OS_Win32)
@@ -64,7 +69,15 @@ void PluginFactory::init(const std::vector<std::string>& scanPath)
                // platform-agnostic name so that callers of getPluginLibrary()
                // and getPluginCreator() do not have to worry about
                // platform-specific naming issues.
-               mPluginLibs[plugin_name] = libs[j];
+               if(mPluginLibs.find(plugin_name) == mPluginLibs.end())
+               {
+                  mPluginLibs[plugin_name] = libs[j];
+                  std::cout << "IOV: Found plugin: [" << plugin_name << "]" << std::endl;
+               }
+               else
+               {
+                  std::cout << "WARNING: IOV found a plugin that was already registered: " << plugin_name << std::endl;
+               }
             }
             else
             {

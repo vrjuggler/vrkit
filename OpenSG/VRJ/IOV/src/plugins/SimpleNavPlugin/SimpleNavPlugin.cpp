@@ -2,6 +2,8 @@
 #include <windows.h>
 #endif
 
+#include <sstream>
+
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
 #include <gmtl/Quat.h>
@@ -54,17 +56,51 @@ SimpleNavPlugin::SimpleNavPlugin()
    , mNavState(RESET)
    , mVelocity(0.0f)
    , mNavMode(WALK)
-   , ACCEL_BUTTON(inf::buttons::NAV_GO_BUTTON)
-   , ROTATE_BUTTON(inf::buttons::NAV_ROTATE_BUTTON)
-   , MODE_BUTTON(inf::buttons::NAV_TOGGLE_BUTTON)
+   , mForBtn(-1)
+   , mRevBtn(-1)
+   , mRotateBtn(-1)
+   , mModeBtn(-1)
 {
    mCanNavigate = isFocused();
 }
 
 void SimpleNavPlugin::init(ViewerPtr viewer)
 {
+   const std::string plugin_path_prop("plugin_path");
+   const std::string plugin_prop("plugin");
+   const std::string for_btn_prop("forward_button_num");
+   const std::string rev_btn_prop("reverse_button_num");
+   const std::string rot_btn_prop("rotate_button_num");
+   const std::string mode_btn_prop("nav_mode_button_num");
+   const int unsigned req_cfg_version(1);
+
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
+
+   // -- Configure -- //
+   std::string elt_type_name = getElementType();
+   jccl::ConfigElementPtr elt = viewer->getConfiguration().getConfigElement(elt_type_name);
+
+   if(!elt)
+   {
+      throw PluginException("ModeSwitchPlugin not find its configuration.", IOV_LOCATION);
+   }
+   vprASSERT(elt->getID() == getElementType());
+
+   // Check for correct version of plugin configuration
+   if(elt->getVersion() < req_cfg_version)
+   {
+      std::stringstream msg;
+      msg << "SimpleNavPlugin: Configuration failed. Required cfg version: " << req_cfg_version
+          << " found:" << elt->getVersion();
+      throw PluginException(msg.str(), IOV_LOCATION);
+   }
+
+   // Get the button for navigation
+   mForBtn = elt->getProperty<int>(for_btn_prop);
+   mRevBtn = elt->getProperty<int>(rev_btn_prop);
+   mRotateBtn = elt->getProperty<int>(rot_btn_prop);
+   mModeBtn = elt->getProperty<int>(mode_btn_prop);
 }
 
 void SimpleNavPlugin::focusChanged()
@@ -87,16 +123,22 @@ void SimpleNavPlugin::updateNavState(ViewerPtr viewer,
    const float max_vel(0.5f);
 
    gadget::DigitalInterface& accel_button =
-      mWandInterface->getButton(ACCEL_BUTTON);
+      mWandInterface->getButton(mForBtn);
+   gadget::DigitalInterface& deccel_button =
+      mWandInterface->getButton(mRevBtn);
    gadget::DigitalInterface& rotate_button =
-      mWandInterface->getButton(ROTATE_BUTTON);
+      mWandInterface->getButton(mRotateBtn);
    gadget::DigitalInterface& mode_button =
-      mWandInterface->getButton(MODE_BUTTON);
+      mWandInterface->getButton(mModeBtn);
 
    // Update velocity
    if ( accel_button->getData() == gadget::Digital::ON )
    {
       mVelocity += inc_vel;
+   }
+   else if ( deccel_button->getData() == gadget::Digital::ON )
+   {
+      mVelocity -= inc_vel;
    }
    else if(mVelocity > 0)
    {
@@ -104,9 +146,9 @@ void SimpleNavPlugin::updateNavState(ViewerPtr viewer,
    }
 
    // Restrict range
-   if(mVelocity < 0)
+   if(mVelocity < -max_vel)
    {
-      mVelocity = 0;
+      mVelocity = -max_vel;
    }
    if(mVelocity > max_vel)
    {

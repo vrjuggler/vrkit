@@ -133,7 +133,7 @@ void CenterPointGrabPlugin::init(ViewerPtr viewer)
 
 void CenterPointGrabPlugin::updateState(ViewerPtr viewer)
 {
-   const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
+   //const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
 
    // Perform intersection tests with all the grabbable objects if and only
    // if we are not already grabbing an object.
@@ -266,7 +266,7 @@ void CenterPointGrabPlugin::run(inf::ViewerPtr viewer)
    // Move the grabbed object.
    if ( mGrabbing )
    {
-      const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
+      //const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
 
       // vw_M_vp is the current position of the view platform in the virtual
       // world.

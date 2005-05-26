@@ -203,7 +203,7 @@ void PointGrabPlugin::init(ViewerPtr viewer)
 
 void PointGrabPlugin::updateState(ViewerPtr viewer)
 {
-   const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
+   //const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
 
    // Get the wand transformation in virtual platform coordinates.
    const gmtl::Matrix44f vp_M_wand(
@@ -379,7 +379,7 @@ void PointGrabPlugin::run(inf::ViewerPtr viewer)
    // Move the grabbed object.
    if ( mGrabbing )
    {
-      const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
+      //const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
 
       // vw_M_vp is the current position of the view platform in the virtual
       // world.

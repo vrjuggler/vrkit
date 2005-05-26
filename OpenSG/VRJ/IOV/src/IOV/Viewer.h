@@ -105,6 +105,12 @@ public:
       return mConfiguration;
    }
 
+   /** Return the plugin factory being used by the system. */
+   inf::PluginFactoryPtr getPluginFactory()
+   {
+      return mPluginFactory;
+   }
+
    /** Dummied init scene method.  It is pure virtual in base so we have
     * to provide an implementation.
     */
@@ -172,9 +178,10 @@ private:
    std::vector<OSG::Connection::Channel> mChannels;
    //@}
 
+   /**< Plugin factory for the entire system. */
    inf::PluginFactoryPtr mPluginFactory;
 
-   /** List of plugins
+   /** List of plugins managed by the viewer.
    * @link association
    * @supplierCardinality 0..**/
    /*# Plugin lnkPlugin; */

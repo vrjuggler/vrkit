@@ -106,9 +106,10 @@ protected:
    float mAcceleration;
    NavMode mNavMode;
 
-   const int ACCEL_BUTTON;
-   const int ROTATE_BUTTON;
-   const int MODE_BUTTON;
+   int mForBtn;      /**< Button for forward motion. */
+   int mRevBtn;      /**< Button for reverse. */
+   int mRotateBtn;   /**< Button for rotate. */
+   int mModeBtn;     /**< Button for swapping mode. */
 };
 
 }

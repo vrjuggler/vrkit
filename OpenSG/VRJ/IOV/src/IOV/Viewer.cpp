@@ -270,6 +270,7 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
       }
    }
 
+   // Add paths from the application configuration
    const unsigned int num_paths(appCfg->getNum(plugin_path_prop));
 
    for ( unsigned int i = 0; i < num_paths; ++i )

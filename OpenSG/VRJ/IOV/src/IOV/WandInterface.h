@@ -1,5 +1,5 @@
-#ifndef WANDINTERFACE_H
-#define WANDINTERFACE_H
+#ifndef INFI_WANDINTERFACE_H
+#define INFI_WANDINTERFACE_H
 
 #include <IOV/DeviceInterface.h>
 #include <gadget/Type/DigitalInterface.h>
@@ -25,29 +25,20 @@ public:
    void init();
 
    /** Return the position of the wand. */
-   gadget::PositionInterface& getWandPos()
-   { return mWandInterface; }
+   gadget::PositionInterface& getWandPos();
 
-   /** Return the interface to the given button number. */
-   gadget::DigitalInterface& getButton(unsigned buttonNum)
-   { return mButtonInterfaces[buttonNum]; }
+   /** Return the interface to the given button number.
+    * If button number == -1 or is out of range, then
+    * return a dummy interface that always returns OFF.
+    */
+   gadget::DigitalInterface& getButton(int buttonNum);
 
 protected:
    gadget::PositionInterface              mWandInterface;
    std::vector<gadget::DigitalInterface>  mButtonInterfaces;
+   gadget::DigitalInterface               mDummyDigital;
 };
 
-inline void WandInterface::init()
-{
-   mWandInterface.init("VJWand");
-
-   mButtonInterfaces.resize(5);
-   mButtonInterfaces[0].init("VJButton0");
-   mButtonInterfaces[1].init("VJButton1");
-   mButtonInterfaces[2].init("VJButton2");
-   mButtonInterfaces[3].init("VJButton3");
-   mButtonInterfaces[4].init("VJButton4");
-}
 
 }
 

@@ -1,3 +1,7 @@
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include <boost/format.hpp>
 #include <sstream>
 
@@ -64,6 +68,8 @@ PluginPtr ViewpointsPlugin::create()
 
 void ViewpointsPlugin::init(inf::ViewerPtr viewer)
 {
+   const unsigned int req_cfg_version(1);
+
    // Get the wand interface
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
@@ -80,6 +86,15 @@ void ViewpointsPlugin::init(inf::ViewerPtr viewer)
 
    // -- Read configuration -- //
    vprASSERT(elt->getID() == vp_plugin_elt_tkn);
+
+   // Check for correct version of plugin configuration
+   if(elt->getVersion() < req_cfg_version)
+   {
+      std::stringstream msg;
+      msg << "ModeSwitchPlugin: Configuration failed. Required cfg version: " << req_cfg_version
+          << " found:" << elt->getVersion();
+      throw PluginException(msg.str(), IOV_LOCATION);
+   }
 
    // Get the control button to use
    mControlBtnNum = elt->getProperty<unsigned>(vp_control_button_num_tkn);

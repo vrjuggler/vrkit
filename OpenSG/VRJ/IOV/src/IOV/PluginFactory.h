@@ -20,6 +20,9 @@ namespace inf
 
 class PluginCreator;
 
+/** Central factory for IOV plugins.
+ * Takes care of scanning, finding, and returning plugin libraries.
+ */
 class IOV_CLASS_API PluginFactory
    : public boost::enable_shared_from_this<PluginFactory>
 {
@@ -43,6 +46,16 @@ public:
     * @see getPluginCreator
     */
    void init(const std::vector<std::string>& scanPath);
+
+   /**
+    * Extends the current list of plugin libraries by
+    * searching the given path looking for additional plug-in libraries
+    * using platform- and build-specific naming conventions.
+    *
+    * @see getPluginLibrary
+    * @see getPluginCreator
+    */
+   void addScanPath(const std::vector<std::string>& scanPath);
 
    /**
     * Returns the plug-in library associated with the given platform-agnostic

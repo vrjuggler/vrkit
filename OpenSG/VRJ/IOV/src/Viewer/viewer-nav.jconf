@@ -11,10 +11,16 @@
       <mode_switch_plugin name="Mode Switcher" version="1">
          <plugin>WandNavPlugin</plugin>
          <plugin>PointGrabPlugin</plugin>
+         <plugin>ViewpointsPlugin</plugin>
+         <swap_button_num>3</swap_button_num>
       </mode_switch_plugin>
       <wand_nav_plugin name="Viewer Wand Nav" version="1">
          <max_velocity>5.0</max_velocity>
          <acceleration>0.05</acceleration>
+         <forward_button_num>0</forward_button_num>
+         <reverse_button_num>-1</reverse_button_num>
+         <rotate_button_num>1</rotate_button_num>
+         <nav_mode_button_num>2</nav_mode_button_num>
       </wand_nav_plugin>
       <point_grab_plugin name="Point Grab Plug-In" version="1">
          <intersect_color>1.0</intersect_color>
@@ -29,6 +35,109 @@
          <grab_shader>highlight.vs</grab_shader>
          <grab_shader>highlight.fs</grab_shader>
       </point_grab_plugin>
+      <viewpoints_plugin name="ViewpointsPlugin" version="1">
+         <control_button_num>0</control_button_num>
+         <viewpoints>
+            <viewpoints_vp name="Position 1" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 2" version="1">
+               <position>20.0</position>
+               <position>0.0</position>
+               <position>-10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>-90.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 3" version="1">
+               <position>-20.0</position>
+               <position>0.0</position>
+               <position>-10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>90.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 4" version="1">
+               <position>10.0</position>
+               <position>0.0</position>
+               <position>10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>10.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 30" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>30.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 60" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>60.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 90" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>90.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 120" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>120.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 150" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>150.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 180" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>180.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+      </viewpoints_plugin>
    </elements>
 </configuration>
 

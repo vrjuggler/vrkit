@@ -7,7 +7,7 @@
       <category>/Application-Specific/</category>
       <category>/Infiscape/</category>
       <property valuetype="integer" variable="false" name="control_button_num">
-         <help>Select the number of the button that should control viewpoint toggling.</help>
+         <help>Select the number of the button that should control viewpoint toggling. -1 means to disable the use of this feature.</help>
          <value label="Control Button" defaultvalue="0" />
       </property>
       <property valuetype="configelement" variable="true" name="viewpoints">
