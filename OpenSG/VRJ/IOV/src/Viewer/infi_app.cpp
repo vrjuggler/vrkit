@@ -93,8 +93,6 @@ void OpenSgViewer::init()
 
    OSG::RefPtr<OSG::NodePtr> model_root;
 
-   mFileName = "data/test_scene.osb";
-
    // Load the model to use
    if (mFileName.empty())
    {
@@ -234,12 +232,14 @@ int main(int argc, char* argv[])
       po::options_description config("Configuration");
       config.add_options()
          ("jconf,j", po::value< std::vector<std::string> >()->composing(),
-          "VR Juggler config file")
+                  "VR Juggler config file")
          ("app,a",
-          po::value<std::string>(&infi_cfg)->default_value("viewer.jconf"),
-          "Viewer configuration file")
+                  po::value<std::string>(&infi_cfg)->default_value("viewer.jconf"),
+                  "Viewer configuration file")
          ("defs,d", po::value<std::string>(&jdef_dir),
-          "Path to custom config definition (.jdef) files")
+                  "Path to custom config definition (.jdef) files")
+         ("file,f",po::value<std::string>()->default_value("data/scenes/test_scene.osb"),
+                  "File to load in scene")
       ;
 
       po::options_description cmdline_options;
@@ -313,6 +313,12 @@ int main(int argc, char* argv[])
       {
          // Load named configuration file.
          app->getConfiguration().loadConfigEltFile(infi_cfg);
+      }
+
+      if (vm.count("file") != 0)
+      {
+         std::string filename = vm["file"].as<std::string>();
+         app->setFilename(filename);
       }
 
       kernel->start();                         // Start the kernel thread
