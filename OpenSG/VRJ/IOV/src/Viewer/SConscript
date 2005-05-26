@@ -29,4 +29,5 @@ if boost_options.isAvailable():
    viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), infi_app_prog)
    viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), jconf_files)
 else:
-   print "NOTE: Cannot build infi_app without Boost.program_options"
+   print "WARNING: Cannot build infi_app without Boost.program_options"
+
