@@ -1,12 +1,13 @@
 #ifndef INFI_WANDINTERFACE_H
 #define INFI_WANDINTERFACE_H
 
-#include <IOV/DeviceInterface.h>
+#include <IOV/Config.h>
+#include <vector>
 #include <gadget/Type/DigitalInterface.h>
 #include <gadget/Type/PositionInterface.h>
-#include <vector>
 
 #include <IOV/WandInterfacePtr.h>
+#include <IOV/DeviceInterface.h>
 
 
 namespace inf
@@ -16,7 +17,7 @@ namespace inf
  *
  * Just uses VJWand and VJButton0..4
  */
-class WandInterface : public DeviceInterface
+class IOV_CLASS_API WandInterface : public DeviceInterface
 {
 public:
    WandInterface()
