@@ -167,15 +167,18 @@
 			<File
 				RelativePath="..\..\src\Iov\ViewPlatform.cpp">
 			</File>
+			<File
+				RelativePath="..\..\src\Iov\WandInterface.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
 			<File
-				RelativePath="..\..\src\Iov\Plugin\Buttons.h">
+				RelativePath="..\..\src\Iov\Buttons.h">
 			</File>
 			<File
-				RelativePath="..\..\src\Iov\Buttons.h">
+				RelativePath="..\..\src\Iov\Plugin\Buttons.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Config.h">
