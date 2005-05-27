@@ -26,6 +26,16 @@ namespace fs = boost::filesystem;
 namespace inf
 {
 
+
+Viewer::Viewer()
+   : vrj::OpenSGApp(NULL)
+    , mAspect(NULL)
+    , mConnection(NULL)
+{
+   mPluginFactory = PluginFactory::create();
+}
+
+
 Viewer::~Viewer()
 {
 }
@@ -280,7 +290,6 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
       );
    }
 
-   mPluginFactory = PluginFactory::create();
    mPluginFactory->init(search_path);
 
    const unsigned int num_plugins(appCfg->getNum(plugin_prop));

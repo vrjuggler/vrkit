@@ -118,11 +118,7 @@ public:
    {;}
 
 protected:
-   Viewer()
-      : vrj::OpenSGApp(NULL)
-      , mAspect(NULL)
-      , mConnection(NULL)
-   {;}
+   Viewer();
 
    /**
     * Override this method to deallocate OpenSG resources when the
