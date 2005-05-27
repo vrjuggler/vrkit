@@ -59,15 +59,20 @@ std::string ModeSwitchPlugin::getDescription()
    }
    else
    {
-      return std::string("Mode: ") + mPlugins[mCurrentMode]->getDescription();
+      return std::string("Mode: ") + mModeNames[mCurrentMode];
    }
 }
 
 void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
 {
    const std::string plugin_path_prop("plugin_path");
-   const std::string plugin_prop("plugin");
+   const std::string plugins_prop("plugins");
+   const std::string mode_names_prop("mode_names");
    const std::string swap_button_prop("swap_button_num");
+   const std::string mode_plugin_type("mode_plugin_def");
+   const std::string active_modes_prop("active_modes");
+   const std::string plugin_prop("plugin");
+
    const unsigned int req_cfg_version(1);
 
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
@@ -94,8 +99,8 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
       throw PluginException(msg.str(), IOV_LOCATION);
    }
 
-   // Get the button for swapping
-   mSwitchButton = elt->getProperty<int>(swap_button_prop);
+   // ---- Process configuration --- //
+   mMaxMode = 0;
 
    // -- Setup the plugin search path -- //
    std::vector<std::string> search_path;
@@ -103,9 +108,8 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
 
    for ( unsigned int i = 0; i < num_paths; ++i )
    {
-      search_path.push_back(
-         elt->getProperty<std::string>(plugin_path_prop, i)
-      );
+      std::string new_path = elt->getProperty<std::string>(plugin_path_prop, i);
+      search_path.push_back(new_path);
    }
 
    inf::PluginFactoryPtr plugin_factory = viewer->getPluginFactory();
@@ -114,53 +118,72 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
       plugin_factory->addScanPath(search_path);
    }
 
+   // Get the button for swapping
+   mSwitchButton = elt->getProperty<int>(swap_button_prop);
+
+   // Get mode names
+   const unsigned int num_mode_names(elt->getNum(mode_names_prop));
+   mMaxMode = num_mode_names-1;
+   for(unsigned i=0; i<num_mode_names; ++i)
+   {
+      std::string mode_name = elt->getProperty<std::string>(mode_names_prop,i);
+      mModeNames.push_back(mode_name);
+   }
+
    // --- Load the managed plugins --- //
-   const unsigned int num_plugins(elt->getNum(plugin_prop));
+   const unsigned num_plugins(elt->getNum(plugins_prop));
 
    // Attempt to load each plugin
    // - Get creator and create plugin
    // - Push onto plugin list
-   for ( unsigned int i = 0; i < num_plugins; ++i )
+   for ( unsigned i = 0; i < num_plugins; ++i )
    {
-      std::string plugin_name = elt->getProperty<std::string>(plugin_prop, i);
+      PluginData plugin_data;
+      jccl::ConfigElementPtr plg_elt = elt->getProperty<jccl::ConfigElementPtr>(plugins_prop,i);
+      plugin_data.mName = plg_elt->getProperty<std::string>(plugin_prop);
       try
       {
          inf::PluginCreator* creator =
-            plugin_factory->getPluginCreator(plugin_name);
+            plugin_factory->getPluginCreator(plugin_data.mName);
 
          if ( NULL != creator )
          {
-            inf::PluginPtr plugin = creator->createPlugin();
+            plugin_data.mPlugin = creator->createPlugin();
+            plugin_data.mPlugin->init(viewer);
 
-            // If this is the first plug-in being added, then it will be
-            // the one to get focus.
-            if ( mPlugins.empty() )
+            const unsigned num_active_modes = plg_elt->getNum(active_modes_prop);
+            for(unsigned m=0; m<num_active_modes; ++m)
             {
-               plugin->setFocused(true);
-            }
-            // Otherwise, all other plug-ins remain unfocused until a
-            // plug-in switch is performed.
-            else
-            {
-               plugin->setFocused(false);
+               unsigned mode_num = plg_elt->getProperty<unsigned>(active_modes_prop,m);
+               if(mode_num > mMaxMode)
+               {  mMaxMode = mode_num; }
+
+               plugin_data.mActiveModes.push_back(mode_num);
             }
 
-            plugin->init(viewer);
-            mPlugins.push_back(plugin);
+            mPlugins.push_back(plugin_data);
          }
          else
          {
             std::cerr << "[ModeSwitchPlugin] ERROR: Plug-in '"
-                      << plugin_name << "' has a NULL creator!"
+                      << plugin_data.mName << "' has a NULL creator!"
                       << std::endl;
          }
       }
       catch (std::runtime_error& ex)
       {
          std::cerr << "WARNING: ModeSwitchPlugin failed to load plug-in '"
-                   << plugin_name << "': " << ex.what() << std::endl;
+                   << plugin_data.mName << "': " << ex.what() << std::endl;
       }
    }
+
+   // Make sure we have enough mode names to match up with the number of modes.
+   if(mMaxMode >= mModeNames.size())
+   {
+      mModeNames.resize(mMaxMode+1, std::string("Unknown Mode"));
+   }
+
+   switchToMode(0);
 }
 
 void ModeSwitchPlugin::updateState(inf::ViewerPtr viewer)
@@ -170,30 +193,59 @@ void ModeSwitchPlugin::updateState(inf::ViewerPtr viewer)
 
    if ( switch_button->getData() == gadget::Digital::TOGGLE_ON )
    {
-      const int old_mode(mCurrentMode);
-      mCurrentMode = (mCurrentMode + 1) % mPlugins.size();
-
-      if ( ! mPlugins.empty() )
-      {
-         mPlugins[old_mode]->setFocused(false);
-         mPlugins[mCurrentMode]->setFocused(true);
-         std::cout << getDescription() << std::endl;
-      }
+      unsigned new_mode(0);
+      if(mMaxMode != 0)
+      { new_mode = (mCurrentMode + 1) % (mMaxMode+1); }
+      switchToMode(new_mode);
    }
 
-   if ( ! mPlugins.empty() )
+   for(unsigned i=0; i<mPlugins.size(); ++i)
    {
-      mPlugins[mCurrentMode]->updateState(viewer);
+      if(mPlugins[i].mPlugin->isFocused())
+      {
+         mPlugins[i].mPlugin->updateState(viewer);
+      }
    }
 }
 
 void ModeSwitchPlugin::run(inf::ViewerPtr viewer)
 {
-   std::vector<PluginPtr>::iterator i;
+   std::vector<PluginData>::iterator i;
    for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
-      (*i)->run(viewer);
+      (*i).mPlugin->run(viewer);
    }
+}
+
+
+void ModeSwitchPlugin::switchToMode(unsigned modeNum)
+{
+   if(modeNum > mMaxMode)
+   {
+      std::cerr << "ModeSwitchPlugin: Attempted to switch out of range to: "
+                << modeNum << ".  Ignoring." << std::endl;
+      return;
+   }
+
+   std::cout << "ModeSwitchPlugin: Switching to mode: " << mModeNames[modeNum] << std::endl;
+
+   for(unsigned i=0; i<mPlugins.size(); ++i)
+   {
+      PluginData plugin = mPlugins[i];
+
+      // If found mode in active modes
+      if(std::find(plugin.mActiveModes.begin(), plugin.mActiveModes.end(), modeNum)
+            != plugin.mActiveModes.end())
+      {
+         plugin.mPlugin->setFocused(true);
+      }
+      else
+      {
+         plugin.mPlugin->setFocused(false);
+      }
+   }
+
+   mCurrentMode = modeNum;
 }
 
 }

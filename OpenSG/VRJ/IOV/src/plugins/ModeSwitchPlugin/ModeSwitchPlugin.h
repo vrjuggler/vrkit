@@ -40,6 +40,10 @@ public:
 
    virtual std::string getDescription();
 
+   /** Initialize and configure the plugin.
+    * This loads the needed support plugins
+    * and switches to the first mode.
+    */
    virtual void init(inf::ViewerPtr viewer);
 
    virtual void updateState(inf::ViewerPtr viewer);
@@ -56,6 +60,12 @@ public:
    }
 
 protected:
+
+   /** Internal helper for mode switching.
+   * Switch to the given mode. Activates and deactivates the plugins needed.
+   */
+   void switchToMode(unsigned modeNum);
+
    /**
     * Deletes this object.  This is an implementation of the pure virtual
     * inf::Plugin::destroy() method.
@@ -77,11 +87,21 @@ protected:
       return std::string("mode_switch_plugin");
    }
 
-   WandInterfacePtr mWandInterface;
-   int              mSwitchButton;
+protected:
+   struct PluginData
+   {
+      std::string            mName;         /**< Configured name of the plugin. */
+      inf::PluginPtr         mPlugin;       /**< The plugin. */
+      std::vector<unsigned>  mActiveModes;  /**< Indexes of modes where plugin is active. */
+   };
 
-   unsigned                      mCurrentMode;     /**< Current active plugin. */
-   std::vector<inf::PluginPtr>   mPlugins;
+   WandInterfacePtr  mWandInterface;
+   int               mSwitchButton;
+
+   std::vector<std::string>     mModeNames;       /**< The names of the plugin modes. */
+   unsigned                     mCurrentMode;     /**< Current active plugin. */
+   unsigned                     mMaxMode;         /**< The maximum valid mode number. */
+   std::vector<PluginData>      mPlugins;
 };
 
 }

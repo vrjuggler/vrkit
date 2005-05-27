@@ -8,12 +8,6 @@
          <listen_port>34000</listen_port>
          <slave_count>0</slave_count>
       </infiscape_opensg_viewer>
-      <mode_switch_plugin name="Mode Switcher" version="1">
-         <plugin>WandNavPlugin</plugin>
-         <plugin>PointGrabPlugin</plugin>
-         <plugin>ViewpointsPlugin</plugin>
-         <swap_button_num>3</swap_button_num>
-      </mode_switch_plugin>
       <wand_nav_plugin name="Viewer Wand Nav" version="1">
          <max_velocity>5.0</max_velocity>
          <acceleration>0.05</acceleration>
@@ -138,6 +132,24 @@
             </viewpoints_vp>
          </viewpoints>
       </viewpoints_plugin>
+      <mode_switch_plugin name="InfiscapeModeSwitchPlug-In0" version="1">
+         <swap_button_num>3</swap_button_num>
+         <plugins>
+            <mode_plugin_def name="Nav Plugin" version="1">
+               <plugin>WandNavPlugin</plugin>
+               <active_modes>0</active_modes>
+            </mode_plugin_def>
+         </plugins>
+         <plugins>
+            <mode_plugin_def name="Viewpoint Plugin" version="1">
+               <plugin>ViewpointsPlugin</plugin>
+               <active_modes>0</active_modes>
+               <active_modes>1</active_modes>
+            </mode_plugin_def>
+         </plugins>
+         <mode_names>Navigation Mode</mode_names>
+         <mode_names>Cycling Mode</mode_names>
+      </mode_switch_plugin>
    </elements>
 </configuration>
 

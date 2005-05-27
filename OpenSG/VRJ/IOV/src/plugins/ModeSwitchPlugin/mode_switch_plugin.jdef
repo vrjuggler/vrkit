@@ -10,19 +10,19 @@
          <help>Each value adds to the path where dynamically loadable plulg-ins can be found. The path may make use of environment variables. For example: &lt;tt&gt;${HOME}/inf-plugins&lt;/tt&gt;. If no values are set for this property, the default search path will be &lt;tt&gt;${VJ_BASE_DIR}/lib{,32,64}/infiscape/viewer/plugins&lt;/tt&gt; depending on the compile-time application binary interface (ABI).</help>
          <value label="Plug-In Path" defaultvalue="" />
       </property>
-      <property valuetype="string" variable="true" name="plugin">
-         <help>The name of a plug-in to be loaded and used by the Infiscape OpenSG Viewer application.</help>
-         <value label="Module Name" defaultvalue="" />
-         <enumeration>
-            <enum label="CenterPointGrabPlugin" value="CenterPointGrabPlugin" />
-            <enum label="PointGrabPlugin" value="PointGrabPlugin" />
-            <enum label="SimpleNavPlugin" value="SimpleNavPlugin" />
-            <enum label="WandNavPlugin" value="WandNavPlugin" />
-         </enumeration>
-      </property>
       <property valuetype="integer" variable="false" name="swap_button_num">
          <help>The number of the button to use for swapping modes.</help>
          <value label="Mode Swap Button" defaultvalue="-1" />
+      </property>
+            <property valuetype="configelement" variable="true" name="plugins">
+         <help />
+         <value label="Plugin" />
+         <allowed_type>mode_plugin_def</allowed_type>
+      </property>
+
+      <property valuetype="string" variable="true" name="mode_names">
+         <help />
+         <value label="Mode Name" defaultvalue="" />
       </property>
       <upgrade_transform />
    </definition_version>
