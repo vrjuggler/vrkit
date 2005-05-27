@@ -94,6 +94,19 @@ public:
       throw(inf::NoSuchPluginException, inf::PluginLoadException,
             inf::PluginInterfaceException);
 
+
+   /** Manually register a creator with the system.
+    *
+    * This method can be used to add creators that are not
+    * able to be found in a dynamic library but are still available.
+    * This is sometimes the case with custom plugins compiled directly into
+    * an application.
+    *
+    * @param creator    A valid creator
+    * @param name       The name of the plugin type that is created by creator.
+    */
+   void registerCreator(inf::PluginCreator* creator, const std::string& name);
+
 protected:
    PluginFactory()
    {
@@ -130,8 +143,11 @@ private:
    void validatePluginInterface(vpr::LibraryPtr pluginLib)
       throw(inf::PluginInterfaceException);
 
-   std::map<std::string, vpr::LibraryPtr>     mPluginLibs;
-   std::map<std::string, inf::PluginCreator*> mPluginCreators;
+   typedef std::map<std::string, vpr::LibraryPtr> plugin_libs_map_t;
+   typedef std::map<std::string, inf::PluginCreator*> plugin_creator_map_t;
+
+   plugin_libs_map_t    mPluginLibs;      /**< Map of plugin libs we know about. */
+   plugin_creator_map_t mPluginCreators;  /**< Map of plugin creators that have been registered. */
 };
 
 }

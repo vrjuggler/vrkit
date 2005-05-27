@@ -112,32 +112,42 @@ vpr::LibraryPtr PluginFactory::getPluginLibrary(const std::string& name) const
    }
 }
 
+// Get the creator to use
+// - First see if we already have one in the map
+// - If not, then search for known library to get it from
 inf::PluginCreator* PluginFactory::getPluginCreator(const std::string& name)
    throw(inf::PluginLoadException, inf::NoSuchPluginException,
          inf::PluginInterfaceException)
 {
-   // Get the vpr::LibraryPtr for the named plug-in.  This will throw an
-   // exception if name is not a valid plug-in name.
-   vpr::LibraryPtr plugin_lib = getPluginLibrary(name);
+   plugin_creator_map_t::iterator i = mPluginCreators.find(name);
 
-   // At this point, we know that the given name must be a valid plug-in name.
-   if ( plugin_lib->isLoaded() )
+   if(mPluginCreators.end() == i)
    {
-      std::map<std::string, inf::PluginCreator*>::iterator c =
-         mPluginCreators.find(name);
+      // Get the vpr::LibraryPtr for the named plug-in.  This will throw an
+      // exception if name is not a valid plug-in name.
+      vpr::LibraryPtr plugin_lib = getPluginLibrary(name);
 
-      if ( c == mPluginCreators.end() )
-      {
-         registerCreator(plugin_lib, name);
-      }
-   }
-   else
-   {
-      if ( plugin_lib->load().success() )
+      // At this point, we know that the given name must be a valid plug-in name.
+      if ( plugin_lib->isLoaded() )
       {
          registerCreator(plugin_lib, name);
       }
       else
+      {
+         if ( plugin_lib->load().success() )
+         {
+            registerCreator(plugin_lib, name);
+         }
+         else
+         {
+            std::stringstream msg_stream;
+            msg_stream << "Plug-in '" << name << "' failed to load";
+            throw PluginLoadException(msg_stream.str(), IOV_LOCATION);
+         }
+      }
+
+      i = mPluginCreators.find(name);
+      if(mPluginCreators.end() == i)
       {
          std::stringstream msg_stream;
          msg_stream << "Plug-in '" << name << "' failed to load";
@@ -145,7 +155,22 @@ inf::PluginCreator* PluginFactory::getPluginCreator(const std::string& name)
       }
    }
 
-   return mPluginCreators[name];
+   return (*i).second;
+}
+
+void PluginFactory::registerCreator(inf::PluginCreator* creator, const std::string& name)
+{
+   plugin_creator_map_t::iterator i = mPluginCreators.find(name);
+   if(i != mPluginCreators.end())
+   {
+      std::cerr << "WARNING: Tried to re-register a creator for plugin type: " << name
+                << ".  This registration will be ignored." << std::endl;
+      return;
+   }
+
+   std::cout << "IOV: PluginFactory: Registering creator for: " << name << std::endl;
+
+   mPluginCreators[name] = creator;
 }
 
 void PluginFactory::registerCreator(vpr::LibraryPtr pluginLib,
@@ -163,7 +188,8 @@ void PluginFactory::registerCreator(vpr::LibraryPtr pluginLib,
    {
       inf::PluginCreator* (*creator_func)();
       creator_func = (inf::PluginCreator* (*)()) creator_symbol;
-      mPluginCreators[name] = (*creator_func)();
+      inf::PluginCreator* new_creator = (*creator_func)();
+      registerCreator(new_creator, name);
    }
    else
    {
