@@ -97,7 +97,7 @@ void ViewpointsPlugin::init(inf::ViewerPtr viewer)
    }
 
    // Get the control button to use
-   mControlBtnNum = elt->getProperty<unsigned>(vp_control_button_num_tkn);
+   mControlBtnNum = elt->getProperty<int>(vp_control_button_num_tkn);
 
    // Read in all the viewpoints
    unsigned num_vps = elt->getNum(vp_viewpoints_tkn);

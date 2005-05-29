@@ -58,7 +58,7 @@ protected:
    }
 
    ViewpointsPlugin()
-      : mControlBtnNum(0)
+      : mControlBtnNum(-1)
       , mNextViewpoint(0)
    {;}
 
@@ -71,7 +71,7 @@ protected:
 
 private:
    WandInterfacePtr        mWandInterface;      /**< Ptr to the wand interface to use. */
-   unsigned                mControlBtnNum;      /**< The index of the control button. */
+   int                     mControlBtnNum;      /**< The index of the control button. */
    unsigned                mNextViewpoint;      /**< The next viewpoint to switch to. */
    std::vector<Viewpoint>  mViewpoints;         /**< The predefined viewpoints. */
 };
