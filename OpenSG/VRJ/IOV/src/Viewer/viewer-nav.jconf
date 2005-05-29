@@ -15,6 +15,7 @@
          <reverse_button_num>-1</reverse_button_num>
          <rotate_button_num>1</rotate_button_num>
          <nav_mode_button_num>2</nav_mode_button_num>
+         <initial_mode>Fly</initial_mode>
       </wand_nav_plugin>
       <point_grab_plugin name="Point Grab Plug-In" version="1">
          <intersect_color>1.0</intersect_color>
@@ -30,7 +31,7 @@
          <grab_shader>highlight.fs</grab_shader>
       </point_grab_plugin>
       <viewpoints_plugin name="ViewpointsPlugin" version="1">
-         <control_button_num>0</control_button_num>
+         <control_button_num>-1</control_button_num>
          <viewpoints>
             <viewpoints_vp name="Position 1" version="1">
                <position>0.0</position>

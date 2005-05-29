@@ -30,6 +30,14 @@
          <help />
          <value label="Mode Toggle Button" defaultvalue="-1" />
       </property>
+      <property valuetype="integer" variable="false" name="initial_mode">
+         <help>The initial mode to start navigation in.</help>
+         <value label="Initial Mode" defaultvalue="0" />
+                 <enumeration>
+            <enum label="Walk" value="0" />
+            <enum label="Fly" value="1" />
+         </enumeration>
+      </property>
       <upgrade_transform />
    </definition_version>
 </definition>

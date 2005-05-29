@@ -93,6 +93,7 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    const std::string rev_btn_prop("reverse_button_num");
    const std::string rot_btn_prop("rotate_button_num");
    const std::string mode_btn_prop("nav_mode_button_num");
+   const std::string initial_mode_prop("initial_mode");
    const int unsigned req_cfg_version(1);
 
    vprASSERT(elt->getID() == getElementType() &&
@@ -125,6 +126,15 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    mRevBtn = elt->getProperty<int>(rev_btn_prop);
    mRotateBtn = elt->getProperty<int>(rot_btn_prop);
    mModeBtn = elt->getProperty<int>(mode_btn_prop);
+
+   // Get initial mode
+   unsigned mode_id = elt->getProperty<int>(initial_mode_prop);
+   if(WandNavPlugin::WALK == mode_id)
+   {  mNavMode = WandNavPlugin::WALK; }
+   else if(WandNavPlugin::FLY == mode_id)
+   {  mNavMode = WandNavPlugin::FLY; }
+   else  // Default: walk
+   {  mNavMode = WandNavPlugin::WALK; }
 
    return true;
 }

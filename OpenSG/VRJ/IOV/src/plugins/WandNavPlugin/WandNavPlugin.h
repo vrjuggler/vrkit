@@ -77,8 +77,8 @@ protected:
    /** Navigation mode. */
    enum NavMode
    {
-      WALK,     /**< Walk (drive) mode */
-      FLY       /**< Fly mode */
+      WALK = 0,     /**< Walk (drive) mode */
+      FLY  = 1      /**< Fly mode */
    };
 
    WandNavPlugin();
