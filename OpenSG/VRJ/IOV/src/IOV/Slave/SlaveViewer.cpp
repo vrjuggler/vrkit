@@ -114,7 +114,9 @@ void SlaveViewer::initScene()
       }
    }
 
+   std::cout << "Slave: Connecting to addr: " << mMasterAddr << std::flush;
    mChannel = mConnection->connectPoint(mMasterAddr);
+   std::cout << "[OK]" << std::endl;
 
    if ( mChannel != -1 )
    {
