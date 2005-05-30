@@ -17,6 +17,14 @@ namespace inf
 
 typedef OSG::CoredNodePtr<OSG::Group> CoredGroupPtr;
 
+
+/** Viewer class/app for the slave side of cluster communication.
+ *
+ * This class implements the slave side of the cluster protocol.
+ *
+ * See: @ref SlaveCommunicationProtocol
+ *
+ */
 class SlaveViewer : public vrj::OpenSGApp
 {
 public:

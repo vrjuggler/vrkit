@@ -44,6 +44,7 @@ void Viewer::init()
 {
    // This has to be called before OSG::osgInit(), which is done by
    // vrj::OpenSGApp::init().
+   // XXX: Does this open up a memory leak in the case where we don't use networking??
    OSG::ChangeList::setReadWriteDefault();
 
    vrj::OpenSGApp::init();
@@ -90,22 +91,8 @@ void Viewer::init()
          // configuration).
          configureNetwork(app_cfg);
 
+         // Setup the plugins that are configured to load
          loadAndInitPlugins(app_cfg);
-
-         /*
-         if ( ! all_elts.empty() )
-         {
-            std::cout << "Unconsumed config elements from viewer configuration: " << std::endl;
-
-            std::vector<jccl::ConfigElementPtr>::iterator i;
-            for ( i = all_elts.begin(); i != all_elts.end(); ++i )
-            {
-               std::cout << "\t" << (*i)->getName() << "\n";
-            }
-
-            std::cout << std::flush;
-         }
-         */
       }
    }
 }
@@ -131,6 +118,7 @@ void Viewer::preFrame()
    // Update the user (and navigation)
    getUser()->update(shared_from_this());
 
+   // If we have networking to do
    if ( NULL != mConnection )
    {
       try
@@ -188,6 +176,10 @@ void Viewer::deallocate()
    mPluginFactory.reset();
 }
 
+
+/**
+ * See @ref SlaveCommunicationProtocol for details of the communication.
+ */
 void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
 {
    const std::string listen_port_prop("listen_port");
@@ -200,6 +192,8 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
 
    if ( listen_port != 0 && slave_count != 0 )
    {
+      std::cout << "Setting up remove slave network:" << std::endl;
+
       vpr::InetAddr local_host_addr;
       if ( vpr::InetAddr::getLocalHost(local_host_addr).success() )
       {
@@ -210,16 +204,22 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
          std::stringstream addr_stream;
          addr_stream << local_host_addr.getAddressString() << ":"
                      << listen_port;
+         std::cout << "   Attempting to bind to: " << addr_stream.str() << std::flush;
          mConnection->bind(addr_stream.str());
+         std::cout << "[OK]" << std::endl;
+      }
+      else
+      {
+         throw inf::Exception("Could not get local host address", IOV_LOCATION);
       }
 
       mChannels.resize(slave_count);
 
       for ( unsigned int s = 0; s < slave_count; ++s )
       {
-         std::cout << "Waiting for slave #" << s << " to connect ..."
-                   << std::endl;
+         std::cout << "   Waiting for slave #" << s << " to connect ..." << std::flush;
          mChannels[s] = mConnection->acceptPoint();
+         std::cout << "[OK]" << std::endl;
       }
 
       OSG::UInt8 finish(false);
@@ -237,7 +237,7 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
       // because that would blow away any actions taken during the
       // initialization of mScene.
 
-      std::cout << "All " << slave_count << " nodes have connected"
+      std::cout << "   All " << slave_count << " slave nodes have connected"
                 << std::endl;
    }
 }

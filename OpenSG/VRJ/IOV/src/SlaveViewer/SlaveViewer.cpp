@@ -17,6 +17,39 @@
 #include "exitcodes.h"
 #include "SlaveViewer.h"
 
+/** @page SlaveCommunicationProtocol Slave Communication Protocol
+ *
+ * The IOV viewer supports a remote slave protocol.  This allows slave
+ * applications to connect to the main viewer to get scene graph
+ * updates in a cluster configuration.
+ *
+ * This page documents the communication protocol used for this comm.
+ *
+ * Notes:
+ * - finish - This is a flag that is true when the slave should disconnect.
+ *
+ * <pre>
+ * Master                              Slave
+ * ------                              ------
+ *          ---- Initialization ----
+ * bind
+ * accept connect (from all slaves)    connect
+ * signal                              wait()
+ * send(scaleFactor)                   recv(scaleFactor)
+ * send(aspect)                        recv(aspect)
+ * send(finish)                        recv(finish)
+ * flush
+ *
+ *          ---- Frame Update ----
+ * signal                              wait
+ * send(aspect)                        recv(aspect)
+ * send(finish)                        recv(finish)
+ * flush                               signal()
+ * wait()                              flush()
+ * </pre>
+ *
+ */
+
 
 namespace
 {

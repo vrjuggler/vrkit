@@ -37,6 +37,9 @@ namespace inf
  * It is called by the VRJ application object.
  *
  * (It may actually be a VRJ app object in the future)
+ *
+ * The viewer class supports a slave communication protocol
+ * for clustering.  See @ref SlaveCommunicationProtocol
  */
 class IOV_CLASS_API Viewer
    : public vrj::OpenSGApp
