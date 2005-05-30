@@ -159,6 +159,9 @@
 				RelativePath="..\..\src\Iov\SceneData.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Slave\SlaveViewer.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\User.cpp">
 			</File>
 			<File
@@ -188,6 +191,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Util\Exceptions.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\ExitCodes.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\GrabData.h">
@@ -233,6 +239,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\ScenePtr.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Slave\SlaveViewer.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\User.h">
