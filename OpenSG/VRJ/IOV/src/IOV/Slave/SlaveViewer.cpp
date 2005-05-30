@@ -59,6 +59,9 @@ const vpr::DebugCategory infSLAVE_APP(
    "SLAVE_APP:"
 );
 
+const int SLAVE_DBG_LVL(vprDBG_STATE_LVL);
+//const int SLAVE_DBG_LVL(0);
+
 }
 
 namespace inf
@@ -193,7 +196,7 @@ void SlaveViewer::contextInit()
    initGl();
 }
 
-void SlaveViewer::preFrame()
+void SlaveViewer::latePreFrame()
 {
    try
    {
@@ -281,8 +284,8 @@ bool SlaveViewer::createdFunction(OSG::FieldContainerPtr& fcp,
       ++mGeometries;
    }
 
-   std::cout << "Created: " << fcp->getType().getName().str() << " "
-             << fcp.getFieldContainerId() << std::endl;
+   vprDEBUG(infSLAVE_APP, SLAVE_DBG_LVL) << "Created: " << fcp->getType().getName().str() << " fc_id:"
+             << fcp.getFieldContainerId() << " " << vprDEBUG_FLUSH;
 #endif
 
    OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
@@ -294,16 +297,20 @@ bool SlaveViewer::createdFunction(OSG::FieldContainerPtr& fcp,
 
       if ( NULL == node_name )
       {
-         std::cout << "<NULL>" << std::endl;
+         vprDEBUG_CONT(infSLAVE_APP, SLAVE_DBG_LVL) << "name: <NULL>" << vprDEBUG_FLUSH;
       }
       else
       {
-         std::cout << "\tname: " << node_name << std::endl;
+         vprDEBUG_CONT(infSLAVE_APP, SLAVE_DBG_LVL) << "name: " << node_name << vprDEBUG_FLUSH;
       }
 #endif
 
       mMaybeNamedFcs.push_back(acp);
    }
+
+#ifdef _DEBUG
+   vprDEBUG_CONT(infSLAVE_APP, SLAVE_DBG_LVL) << std::endl << vprDEBUG_FLUSH;
+#endif
 
    return true;
 }
@@ -312,9 +319,9 @@ bool SlaveViewer::changedFunction(OSG::FieldContainerPtr& fcp,
                                   OSG::RemoteAspect*)
 {
 #ifdef _DEBUG
-   vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL)
-      << "Changed: " << fcp->getType().getName().str() << " "
-      << fcp.getFieldContainerId() << std::endl;
+   vprDEBUG(infSLAVE_APP, SLAVE_DBG_LVL)
+      << "Changed: " << fcp->getType().getName().str() << " fc_id:"
+             << fcp.getFieldContainerId() << " "<< vprDEBUG_FLUSH;
 
    OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
 
@@ -323,13 +330,17 @@ bool SlaveViewer::changedFunction(OSG::FieldContainerPtr& fcp,
       const char* node_name = OSG::getName(acp);
       if ( NULL == node_name )
       {
-         vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL) << "<NULL>" << std::endl;
+         vprDEBUG_CONT(infSLAVE_APP, SLAVE_DBG_LVL) << "name: <NULL>" << std::endl << vprDEBUG_FLUSH;
       }
       else
       {
-         vprDEBUG(infSLAVE_APP, vprDBG_STATE_LVL) << "\tname: " << node_name
-                                                  << std::endl;
+         vprDEBUG_CONT(infSLAVE_APP, SLAVE_DBG_LVL) << "name: " << node_name
+                                                  << std::endl << vprDEBUG_FLUSH;
       }
+   }
+   else
+   {
+      vprDEBUG_CONT(infSLAVE_APP, SLAVE_DBG_LVL) << std::endl << vprDEBUG_FLUSH;
    }
 #endif
 
@@ -340,6 +351,30 @@ bool SlaveViewer::destroyedFunction(OSG::FieldContainerPtr& fcp,
                                     OSG::RemoteAspect*)
 {
 #ifdef _DEBUG
+   vprDEBUG(infSLAVE_APP, SLAVE_DBG_LVL)
+      << "Destroyed: " << fcp->getType().getName().str() << " fc_id:"
+             << fcp.getFieldContainerId() << " "<< vprDEBUG_FLUSH;
+
+   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
+
+   if ( OSG::NullFC != acp )
+   {
+      const char* node_name = OSG::getName(acp);
+      if ( NULL == node_name )
+      {
+         vprDEBUG_CONT(infSLAVE_APP, SLAVE_DBG_LVL) << "name: <NULL>" << std::endl << vprDEBUG_FLUSH;
+      }
+      else
+      {
+         vprDEBUG_CONT(infSLAVE_APP, SLAVE_DBG_LVL) << "name: " << node_name
+                                                  << std::endl << vprDEBUG_FLUSH;
+      }
+   }
+   else
+   {
+      vprDEBUG_CONT(infSLAVE_APP, SLAVE_DBG_LVL) << std::endl << vprDEBUG_FLUSH;
+   }
+
    if ( OSG::Node::getClassType() == fcp->getType() )
    {
       --mNodes;

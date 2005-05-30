@@ -117,7 +117,10 @@ void Viewer::preFrame()
 
    // Update the user (and navigation)
    getUser()->update(shared_from_this());
+}
 
+void Viewer::latePreFrame()
+{
    // If we have networking to do
    if ( NULL != mConnection )
    {

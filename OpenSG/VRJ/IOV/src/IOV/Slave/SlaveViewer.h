@@ -44,7 +44,7 @@ public:
 
    virtual void contextInit();
 
-   virtual void preFrame();
+   virtual void latePreFrame();
 
    virtual float getDrawScaleFactor()
    {

@@ -75,6 +75,11 @@ public:
     */
    virtual void preFrame();
 
+   /** Called after cluster data sync and after preFrame is complete.
+    * We use it to send out OpenSG scene graph updates to the other nodes.
+    */
+   virtual void latePreFrame();
+
    /** Called at the end of each frame.
     * @note: Derived class implementations <b>MUST</b> call up to this method.
     */
