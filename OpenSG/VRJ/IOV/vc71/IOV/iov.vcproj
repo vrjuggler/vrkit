@@ -175,9 +175,6 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
 			<File
-				RelativePath="..\..\src\Iov\Buttons.h">
-			</File>
-			<File
 				RelativePath="..\..\src\Iov\Plugin\Buttons.h">
 			</File>
 			<File
