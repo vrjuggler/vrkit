@@ -26,7 +26,7 @@ if boost_options.isAvailable():
       viewerEnv.Prepend(LIBS = [po_lib])
 
    slave_viewer_prog = viewerEnv.Program('slaveViewer', 
-                              ['main.cpp', 'SlaveViewer.cpp',])
+                              ['slave_app.cpp', 'SlaveViewer.cpp',])
    viewerEnv.Install(pj(inst_paths['app_base'],'slaveViewer'), slave_viewer_prog)
 else:
    print "WARNING: Cannot build slaveViewer without Boost.program_options"
