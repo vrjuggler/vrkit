@@ -12,7 +12,6 @@
 
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
-#include <IOV/Plugin/Buttons.h>
 
 
 namespace inf

@@ -24,6 +24,7 @@
 #include <IOV/InterfaceTrader.h>
 #include <IOV/WandInterface.h>
 #include <IOV/ViewPlatform.h>
+#include <IOV/Plugin/Buttons.h>
 #include "PointGrabPlugin.h"
 
 

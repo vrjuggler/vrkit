@@ -20,7 +20,6 @@
 #include <IOV/PluginCreator.h>
 #include <IOV/WandInterface.h>
 #include <IOV/User.h>
-#include <IOV/Plugin/Buttons.h>
 #include <IOV/Util/Exceptions.h>
 
 #include "WandNavPlugin.h"
