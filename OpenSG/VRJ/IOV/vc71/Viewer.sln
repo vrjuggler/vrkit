@@ -38,6 +38,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wand Nav Plug-in", "WandNav
 		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "slaveViewer", "SlaveViewer\slaveViewer.vcproj", "{9A98F258-1C50-4BE4-8DB7-C831D1952209}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -76,6 +80,10 @@ Global
 		{ACCCF9F2-B4D3-4B6F-86B2-B8A5198CA38E}.Debug.Build.0 = Debug|Win32
 		{ACCCF9F2-B4D3-4B6F-86B2-B8A5198CA38E}.Release.ActiveCfg = Release|Win32
 		{ACCCF9F2-B4D3-4B6F-86B2-B8A5198CA38E}.Release.Build.0 = Release|Win32
+		{9A98F258-1C50-4BE4-8DB7-C831D1952209}.Debug.ActiveCfg = Debug|Win32
+		{9A98F258-1C50-4BE4-8DB7-C831D1952209}.Debug.Build.0 = Debug|Win32
+		{9A98F258-1C50-4BE4-8DB7-C831D1952209}.Release.ActiveCfg = Release|Win32
+		{9A98F258-1C50-4BE4-8DB7-C831D1952209}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
