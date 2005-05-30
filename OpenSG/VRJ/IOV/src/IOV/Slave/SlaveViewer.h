@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <IOV/Config.h>
+
 #include <OpenSG/OSGGroup.h>
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGCoredNodePtr.h>
@@ -25,7 +27,7 @@ typedef OSG::CoredNodePtr<OSG::Group> CoredGroupPtr;
  * See: @ref SlaveCommunicationProtocol
  *
  */
-class SlaveViewer : public vrj::OpenSGApp
+class IOV_CLASS_API SlaveViewer : public vrj::OpenSGApp
 {
 public:
    SlaveViewer(const std::string& masterAddr,

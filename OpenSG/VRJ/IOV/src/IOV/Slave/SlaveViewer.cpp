@@ -14,8 +14,8 @@
 #include <vpr/Util/Debug.h>
 #include <gadget/Type/Position/PositionUnitConversion.h>
 
-#include "exitcodes.h"
-#include "SlaveViewer.h"
+#include <IOV/ExitCodes.h>
+#include <IOV/Slave/SlaveViewer.h>
 
 /** @page SlaveCommunicationProtocol Slave Communication Protocol
  *

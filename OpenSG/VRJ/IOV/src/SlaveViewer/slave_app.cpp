@@ -8,8 +8,8 @@
 
 #include <vrj/Kernel/Kernel.h>
 
-#include "exitcodes.h"
-#include "SlaveViewer.h"
+#include <IOV/ExitCodes.h>
+#include <IOV/Slave/SlaveViewer.h>
 
 #define IOSV_VERSION_MAJOR 0
 #define IOSV_VERSION_MINOR 1
