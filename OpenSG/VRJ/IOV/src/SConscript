@@ -4,5 +4,5 @@ Import('*')
 env = baseEnv.Copy()
 Export('env')
 
-SConscript(dirs = ['IOV', 'plugins', 'Viewer'])
+SConscript(dirs = ['IOV', 'plugins', 'SlaveViewer', 'Viewer'])
 

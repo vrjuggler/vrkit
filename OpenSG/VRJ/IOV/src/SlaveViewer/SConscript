@@ -1,0 +1,33 @@
+#!python
+#
+import SConsAddons.Util       # Get the utils
+import sys, os, re, string, glob
+pj = os.path.join
+GetPlatform = SConsAddons.Util.GetPlatform;
+
+Import('*')
+
+viewerEnv = baseEnv.Copy()
+
+boost_options.updateEnv(viewerEnv)
+
+if boost_options.isAvailable():
+   viewerEnv.Prepend(CPPPATH = inst_paths['include'],
+                     LIBPATH = inst_paths['lib'],
+                     LIBS = 'iov')
+   viewerEnv.Append(CPPPATH = ['.'])
+
+   # XXX: There has to be a better way to do this Mac-specific stuff.
+   if GetPlatform() == 'mac':
+      viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
+      viewerEnv.Prepend(LIBS = ['boost_program_options-1_33'])
+   else:
+      po_lib = boost_options.buildFullLibName('program_options')
+      viewerEnv.Prepend(LIBS = [po_lib])
+
+   slave_viewer_prog = viewerEnv.Program('slaveViewer', 
+                              ['main.cpp', 'SlaveViewer.cpp',])
+   viewerEnv.Install(pj(inst_paths['app_base'],'slaveViewer'), slave_viewer_prog)
+else:
+   print "WARNING: Cannot build slaveViewer without Boost.program_options"
+
