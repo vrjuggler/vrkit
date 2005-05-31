@@ -201,6 +201,55 @@ void Viewer::deallocate()
    mScene.reset();
    mPlugins.clear();
    mPluginFactory.reset();
+
+   // Output information about what is left over
+   typedef std::vector<OSG::FieldContainerPtr>      FieldContainerStore;
+   typedef FieldContainerStore::const_iterator FieldContainerStoreConstIt;
+
+   const FieldContainerStore *pFCStore =
+          OSG::FieldContainerFactory::the()->getFieldContainerStore();
+
+   std::cout << "Viewer::deallocate:\n"
+             << "      Total OpenSG objects allocated: " << pFCStore->size() << std::endl;
+
+   unsigned non_null_count(0);
+
+   for(unsigned i=0; i<pFCStore->size(); ++i)
+   {
+      OSG::FieldContainerPtr ptr = (*pFCStore)[i];
+      if(ptr != OSG::NullFC)
+      {
+         non_null_count += 1;
+      }
+   }
+
+   std::cout << "   Remaining non-null OpenSG objects: " << non_null_count << std::endl;
+
+// Enable this section when you want to see the names and types of the objects that remain.
+#if 0
+   std::cout << " ---- non-null objects remaining --- " << std::endl;
+   for(unsigned i=0; i<pFCStore->size(); ++i)
+   {
+      OSG::FieldContainerPtr ptr = (*pFCStore)[i];
+      if(ptr != OSG::NullFC)
+      {
+         OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(ptr);
+         const char* node_name = OSG::getName(acp);
+         std::string node_name_str("<NULL>");
+         if(NULL != node_name)
+         {
+            node_name_str = std::string(node_name);
+         }
+
+         std::cout << "   " << i << ": "
+                   << "  type:" << ptr->getType().getName().str() << " id:"
+                   << ptr.getFieldContainerId()
+                   << " name:" << node_name_str
+                   << std::endl;
+      }
+   }
+#endif
+
 }
 
 
