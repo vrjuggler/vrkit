@@ -162,9 +162,26 @@ if not SConsAddons.Util.hasHelpFlag():
    Export('baseEnv', 'build_dir', 'inst_paths')
 
    SConscript(dirs=['src',], build_dir=build_dir, duplicate=0)
-   
+
+
+   srcdir_abs_path = baseEnv.Dir('share').srcnode().abspath
+   #print "src dir abs: ", srcdir_abs_path
+   ret_args = []
+															
+   def collect_args(junk, dir_path, name_list):
+      dirs = []
+      files = []
+      for n in name_list:
+         if os.path.isfile(os.path.join(dir_path, n)):
+	    files.append(n)
+         else:
+	    dirs.append(n)
+      ret_args.append( [dir_path, dirs, files] )
+															
+   os.path.walk(srcdir_abs_path, collect_args, None)
+
    # Install the contents of the data directory
-   for p, d, files in os.walk('data'):
+   for p, d, files in ret_args:
       if not p.count('.svn'):
          for fname in [pj(p,f) for f in files]:
             baseEnv.InstallAs(pj(inst_paths['share'],fname), fname)
