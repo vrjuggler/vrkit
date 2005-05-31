@@ -44,7 +44,11 @@
  * signal                              wait
  * send(aspect)                        recv(aspect)
  * send(finish)                        recv(finish)
+ * send(userData)                      recv(userData)
  * flush                               signal()
+ * wait()                              flush()
+ * recv(userData) (for each)           send(userData)
+ *                                     signal()
  * wait()                              flush()
  * </pre>
  *
@@ -207,8 +211,14 @@ void SlaveViewer::latePreFrame()
          mAspect.receiveSync(*mConnection);
          OSG::Thread::getCurrentChangeList()->clearAll();
          mConnection->getValue(finish);
+         readDataFromMaster(*mConnection);
          mConnection->signal();
          mConnection->flush();
+         /*
+         sendDataToMaster(*mConnection);
+         mConnection->signal();
+         mConnection->flush();
+         */
       }
 
       if ( finish )
@@ -231,6 +241,17 @@ void SlaveViewer::latePreFrame()
       ::exit(inf::EXIT_ERR_COMM);
    }
 }
+
+void SlaveViewer::sendDataToMaster(OSG::BinaryDataHandler& writer)
+{
+
+}
+
+void SlaveViewer::readDataFromMaster(OSG::BinaryDataHandler& reader)
+{
+
+}
+
 
 void SlaveViewer::initGl()
 {

@@ -7,6 +7,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include <OpenSG/OSGConnection.h>
+#include <OpenSG/OSGBinaryDataHandler.h>
 
 #include <jccl/Config/ConfigElementPtr.h>
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
@@ -124,6 +125,19 @@ public:
     */
    virtual void initScene()
    {;}
+
+public:
+   /** @name Cluster app data methods.
+    * These methods are used to communicate data over an OpenSG network connection
+    * with the cluster slave nodes.
+    * It is called as part of the cluster communication protocol in latePreFrame.
+    * @note Derived classes must call up to parent class methods.
+    */
+   //@{
+   virtual void sendDataToSlaves(OSG::BinaryDataHandler& writer);
+
+   virtual void readDataFromSlave(OSG::BinaryDataHandler& reader);
+   //@}
 
 protected:
    Viewer();

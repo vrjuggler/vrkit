@@ -131,8 +131,21 @@ void Viewer::latePreFrame()
          mConnection->signal();
          mAspect->sendSync(*mConnection, OSG::Thread::getCurrentChangeList());
          mConnection->putValue(finish);
+         sendDataToSlaves(*mConnection);
          mConnection->flush();
          mConnection->wait();
+
+         /*
+         for(unsigned i=0; i<mChannels.size(); ++i)
+         {
+            mConnection->clearSelection();
+            mConnection->addSelection(mChannels[i]);
+            mConnection->selectChannel();
+            readDataFromSlave(*mConnection);
+         }
+         mConnection->resetSelection();
+         mConnection->wait();
+         */
 
          OSG::Thread::getCurrentChangeList()->clearAll();
       }
@@ -149,6 +162,17 @@ void Viewer::latePreFrame()
       }
    }
 }
+
+void Viewer::sendDataToSlaves(OSG::BinaryDataHandler& writer)
+{
+
+}
+
+void Viewer::readDataFromSlave(OSG::BinaryDataHandler& reader)
+{
+
+}
+
 
 void Viewer::exit()
 {

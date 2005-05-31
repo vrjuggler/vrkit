@@ -10,6 +10,7 @@
 #include <OpenSG/OSGCoredNodePtr.h>
 #include <OpenSG/OSGRemoteAspect.h>
 #include <OpenSG/OSGPointConnection.h>
+#include <OpenSG/OSGBinaryDataHandler.h>
 
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
 
@@ -50,6 +51,19 @@ public:
    {
       return mDrawScaleFactor;
    }
+
+public:
+   /** @name Cluster app data methods.
+    * These methods are used to communicate data over an OpenSG network connection
+    * with the master node.
+    * It is called as part of the cluster communication protocol in latePreFrame.
+    * @note Derived classes must call up to parent class methods.
+    */
+   //@{
+   virtual void sendDataToMaster(OSG::BinaryDataHandler& writer);
+
+   virtual void readDataFromMaster(OSG::BinaryDataHandler& reader);
+   //@}
 
 private:
    void initGl();
