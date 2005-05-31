@@ -206,11 +206,24 @@ void Viewer::deallocate()
    typedef std::vector<OSG::FieldContainerPtr>      FieldContainerStore;
    typedef FieldContainerStore::const_iterator FieldContainerStoreConstIt;
 
-   const FieldContainerStore *pFCStore =
-          OSG::FieldContainerFactory::the()->getFieldContainerStore();
+   OSG::FieldContainerFactory* fact = OSG::FieldContainerFactory::the();
+   const FieldContainerStore *pFCStore =fact->getFieldContainerStore();
+   unsigned num_types = fact->getNumTypes();
+
+   std::vector<unsigned> type_ids;
+   for(OSG::FieldContainerFactory::TypeMapIterator i=fact->beginTypes(); i!=fact->endTypes(); ++i)
+   {
+      if( ((*i).second != NULL) && ((*i).second)->getPrototype() != OSG::NullFC)
+      {
+         unsigned type_proto_ptr_id = ((*i).second)->getPrototype().getFieldContainerId();
+         type_ids.push_back(type_proto_ptr_id);
+         //std::cout << "Protyo ptr id: " << type_proto_ptr_id << std::endl;
+      }
+   }
 
    std::cout << "Viewer::deallocate:\n"
-             << "      Total OpenSG objects allocated: " << pFCStore->size() << std::endl;
+             << "                                  num_types: " << num_types << std::endl
+             << "   Total OpenSG objects allocated (w/types): " << pFCStore->size() << std::endl;
 
    unsigned non_null_count(0);
 
@@ -223,7 +236,7 @@ void Viewer::deallocate()
       }
    }
 
-   std::cout << "   Remaining non-null OpenSG objects: " << non_null_count << std::endl;
+   std::cout << "     Rem non-null OpenSG objects (wo/types): " << (non_null_count-num_types) << std::endl;
 
 // Enable this section when you want to see the names and types of the objects that remain.
 #if 0
@@ -231,7 +244,8 @@ void Viewer::deallocate()
    for(unsigned i=0; i<pFCStore->size(); ++i)
    {
       OSG::FieldContainerPtr ptr = (*pFCStore)[i];
-      if(ptr != OSG::NullFC)
+      if( (std::count(type_ids.begin(), type_ids.end(), i) == 0)
+           && (ptr != OSG::NullFC) )
       {
          OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(ptr);
          const char* node_name = OSG::getName(acp);
