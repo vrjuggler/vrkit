@@ -128,16 +128,11 @@ void Viewer::latePreFrame()
       {
          OSG::UInt8 finish(false);
 
-         std::cout << "snd: signal" << std::endl;
          mConnection->signal();
-         std::cout << "snd: sync" << std::endl;
          mAspect->sendSync(*mConnection, OSG::Thread::getCurrentChangeList());
-         std::cout << "snd: finish" << std::endl;
          mConnection->putValue(finish);
-         std::cout << "snd: to slave" << std::endl;
          sendDataToSlaves(*mConnection);
          mConnection->flush();
-         std::cout << "rcv: wait" << std::endl;
          mConnection->wait();
 
          /*

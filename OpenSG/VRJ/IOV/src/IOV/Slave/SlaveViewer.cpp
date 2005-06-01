@@ -208,14 +208,10 @@ void SlaveViewer::latePreFrame()
 
       if ( mConnection->wait() )
       {
-         std::cout << "rcv: sync" << std::endl;
          mAspect.receiveSync(*mConnection);
          OSG::Thread::getCurrentChangeList()->clearAll();
-         std::cout << "rcv: finish" << std::endl;
          mConnection->getValue(finish);
-         std::cout << "rcv: from master" << std::endl;
          readDataFromMaster(*mConnection);
-         std::cout << "snd: signalling" << std::endl;
          mConnection->signal();
          mConnection->flush();
          /*
