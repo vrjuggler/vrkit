@@ -121,6 +121,10 @@ void Viewer::preFrame()
 
 void Viewer::latePreFrame()
 {
+   static int iter_num(0);
+
+   OSG::Connection::Channel channel;
+
    // If we have networking to do
    if ( NULL != mConnection )
    {
@@ -133,19 +137,16 @@ void Viewer::latePreFrame()
          mConnection->putValue(finish);
          sendDataToSlaves(*mConnection);
          mConnection->flush();
-         mConnection->wait();
 
-         /*
-         for(unsigned i=0; i<mChannels.size(); ++i)
+         unsigned count(0);
+         while(mConnection->getSelectionCount()>0)
          {
-            mConnection->clearSelection();
-            mConnection->addSelection(mChannels[i]);
-            mConnection->selectChannel();
+            channel = mConnection->selectChannel();
             readDataFromSlave(*mConnection);
+            mConnection->subSelection(channel);
          }
+
          mConnection->resetSelection();
-         mConnection->wait();
-         */
 
          OSG::Thread::getCurrentChangeList()->clearAll();
       }

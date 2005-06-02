@@ -44,12 +44,8 @@
  * signal                              wait
  * send(aspect)                        recv(aspect)
  * send(finish)                        recv(finish)
- * send(userData)                      recv(userData)
- * flush                               signal()
- * wait()                              flush()
- * recv(userData) (for each)           send(userData)
- *                                     signal()
- * wait()                              flush()
+ * send(userData), flush               recv(userData)
+ * recv(userData) (for each)           send(userData), flush
  * </pre>
  *
  */
@@ -202,6 +198,7 @@ void SlaveViewer::contextInit()
 
 void SlaveViewer::latePreFrame()
 {
+   static int iter_num(0);
    try
    {
       OSG::UInt8 finish(false);
@@ -212,13 +209,8 @@ void SlaveViewer::latePreFrame()
          OSG::Thread::getCurrentChangeList()->clearAll();
          mConnection->getValue(finish);
          readDataFromMaster(*mConnection);
-         mConnection->signal();
-         mConnection->flush();
-         /*
          sendDataToMaster(*mConnection);
-         mConnection->signal();
          mConnection->flush();
-         */
       }
 
       if ( finish )
