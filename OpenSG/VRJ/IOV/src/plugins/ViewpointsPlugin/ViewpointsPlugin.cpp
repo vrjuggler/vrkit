@@ -28,6 +28,7 @@ namespace
    const std::string vp_plugin_elt_tkn("viewpoints_plugin");
    const std::string vp_control_button_num_tkn("control_button_num");
    const std::string vp_viewpoints_tkn("viewpoints");
+   const std::string vp_units_to_meters_tkn("units_to_meters");
 
    const std::string vp_vp_elt_tkn("viewpoints_vp");
    const std::string vp_pos_elt_tkn("position");
@@ -99,6 +100,8 @@ void ViewpointsPlugin::init(inf::ViewerPtr viewer)
    // Get the control button to use
    mControlBtnNum = elt->getProperty<int>(vp_control_button_num_tkn);
 
+   float to_meters_scalar = elt->getProperty<float>(vp_units_to_meters_tkn);
+
    // Read in all the viewpoints
    unsigned num_vps = elt->getNum(vp_viewpoints_tkn);
    for(unsigned i=0;i<num_vps;i++)
@@ -109,6 +112,9 @@ void ViewpointsPlugin::init(inf::ViewerPtr viewer)
       float xt = vp_elt->getProperty<float>(vp_pos_elt_tkn, 0);
       float yt = vp_elt->getProperty<float>(vp_pos_elt_tkn, 1);
       float zt = vp_elt->getProperty<float>(vp_pos_elt_tkn, 2);
+      xt *= to_meters_scalar;
+      yt *= to_meters_scalar;
+      zt *= to_meters_scalar;
 
       float xr = vp_elt->getProperty<float>(vp_rot_elt_tkn, 0);
       float yr = vp_elt->getProperty<float>(vp_rot_elt_tkn, 1);
