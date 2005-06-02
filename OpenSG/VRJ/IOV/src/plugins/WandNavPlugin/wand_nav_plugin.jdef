@@ -14,6 +14,11 @@
          <help>Acceleration value used when navigating.</help>
          <value label="Acceleration" defaultvalue="0.0050" />
       </property>
+      <property valuetype="float" variable="false" name="rotation_sensitivity">
+         <help>Sensitivity for rotation.  Amount rotated = (angle*delta_time*sensitivity).</help>
+         <value label="Rotation Sensitivity" defaultvalue="0.5" />
+      </property>
+
       <property valuetype="integer" variable="false" name="forward_button_num">
          <help />
          <value label="Forward Button Number" defaultvalue="-1" />

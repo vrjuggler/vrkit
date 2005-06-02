@@ -57,6 +57,7 @@ WandNavPlugin::WandNavPlugin()
    , mVelocity(0.0f)
    , mMaxVelocity(0.5f)
    , mAcceleration(0.005f)
+   , mRotationSensitivity(0.5f)
    , mNavMode(WALK)
    , mForBtn(-1)
    , mRevBtn(-1)
@@ -93,6 +94,7 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    const std::string rot_btn_prop("rotate_button_num");
    const std::string mode_btn_prop("nav_mode_button_num");
    const std::string initial_mode_prop("initial_mode");
+   const std::string rotation_sensitivity("rotation_sensitivity");
    const int unsigned req_cfg_version(1);
 
    vprASSERT(elt->getID() == getElementType() &&
@@ -109,6 +111,7 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
 
    float max_velocity = elt->getProperty<float>("max_velocity");
    float accel        = elt->getProperty<float>("acceleration");
+   mRotationSensitivity = elt->getProperty<float>(rotation_sensitivity);
 
    if ( max_velocity > 0.0f )
    {
@@ -244,6 +247,8 @@ void WandNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
          // Handle rotations.
          case ROTATE:
             {
+               const gmtl::Vec3f y_axis(0.0, 1.0, 0.0);
+
                gmtl::Matrix44f rot_mat(
                   mWandInterface->getWandPos()->getData(scale_factor)
                );
@@ -252,11 +257,12 @@ void WandNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
                if ( gmtl::MAT_IDENTITY44F != rot_mat )
                {
                   float y_rot = gmtl::makeYRot(rot_mat);
-                  gmtl::Quatf goal_quat(0.0f, 1.0f, 0.0f, y_rot);
+                  gmtl::Matrix44f goal_mat = gmtl::make<gmtl::Matrix44f>(gmtl::AxisAnglef(y_rot, y_axis));
+                  gmtl::Quatf goal_quat = gmtl::make<gmtl::Quatf>(goal_mat);
 
                   gmtl::Quatf source_quat;
                   gmtl::Quatf slerp_quat;
-                  gmtl::slerp(slerp_quat, delta_sec, source_quat, goal_quat);
+                  gmtl::slerp(slerp_quat, (delta_sec*mRotationSensitivity), source_quat, goal_quat);
 
                   gmtl::Matrix44f rot_xform;
                   gmtl::set(rot_xform, slerp_quat);

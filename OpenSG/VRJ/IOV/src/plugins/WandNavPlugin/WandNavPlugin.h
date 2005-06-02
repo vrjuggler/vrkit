@@ -104,6 +104,7 @@ protected:
    float mVelocity;
    float mMaxVelocity;
    float mAcceleration;
+   float mRotationSensitivity;      /**< Scalar on rotation delta.  Used to adjust sensitivity. */
    NavMode mNavMode;
 
    int mForBtn;      /**< Button for forward motion. */
