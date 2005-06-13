@@ -41,7 +41,7 @@ def BuildLinuxEnvironment():
       CXXFLAGS.extend(['-DNDEBUG', '-O2'])
    else:
       CXXFLAGS.extend(['-D_DEBUG', '-gdwarf-2', '-fno-inline', '-fno-default-inline'])
-   
+
    env.Append(
       CXXFLAGS    = CXXFLAGS,
       LINKFLAGS   = LINKFLAGS,
@@ -87,10 +87,10 @@ elif GetPlatform() == 'mac':
 
 # Export symbols for use by SConscript files in subdirectories.
 Export('GetPlatform')
-   
+
 # ---------- Options ------------ #
 options_cache_filename = 'options.cache.' + GetPlatform()
-opts = SConsAddons.Options.Options(files = [options_cache_filename, 'options.custom'], 
+opts = SConsAddons.Options.Options(files = [options_cache_filename, 'options.custom'],
                                    args= ARGUMENTS);
 boost_options = SConsAddons.Options.Boost.Boost("boost", "1.32.0",
                                                 required = False)
@@ -134,7 +134,7 @@ if not SConsAddons.Util.hasHelpFlag():
    inst_paths['share'] = pj(inst_paths['base'],'share','IOV')
    inst_paths['definitions'] = pj(inst_paths['share'],'definitions')
    inst_paths['app_base'] = pj(inst_paths['share'],'apps')
-   
+
    print "Using prefix: ", inst_paths["base"]
    baseEnv.Alias('install', inst_paths['base'])
 
@@ -155,9 +155,9 @@ if not SConsAddons.Util.hasHelpFlag():
    # the output returned by 'vrjuggler-config --cxxflags'.
    if boost_options.isAvailable():
       boost_options.updateEnv(baseEnv)
-   
+
    if SCons.Util.WhereIs('distcc'):
-      baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")   
+      baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")
 
    Export('baseEnv', 'build_dir', 'inst_paths')
 
@@ -173,9 +173,9 @@ if not SConsAddons.Util.hasHelpFlag():
       files = []
       for n in name_list:
          if os.path.isfile(os.path.join(dir_path, n)):
-	    files.append(n)
+            files.append(n)
          else:
-	    dirs.append(n)
+            dirs.append(n)
       ret_args.append( [dir_path, dirs, files] )
 
    os.path.walk(srcdir_abs_path, collect_args, None)
@@ -193,4 +193,4 @@ if not SConsAddons.Util.hasHelpFlag():
 
 Help(help_text)
 
-# end   
+# end
