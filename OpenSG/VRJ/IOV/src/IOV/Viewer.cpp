@@ -53,7 +53,8 @@ void Viewer::init()
    bool have_config = (mConfiguration.getAllConfigElements().size() > 0);
    if (!have_config)
    {
-      std::cerr << "WARNING: System has no configuration files loaded!" << std::endl;
+      std::cerr << "WARNING: No configuration files were provided to the "
+                << "Viewer application!" << std::endl;
    }
 
    // Create an initialize the user
