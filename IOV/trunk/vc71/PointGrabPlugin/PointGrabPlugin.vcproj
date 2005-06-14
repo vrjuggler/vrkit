@@ -11,9 +11,9 @@
 	</Platforms>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="..\plugins"
-			IntermediateDirectory="DebugDLL"
+			Name="DebugDLL|Win32"
+			OutputDirectory="..\$(PlatformName)\plugins"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -38,7 +38,7 @@
 				AdditionalDependencies="iov_d.lib vrj_d.lib vrj_ogl_d.lib gadget_d.lib sonix_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/PointGrabPlugin_d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\IOV\DebugDLL;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/PointGrabPlugin_d.pdb"
 				SubSystem="1"
@@ -66,9 +66,9 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="..\plugins"
-			IntermediateDirectory="ReleaseDLL"
+			Name="ReleaseDLL|Win32"
+			OutputDirectory="..\$(PlatformName)\plugins"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -96,7 +96,7 @@
 				AdditionalDependencies="iov.lib vrj.lib vrj_ogl.lib gadget.lib sonix.lib jccl.lib vpr.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/PointGrabPlugin.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\IOV\ReleaseDLL;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				GenerateDebugInformation="FALSE"
 				SubSystem="1"
 				OptimizeReferences="2"

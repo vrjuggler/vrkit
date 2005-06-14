@@ -188,9 +188,9 @@ def writeCacheFile(optionDict):
       cache_file.write(output)
    cache_file.close()
 
-def doInstall(prefix):
+def doInstall(prefix, platform):
    makeTree(prefix)
-   installIOV(prefix)
+   installIOV(prefix, platform)
 
 def mkinstalldirs(dir):
    if dir != '' and not os.path.exists(dir):
@@ -251,21 +251,23 @@ def installDir(startDir, destDir, allowedExts = None, disallowedExts = None,
    os.chdir(cwd)
 
 def installLibs(srcRoot, destdir,
+                buildPlatforms = ['Win32', 'x64'],
                 buildTypes = ['ReleaseDLL', 'DebugDLL', 'Release', 'Debug'],
                 extensions = ['.dll', '.lib']):
-   for t in buildTypes:
-      srcdir = os.path.join(srcRoot, t)
-      if os.path.exists(srcdir):
-         installDir(srcdir, destdir, extensions)
+   for p in buildPlatforms:
+      for t in buildTypes:
+         srcdir = os.path.join(srcRoot, p, t)
+         if os.path.exists(srcdir):
+            installDir(srcdir, destdir, extensions)
 
-def installIOV(prefix):
+def installIOV(prefix, platform):
    destdir = os.path.join(prefix, 'include', 'IOV')
    srcdir  = os.path.join(gProjectDir, 'src', 'IOV')
    installDir(srcdir, destdir, ['.h'])
 
    destdir = os.path.join(prefix, 'lib')
    srcroot = os.path.join(gProjectDir, 'vc71', 'IOV')
-   installLibs(srcroot, destdir)
+   installLibs(srcroot, destdir, buildPlatforms = [platform])
 
    share_root = os.path.join(prefix, 'share', 'IOV')
    destdir = os.path.join(share_root, 'data')
@@ -277,11 +279,11 @@ def installIOV(prefix):
    installDir(srcdir, destdir, ['.jdef'])
    jdef_destdir = destdir
 
-   installPlugins(prefix, share_root, jdef_destdir)
+   installPlugins(prefix, platform, share_root, jdef_destdir)
 
-def installPlugins(prefix, shareRoot, jdefDir):
+def installPlugins(prefix, platform, shareRoot, jdefDir):
    destdir = os.path.join(prefix, 'lib', 'IOV', 'plugins')
-   plugin_build_dir = os.path.join(gProjectDir, 'vc71', 'plugins')
+   plugin_build_dir = os.path.join(gProjectDir, 'vc71', platform, 'plugins')
    installDir(plugin_build_dir, destdir, ['.dll'])
 
    plugin_src_glob = os.path.join(gProjectDir, 'src', 'plugins', '*Plugin')
@@ -335,7 +337,7 @@ def main():
          proceed = sys.stdin.readline().strip(" \n")
 
          if proceed == '' or proceed.lower().startswith('y'):
-            doInstall(options['prefix'])
+            doInstall(options['prefix'], 'Win32')
    except OSError, osEx:
       print "Could not execute %s: %s" % (devenv_cmd, osEx)
       sys.exit(EXIT_STATUS_MSVS_START_ERROR)
