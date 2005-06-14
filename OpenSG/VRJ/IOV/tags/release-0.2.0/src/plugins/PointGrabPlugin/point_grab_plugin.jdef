@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="point_grab_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="Point Grab Plug-In (Infiscape)">
+      <abstract>false</abstract>
+      <help />
+      <parent />
+      <category>/Application-Specific/</category>
+      <category>/Infiscape/</category>
+      <property valuetype="float" variable="false" name="intersect_color">
+         <help>Red/green/blue color for the object intersection highlight.</help>
+         <value label="Red" defaultvalue="1.0" />
+         <value label="Green" defaultvalue="1.0" />
+         <value label="Blue" defaultvalue="0.0" />
+      </property>
+      <property valuetype="float" variable="false" name="grab_color">
+         <help>Red/green/blue color for the object grabbing highlight.</help>
+         <value label="Red" defaultvalue="1.0" />
+         <value label="Green" defaultvalue="0.0" />
+         <value label="Blue" defaultvalue="1.0" />
+      </property>
+      <property valuetype="string" variable="true" name="shader_search_path">
+         <help>A list of zero or more directories to search for vertex and fragment shaders. The use of environment variables is allowed. Environment variables are referenced using the form &lt;tt&gt;${ENV_VAR}&lt;/tt&gt; or &lt;tt&gt;$(ENV_VAR)&lt;/tt&gt;. Regardless of the value(s) set for this property, the path &lt;tt&gt;${IOV_BASE_DIR}/share/IOV/data/shaders&lt;/tt&gt; will always be searched for shader program files that are not identified by an absolute path.</help>
+         <value label="Diredctory" defaultvalue="" />
+      </property>
+      <property valuetype="boolean" variable="false" name="enable_highlight_shaders">
+         <help>Indicates whether to use GLSL shaders to highlight the selected object (intersection and grabbing).</help>
+         <value label="Use GLSL Intersection Highlighter?" defaultvalue="true" />
+      </property>
+      <property valuetype="string" variable="false" name="intersect_shader">
+         <help>The vertex and fragment shaders to use for highlighting the currently intersected object.</help>
+         <value label="Vertex Shader" defaultvalue="${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.vs" />
+         <value label="Fragment Shader" defaultvalue="${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.fs" />
+      </property>
+      <property valuetype="string" variable="false" name="grab_shader">
+         <help>The vertex and fragment shaders to use for highlighting the currently grabbed object.</help>
+         <value label="Vertex Shader" defaultvalue="${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.vs" />
+         <value label="Fragment Shader" defaultvalue="${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.fs" />
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>
+

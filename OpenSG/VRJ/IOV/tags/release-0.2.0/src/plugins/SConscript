@@ -1,0 +1,32 @@
+#!python
+import os
+import SConsAddons.Util as sca_util
+pj = os.path.join
+
+Import('*')
+
+src_dir = sca_util.getFullSrcPath(env)
+plugin_dirs = [d for d in os.listdir(src_dir) if (os.path.isdir(pj(src_dir,d)) and not d.startswith('.'))]
+
+# Create plugin environment with paths
+# to the IOV library we built and installed
+plugin_env = baseEnv.Copy()
+plugin_env.Append(CPPPATH = inst_paths['include'],
+                  LIBPATH = inst_paths['lib'])
+plugin_env.Prepend(LIBS = ['iov'])
+
+for plugin_name in plugin_dirs:
+   plugin_srcs = []
+   def_files = []
+   for p, d, files in sca_util.WalkBuildFromSource(plugin_name, plugin_env):
+      plugin_srcs += [pj(p,f) for f in files if f.endswith('.cpp')]
+      def_files += [pj(p,f) for f in files if f.endswith('.jdef')]
+   #print "Plugin: ", plugin_name
+   #print "   srcs:", plugin_srcs
+   #print "   defs:", def_files
+   lib_name = plugin_name
+   if (optimize != 'yes'):
+      lib_name += '_d'
+   plugin_lib = plugin_env.SharedLibrary(lib_name, plugin_srcs, SHLIBPREFIX = '')
+   env.Install(inst_paths['lib_plugin'], plugin_lib)
+   env.Install(inst_paths['definitions'], def_files)

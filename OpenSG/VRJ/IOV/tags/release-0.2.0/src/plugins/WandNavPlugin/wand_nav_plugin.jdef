@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="wand_nav_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="Infiscape Wand Navigation Plug-In">
+      <abstract>false</abstract>
+      <help />
+      <category>/Application-Specific/</category>
+      <category>/Infiscape/</category>
+      <property valuetype="float" variable="false" name="max_velocity">
+         <help>Maximum velocity for navigation.</help>
+         <value label="Maximum Velocity" defaultvalue="0.5" />
+      </property>
+      <property valuetype="float" variable="false" name="acceleration">
+         <help>Acceleration value used when navigating.</help>
+         <value label="Acceleration" defaultvalue="0.0050" />
+      </property>
+      <property valuetype="float" variable="false" name="rotation_sensitivity">
+         <help>Sensitivity for rotation.  Amount rotated = (angle*delta_time*sensitivity).</help>
+         <value label="Rotation Sensitivity" defaultvalue="0.5" />
+      </property>
+
+      <property valuetype="integer" variable="false" name="forward_button_num">
+         <help />
+         <value label="Forward Button Number" defaultvalue="-1" />
+      </property>
+      <property valuetype="integer" variable="false" name="reverse_button_num">
+         <help />
+         <value label="Reverse Button Number" defaultvalue="-1" />
+      </property>
+      <property valuetype="integer" variable="false" name="rotate_button_num">
+         <help />
+         <value label="Rotate Button Number" defaultvalue="-1" />
+      </property>
+      <property valuetype="integer" variable="false" name="nav_mode_button_num">
+         <help />
+         <value label="Mode Toggle Button" defaultvalue="-1" />
+      </property>
+      <property valuetype="integer" variable="false" name="initial_mode">
+         <help>The initial mode to start navigation in.</help>
+         <value label="Initial Mode" defaultvalue="0" />
+                 <enumeration>
+            <enum label="Walk" value="0" />
+            <enum label="Fly" value="1" />
+         </enumeration>
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>
+
