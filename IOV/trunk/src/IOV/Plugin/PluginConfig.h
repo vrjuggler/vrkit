@@ -7,7 +7,7 @@
  * IOV_PLUGIN_EXTERN for the prototype and IOV_IMPLEMENT for the implementation.
  * ----------------------------------------------------------------------------
  */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 
 #   if defined(__GNUC__)
 #       undef _declspec
@@ -48,7 +48,7 @@
 #   define IOV_PLUGIN_CALLBACK_DECL
 #   define IOV_PLUGIN_STATIC_CALLBACK(__x) static __x
 
-#endif  /* WIN32 */
+#endif  /* WIN32 || WIN64 */
 
 #ifdef _IOV_PLUGIN_BUILD_
 #   define IOV_PLUGIN_API(__type)      IOV_PLUGIN_EXPORT(__type)

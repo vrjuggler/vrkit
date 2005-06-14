@@ -72,7 +72,7 @@ public:
       }
    }
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
    /**
     * Overlaod delete so that we can delete our memory correctly.  This is
     * necessary for DLLs on Win32 to release memory from the correct memory
