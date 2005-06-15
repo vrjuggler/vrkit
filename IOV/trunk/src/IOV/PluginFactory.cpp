@@ -25,7 +25,7 @@ void PluginFactory::addScanPath(const std::vector<std::string>& scanPath)
 {
    // Determine the platform-specific file extension used for dynamically
    // loadable code.
-#if defined(VPR_OS_Win32)
+#if defined(VPR_OS_Win32) || defined(VPR_OS_Windows)
    const std::string driver_ext("dll");
 #elif defined(VPR_OS_Darwin)
    // NOTE: The file extension "bundle" may be appropriate in some cases.
