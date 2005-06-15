@@ -135,10 +135,12 @@ void ViewpointsPlugin::init(inf::ViewerPtr viewer)
 
    // Setup the internals
    // - Setup the next viewpoint to use
+   /*
    if(num_vps > 0)
    {
       mNextViewpoint = 1;
    }
+   */
 }
 
 //
