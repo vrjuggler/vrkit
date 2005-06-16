@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #if defined(WIN32) || defined(WIN64)
 #include <windows.h>
 #endif

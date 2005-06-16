@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef _INF_PLUGIN_FACTORY_H_
 #define _INF_PLUGIN_FACTORY_H_
 

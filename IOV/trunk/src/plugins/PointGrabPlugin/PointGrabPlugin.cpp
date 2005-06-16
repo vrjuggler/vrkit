@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #include <stdexcept>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>

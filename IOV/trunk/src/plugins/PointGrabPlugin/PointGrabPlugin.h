@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef _INF_POINT_GRAB_PLUGIN_H_
 #define _INF_POINT_GRAB_PLUGIN_H_
 

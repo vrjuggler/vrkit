@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef SCENE_DATA_PTR_H_
 #define SCENE_DATA_PTR_H_
 

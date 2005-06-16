@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #include <gmtl/External/OpenSGConvert.h>
 
 #include <IOV/ViewPlatform.h>

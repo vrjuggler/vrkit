@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #include <sstream>
 
 #include <IOV/PluginCreator.h>

@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #include <iostream>
 #include <vpr/System.h>
 #include <IOV/Util/Exceptions.h>

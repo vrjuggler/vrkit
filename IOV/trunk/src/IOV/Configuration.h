@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef INF_CONFIGURATION_H
 #define INF_CONFIGURATION_H
 

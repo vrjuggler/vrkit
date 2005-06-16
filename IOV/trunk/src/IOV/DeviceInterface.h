@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef DEVICEINTERFACE_H
 #define DEVICEINTERFACE_H
 

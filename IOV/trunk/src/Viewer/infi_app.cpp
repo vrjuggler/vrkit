@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #include <stdlib.h>
 #include <boost/program_options.hpp>
 

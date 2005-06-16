@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef VIEWPLATFORM_H
 #define VIEWPLATFORM_H
 

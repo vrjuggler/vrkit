@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef _INF_GRAB_DATA_PTR_H_
 #define _INF_GRAB_DATA_PTR_H_
 

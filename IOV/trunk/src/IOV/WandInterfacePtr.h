@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef WAND_INTERFACE_PTR_H_
 #define WAND_INTERFACE_PTR_H_
 

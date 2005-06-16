@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef PLUGIN_H
 #define PLUGIN_H
 

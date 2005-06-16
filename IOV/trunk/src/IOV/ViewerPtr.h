@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef VIEWER_PTR_H_
 #define VIEWER_PTR_H_
 

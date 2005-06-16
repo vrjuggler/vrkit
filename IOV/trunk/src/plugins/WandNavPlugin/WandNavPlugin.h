@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef WAND_NAV_PLUGIN_H
 #define WAND_NAV_PLUGIN_H
 

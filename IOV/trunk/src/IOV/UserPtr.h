@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef USER_PTR_H_
 #define USER_PTR_H_
 

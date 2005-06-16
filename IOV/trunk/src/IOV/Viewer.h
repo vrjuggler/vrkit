@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef VIEWER_H
 #define VIEWER_H
 

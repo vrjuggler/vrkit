@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #include <gmtl/Generate.h>
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
