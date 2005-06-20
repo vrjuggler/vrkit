@@ -141,7 +141,7 @@ void Viewer::latePreFrame()
          sendDataToSlaves(*mConnection);
          mConnection->flush();
 
-         unsigned count(0);
+         unsigned int count(0);
          while(mConnection->getSelectionCount()>0)
          {
             channel = mConnection->selectChannel();
@@ -212,14 +212,14 @@ void Viewer::deallocate()
 
    OSG::FieldContainerFactory* fact = OSG::FieldContainerFactory::the();
    const FieldContainerStore *pFCStore =fact->getFieldContainerStore();
-   unsigned num_types = fact->getNumTypes();
+   unsigned int num_types = fact->getNumTypes();
 
-   std::vector<unsigned> type_ids;
+   std::vector<unsigned int> type_ids;
    for(OSG::FieldContainerFactory::TypeMapIterator i=fact->beginTypes(); i!=fact->endTypes(); ++i)
    {
       if( ((*i).second != NULL) && ((*i).second)->getPrototype() != OSG::NullFC)
       {
-         unsigned type_proto_ptr_id = ((*i).second)->getPrototype().getFieldContainerId();
+         unsigned int type_proto_ptr_id = ((*i).second)->getPrototype().getFieldContainerId();
          type_ids.push_back(type_proto_ptr_id);
          //std::cout << "Protyo ptr id: " << type_proto_ptr_id << std::endl;
       }
@@ -229,7 +229,7 @@ void Viewer::deallocate()
              << "                                  num_types: " << num_types << std::endl
              << "   Total OpenSG objects allocated (w/types): " << pFCStore->size() << std::endl;
 
-   unsigned non_null_count(0);
+   unsigned int non_null_count(0);
 
    for(unsigned i=0; i<pFCStore->size(); ++i)
    {
