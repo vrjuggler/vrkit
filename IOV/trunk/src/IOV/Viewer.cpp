@@ -143,7 +143,6 @@ void Viewer::latePreFrame()
          sendDataToSlaves(*mConnection);
          mConnection->flush();
 
-         unsigned int count(0);
          while(mConnection->getSelectionCount()>0)
          {
             channel = mConnection->selectChannel();
