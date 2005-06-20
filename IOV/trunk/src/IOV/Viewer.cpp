@@ -31,8 +31,8 @@ namespace inf
 
 Viewer::Viewer()
    : vrj::OpenSGApp(NULL)
-    , mAspect(NULL)
-    , mConnection(NULL)
+   , mAspect(NULL)
+   , mConnection(NULL)
 {
    mPluginFactory = PluginFactory::create();
 }
@@ -46,7 +46,8 @@ void Viewer::init()
 {
    // This has to be called before OSG::osgInit(), which is done by
    // vrj::OpenSGApp::init().
-   // XXX: Does this open up a memory leak in the case where we don't use networking??
+   // XXX: Does this open up a memory leak in the case where we don't use
+   // networking??
    OSG::ChangeList::setReadWriteDefault();
 
    vrj::OpenSGApp::init();
@@ -76,7 +77,8 @@ void Viewer::init()
       const std::string app_elt_type("infiscape_opensg_viewer");
       const std::string root_name_prop("root_name");
 
-      jccl::ConfigElementPtr app_cfg = mConfiguration.getConfigElement(app_elt_type);
+      jccl::ConfigElementPtr app_cfg =
+         mConfiguration.getConfigElement(app_elt_type);
 
       if ( app_cfg )
       {
@@ -207,7 +209,7 @@ void Viewer::deallocate()
    mPluginFactory.reset();
 
    // Output information about what is left over
-   typedef std::vector<OSG::FieldContainerPtr>      FieldContainerStore;
+   typedef std::vector<OSG::FieldContainerPtr> FieldContainerStore;
    typedef FieldContainerStore::const_iterator FieldContainerStoreConstIt;
 
    OSG::FieldContainerFactory* fact = OSG::FieldContainerFactory::the();
@@ -215,11 +217,13 @@ void Viewer::deallocate()
    unsigned int num_types = fact->getNumTypes();
 
    std::vector<unsigned int> type_ids;
-   for(OSG::FieldContainerFactory::TypeMapIterator i=fact->beginTypes(); i!=fact->endTypes(); ++i)
+   OSG::FieldContainerFactory::TypeMapIterator i;
+   for ( i = fact->beginTypes(); i != fact->endTypes(); ++i )
    {
       if( ((*i).second != NULL) && ((*i).second)->getPrototype() != OSG::NullFC)
       {
-         unsigned int type_proto_ptr_id = ((*i).second)->getPrototype().getFieldContainerId();
+         unsigned int type_proto_ptr_id =
+            ((*i).second)->getPrototype().getFieldContainerId();
          type_ids.push_back(type_proto_ptr_id);
          //std::cout << "Protyo ptr id: " << type_proto_ptr_id << std::endl;
       }
@@ -227,11 +231,12 @@ void Viewer::deallocate()
 
    std::cout << "Viewer::deallocate:\n"
              << "                                  num_types: " << num_types << std::endl
-             << "   Total OpenSG objects allocated (w/types): " << pFCStore->size() << std::endl;
+             << "   Total OpenSG objects allocated (w/types): " << pFCStore->size()
+             << std::endl;
 
    unsigned int non_null_count(0);
 
-   for(unsigned i=0; i<pFCStore->size(); ++i)
+   for ( unsigned int i = 0; i < pFCStore->size(); ++i )
    {
       OSG::FieldContainerPtr ptr = (*pFCStore)[i];
       if(ptr != OSG::NullFC)
@@ -240,9 +245,11 @@ void Viewer::deallocate()
       }
    }
 
-   std::cout << "     Rem non-null OpenSG objects (wo/types): " << (non_null_count-num_types) << std::endl;
+   std::cout << "     Rem non-null OpenSG objects (wo/types): "
+             << (non_null_count-num_types) << std::endl;
 
-// Enable this section when you want to see the names and types of the objects that remain.
+// Enable this section when you want to see the names and types of the objects
+// that remain.
 #if 0
    std::cout << " ---- non-null objects remaining --- " << std::endl;
    for(unsigned i=0; i<pFCStore->size(); ++i)
@@ -251,7 +258,8 @@ void Viewer::deallocate()
       if( (std::count(type_ids.begin(), type_ids.end(), i) == 0)
            && (ptr != OSG::NullFC) )
       {
-         OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(ptr);
+         OSG::AttachmentContainerPtr acp =
+            OSG::AttachmentContainerPtr::dcast(ptr);
          const char* node_name = OSG::getName(acp);
          std::string node_name_str("<NULL>");
          if(NULL != node_name)
@@ -298,7 +306,8 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
          std::stringstream addr_stream;
          addr_stream << local_host_addr.getAddressString() << ":"
                      << listen_port;
-         std::cout << "   Attempting to bind to: " << addr_stream.str() << std::flush;
+         std::cout << "   Attempting to bind to: " << addr_stream.str()
+                   << std::flush;
          mConnection->bind(addr_stream.str());
          std::cout << "[OK]" << std::endl;
       }
@@ -311,7 +320,8 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
 
       for ( unsigned int s = 0; s < slave_count; ++s )
       {
-         std::cout << "   Waiting for slave #" << s << " to connect ..." << std::flush;
+         std::cout << "   Waiting for slave #" << s << " to connect ..."
+                   << std::flush;
          mChannels[s] = mConnection->acceptPoint();
          std::cout << "[OK]" << std::endl;
       }
@@ -395,7 +405,8 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
 
       try
       {
-         std::cout << "   Loading plugin: " << plugin_name << " .... " << std::endl;
+         std::cout << "   Loading plugin: " << plugin_name << " .... "
+                   << std::endl;
          inf::PluginCreator* creator =
             mPluginFactory->getPluginCreator(plugin_name);
 
@@ -403,7 +414,8 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
          {
             inf::PluginPtr plugin = creator->createPlugin();
             plugin->setFocused(true);
-            plugin->init(shared_from_this());                     // Initialize the plugin, and configure it
+            // Initialize the plugin, and configure it.
+            plugin->init(shared_from_this());
             mPlugins.push_back(plugin);
          }
          else
