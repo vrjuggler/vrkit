@@ -238,14 +238,15 @@ void SlaveViewer::latePreFrame()
 
 void SlaveViewer::sendDataToMaster(OSG::BinaryDataHandler& writer)
 {
-
+   OSG::UInt8 junk(false);
+   writer.putValue(junk);
 }
 
 void SlaveViewer::readDataFromMaster(OSG::BinaryDataHandler& reader)
 {
-
+   OSG::UInt8 junk;
+   reader.getValue(junk);
 }
-
 
 void SlaveViewer::initGl()
 {

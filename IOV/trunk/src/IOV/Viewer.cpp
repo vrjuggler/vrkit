@@ -170,14 +170,15 @@ void Viewer::latePreFrame()
 
 void Viewer::sendDataToSlaves(OSG::BinaryDataHandler& writer)
 {
-
+   OSG::UInt8 junk(false);
+   writer.putValue(junk);
 }
 
 void Viewer::readDataFromSlave(OSG::BinaryDataHandler& reader)
 {
-
+   OSG::UInt8 junk;
+   reader.getValue(junk);
 }
-
 
 void Viewer::exit()
 {
