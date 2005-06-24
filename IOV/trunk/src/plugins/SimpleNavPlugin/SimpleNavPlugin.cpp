@@ -92,8 +92,9 @@ void SimpleNavPlugin::init(ViewerPtr viewer)
    if(elt->getVersion() < req_cfg_version)
    {
       std::stringstream msg;
-      msg << "SimpleNavPlugin: Configuration failed. Required cfg version: " << req_cfg_version
-          << " found:" << elt->getVersion();
+      msg << "Configuration of SimpleNavPlugin failed.  Required config "
+          << "element version is " << req_cfg_version << ", but element '"
+          << elt->getName() << "' is version " << elt->getVersion();
       throw PluginException(msg.str(), IOV_LOCATION);
    }
 
