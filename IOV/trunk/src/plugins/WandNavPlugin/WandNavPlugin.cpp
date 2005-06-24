@@ -40,7 +40,8 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer, vpr::Uint32& minorVer)
+IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                               vpr::Uint32& minorVer)
 {
    majorVer = INF_PLUGIN_API_MAJOR;
    minorVer = INF_PLUGIN_API_MINOR;
@@ -94,9 +95,10 @@ void WandNavPlugin::init(ViewerPtr viewer)
 
    // Configure
    std::string elt_type_name = getElementType();
-   jccl::ConfigElementPtr cfg_elt = viewer->getConfiguration().getConfigElement(elt_type_name);
+   jccl::ConfigElementPtr cfg_elt =
+      viewer->getConfiguration().getConfigElement(elt_type_name);
 
-   if(!cfg_elt)
+   if ( ! cfg_elt )
    {
       throw PluginException("WandNavPlugin not find its configuration.",
                             IOV_LOCATION);
@@ -121,7 +123,7 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
              "Got unexpected config element type");
 
    // Check for correct version of plugin configuration
-   if(elt->getVersion() < req_cfg_version)
+   if ( elt->getVersion() < req_cfg_version )
    {
       std::stringstream msg;
       msg << "SimpleNavPlugin: Configuration failed. Required cfg version: "
@@ -151,13 +153,19 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    configButtons(elt, reset_btn_prop, mResetBtn);
 
    // Get initial mode
-   unsigned mode_id = elt->getProperty<int>(initial_mode_prop);
-   if(WandNavPlugin::WALK == mode_id)
-   {  mNavMode = WandNavPlugin::WALK; }
-   else if(WandNavPlugin::FLY == mode_id)
-   {  mNavMode = WandNavPlugin::FLY; }
+   unsigned int mode_id = elt->getProperty<unsigned int>(initial_mode_prop);
+   if ( WandNavPlugin::WALK == mode_id )
+   {
+      mNavMode = WandNavPlugin::WALK;
+   }
+   else if ( WandNavPlugin::FLY == mode_id )
+   {
+      mNavMode = WandNavPlugin::FLY;
+   }
    else  // Default: walk
-   {  mNavMode = WandNavPlugin::WALK; }
+   {
+      mNavMode = WandNavPlugin::WALK;
+   }
 
    return true;
 }
@@ -268,12 +276,15 @@ void WandNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
                if ( gmtl::MAT_IDENTITY44F != rot_mat )
                {
                   float y_rot = gmtl::makeYRot(rot_mat);
-                  gmtl::Matrix44f goal_mat = gmtl::make<gmtl::Matrix44f>(gmtl::AxisAnglef(y_rot, y_axis));
+                  gmtl::Matrix44f goal_mat =
+                     gmtl::make<gmtl::Matrix44f>(gmtl::AxisAnglef(y_rot,
+                                                                  y_axis));
                   gmtl::Quatf goal_quat = gmtl::make<gmtl::Quatf>(goal_mat);
 
                   gmtl::Quatf source_quat;
                   gmtl::Quatf slerp_quat;
-                  gmtl::slerp(slerp_quat, (delta_sec*mRotationSensitivity), source_quat, goal_quat);
+                  gmtl::slerp(slerp_quat, delta_sec * mRotationSensitivity,
+                              source_quat, goal_quat);
 
                   gmtl::Matrix44f rot_xform;
                   gmtl::set(rot_xform, slerp_quat);
