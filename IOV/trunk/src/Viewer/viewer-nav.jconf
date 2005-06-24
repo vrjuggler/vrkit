@@ -8,13 +8,15 @@
          <listen_port>34000</listen_port>
          <slave_count>0</slave_count>
       </infiscape_opensg_viewer>
-      <wand_nav_plugin name="Viewer Wand Nav" version="1">
+      <wand_nav_plugin name="Viewer Wand Nav" version="2">
          <max_velocity>5.0</max_velocity>
          <acceleration>0.05</acceleration>
-         <forward_button_num>0</forward_button_num>
-         <reverse_button_num>-1</reverse_button_num>
-         <rotate_button_num>1</rotate_button_num>
-         <nav_mode_button_num>2</nav_mode_button_num>
+         <rotation_sensitivity>0.5</rotation_sensitivity>
+         <forward_button_nums>0</forward_button_nums>
+         <reverse_button_nums>-1</reverse_button_nums>
+         <rotate_button_nums>1</rotate_button_nums>
+         <nav_mode_button_nums>2</nav_mode_button_nums>
+         <reset_button_nums>0,1</reset_button_nums>
          <initial_mode>Fly</initial_mode>
       </wand_nav_plugin>
       <point_grab_plugin name="Point Grab Plug-In" version="1">
@@ -32,6 +34,7 @@
       </point_grab_plugin>
       <viewpoints_plugin name="ViewpointsPlugin" version="1">
          <control_button_num>-1</control_button_num>
+         <units_to_meters>1.0</units_to_meters>
          <viewpoints>
             <viewpoints_vp name="Position 1" version="1">
                <position>0.0</position>

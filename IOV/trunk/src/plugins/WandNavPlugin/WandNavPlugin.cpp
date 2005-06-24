@@ -4,7 +4,12 @@
 #include <windows.h>
 #endif
 
+#include <string.h>
 #include <sstream>
+#include <numeric>
+#include <algorithm>
+#include <vector>
+#include <boost/algorithm/string.hpp>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
@@ -52,6 +57,18 @@ IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
 namespace inf
 {
 
+struct ButtonTest
+{
+   ButtonTest()
+   {
+   }
+
+   bool operator()(int b0, int b1)
+   {
+      return true;
+   }
+};
+
 WandNavPlugin::WandNavPlugin()
    : mLastFrameTime(0, vpr::Interval::Sec)
    , mCanNavigate(false)
@@ -61,10 +78,11 @@ WandNavPlugin::WandNavPlugin()
    , mAcceleration(0.005f)
    , mRotationSensitivity(0.5f)
    , mNavMode(WALK)
-   , mForBtn(-1)
-   , mRevBtn(-1)
-   , mRotateBtn(-1)
-   , mModeBtn(-1)
+   , mForwardBtn(gadget::Digital::ON)
+   , mReverseBtn(gadget::Digital::ON)
+   , mRotateBtn(gadget::Digital::ON)
+   , mModeBtn(gadget::Digital::TOGGLE_ON)
+   , mResetBtn(gadget::Digital::ON)
 {
    mCanNavigate = isFocused();
 }
@@ -88,16 +106,16 @@ void WandNavPlugin::init(ViewerPtr viewer)
    config(cfg_elt);
 }
 
-
 bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
 {
-   const std::string for_btn_prop("forward_button_num");
-   const std::string rev_btn_prop("reverse_button_num");
-   const std::string rot_btn_prop("rotate_button_num");
-   const std::string mode_btn_prop("nav_mode_button_num");
+   const std::string for_btn_prop("forward_button_nums");
+   const std::string rev_btn_prop("reverse_button_nums");
+   const std::string rot_btn_prop("rotate_button_nums");
+   const std::string mode_btn_prop("nav_mode_button_nums");
+   const std::string reset_btn_prop("reset_button_nums");
    const std::string initial_mode_prop("initial_mode");
    const std::string rotation_sensitivity("rotation_sensitivity");
-   const int unsigned req_cfg_version(1);
+   const unsigned int req_cfg_version(2);
 
    vprASSERT(elt->getID() == getElementType() &&
              "Got unexpected config element type");
@@ -106,8 +124,8 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    if(elt->getVersion() < req_cfg_version)
    {
       std::stringstream msg;
-      msg << "SimpleNavPlugin: Configuration failed. Required cfg version: " << req_cfg_version
-          << " found:" << elt->getVersion();
+      msg << "SimpleNavPlugin: Configuration failed. Required cfg version: "
+          << req_cfg_version << " found:" << elt->getVersion();
       throw PluginException(msg.str(), IOV_LOCATION);
    }
 
@@ -125,11 +143,12 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
       setAcceleration(accel);
    }
 
-   // Get the button for navigation
-   mForBtn = elt->getProperty<int>(for_btn_prop);
-   mRevBtn = elt->getProperty<int>(rev_btn_prop);
-   mRotateBtn = elt->getProperty<int>(rot_btn_prop);
-   mModeBtn = elt->getProperty<int>(mode_btn_prop);
+   // Get the buttons for navigation.
+   configButtons(elt, for_btn_prop, mForwardBtn);
+   configButtons(elt, rev_btn_prop, mReverseBtn);
+   configButtons(elt, rot_btn_prop, mRotateBtn);
+   configButtons(elt, mode_btn_prop, mModeBtn);
+   configButtons(elt, reset_btn_prop, mResetBtn);
 
    // Get initial mode
    unsigned mode_id = elt->getProperty<int>(initial_mode_prop);
@@ -159,21 +178,12 @@ void WandNavPlugin::updateNavState(ViewerPtr viewer,
 {
    vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
 
-   gadget::DigitalInterface& accel_button =
-      mWandInterface->getButton(mForBtn);
-   gadget::DigitalInterface& deccel_button =
-      mWandInterface->getButton(mRevBtn);
-   gadget::DigitalInterface& rotate_button =
-      mWandInterface->getButton(mRotateBtn);
-   gadget::DigitalInterface& mode_button =
-      mWandInterface->getButton(mModeBtn);
-
    // Update velocity
-   if ( accel_button->getData() == gadget::Digital::ON )
+   if ( mForwardBtn.test() )
    {
       mVelocity += mAcceleration;
    }
-   else if ( deccel_button->getData() == gadget::Digital::ON )
+   else if ( mReverseBtn.test() )
    {
       mVelocity -= mAcceleration;
    }
@@ -193,20 +203,19 @@ void WandNavPlugin::updateNavState(ViewerPtr viewer,
    }
 
    // Swap the navigation mode if the mode switching button was toggled on.
-   if ( mode_button->getData() == gadget::Digital::TOGGLE_ON )
+   if ( mModeBtn.test() )
    {
       mNavMode = (mNavMode == WALK ? FLY : WALK);
       std::cout << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
                 << std::endl;
    }
-
    // If the accelerate button and the rotate button are pressed together,
    // then reset to the starting point translation and rotation.
-   if ( accel_button->getData() && rotate_button->getData() )
+   else if ( mResetBtn.test() )
    {
       mNavState = RESET;
    }
-   else if ( rotate_button->getData() == gadget::Digital::ON )
+   else if ( mRotateBtn.test() )
    {
       mNavState = ROTATE;
    }
@@ -319,6 +328,48 @@ void WandNavPlugin::setMaximumVelocity(const float maxVelocity)
 void WandNavPlugin::setAcceleration(const float acceleration)
 {
    mAcceleration = acceleration;
+}
+
+struct StringToInt
+{
+   int operator()(const std::string& input)
+   {
+      return atoi(input.c_str());
+   }
+};
+
+void WandNavPlugin::configButtons(jccl::ConfigElementPtr elt,
+                                  const std::string& propName,
+                                  WandNavPlugin::DigitalHolder& holder)
+{
+   holder.mWandIf = mWandInterface;
+
+   std::string btn_str = elt->getProperty<std::string>(propName);
+
+   std::vector<std::string> btn_strings;
+   boost::trim(btn_str);
+   boost::split(btn_strings, btn_str, boost::is_any_of(", "));
+   holder.mButtonVec.resize(btn_strings.size());
+   std::transform(btn_strings.begin(), btn_strings.end(),
+                  holder.mButtonVec.begin(), StringToInt());
+}
+
+bool WandNavPlugin::DigitalHolder::test()
+{
+   if ( mButtonVec.empty() )
+   {
+      return false;
+   }
+   else
+   {
+      return std::accumulate(mButtonVec.begin(), mButtonVec.end(), true,
+                             *this);
+   }
+}
+
+bool WandNavPlugin::DigitalHolder::operator()(bool state, int btn)
+{
+   return state && mWandIf->getButton(btn)->getData() == mButtonState;
 }
 
 }

@@ -18,7 +18,6 @@
          <help>Sensitivity for rotation.  Amount rotated = (angle*delta_time*sensitivity).</help>
          <value label="Rotation Sensitivity" defaultvalue="0.5" />
       </property>
-
       <property valuetype="integer" variable="false" name="forward_button_num">
          <help />
          <value label="Forward Button Number" defaultvalue="-1" />
@@ -44,6 +43,92 @@
          </enumeration>
       </property>
       <upgrade_transform />
+   </definition_version>
+   <definition_version version="2" label="Infiscape Wand Navigation Plug-In">
+      <abstract>false</abstract>
+      <help>Plug-in to the Infiscape OpenSG Viewer application for performing wand-based navigation. A wand is expected to be tracked and have four buttons (digital input sources).</help>
+      <category>/Application-Specific/</category>
+      <category>/Infiscape/</category>
+      <property valuetype="float" variable="false" name="max_velocity">
+         <help>Maximum velocity for navigation.</help>
+         <value label="Maximum Velocity" defaultvalue="0.5" />
+      </property>
+      <property valuetype="float" variable="false" name="acceleration">
+         <help>Acceleration value used when navigating.</help>
+         <value label="Acceleration" defaultvalue="0.0050" />
+      </property>
+      <property valuetype="float" variable="false" name="rotation_sensitivity">
+         <help>Sensitivity for rotation.  Amount rotated = (angle*delta_time*sensitivity).</help>
+         <value label="Rotation Sensitivity" defaultvalue="0.5" />
+      </property>
+      <property valuetype="string" variable="false" name="forward_button_nums">
+         <help>Select the number(s) of the button that should activate forward (positive) navigation. The button number must be in the range [0,3]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <value label="Forward Button" defaultvalue="-1" />
+      </property>
+      <property valuetype="string" variable="false" name="reverse_button_nums">
+         <help>Select the number(s) of the button that should activate reverse (negative) navigation. The button number must be in the range [0,3]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <value label="Reverse Button" defaultvalue="-1" />
+      </property>
+      <property valuetype="string" variable="false" name="rotate_button_nums">
+         <help>Select the number(s) of the button that should activate rotation. The button number must be in the range [0,3]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <value label="Rotate Button Number(s)" defaultvalue="-1" />
+      </property>
+      <property valuetype="string" variable="false" name="nav_mode_button_nums">
+         <help>Select the number(s) of the button that should toggle the navigation mode between walk and fly. The button number must be in the range [0,3]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <value label="Mode Toggle Button Number(s)" defaultvalue="-1" />
+      </property>
+      <property valuetype="string" variable="false" name="reset_button_nums">
+         <help>Select the number(s) of the button that should reset the navigation back to the origin. The button number must be in the range [0,3]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <value label="Reset Button Number(s)" defaultvalue="-1" />
+      </property>
+      <property valuetype="integer" variable="false" name="initial_mode">
+         <help>The initial navigation mode.</help>
+         <value label="Initial Mode" defaultvalue="0" />
+                 <enumeration>
+            <enum label="Walk" value="0" />
+            <enum label="Fly" value="1" />
+         </enumeration>
+      </property>
+      <upgrade_transform>
+         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jconf="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" version="1.0">
+            <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
+            <xsl:variable name="jconf">http://www.vrjuggler.org/jccl/xsd/3.0/configuration</xsl:variable>
+
+            <xsl:template match="/">
+                <xsl:apply-templates/>
+            </xsl:template>
+
+            <xsl:template match="jconf:wand_nav_plugin">
+               <xsl:element namespace="{$jconf}" name="wand_nav_plugin">
+                  <xsl:attribute name="name">
+                     <xsl:value-of select="@name"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="version">2</xsl:attribute>
+                  <xsl:copy-of select="./jconf:max_velocity" />
+                  <xsl:copy-of select="./jconf:acceleration" />
+                  <xsl:copy-of select="./jconf:rotation_sensitivity" />
+                  <xsl:element namespace="{$jconf}" name="forward_button_nums">
+                     <xsl:value-of select="./jconf:forward_button_num" />
+                  </xsl:element>
+                  <xsl:element namespace="{$jconf}" name="reverse_button_nums">
+                     <xsl:value-of select="./jconf:reverse_button_num" />
+                  </xsl:element>
+                  <xsl:element namespace="{$jconf}" name="rotate_button_nums">
+                     <xsl:value-of select="./jconf:rotate_button_num" />
+                  </xsl:element>
+                  <xsl:element namespace="{$jconf}" name="nav_mode_button_nums">
+                     <xsl:value-of select="./jconf:nav_mode_button_num" />
+                  </xsl:element>
+                  <xsl:element namespace="{$jconf}" name="reset_button_nums">
+                     <xsl:value-of select="./jconf:forward_button_num" />
+                     <xsl:text>,</xsl:text>
+                     <xsl:value-of select="./jconf:rotate_button_num" />
+                  </xsl:element>
+                  <xsl:copy-of select="./jconf:initial_mode" />
+               </xsl:element>
+            </xsl:template>
+         </xsl:stylesheet>
+      </upgrade_transform>
    </definition_version>
 </definition>
 

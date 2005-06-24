@@ -83,6 +83,23 @@ protected:
       FLY  = 1      /**< Fly mode */
    };
 
+   struct DigitalHolder
+   {
+      DigitalHolder(const gadget::Digital::State btnState)
+         : mButtonState(btnState)
+      {
+         /* Do nothing. */ ;
+      }
+
+      bool test();
+
+      bool operator()(bool state, int btn);
+
+      WandInterfacePtr       mWandIf;
+      gadget::Digital::State mButtonState;
+      std::vector<int>       mButtonVec;
+   };
+
    WandNavPlugin();
 
    virtual void focusChanged();
@@ -90,6 +107,9 @@ protected:
    virtual void updateNavState(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
    virtual void runNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
+
+   void configButtons(jccl::ConfigElementPtr elt, const std::string& propName,
+                      DigitalHolder& holder);
 
    static std::string getElementType()
    {
@@ -109,10 +129,11 @@ protected:
    float mRotationSensitivity;      /**< Scalar on rotation delta.  Used to adjust sensitivity. */
    NavMode mNavMode;
 
-   int mForBtn;      /**< Button for forward motion. */
-   int mRevBtn;      /**< Button for reverse. */
-   int mRotateBtn;   /**< Button for rotate. */
-   int mModeBtn;     /**< Button for swapping mode. */
+   DigitalHolder mForwardBtn;  /**< Button for forward motion. */
+   DigitalHolder mReverseBtn;  /**< Button for reverse. */
+   DigitalHolder mRotateBtn;   /**< Button for rotate. */
+   DigitalHolder mModeBtn;     /**< Button for swapping mode. */
+   DigitalHolder mResetBtn;    /**< Button for resetting location. */
 };
 
 }
