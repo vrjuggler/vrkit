@@ -123,6 +123,8 @@ private:
 
    WandInterfacePtr mWandInterface;
 
+   DigitalHolder mGrabBtn;  /**< Button for grabbing and releasing objects. */
+
    bool mIntersecting;
    bool mGrabbing;
    inf::CoredTransformPtr mIntersectedObj;
@@ -140,8 +142,6 @@ private:
 
    snx::SoundHandle mIntersectSound;
    snx::SoundHandle mGrabSound;
-
-   DigitalHolder mGrabBtn;  /**< Button for grabbing and releasing objects. */
 };
 
 }
