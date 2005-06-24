@@ -1,6 +1,11 @@
 // Copyright (C) Infiscape Corporation 2005
 
+#include <string.h>
+#include <sstream>
+#include <numeric>
+#include <algorithm>
 #include <stdexcept>
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -26,7 +31,7 @@
 #include <IOV/InterfaceTrader.h>
 #include <IOV/WandInterface.h>
 #include <IOV/ViewPlatform.h>
-#include <IOV/Plugin/Buttons.h>
+#include <IOV/Util/Exceptions.h>
 #include "PointGrabPlugin.h"
 
 
@@ -323,13 +328,9 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       }
    }
 
-   gadget::DigitalInterface& grab_button =
-      mWandInterface->getButton(GRAB_BUTTON);
-
    // If we are intersecting an object but not grabbing it and the grab
    // button has just been pressed, grab the intersected object.
-   if ( mIntersecting && ! mGrabbing &&
-        grab_button->getData() == gadget::Digital::TOGGLE_ON )
+   if ( mIntersecting && ! mGrabbing && mGrabBtn.test() )
    {
       mGrabSound.trigger();
       mGrabbing   = true;
@@ -357,8 +358,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
    }
    // If we are grabbing an object and the grab button has just been pressed
    // again, release the grabbed object.
-   else if ( mGrabbing &&
-             grab_button->getData() == gadget::Digital::TOGGLE_ON )
+   else if ( mGrabbing && mGrabBtn.test() )
    {
       mGrabbing = false;
 
@@ -414,8 +414,23 @@ bool PointGrabPlugin::config(jccl::ConfigElementPtr elt)
 {
    vprASSERT(elt->getID() == getElementType());
 
+   const unsigned int req_cfg_version(2);
+
+   // Check for correct version of plugin configuration.
+   if ( elt->getVersion() < req_cfg_version )
+   {
+      std::stringstream msg;
+      msg << "Configuration of PointGrabPlugin failed.  Required config "
+          << "element version is " << req_cfg_version << ", but element '"
+          << elt->getName() << "' is version " << elt->getVersion();
+      throw PluginException(msg.str(), IOV_LOCATION);
+   }
+
+   const std::string grab_btn_prop("grab_button_nums");
    const std::string isect_prop("intersect_color");
    const std::string grab_prop("grab_color");
+
+   configButtons(elt, grab_btn_prop, mGrabBtn);
 
    float isect_color[3];
    float grab_color[3];
@@ -486,13 +501,13 @@ bool PointGrabPlugin::config(jccl::ConfigElementPtr elt)
 }
 
 PointGrabPlugin::PointGrabPlugin()
-   : GRAB_BUTTON(inf::buttons::GRAB_TOGGLE_BUTTON)
-   , mEnableShaders(true)
+   : mEnableShaders(true)
    , mIsectVertexShaderFile("highlight.vs")
    , mIsectFragmentShaderFile("highlight.vs")
    , mGrabVertexShaderFile("highlight.vs")
    , mGrabFragmentShaderFile("highlight.vs")
    , mIntersecting(false)
+   , mGrabBtn(gadget::Digital::TOGGLE_ON)
    , mGrabbing(false)
    , mIntersectColor(1.0f, 1.0f, 0.0f)
    , mGrabColor(1.0f, 0.0f, 1.0f)
@@ -624,6 +639,48 @@ fs::path PointGrabPlugin::getCompleteShaderFile(const std::string& filename)
    }
 
    return file_path;
+}
+
+struct StringToInt
+{
+   int operator()(const std::string& input)
+   {
+      return atoi(input.c_str());
+   }
+};
+
+void PointGrabPlugin::configButtons(jccl::ConfigElementPtr elt,
+                                    const std::string& propName,
+                                    PointGrabPlugin::DigitalHolder& holder)
+{
+   holder.mWandIf = mWandInterface;
+
+   std::string btn_str = elt->getProperty<std::string>(propName);
+
+   std::vector<std::string> btn_strings;
+   boost::trim(btn_str);
+   boost::split(btn_strings, btn_str, boost::is_any_of(", "));
+   holder.mButtonVec.resize(btn_strings.size());
+   std::transform(btn_strings.begin(), btn_strings.end(),
+                  holder.mButtonVec.begin(), StringToInt());
+}
+
+bool PointGrabPlugin::DigitalHolder::test()
+{
+   if ( mButtonVec.empty() )
+   {
+      return false;
+   }
+   else
+   {
+      return std::accumulate(mButtonVec.begin(), mButtonVec.end(), true,
+                             *this);
+   }
+}
+
+bool PointGrabPlugin::DigitalHolder::operator()(bool state, int btn)
+{
+   return state && mWandIf->getButton(btn)->getData() == mButtonState;
 }
 
 }

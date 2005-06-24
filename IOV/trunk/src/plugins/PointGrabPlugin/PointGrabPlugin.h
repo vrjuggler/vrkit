@@ -6,6 +6,7 @@
 #include <IOV/Plugin/PluginConfig.h>
 
 #include <string>
+#include <vector>
 #include <exception>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/filesystem/path.hpp>
@@ -78,6 +79,23 @@ protected:
    PointGrabPlugin();
 
 private:
+   struct DigitalHolder
+   {
+      DigitalHolder(const gadget::Digital::State btnState)
+         : mButtonState(btnState)
+      {
+         /* Do nothing. */ ;
+      }
+
+      bool test();
+
+      bool operator()(bool state, int btn);
+
+      WandInterfacePtr       mWandIf;
+      gadget::Digital::State mButtonState;
+      std::vector<int>       mButtonVec;
+   };
+
    void updateHighlight(OSG::NodePtr highlightNode);
 
    OSG::RefPtr<OSG::ChunkMaterialPtr> createShader(const std::string& vertexShader,
@@ -86,12 +104,13 @@ private:
 
    boost::filesystem::path getCompleteShaderFile(const std::string& filename);
 
+   void configButtons(jccl::ConfigElementPtr elt, const std::string& propName,
+                      DigitalHolder& holder);
+
    static std::string getElementType()
    {
       return std::string("point_grab_plugin");
    }
-
-   const int GRAB_BUTTON;
 
    std::vector<boost::filesystem::path> mShaderSearchPath;
    bool mEnableShaders;
@@ -121,8 +140,11 @@ private:
 
    snx::SoundHandle mIntersectSound;
    snx::SoundHandle mGrabSound;
+
+   DigitalHolder mGrabBtn;  /**< Button for grabbing and releasing objects. */
 };
 
 }
+
 
 #endif
