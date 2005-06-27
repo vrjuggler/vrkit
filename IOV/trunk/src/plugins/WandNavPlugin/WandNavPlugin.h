@@ -85,13 +85,7 @@ protected:
 
    struct DigitalHolder
    {
-      DigitalHolder(const gadget::Digital::State btnState)
-         : mButtonState(btnState)
-      {
-         /* Do nothing. */ ;
-      }
-
-      bool test();
+      bool test(const gadget::Digital::State testState);
 
       bool operator()(bool state, int btn);
 

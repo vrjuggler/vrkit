@@ -79,11 +79,6 @@ WandNavPlugin::WandNavPlugin()
    , mAcceleration(0.005f)
    , mRotationSensitivity(0.5f)
    , mNavMode(WALK)
-   , mForwardBtn(gadget::Digital::ON)
-   , mReverseBtn(gadget::Digital::ON)
-   , mRotateBtn(gadget::Digital::ON)
-   , mModeBtn(gadget::Digital::TOGGLE_ON)
-   , mResetBtn(gadget::Digital::ON)
 {
    mCanNavigate = isFocused();
 }
@@ -188,11 +183,11 @@ void WandNavPlugin::updateNavState(ViewerPtr viewer,
    vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
 
    // Update velocity
-   if ( mForwardBtn.test() )
+   if ( mForwardBtn.test(gadget::Digital::ON) )
    {
       mVelocity += mAcceleration;
    }
-   else if ( mReverseBtn.test() )
+   else if ( mReverseBtn.test(gadget::Digital::ON) )
    {
       mVelocity -= mAcceleration;
    }
@@ -212,7 +207,7 @@ void WandNavPlugin::updateNavState(ViewerPtr viewer,
    }
 
    // Swap the navigation mode if the mode switching button was toggled on.
-   if ( mModeBtn.test() )
+   if ( mModeBtn.test(gadget::Digital::TOGGLE_ON) )
    {
       mNavMode = (mNavMode == WALK ? FLY : WALK);
       std::cout << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
@@ -220,11 +215,11 @@ void WandNavPlugin::updateNavState(ViewerPtr viewer,
    }
    // If the accelerate button and the rotate button are pressed together,
    // then reset to the starting point translation and rotation.
-   else if ( mResetBtn.test() )
+   else if ( mResetBtn.test(gadget::Digital::ON) )
    {
       mNavState = RESET;
    }
-   else if ( mRotateBtn.test() )
+   else if ( mRotateBtn.test(gadget::Digital::ON) )
    {
       mNavState = ROTATE;
    }
@@ -366,7 +361,7 @@ void WandNavPlugin::configButtons(jccl::ConfigElementPtr elt,
                   holder.mButtonVec.begin(), StringToInt());
 }
 
-bool WandNavPlugin::DigitalHolder::test()
+bool WandNavPlugin::DigitalHolder::test(const gadget::Digital::State testState)
 {
    if ( mButtonVec.empty() )
    {
@@ -374,6 +369,7 @@ bool WandNavPlugin::DigitalHolder::test()
    }
    else
    {
+      mButtonState = testState;
       return std::accumulate(mButtonVec.begin(), mButtonVec.end(), true,
                              *this);
    }

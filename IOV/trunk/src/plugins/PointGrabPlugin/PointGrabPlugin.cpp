@@ -330,7 +330,8 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
 
    // If we are intersecting an object but not grabbing it and the grab
    // button has just been pressed, grab the intersected object.
-   if ( mIntersecting && ! mGrabbing && mGrabBtn.test() )
+   if ( mIntersecting && ! mGrabbing &&
+        mGrabBtn.test(gadget::Digital::TOGGLE_ON) )
    {
       mGrabSound.trigger();
       mGrabbing   = true;
@@ -358,7 +359,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
    }
    // If we are grabbing an object and the grab button has just been pressed
    // again, release the grabbed object.
-   else if ( mGrabbing && mGrabBtn.test() )
+   else if ( mGrabbing && mGrabBtn.test(gadget::Digital::TOGGLE_ON) )
    {
       mGrabbing = false;
 
@@ -506,7 +507,6 @@ PointGrabPlugin::PointGrabPlugin()
    , mIsectFragmentShaderFile("highlight.vs")
    , mGrabVertexShaderFile("highlight.vs")
    , mGrabFragmentShaderFile("highlight.vs")
-   , mGrabBtn(gadget::Digital::TOGGLE_ON)
    , mIntersecting(false)
    , mGrabbing(false)
    , mIntersectColor(1.0f, 1.0f, 0.0f)
@@ -665,7 +665,7 @@ void PointGrabPlugin::configButtons(jccl::ConfigElementPtr elt,
                   holder.mButtonVec.begin(), StringToInt());
 }
 
-bool PointGrabPlugin::DigitalHolder::test()
+bool PointGrabPlugin::DigitalHolder::test(const gadget::Digital::State testState)
 {
    if ( mButtonVec.empty() )
    {
@@ -673,6 +673,7 @@ bool PointGrabPlugin::DigitalHolder::test()
    }
    else
    {
+      mButtonState = testState;
       return std::accumulate(mButtonVec.begin(), mButtonVec.end(), true,
                              *this);
    }
