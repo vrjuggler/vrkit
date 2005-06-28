@@ -98,7 +98,7 @@ vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("vrjuggler", "1.1.169", requ
 opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.4.0",
                                                    required = True)
 
-Export('boost_options')
+Export('boost_options','opensg_options')
 
 opts.AddOption(boost_options)
 opts.AddOption( vrj_options )
@@ -134,6 +134,7 @@ if not SConsAddons.Util.hasHelpFlag():
    inst_paths['share'] = pj(inst_paths['base'],'share','IOV')
    inst_paths['definitions'] = pj(inst_paths['share'],'definitions')
    inst_paths['app_base'] = pj(inst_paths['share'],'apps')
+   inst_paths['test_base'] = pj(inst_paths['share'],'test')
 
    print "Using prefix: ", inst_paths["base"]
    baseEnv.Alias('install', inst_paths['base'])
@@ -161,13 +162,14 @@ if not SConsAddons.Util.hasHelpFlag():
 
    Export('baseEnv', 'build_dir', 'inst_paths')
 
-   SConscript(dirs=['src',], build_dir=build_dir, duplicate=0)
+   SConscript(dirs=['src'], build_dir=build_dir, duplicate=0)
 
 
    srcdir_abs_path = baseEnv.Dir('data').srcnode().abspath
    #print "src dir abs: ", srcdir_abs_path
    ret_args = []
 
+   # Collect all file arguments from the walk into dirs and files
    def collect_args(junk, dir_path, name_list):
       dirs = []
       files = []
