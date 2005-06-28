@@ -10,6 +10,7 @@
 #include <OpenSG/OSGGLUTWindow.h>
 #include <OpenSG/OSGSimpleSceneManager.h>
 #include <OpenSG/OSGSceneFileHandler.h>
+#include <IOV/UiBuilder.h>
 
 
 OSG::SimpleSceneManager* mgr;
@@ -26,17 +27,17 @@ int main(int argc, char* argv[])
     gwin->init();
 
     // load the scene
+    OSG::NodePtr scene = OSG::Node::create();
 
-    OSG::NodePtr scene;
+    inf::UiBuilder builder;
 
-    if(argc < 2)
-    {
-        scene = OSG::makeTorus(.5, 2, 16, 16);
-    }
-    else
-    {
-        scene = OSG::SceneFileHandler::the().read(argv[1]);
-    }
+    //
+    OSG::Color3f color(1.0, 0.0, 0.0);
+    OSG::GeometryPtr geom = builder.createGeomGeo();
+    builder.buildRectangle(geom, color,
+                           OSG::Pnt2f(0,0), OSG::Pnt2f(10,10), true);
+
+    scene->setCore(geom);
 
 
     mgr = new OSG::SimpleSceneManager;
@@ -91,27 +92,33 @@ void motion(int x, int y)
 // react to keys
 void keyboard(unsigned char k, int , int )
 {
-    switch(k)
-    {
-        case 27:
-        {
-            OSG::osgExit();
-            exit(0);
-        }
-        break;
+   switch (k)
+   {
+   case 27:
+      {
+         OSG::osgExit();
+         exit(0);
+      }
+      break;
 
-        case 'f':
-        {
-            mgr->setNavigationMode(OSG::Navigator::FLY);
-        }
-        break;
+   case 'f':
+      mgr->setNavigationMode(OSG::Navigator::FLY);
+      break;
 
-        case 't':
-        {
-            mgr->setNavigationMode(OSG::Navigator::TRACKBALL);
-        }
-        break;
-    }
+   case 't':
+      mgr->setNavigationMode(OSG::Navigator::TRACKBALL);
+      break;
+   case 'z':
+      glPolygonMode( GL_FRONT_AND_BACK, GL_POINT);
+      std::cerr << "PolygonMode: Point." << std::endl;
+      break;
+   case 'x':   glPolygonMode( GL_FRONT_AND_BACK, GL_LINE);
+      std::cerr << "PolygonMode: Line." << std::endl;
+      break;
+   case 'c':   glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
+      std::cerr << "PolygonMode: Fill." << std::endl;
+      break;
+   }
 }
 
 // setup the GLUT library which handles the windows for us
