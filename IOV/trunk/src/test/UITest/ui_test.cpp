@@ -33,9 +33,13 @@ int main(int argc, char* argv[])
 
     //
     OSG::Color3f color(1.0, 0.0, 0.0);
+    OSG::Color3f color2(0.0, 1.0, 0.0);
+
     OSG::GeometryPtr geom = builder.createGeomGeo();
+    builder.buildBox(geom,color2,
+                          OSG::Pnt2f(1,1), OSG::Pnt2f(3,9), 2.0f);
     builder.buildRectangle(geom, color,
-                           OSG::Pnt2f(0,0), OSG::Pnt2f(10,10), true);
+                           OSG::Pnt2f(0,0), OSG::Pnt2f(10,10), 0.4, true);
 
     scene->setCore(geom);
 
@@ -105,8 +109,18 @@ void keyboard(unsigned char k, int , int )
       mgr->setNavigationMode(OSG::Navigator::FLY);
       break;
 
+   case 'd':
+      OSG::SceneFileHandler::the().write(mgr->getRoot(),"dump_scene.osb");
+      std::cout << "Wrote out scene: dump_scene.osb" << std::endl;
+      break;
+
    case 't':
       mgr->setNavigationMode(OSG::Navigator::TRACKBALL);
+      break;
+
+   case 'l':
+      mgr->setHeadlight(!mgr->getHeadlightState());
+      std::cout << "Set headlight: " << mgr->getHeadlightState() << std::endl;
       break;
    case 'z':
       glPolygonMode( GL_FRONT_AND_BACK, GL_POINT);
@@ -121,6 +135,15 @@ void keyboard(unsigned char k, int , int )
    }
 }
 
+void initgl(void)
+{
+   glClearColor(0.1, 0.0, 0.1, 0.0);
+   glShadeModel(GL_SMOOTH);
+   glEnable(GL_DEPTH_TEST);
+   glEnable(GL_NORMALIZE);
+   glEnable(GL_LIGHTING);
+}
+
 // setup the GLUT library which handles the windows for us
 int setupGLUT(int *argc, char *argv[])
 {
@@ -129,6 +152,7 @@ int setupGLUT(int *argc, char *argv[])
 
     int winid = glutCreateWindow("IOV UI Test");
 
+    initgl();
     glutReshapeFunc(reshape);
     glutDisplayFunc(display);
     glutIdleFunc(display);
