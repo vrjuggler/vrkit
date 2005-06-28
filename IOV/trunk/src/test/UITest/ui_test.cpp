@@ -32,13 +32,15 @@ int main(int argc, char* argv[])
     inf::UiBuilder builder;
 
     //
-    OSG::Color3f color(1.0, 0.0, 0.0);
-    OSG::Color3f color2(0.0, 1.0, 0.0);
+    OSG::Color3f white(1,1,1);
 
     OSG::GeometryPtr geom = builder.createGeomGeo();
-    builder.buildBox(geom,color2,
-                          OSG::Pnt2f(1,1), OSG::Pnt2f(3,9), 2.0f);
-    builder.buildRectangle(geom, color,
+    builder.buildBox(geom, white,OSG::Pnt2f(1,1), OSG::Pnt2f(2,9), 0.5f);  // left
+    //builder.buildBox(geom, white,OSG::Pnt2f(8,1), OSG::Pnt2f(9,9), 0.5f);  // right
+    //builder.buildBox(geom, white,OSG::Pnt2f(1,8), OSG::Pnt2f(9,9), 0.5f);  // top
+    //builder.buildBox(geom, white,OSG::Pnt2f(1,1), OSG::Pnt2f(9,2), 0.5f);  // bottom
+
+    builder.buildRectangle(geom, OSG::Color3f(0.7,0.7,0.7),
                            OSG::Pnt2f(0,0), OSG::Pnt2f(10,10), 0.4, true);
 
     scene->setCore(geom);
