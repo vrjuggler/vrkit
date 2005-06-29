@@ -22,11 +22,31 @@
 #include <OpenSG/OSGImage.h>
 
 #include <IOV/UiBuilder.h>
+#include <sstream>
 
 
 OSG::SimpleSceneManager* mgr;
 
+std::stringstream    gOverlayTextStream;  /**< Text to write out each frame. */
+
 int setupGLUT(int* argc, char* argv[]);
+
+template<class OutIt>
+void splitStr(
+   const std::string& s,
+   const std::string& sep,
+   OutIt dest)
+{
+   std::string::size_type left = s.find_first_not_of( sep );
+   std::string::size_type right = s.find_first_of( sep, left );
+   while( left < right )
+   {
+      *dest = s.substr( left, right-left );
+      ++dest;
+      left = s.find_first_not_of( sep, right );
+      right = s.find_first_of( sep, left );
+   }
+}
 
 /** Little wrapper for holding text data. */
 class TextStuff
@@ -39,10 +59,17 @@ public:
         mStyle(OSG::TextFace::STYLE_PLAIN),
         mTextGap(1),
         mTextureWidth(1024),
+        mFaceSize(46),
         mLineSpacing(1.0f),
         mMaxExtent(0.0f),
         mGeoScale(1.0f)
    {;}
+
+   void setText(std::vector<std::string> lines)
+   {
+      mLines = lines;
+      updateScene();
+   }
 
    // Initialize the scene structures and get everything going
    void initialize()
@@ -98,17 +125,13 @@ public:
 
    void updateScene()
    {
-      std::vector<std::string> lines;
-      lines.push_back("Hello");
-      lines.push_back("World");
-
       OSG::TextLayoutResult layout_result;
       OSG::TextLayoutParam layout_param;
       layout_param.maxExtend = mMaxExtent;
       layout_param.setLength(mMaxExtent);
       layout_param.spacing = mLineSpacing;
 
-      mFace->layout(lines, layout_param, layout_result);
+      mFace->layout(mLines, layout_param, layout_result);
       OSG::GeometryPtr geom_ptr = mTextGeom.get();
 
       OSG::Vec2f bounds = layout_result.textBounds;
@@ -122,6 +145,7 @@ public:
        OSG::TextTXFParam param;
        param.textureWidth = mTextureWidth;
        param.gap = mTextGap;
+       param.size = mFaceSize;
 
        OSG::TextTXFFace* new_face = OSG::TextTXFFace::create(mFamilyName, mStyle, param);
        if (NULL == new_face)
@@ -155,6 +179,18 @@ public:
 
       std::cout << "Setting mTextureWidth: " << mTextureWidth << std::endl;
 
+      updateFace();
+      updateScene();
+   }
+
+   void incFaceSize(bool inc=true)
+   {
+      if(inc)
+         mFaceSize += 1;
+      else if(0 != mFaceSize)
+         mFaceSize -= 1;
+
+      std::cout << "Set face size to: " << mFaceSize << std::endl;
       updateFace();
       updateScene();
    }
@@ -217,8 +253,9 @@ public:
       updateScene();
    }
 
-
 public:
+   std::vector<std::string>   mLines;
+
    OSG::NodeRefPtr            mRootNode;     /**< Root node for text geom. */
    OSG::GeometryRefPtr        mTextGeom;     /**< Geom core for the text. */
    OSG::ChunkMaterialRefPtr   mTextMat;      /**< Material for the text geom. */
@@ -232,6 +269,7 @@ public:
 
    unsigned                   mTextGap;      /**< The gap between glyphs in pixels */
    unsigned                   mTextureWidth; /**< The width of the texture in pixels */
+   unsigned                   mFaceSize;     /**< The "size" param of the face. */
 
    float                      mLineSpacing;  /**< Spacing to use in the layout. */
    float                      mMaxExtent;    /**< Maximum extent to use. */
@@ -240,6 +278,25 @@ public:
 };
 
 TextStuff  gTextStuff;
+
+void update()
+{
+   static unsigned frame(0);
+   frame += 1;
+
+   gOverlayTextStream << "frame: " << frame << "\n";
+
+   std::string overlay_text = gOverlayTextStream.str();
+   std::vector<std::string> overlay_lines;
+   splitStr(overlay_text,"\n",std::back_inserter(overlay_lines));
+
+   gTextStuff.setText(overlay_lines);
+
+   gOverlayTextStream.str(std::string(""));  // Clear it out
+
+   gOverlayTextStream << "Hello\nWorld!!\n";
+
+}
 
 void printFontFamilies()
 {
@@ -287,7 +344,6 @@ int main(int argc, char* argv[])
     ui_node->setCore(geom);
     scene->addChild(ui_node);
 
-
     // Setup text sample
     gTextStuff.initialize();
     gTextStuff.updateFace();
@@ -312,6 +368,8 @@ int main(int argc, char* argv[])
 // redraw the window
 void display(void)
 {
+   update();
+
     mgr->idle();
     mgr->redraw();
 }
@@ -353,6 +411,13 @@ void keyboard(unsigned char k, int , int )
          OSG::osgExit();
          exit(0);
       }
+      break;
+
+   case '-':
+      gTextStuff.incFaceSize(false);
+      break;
+   case '=':
+      gTextStuff.incFaceSize(true);
       break;
 
    case '[':
