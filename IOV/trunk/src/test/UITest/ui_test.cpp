@@ -10,12 +10,249 @@
 #include <OpenSG/OSGGLUTWindow.h>
 #include <OpenSG/OSGSimpleSceneManager.h>
 #include <OpenSG/OSGSceneFileHandler.h>
+
+#include <OpenSG/OSGTextTXFFace.h>
+#include <OpenSG/OSGTextTXFGlyph.h>
+#include <OpenSG/OSGTextFaceFactory.h>
+#include <OpenSG/OSGTextLayoutParam.h>
+#include <OpenSG/OSGTextLayoutResult.h>
+
+#include <OpenSG/OSGChunkMaterial.h>
+#include <OpenSG/OSGTextureChunk.h>
+#include <OpenSG/OSGImage.h>
+
 #include <IOV/UiBuilder.h>
 
 
 OSG::SimpleSceneManager* mgr;
 
 int setupGLUT(int* argc, char* argv[]);
+
+/** Little wrapper for holding text data. */
+class TextStuff
+{
+public:
+   TextStuff()
+      : mFace(NULL),
+        mFamilyName("SANS"),
+        mNextFamily(0),
+        mStyle(OSG::TextFace::STYLE_PLAIN),
+        mTextGap(1),
+        mTextureWidth(1024),
+        mLineSpacing(1.0f),
+        mMaxExtent(0.0f),
+        mGeoScale(1.0f)
+   {;}
+
+   // Initialize the scene structures and get everything going
+   void initialize()
+   {
+      OSG::TextFaceFactory::the().getFontFamilies(mFamilies);  // Get list of all families
+
+      mRootNode = OSG::Node::create();
+      mTextGeom = OSG::Geometry::create();
+      mTextMat = OSG::ChunkMaterial::create();
+      mTextureChunk = OSG::TextureChunk::create();
+
+      OSG::CPEditor rne(mRootNode);
+      OSG::CPEditor tge(mTextGeom);
+      OSG::CPEditor tme(mTextMat);
+      OSG::CPEditor tce(mTextureChunk);
+
+      // XXX: Setup a default face to use
+
+      // Setup defaults for the texture
+      OSG::ImagePtr img = OSG::Image::create();         // Temporary image for now
+      OSG::UChar8 data[] = {0,0,0, 50,50,50, 100,100,100, 255,255,255};
+
+      beginEditCP(img);
+         img->set( OSG::Image::OSG_RGB_PF, 2, 2, 1, 1, 1, 0, data);
+      endEditCP(img);
+
+      // -- Setup texture and materials -- //
+      mTextureChunk->setImage(img);
+      mTextureChunk->setWrapS(GL_CLAMP);
+      mTextureChunk->setWrapT(GL_CLAMP);
+      mTextureChunk->setMagFilter(GL_LINEAR);
+      mTextureChunk->setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
+      mTextureChunk->setEnvMode(GL_MODULATE);
+      mTextureChunk->setInternalFormat(GL_INTENSITY);
+
+      OSG::MaterialChunkPtr mat_chunk = OSG::MaterialChunk::create();
+      OSG::beginEditCP(mat_chunk);
+      {
+         mat_chunk->setAmbient (OSG::Color4f(1.f, 1.f, 1.f, 1.f));
+         mat_chunk->setDiffuse (OSG::Color4f(1.f, 1.f, 1.f, 1.f));
+         mat_chunk->setEmission(OSG::Color4f(0.f, 0.f, 0.f, 1.f));
+         mat_chunk->setSpecular(OSG::Color4f(0.f, 0.f, 0.f, 1.f));
+         mat_chunk->setShininess(0);
+      }
+      OSG::endEditCP(mat_chunk);
+
+      mTextMat->addChunk(mTextureChunk);
+      mTextMat->addChunk(mat_chunk);
+
+      mTextGeom->setMaterial(mTextMat);
+      mRootNode->setCore(mTextGeom);
+   }
+
+   void updateScene()
+   {
+      std::vector<std::string> lines;
+      lines.push_back("Hello");
+      lines.push_back("World");
+
+      OSG::TextLayoutResult layout_result;
+      OSG::TextLayoutParam layout_param;
+      layout_param.maxExtend = mMaxExtent;
+      layout_param.setLength(mMaxExtent);
+      layout_param.spacing = mLineSpacing;
+
+      mFace->layout(lines, layout_param, layout_result);
+      OSG::GeometryPtr geom_ptr = mTextGeom.get();
+
+      OSG::Vec2f bounds = layout_result.textBounds;
+      //std::cout << "Text bounds: " << bounds << std::endl;
+      mFace->fillGeo(geom_ptr, layout_result, mGeoScale);
+   }
+
+   void updateFace()
+   {
+      // Try to create new face
+       OSG::TextTXFParam param;
+       param.textureWidth = mTextureWidth;
+       param.gap = mTextGap;
+
+       OSG::TextTXFFace* new_face = OSG::TextTXFFace::create(mFamilyName, mStyle, param);
+       if (NULL == new_face)
+       {
+          std::cerr << "ERROR: Failed to allocate face." << std::endl;
+       }
+       subRefP(mFace);
+       mFace = new_face;
+       addRefP(mFace);
+
+       OSG::beginEditCP(mTextureChunk);
+         OSG::ImagePtr face_image = mFace->getTexture();
+         mTextureChunk->setImage(face_image);
+       OSG::endEditCP(mTextureChunk);
+   }
+
+   /** Increment/decrement current texture size and regen face. */
+   void incTextureSize(bool dec=false)
+   {
+      switch (mTextureWidth)
+      {
+      case 0:  mTextureWidth = (dec?0:16);  break;
+      case 16:  mTextureWidth = (dec?0:32);  break;
+      case 32:  mTextureWidth = (dec?16:64);  break;
+      case 64:  mTextureWidth = (dec?32:128);  break;
+      case 128:  mTextureWidth = (dec?64:256);  break;
+      case 256:  mTextureWidth = (dec?128:512);  break;
+      case 512:  mTextureWidth = (dec?256:1024);  break;
+      case 1024:  mTextureWidth = (dec?512:1024);  break;
+      }
+
+      std::cout << "Setting mTextureWidth: " << mTextureWidth << std::endl;
+
+      updateFace();
+      updateScene();
+   }
+
+   /** Cycle to the next family in the set of available font families. */
+   void goToNextFamily()
+   {
+      mFamilyName = mFamilies[mNextFamily];
+      mNextFamily += 1;
+      if(mNextFamily >= mFamilies.size())
+      { mNextFamily = 0; }
+
+      std::cout << "New family: " << mFamilyName << std::endl;
+      updateFace();
+      updateScene();
+   }
+
+   void incLineSpacing(bool inc=true)
+   {
+      float increment(0.05f);
+      if(!inc)
+      { increment *= -1.0f; }
+
+      mLineSpacing += increment;
+
+      if(mLineSpacing < 0.0f)
+      {  mLineSpacing = 0.0f; }
+
+      std::cout << "Set line spacing to: " << mLineSpacing << std::endl;
+      updateScene();
+   }
+
+   void incMaxExtent(bool inc=true)
+   {
+      float increment(0.5f);
+      if(!inc)
+      { increment *= -1.0f; }
+
+      mMaxExtent += increment;
+
+      if(mMaxExtent < 0.0f)
+      { mMaxExtent = 0.0f; }
+
+      std::cout << "Set max extent to: " << mMaxExtent << std::endl;
+      updateScene();
+   }
+
+   void incGeoScale(bool inc=true)
+   {
+      float increment(0.05f);
+      if(!inc)
+      { increment *= -1.0f; }
+
+      mGeoScale += increment;
+
+      if(mGeoScale < 0.0f)
+      { mGeoScale = 0.0f; }
+
+      std::cout << "Set geo scale to: " << mGeoScale << std::endl;
+      updateScene();
+   }
+
+
+public:
+   OSG::NodeRefPtr            mRootNode;     /**< Root node for text geom. */
+   OSG::GeometryRefPtr        mTextGeom;     /**< Geom core for the text. */
+   OSG::ChunkMaterialRefPtr   mTextMat;      /**< Material for the text geom. */
+   OSG::TextureChunkRefPtr    mTextureChunk; /**< Texture chunk for the text material. */
+
+   OSG::TextTXFFace*          mFace;
+   std::string                mFamilyName;   /**< The name of the font family. */
+   std::vector<std::string>   mFamilies;
+   unsigned                   mNextFamily;   /**< Next text family to use. */
+   OSG::TextFace::Style       mStyle;
+
+   unsigned                   mTextGap;      /**< The gap between glyphs in pixels */
+   unsigned                   mTextureWidth; /**< The width of the texture in pixels */
+
+   float                      mLineSpacing;  /**< Spacing to use in the layout. */
+   float                      mMaxExtent;    /**< Maximum extent to use. */
+
+   float                      mGeoScale;     /**< Scale for geometry. */
+};
+
+TextStuff  gTextStuff;
+
+void printFontFamilies()
+{
+   std::vector<std::string> families;
+   OSG::TextFaceFactory::the().getFontFamilies(families);  // Get list of all families
+
+   std::cout << "--- Font Families ---\n";
+   for(unsigned i=0; i<families.size(); ++i)
+   {
+      std::cout << families[i] << std::endl;
+   }
+   std::cout << "---------------------\n";
+}
 
 int main(int argc, char* argv[])
 {
@@ -26,10 +263,14 @@ int main(int argc, char* argv[])
     gwin->setId(winid);
     gwin->init();
 
+    printFontFamilies();
+
     // load the scene
     OSG::NodePtr scene = OSG::Node::create();
+    scene->setCore(OSG::Group::create());
 
     inf::UiBuilder builder;
+    OSG::NodePtr ui_node = OSG::Node::create();
 
     //
     OSG::Color3f white(1,1,1);
@@ -43,8 +284,15 @@ int main(int argc, char* argv[])
     builder.buildRectangle(geom, OSG::Color3f(0.7,0.7,0.7),
                            OSG::Pnt2f(0,0), OSG::Pnt2f(10,10), 0.4, true);
 
-    scene->setCore(geom);
+    ui_node->setCore(geom);
+    scene->addChild(ui_node);
 
+
+    // Setup text sample
+    gTextStuff.initialize();
+    gTextStuff.updateFace();
+    gTextStuff.updateScene();
+    scene->addChild(gTextStuff.mRootNode);
 
     mgr = new OSG::SimpleSceneManager;
 
@@ -107,8 +355,37 @@ void keyboard(unsigned char k, int , int )
       }
       break;
 
+   case '[':
+      gTextStuff.incTextureSize(false);
+      break;
+   case ']':
+      gTextStuff.incTextureSize(true);
+      break;
+
+   case '<':
+      gTextStuff.incMaxExtent(false);
+      break;
+   case '>':
+      gTextStuff.incMaxExtent(true);
+      break;
+
+   case ',':
+      gTextStuff.incLineSpacing(false);
+      break;
+   case '.':
+      gTextStuff.incLineSpacing(true);
+      break;
+
+   case '{':
+      gTextStuff.incGeoScale(false);
+      break;
+   case '}':
+      gTextStuff.incGeoScale(true);
+      break;
+
+
    case 'f':
-      mgr->setNavigationMode(OSG::Navigator::FLY);
+      gTextStuff.goToNextFamily();
       break;
 
    case 'd':
