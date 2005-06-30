@@ -38,16 +38,20 @@ public:
     * @PARAM alpha   Uniform alpha to apply to all vert colors.
     * @PARAM filled  If true the rectangle is a filled tri list, else it is a line loop.
     */
-   void buildRectangle(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float alpha=1.0, bool filled=true);
+   void buildRectangleOutline(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float alpha=1.0);
 
    /** Build a 3D box.
     * @PARAM geom    The geometry to add to.
     * @PARAM minPt   Minimum pt on box.
     * @PARAM maxPt   Maximum pt on box.
-    * @PARAM depth   Depth of the box. (this depth is split symetrically across z=0, ie.[-(depth/2) ,depth/2]
+    * @PARAM frontDepth  Z value of the front surface
+    * @PARAM backDepth   Z value of the back surface.
     * @PARAM alpha   Uniform alpha to apply to all vert colors.
+    * @note If front and back depth are equal, then we only draw front facing surface.
     */
-   void buildBox(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float depth, float alpha=1.0f);
+   void buildRectangle(OSG::GeometryPtr geom, const OSG::Color3f color,
+                       const OSG::Pnt2f minPt, const OSG::Pnt2f maxPt,
+                       const float frontDepth=0, const float backDepth=0, const float alpha=1.0f);
 
    /** Build a 3D disc.
     * @PARAM geom    The geometry to add to.
@@ -60,6 +64,7 @@ public:
     * @PARAM endAngle    Ending angle in radians.
     * @PARAM frontDepth  Z value of the front surface
     * @PARAM backDepth   Z value of the back surface.
+    * @note If front and back depth are equal, then we only draw front facing surface.
     */
    void buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const OSG::Pnt2f center,
                   const float innerRad, const float outerRad, const unsigned numSegs, const float startAngle=0, const float endAngle=gmtl::Math::TWO_PI,
@@ -87,9 +92,17 @@ public:
    OSG::GeometryPtr createTextGeom();
 
    /** Replace the geomtetry in the area here.
-    * @todo: color, offset
+    * @note The font passed is used to update the geom texture for the glyphs.
     */
-   void buildText(OSG::GeometryPtr geom, UiBuilder::Font& font, std::string text, float scale=1.0f, float spacing=1.0f);
+   void buildText(OSG::GeometryPtr geom, UiBuilder::Font& font, std::string text, OSG::Vec2f offset=OSG::Vec2f(0,0),
+                  OSG::Color3f color=OSG::Color3f(1,1,1), float scale=1.0f, float spacing=1.0f);
+
+   /** Add text to the geometry.
+    * @note The font is NOT used to set the texture.  It must be the same as what you used to build the text geom.
+    */
+   void addText(OSG::GeometryPtr geom, UiBuilder::Font& font, std::string text, OSG::Vec2f offset=OSG::Vec2f(0,0),
+                  OSG::Color3f color=OSG::Color3f(1,1,1), float scale=1.0f, float spacing=1.0f);
+
 
    /** Get the size that the text will take up on screen. */
    OSG::Vec2f getTextSize(UiBuilder::Font& font, std::string text, float spacing=1.0f);

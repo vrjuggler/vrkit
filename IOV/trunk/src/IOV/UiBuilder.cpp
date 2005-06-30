@@ -87,7 +87,7 @@ OSG::GeometryPtr UiBuilder::createGeomGeo()
    return geo_core;
 }
 
-void UiBuilder::buildRectangle(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float alpha, bool filled)
+void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float alpha)
 {
    OSG::GeoPTypesPtr types = OSG::GeoPTypesUI8Ptr::dcast(geom->getTypes());
    OSG::GeoPLengthsPtr lens = OSG::GeoPLengthsUI32Ptr::dcast(geom->getLengths());
@@ -114,37 +114,21 @@ void UiBuilder::buildRectangle(OSG::GeometryPtr geom, OSG::Color3f color, OSG::P
               ul(minPt.x(), maxPt.y(), 0.0f), ur(maxPt.x(), maxPt.y(), 0.0f);
    OSG::Color4f used_color(color.red(), color.green(), color.blue(), alpha);
 
-   if(filled)
-   {
-      const unsigned num_verts(2*3);
+   const unsigned num_verts(4);
 
-      types->addValue(GL_TRIANGLES);
-      lens->addValue(num_verts);
-      verts->addValue(lr); verts->addValue(ur); verts->addValue(ul);
-      verts->addValue(ll); verts->addValue(lr); verts->addValue(ul);
-      for(unsigned i=0;i<num_verts;++i)
-      {
-         mfc->push_back(used_color);
-         norms->addValue(OSG::Vec3f(0,0,-1));
-      }
-   }
-   else  // Line strip
+   types->addValue(GL_LINE_STRIP);
+   lens->addValue(num_verts);
+   verts->addValue(lr); verts->addValue(ur);
+   verts->addValue(ul); verts->addValue(ll);
+   for(unsigned i=0;i<num_verts;++i)
    {
-      const unsigned num_verts(4);
-
-      types->addValue(GL_LINE_STRIP);
-      lens->addValue(num_verts);
-      verts->addValue(lr); verts->addValue(ur);
-      verts->addValue(ul); verts->addValue(ll);
-      for(unsigned i=0;i<num_verts;++i)
-      {
-         mfc->push_back(used_color);
-         norms->addValue(OSG::Vec3f(0,0,-1));
-      }
+      mfc->push_back(used_color);
+      norms->addValue(OSG::Vec3f(0,0,-1));
    }
 }
 
-void UiBuilder::buildBox(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float depth, float alpha)
+void UiBuilder::buildRectangle(OSG::GeometryPtr geom, const OSG::Color3f color, const OSG::Pnt2f minPt, const OSG::Pnt2f maxPt,
+                         const float frontDepth, const float backDepth, const float alpha)
 {
    OSG::GeoPTypesPtr types = OSG::GeoPTypesUI8Ptr::dcast(geom->getTypes());
    OSG::GeoPLengthsPtr lens = OSG::GeoPLengthsUI32Ptr::dcast(geom->getLengths());
@@ -162,6 +146,7 @@ void UiBuilder::buildBox(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f m
    assert(NULL != mfc);
 
    OSG::Color4f used_color(color.red(), color.green(), color.blue(), alpha);
+   bool only_front_flag = (frontDepth==backDepth);    // If front and back are the same, then only do front surface
 
    OSG::CPEditor types_ed(types);
    OSG::CPEditor lens_ed(lens);
@@ -169,22 +154,21 @@ void UiBuilder::buildBox(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f m
    OSG::CPEditor colors_ed(colors);
    OSG::CPEditor norms_ed(norms);
 
-   float z_offset(depth/2.0f);
-   OSG::Pnt3f corners[6];
-   corners[0].setValues(minPt.x(), minPt.y(), z_offset); // llf
-   corners[1].setValues(maxPt.x(), minPt.y(), z_offset); // lrf
-   corners[2].setValues(minPt.x(), maxPt.y(), z_offset); // ulf
-   corners[3].setValues(maxPt.x(), maxPt.y(), z_offset); // urf
-   corners[4].setValues(minPt.x(), minPt.y(), -z_offset); // llb
-   corners[5].setValues(maxPt.x(), minPt.y(), -z_offset); // lrb
-   corners[6].setValues(minPt.x(), maxPt.y(), -z_offset); // ulb
-   corners[7].setValues(maxPt.x(), maxPt.y(), -z_offset); // urb
+   OSG::Pnt3f corners[8];
+   corners[0].setValues(minPt.x(), minPt.y(), frontDepth); // llf
+   corners[1].setValues(maxPt.x(), minPt.y(), frontDepth); // lrf
+   corners[2].setValues(minPt.x(), maxPt.y(), frontDepth); // ulf
+   corners[3].setValues(maxPt.x(), maxPt.y(), frontDepth); // urf
+   corners[4].setValues(minPt.x(), minPt.y(), backDepth); // llb
+   corners[5].setValues(maxPt.x(), minPt.y(), backDepth); // lrb
+   corners[6].setValues(minPt.x(), maxPt.y(), backDepth); // ulb
+   corners[7].setValues(maxPt.x(), maxPt.y(), backDepth); // urb
 
    #define ADD_TRI(a,b,c) {                   \
       OSG::Vec3f e1 = corners[b]-corners[a];  \
       OSG::Vec3f e2 = corners[c]-corners[a];  \
       OSG::Vec3f norm = e1.cross(e2);         \
-      norm.normalize();                         \
+      norm.normalize();                       \
       verts->addValue(corners[a]);            \
       verts->addValue(corners[b]);            \
       verts->addValue(corners[c]);            \
@@ -200,11 +184,14 @@ void UiBuilder::buildBox(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f m
    lens->addValue(num_verts);
 
    ADD_SIDE(0,1,3,2);
-   ADD_SIDE(1,5,7,3);
-   ADD_SIDE(5,4,6,7);
-   ADD_SIDE(4,0,2,6);
-   ADD_SIDE(4,5,1,0);
-   ADD_SIDE(2,3,7,6);
+   if(!only_front_flag)
+   {
+      ADD_SIDE(1,5,7,3);
+      ADD_SIDE(5,4,6,7);
+      ADD_SIDE(4,0,2,6);
+      ADD_SIDE(4,5,1,0);
+      ADD_SIDE(2,3,7,6);
+   }
 
    #undef ADD_SIDE
    #undef ADD_TRI
@@ -281,6 +268,10 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const
       // Early abort if we only want one face
       if((1==strip) && only_front_flag)
       {  break; }
+
+      // Skip inner if inner rad is 0
+      if((0.0 == innerRad) && (3 == strip))
+      { continue; }
 
       // Setup the correct source data to use for this strip
       switch(strip)
@@ -423,10 +414,12 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
    OSG::GeometryPtr        text_geom = OSG::Geometry::create();
    OSG::ChunkMaterialPtr   text_mat = OSG::ChunkMaterial::create();
    OSG::TextureChunkPtr    texture_chunk = OSG::TextureChunk::create();
+   OSG::BlendChunkPtr      blend_chunk = OSG::BlendChunk::create();
 
    OSG::CPEditor tge(text_geom);
    OSG::CPEditor tme(text_mat);
    OSG::CPEditor tce(texture_chunk);
+   OSG::CPEditor bce(blend_chunk);
 
    // XXX: Setup a default face to use
 
@@ -445,7 +438,6 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
    texture_chunk->setMagFilter(GL_LINEAR);
    texture_chunk->setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
    texture_chunk->setEnvMode(GL_MODULATE);
-   texture_chunk->setInternalFormat(GL_INTENSITY);
 
    OSG::MaterialChunkPtr mat_chunk = OSG::MaterialChunk::create();
    OSG::beginEditCP(mat_chunk);
@@ -462,12 +454,17 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
    // -- Polygon offset -- //
    OSG::PolygonChunkPtr poly_chunk = OSG::PolygonChunk::create();
    OSG::CPEditor pce(poly_chunk);
-   //poly_chunk->setOffsetFactor(-1.0f);
-   //poly_chunk->setOffsetBias(-1.0f);
+   poly_chunk->setOffsetFactor(-1.0f);
+   poly_chunk->setOffsetBias(-1.0f);
+   poly_chunk->setOffsetFill(true);
+
+   blend_chunk->setSrcFactor(GL_SRC_ALPHA);
+   blend_chunk->setDestFactor(GL_ONE_MINUS_SRC_ALPHA);
 
    text_mat->addChunk(texture_chunk);
    text_mat->addChunk(mat_chunk);
    text_mat->addChunk(poly_chunk);
+   text_mat->addChunk(blend_chunk);
 
    text_geom->setMaterial(text_mat);
 
@@ -475,7 +472,8 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
 }
 
 void UiBuilder::buildText( OSG::GeometryPtr geom, UiBuilder::Font& font,
-                           std::string text, float scale, float spacing)
+                           std::string text, OSG::Vec2f offset,
+                           OSG::Color3f color, float scale, float spacing)
 {
    OSG::TextLayoutResult layout_result;
    OSG::TextLayoutParam layout_param;
@@ -485,9 +483,35 @@ void UiBuilder::buildText( OSG::GeometryPtr geom, UiBuilder::Font& font,
    splitStr(text,"\n",std::back_inserter(lines));
 
    font.mFace->layout(lines, layout_param, layout_result);
+   font.mFace->fillGeo(geom, layout_result, scale, offset, color);
 
-   font.mFace->fillGeo(geom, layout_result, scale);
+   OSG::ChunkMaterialPtr mat = OSG::ChunkMaterialPtr::dcast(geom->getMaterial());
+   vprASSERT(OSG::NullFC != mat);
+
+   OSG::StateChunkPtr tex_state_chunk = mat->find(OSG::TextureChunk::getClassType());
+   OSG::TextureChunkPtr tex_chunk = OSG::TextureChunkPtr::dcast(tex_state_chunk);
+   vprASSERT(OSG::NullFC != tex_chunk);
+
+   OSG::CPEditor tce(tex_chunk);
+   OSG::ImagePtr face_image = font.mFace->getTexture();
+   tex_chunk->setImage(face_image);
 }
+
+void UiBuilder::addText( OSG::GeometryPtr geom, UiBuilder::Font& font,
+                         std::string text, OSG::Vec2f offset,
+                         OSG::Color3f color, float scale, float spacing)
+{
+   OSG::TextLayoutResult layout_result;
+   OSG::TextLayoutParam layout_param;
+   layout_param.spacing = spacing;
+
+   std::vector<std::string> lines;
+   splitStr(text,"\n",std::back_inserter(lines));
+
+   font.mFace->layout(lines, layout_param, layout_result);
+   font.mFace->addToGeom(geom, layout_result, scale, offset, color);
+}
+
 
 OSG::Vec2f UiBuilder::getTextSize(UiBuilder::Font& font, std::string text, float spacing)
 {
