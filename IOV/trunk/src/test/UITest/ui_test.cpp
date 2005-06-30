@@ -48,6 +48,41 @@ void splitStr(
    }
 }
 
+
+class StatusPanel
+{
+public:
+   /** The text for the header. */
+   void setHeaderText(std::string header);
+
+   /** Set text for the control section of the panel. */
+   void setControlText(std::string text);
+
+   /** Add another message to the status panel. */
+   void addStatusMessage(std::string msg);
+
+protected:
+   void updatePanelScene();
+
+protected:
+
+};
+
+void StatusPanel::setHeaderText(std::string header)
+{
+}
+
+void StatusPanel::setControlText(std::string text)
+{
+
+}
+
+void StatusPanel::addStatusMessage(std::string msg)
+{
+
+}
+
+
 /** Little wrapper for holding text data. */
 class TextStuff
 {
@@ -108,8 +143,8 @@ public:
       OSG::MaterialChunkPtr mat_chunk = OSG::MaterialChunk::create();
       OSG::beginEditCP(mat_chunk);
       {
-         mat_chunk->setAmbient (OSG::Color4f(1.f, 1.f, 1.f, 1.f));
-         mat_chunk->setDiffuse (OSG::Color4f(1.f, 1.f, 1.f, 1.f));
+         mat_chunk->setAmbient (OSG::Color4f(1.f, 0.f, 0.f, 1.f));
+         mat_chunk->setDiffuse (OSG::Color4f(1.f, 0.f, 0.f, 1.f));
          mat_chunk->setEmission(OSG::Color4f(0.f, 0.f, 0.f, 1.f));
          mat_chunk->setSpecular(OSG::Color4f(0.f, 0.f, 0.f, 1.f));
          mat_chunk->setShininess(0);
@@ -327,28 +362,50 @@ int main(int argc, char* argv[])
     scene->setCore(OSG::Group::create());
 
     inf::UiBuilder builder;
-    OSG::NodePtr ui_node = OSG::Node::create();
+    OSG::NodePtr ui_group = OSG::Node::create();
+    ui_group->setCore(OSG::Group::create());
+
+    OSG::NodePtr panel_node = OSG::Node::create();
 
     //
     OSG::Color3f white(1,1,1);
 
-    OSG::GeometryPtr geom = builder.createGeomGeo();
-    builder.buildBox(geom, white,OSG::Pnt2f(1,1), OSG::Pnt2f(2,9), 0.5f);  // left
-    //builder.buildBox(geom, white,OSG::Pnt2f(8,1), OSG::Pnt2f(9,9), 0.5f);  // right
-    //builder.buildBox(geom, white,OSG::Pnt2f(1,8), OSG::Pnt2f(9,9), 0.5f);  // top
-    //builder.buildBox(geom, white,OSG::Pnt2f(1,1), OSG::Pnt2f(9,2), 0.5f);  // bottom
-
-    builder.buildRectangle(geom, OSG::Color3f(0.7,0.7,0.7),
+    OSG::GeometryPtr pan_geom = builder.createGeomGeo();
+    builder.buildBox(pan_geom, white,OSG::Pnt2f(1,1), OSG::Pnt2f(2,9), 0.5f);  // left
+    //builder.buildBox(pan_geom, white,OSG::Pnt2f(8,1), OSG::Pnt2f(9,9), 0.5f);  // right
+    //builder.buildBox(pan_geom, white,OSG::Pnt2f(1,8), OSG::Pnt2f(9,9), 0.5f);  // top
+    //builder.buildBox(pan_geom, white,OSG::Pnt2f(1,1), OSG::Pnt2f(9,2), 0.5f);  // bottom
+    builder.buildRectangle(pan_geom, OSG::Color3f(0.7,0.7,0.7),
                            OSG::Pnt2f(0,0), OSG::Pnt2f(10,10), 0.4, true);
 
-    ui_node->setCore(geom);
-    scene->addChild(ui_node);
+    builder.buildDisc(pan_geom,  OSG::Color3f(0.0, 0.7, 0.2), OSG::Pnt2f(-5,4),
+                      0.5, 2.0, 17, 0, gmtl::Math::PI_OVER_2, 0.5, -0.5, true, 1.0f);
+
+    builder.buildDisc(pan_geom,  OSG::Color3f(0.0, 0.2, 0.8), OSG::Pnt2f(-5,-4),
+                      0.0, 1.5, 32, 0, gmtl::Math::TWO_PI, 0.5, -0.5, true, 1.0f);
+
+    builder.buildDisc(pan_geom,  OSG::Color3f(0.5, 0.0, 0.8), OSG::Pnt2f(-8,0),
+                      0.0, 1.5, 32, 0, gmtl::Math::TWO_PI, 0, 0, true, 1.0f);
+
+
+
+    panel_node->setCore(pan_geom);
+    ui_group->addChild(panel_node);
+
+    OSG::GeometryPtr text_geom = builder.createTextGeom();
+    inf::UiBuilder::Font font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
+    builder.buildText(text_geom, font, "This is\na\test.", 1.0f, 1.0f);
+    OSG::NodePtr text_node = OSG::Node::create();
+    text_node->setCore(text_geom);
+    ui_group->addChild(text_node);
+
+    scene->addChild(ui_group);
 
     // Setup text sample
     gTextStuff.initialize();
     gTextStuff.updateFace();
     gTextStuff.updateScene();
-    scene->addChild(gTextStuff.mRootNode);
+    //scene->addChild(gTextStuff.mRootNode);
 
     mgr = new OSG::SimpleSceneManager;
 
