@@ -162,6 +162,9 @@
 				RelativePath="..\..\src\Iov\Slave\SlaveViewer.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\UiBuilder.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\User.cpp">
 			</File>
 			<File
@@ -242,6 +245,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Slave\SlaveViewer.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\UiBuilder.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\User.h">
