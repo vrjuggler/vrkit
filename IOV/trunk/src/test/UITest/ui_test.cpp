@@ -106,6 +106,7 @@ protected:
    float    mPanWidth, mPanHeight;  /**< Panel size in OpenSG units. */
    float    mBorderWidth;           /**< Width of the border in real units. */
 
+   // -- Percentages -- //
    float    mTitleHeight;           /**< Height to make the titles. */
 
    float    mStatusHeight;          /**< Size of the status section. */
@@ -172,8 +173,8 @@ void StatusPanel::initialize()
    mPanelGeomNode->setCore(mPanelGeomCore);
    mTextGeomNode->setCore(mTextGeomCore);
 
-   mRootPanelNode->setCore(mTextGeomCore);
-   mRootPanelNode->setCore(mPanelGeomCore);
+   mRootPanelNode->addChild(mPanelGeomNode);
+   mRootPanelNode->addChild(mTextGeomNode);
 
    mFont = new inf::UiBuilder::Font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
 }
@@ -235,13 +236,12 @@ void StatusPanel::updatePanelScene()
    mBuilder.buildRoundedRectangle(mPanelGeomCore, mBgColor,     panel_ll, panel_ur, 0.0, inner_rad+(mBorderWidth*2),
                                  num_segs, true,  0,      0, mBgAlpha);
 
+   const float text_spacing(0.7);
+   float abs_title_height = mTitleHeight*mPanHeight;
+   const float title_indent(0.1 * mPanWidth);
+   OSG::Vec2f header_title_pos(title_indent,mPanHeight-abs_title_height);
 
-   /*
-   OSG::Pnt2f header_title_pos(
-   builder.buildText(text_geom, font, "This is\na\ntest.", OSG::Vec2f(3,8), text_color, 1.0f, 1.0f);
-   builder.addText(text_geom, font, "More text here.\nIn YELLOW!!!", OSG::Vec2f(2,5), OSG::Color3f(1,1,0), 1.0f, 1.0f);
-   */
-
+   mBuilder.buildText(mTextGeomCore.get(), *mFont, mHeaderTitle, header_title_pos, mTitleColor, abs_title_height, text_spacing);
 
 }
 
