@@ -22,12 +22,13 @@
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
 
+#include "GeometryHighlightTraverser.h"
+
 
 namespace inf
 {
 
-typedef OSG::CoredNodePtr<OSG::Geometry>      CoredGeomPtr;
-typedef OSG::CoredNodePtr<OSG::MaterialGroup> CoredMatGroupPtr;
+typedef OSG::CoredNodePtr<OSG::Geometry> CoredGeomPtr;
 
 class PointGrabPlugin
    : public inf::Plugin
@@ -90,6 +91,8 @@ private:
       std::vector<int>       mButtonVec;
    };
 
+   void changeHighlightMaterial(OSG::RefPtr<OSG::ChunkMaterialPtr> newMat);
+
    void updateHighlight(OSG::NodePtr highlightNode);
 
    OSG::RefPtr<OSG::ChunkMaterialPtr> createShader(const std::string& vertexShader,
@@ -123,11 +126,12 @@ private:
    bool mGrabbing;
    inf::CoredTransformPtr mIntersectedObj;
 
+   GeometryHighlightTraverser mGeomTraverser;
    OSG::Color3f mIntersectColor;
    OSG::Color3f mGrabColor;
 
    bool mUsingShader;
-   inf::CoredMatGroupPtr              mCoredHighlightNode;
+   inf::CoredGeomPtr                  mCoredHighlightNode;
    OSG::GeoPositions3fPtr             mHighlightPoints;
    OSG::RefPtr<OSG::ChunkMaterialPtr> mIsectHighlightMaterial;
    OSG::RefPtr<OSG::ChunkMaterialPtr> mGrabHighlightMaterial;

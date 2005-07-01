@@ -32,6 +32,7 @@
 #include <IOV/WandInterface.h>
 #include <IOV/ViewPlatform.h>
 #include <IOV/Util/Exceptions.h>
+
 #include "PointGrabPlugin.h"
 
 
@@ -199,13 +200,7 @@ void PointGrabPlugin::init(ViewerPtr viewer)
       OSG::endEditCP(geo);
       OSG::addRefCP(geo);
 
-      inf::CoredGeomPtr geom_node = inf::CoredGeomPtr(geo);
-
-      mCoredHighlightNode =
-         inf::CoredMatGroupPtr(OSG::MaterialGroup::create());
-      OSG::beginEditCP(mCoredHighlightNode);
-         mCoredHighlightNode.node()->addChild(geom_node);
-      OSG::endEditCP(mCoredHighlightNode);
+      mCoredHighlightNode = inf::CoredGeomPtr(geo);
    }
 }
 
@@ -287,42 +282,44 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
             // XXX: Is there any cleaner way to do this?
             OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
 
+            mGeomTraverser.reset();
+
             if ( mUsingShader )
             {
-               OSG::NodePtr highlight_parent =
-                  mCoredHighlightNode.node()->getParent();
-
-               if ( highlight_parent != mIntersectedObj.node() )
-               {
-                  // XXX: Is there a cleaner (or shorter) way to do this?
-                  while ( mCoredHighlightNode.node()->getNChildren() > 0 )
-                  {
-                     mCoredHighlightNode.node()->subChild(0);
-                  }
-                  mCoredHighlightNode.node()->addChild(
-                     OSG::deepCloneTree(lit_node)
-                  );
-               }
+               OSG::traverse(lit_node,
+                             OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
+                                OSG::Action::ResultE,
+                                GeometryHighlightTraverser,
+                                OSG::NodePtr
+                             >(&mGeomTraverser,
+                               &GeometryHighlightTraverser::enter));
             }
-
-            OSG::beginEditCP(mCoredHighlightNode,
-                             OSG::Geometry::MaterialFieldMask);
-               mCoredHighlightNode->setMaterial(mIsectHighlightMaterial);
-            OSG::endEditCP(mCoredHighlightNode,
-                           OSG::Geometry::MaterialFieldMask);
-
-            OSG::beginEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
-               mIntersectedObj.node()->addChild(mCoredHighlightNode);
-            OSG::endEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
-
-            if ( ! mUsingShader )
+            else
             {
+               OSG::traverse(mCoredHighlightNode,
+                             OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
+                                OSG::Action::ResultE,
+                                GeometryHighlightTraverser,
+                                OSG::NodePtr
+                             >(&mGeomTraverser,
+                               &GeometryHighlightTraverser::enter));
+               OSG::beginEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
+                  mIntersectedObj.node()->addChild(mCoredHighlightNode);
+               OSG::endEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
                updateHighlight(lit_node);
             }
+
+            // XXX: I wish that there was a way to do this that would preserve
+            // the reference count for mIsectHighlightMaterial...
+            OSG::RefPtr<OSG::MaterialPtr> highlight_mat(
+               mIsectHighlightMaterial.get()
+            );
+            mGeomTraverser.addHighlightMaterial(highlight_mat);
          }
          // Otherwise, we are intersecting nothing.
          else
          {
+            mGeomTraverser.removeHighlightMaterial();
             mIntersecting = false;
          }
       }
@@ -336,9 +333,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       mGrabSound.trigger();
       mGrabbing   = true;
 
-      OSG::beginEditCP(mCoredHighlightNode, OSG::Geometry::MaterialFieldMask);
-         mCoredHighlightNode->setMaterial(mGrabHighlightMaterial);
-      OSG::endEditCP(mCoredHighlightNode, OSG::Geometry::MaterialFieldMask);
+      changeHighlightMaterial(mGrabHighlightMaterial);
 
       // m_wand_M_obj is the offset between the wand and the grabbed object's
       // center point:
@@ -368,11 +363,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       // intersecting state and clear mIntersectedObj.
       if ( mIntersectedObj.node() != OSG::NullFC )
       {
-         OSG::beginEditCP(mCoredHighlightNode,
-                          OSG::Geometry::MaterialFieldMask);
-            mCoredHighlightNode->setMaterial(mIsectHighlightMaterial);
-         OSG::endEditCP(mCoredHighlightNode, OSG::Geometry::MaterialFieldMask);
-
+         changeHighlightMaterial(mIsectHighlightMaterial);
          gmtl::identity(m_wand_M_obj);
       }
    }
@@ -516,6 +507,15 @@ PointGrabPlugin::PointGrabPlugin()
    /* Do nothing. */ ;
 }
 
+void PointGrabPlugin::
+changeHighlightMaterial(OSG::RefPtr<OSG::ChunkMaterialPtr> newMat)
+{
+   // XXX: I wish that there was a way to do this that would preserve the
+   // reference count for newMat...
+   OSG::RefPtr<OSG::MaterialPtr> highlight_mat(newMat.get());
+   mGeomTraverser.changeHighlightMaterial(highlight_mat);
+}
+
 // The implementation of this helper method is adapted from
 // OSG::SimpleSceneManager::updateHighlight() in OpenSG 1.4.0.
 void PointGrabPlugin::updateHighlight(OSG::NodePtr highlightNode)
@@ -604,8 +604,6 @@ PointGrabPlugin::createShader(const std::string& vertexShader,
          material->addChunk(blend_chunk);
       OSG::endEditCP(material);
 
-      mCoredHighlightNode =
-         inf::CoredMatGroupPtr(OSG::MaterialGroup::create());
       mUsingShader = true;
 
       return material;
