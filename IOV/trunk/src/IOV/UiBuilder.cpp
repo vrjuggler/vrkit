@@ -60,12 +60,12 @@ OSG::GeometryPtr UiBuilder::createGeomGeo()
    blend_chunk->setSrcFactor(GL_SRC_ALPHA);
    blend_chunk->setDestFactor(GL_ONE_MINUS_SRC_ALPHA);
 
-   depth_chunk->setEnable(true);
-
+   depth_chunk->setEnable(true);   
+   
    OSG::beginEditCP(mat);
       mat->addChunk(mat_chunk);
       mat->addChunk(blend_chunk);
-      mat->addChunk(depth_chunk);
+      mat->addChunk(depth_chunk);      
    OSG::endEditCP(mat);
 
    // XXX: Handle transparency
@@ -178,7 +178,7 @@ void UiBuilder::buildRectangle(OSG::GeometryPtr geom, const OSG::Color3f color, 
 
    #define ADD_SIDE(a,b,c,d) ADD_TRI(a,b,c);  ADD_TRI(c,d,a)
 
-   const unsigned num_verts(3*6*2);
+   const unsigned num_verts((3*2)*(only_front_flag?1:6));
 
    types->addValue(GL_TRIANGLES);
    lens->addValue(num_verts);
@@ -297,7 +297,7 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const
          break;
       }
 
-      // Ad the geometry data
+      // Add the geometry data
       types->addValue(GL_TRIANGLE_STRIP);
       lens->addValue(num_verts_per_strip);
       for(unsigned i=0; i<(*bottom_verts).size(); ++i)
