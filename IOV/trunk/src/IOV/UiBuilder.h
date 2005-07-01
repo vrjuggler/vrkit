@@ -53,6 +53,23 @@ public:
                        const OSG::Pnt2f minPt, const OSG::Pnt2f maxPt,
                        const float frontDepth=0, const float backDepth=0, const float alpha=1.0f);
 
+   /** Build a 3D box with rounded corners.
+    * @PARAM geom    The geometry to add to.
+    * @PARAM minPt   Minimum pt on box.
+    * @PARAM maxPt   Maximum pt on box.
+    * @PARAM innerRad Inner radius.
+    * @PARAM outerRad Outer radius.
+    * @PARAM numSegs  Number of segments to use.
+    * @PARAM frontDepth  Z value of the front surface
+    * @PARAM backDepth   Z value of the back surface.
+    * @PARAM alpha   Uniform alpha to apply to all vert colors.
+    * @note If front and back depth are equal, then we only draw front facing surface.
+    */
+   void buildRoundedRectangle(OSG::GeometryPtr geom, const OSG::Color3f color,
+                              const OSG::Pnt2f minPt, const OSG::Pnt2f maxPt,
+                              const float innerRad, const float outerRad, const unsigned numSegs, const bool filled,
+                              const float frontDepth=0, const float backDepth=0, const float alpha=1.0f);
+
    /** Build a 3D disc.
     * @PARAM geom    The geometry to add to.
     * @PARAM color   Color for the geometry

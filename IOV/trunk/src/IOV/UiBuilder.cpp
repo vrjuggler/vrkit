@@ -60,12 +60,12 @@ OSG::GeometryPtr UiBuilder::createGeomGeo()
    blend_chunk->setSrcFactor(GL_SRC_ALPHA);
    blend_chunk->setDestFactor(GL_ONE_MINUS_SRC_ALPHA);
 
-   depth_chunk->setEnable(true);   
-   
+   depth_chunk->setEnable(true);
+
    OSG::beginEditCP(mat);
       mat->addChunk(mat_chunk);
       mat->addChunk(blend_chunk);
-      mat->addChunk(depth_chunk);      
+      mat->addChunk(depth_chunk);
    OSG::endEditCP(mat);
 
    // XXX: Handle transparency
@@ -197,6 +197,35 @@ void UiBuilder::buildRectangle(OSG::GeometryPtr geom, const OSG::Color3f color, 
    #undef ADD_TRI
 }
 
+void UiBuilder::buildRoundedRectangle(OSG::GeometryPtr geom, const OSG::Color3f color,
+                                      const OSG::Pnt2f minPt, const OSG::Pnt2f maxPt,
+                                      const float innerRad, const float outerRad, const unsigned numSegs, const bool filled,
+                                      const float frontDepth, const float backDepth, const float alpha)
+{
+   OSG::Pnt2f ul_corner(minPt[0], maxPt[1]), lr_corner(maxPt[0], minPt[1]);
+
+   const float pi(gmtl::Math::PI);
+
+   // Build the corners
+   buildDisc(geom, color, maxPt,     innerRad, outerRad, numSegs, pi*0.0f, pi*0.5f, frontDepth, backDepth, true, alpha);
+   buildDisc(geom, color, ul_corner, innerRad, outerRad, numSegs, pi*0.5f, pi*1.0f, frontDepth, backDepth, true, alpha);
+   buildDisc(geom, color, minPt,     innerRad, outerRad, numSegs, pi*1.0f, pi*1.5f, frontDepth, backDepth, true, alpha);
+   buildDisc(geom, color, lr_corner, innerRad, outerRad, numSegs, pi*1.5f, pi*2.0f, frontDepth, backDepth, true, alpha);
+
+   // Build edges
+   buildRectangle(geom, color, OSG::Pnt2f(minPt.x()-outerRad,minPt.y()), OSG::Pnt2f(maxPt.x()-innerRad,maxPt.y()), frontDepth, backDepth, alpha);  //left
+   buildRectangle(geom, color, OSG::Pnt2f(maxPt.x()+innerRad,minPt.y()), OSG::Pnt2f(maxPt.x()+outerRad,maxPt.y()), frontDepth, backDepth, alpha);  //right
+   buildRectangle(geom, color, OSG::Pnt2f(minPt.x(),minPt.y()-outerRad), OSG::Pnt2f(maxPt.x(),maxPt.y()-innerRad), frontDepth, backDepth, alpha);  //bottom
+   buildRectangle(geom, color, OSG::Pnt2f(minPt.x(),minPt.y()+innerRad), OSG::Pnt2f(maxPt.x(),maxPt.y()+outerRad), frontDepth, backDepth, alpha);  //top
+
+   // Build center (if needed)
+   if(filled)
+   {
+      buildRectangle(geom, color, minPt, maxPt, frontDepth, backDepth, alpha);
+   }
+
+}
+
 void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const OSG::Pnt2f center,
                           const float innerRad, const float outerRad, const unsigned numSegs,
                           const float startAngle, const float endAngle,
@@ -269,7 +298,7 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const
       if((1==strip) && only_front_flag)
       {  break; }
 
-      // Skip inner if inner rad is 0
+      // Skip inner if inner rad is 0 (since it would just be a bunch of tris on top of each other)
       if((0.0 == innerRad) && (3 == strip))
       { continue; }
 
@@ -311,11 +340,15 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const
          if(i!=((*bottom_verts).size()-1))
          {
             OSG::Vec3f next_bottom_vert((*bottom_verts)[i+1].x(),(*bottom_verts)[i+1].y(), bottom_depth);
+            if(next_bottom_vert == bottom_vert)    // Case with verts on top of each other at center of disc
+            { next_bottom_vert = OSG::Vec3f((*top_verts)[i+1].x(),(*top_verts)[i+1].y(), top_depth); }
             normal = (top_vert-bottom_vert).cross(next_bottom_vert-top_vert);
          }
          else
          {
             OSG::Vec3f prev_bottom_vert((*bottom_verts)[i-1].x(), (*bottom_verts)[i-1].y(), bottom_depth);
+            if(prev_bottom_vert == bottom_vert)    // Case with verts on top of each other at center of disc
+            { prev_bottom_vert = OSG::Vec3f((*top_verts)[i-1].x(),(*top_verts)[i-1].y(), top_depth); }
             normal = (top_vert-prev_bottom_vert).cross(bottom_vert-top_vert);
          }
          normal.normalize();

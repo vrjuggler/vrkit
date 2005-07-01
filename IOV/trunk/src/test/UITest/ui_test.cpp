@@ -145,40 +145,32 @@ int main(int argc, char* argv[])
     builder.buildRectangle(pan_geom, white, OSG::Pnt2f(1.0,8.5), OSG::Pnt2f(9.0,9.0), 0.3, -0.2);  // top
     builder.buildRectangle(pan_geom, white, OSG::Pnt2f(1.0,1.0), OSG::Pnt2f(9.0,1.5), 0.3, -0.2);  // bottom
     */
-    
-    builder.buildDisc(pan_geom,  OSG::Color3f(0.0, 0.7, 0.2), OSG::Pnt2f(-5,4),
-                      0.5, 2.0, 17, 0, gmtl::Math::PI_OVER_2, 0.5, -0.5, true, 1.0f);
-    /*
-    builder.buildDisc(pan_geom,  OSG::Color3f(0.0, 0.7, 0.7), OSG::Pnt2f(-7,3),
-                      0, 1.7, 17, 0, gmtl::Math::PI_OVER_2, 0.5, -0.5, true, 1.0f);
 
-    
-    builder.buildDisc(pan_geom,  OSG::Color3f(0.0, 0.2, 0.8), OSG::Pnt2f(-5,-4),
-                      0.0, 1.5, 32, 0, gmtl::Math::TWO_PI, 0.5, -0.5, true, 1.0f);
-    */
-
+    builder.buildDisc(pan_geom,  OSG::Color3f(0.0, 0.7, 0.2), OSG::Pnt2f(-5,4), 0.5, 2.0, 17, 0, gmtl::Math::PI_OVER_2, 0.5, -0.5, true, 1.0f);
+    //builder.buildDisc(pan_geom,  OSG::Color3f(0.0, 0.7, 0.7), OSG::Pnt2f(-7,3), 0, 1.7, 17, 0, gmtl::Math::PI_OVER_2, 0.5, -0.5, true, 1.0f);
+    //builder.buildDisc(pan_geom,  OSG::Color3f(0.0, 0.2, 0.8), OSG::Pnt2f(-5,-4),0.0, 1.5, 32, 0, gmtl::Math::TWO_PI, 0.5, -0.5, true, 1.0f);
+    //builder.buildDisc(pan_geom,  OSG::Color3f(0.5, 0.0, 0.8), OSG::Pnt2f(-8,0), 0.0, 1.5, 32, 0, gmtl::Math::PI *0.75 , 0, 0, true, 1.0f);
     //*/
-    builder.buildDisc(pan_geom,  OSG::Color3f(0.5, 0.0, 0.8), OSG::Pnt2f(-8,0),
-                      0.0, 1.5, 32, 0, gmtl::Math::PI *0.75 , 0, 0, true, 1.0f);
-        
-    
+
+
     OSG::Color3f bg_color(0.7, 0.7, 0.7);
     float bg_alpha(0.4);
-    float q1(gmtl::Math::PI_OVER_2), q2(gmtl::Math::PI), q3(gmtl::Math::PI+gmtl::Math::PI_OVER_2),
-          q4(gmtl::Math::TWO_PI);
-    
+
     /*
     builder.buildRectangle(pan_geom, bg_color, OSG::Pnt2f(0,1), OSG::Pnt2f(10,9), 0,0, bg_alpha);
     builder.buildRectangle(pan_geom, bg_color, OSG::Pnt2f(1,0), OSG::Pnt2f(9,1),  0,0, bg_alpha);
     builder.buildRectangle(pan_geom, bg_color, OSG::Pnt2f(1,9), OSG::Pnt2f(9,10), 0,0, bg_alpha);
     */
-    
 
-    builder.buildDisc(pan_geom, bg_color, OSG::Pnt2f(9,9), 0, 1, 16,  0, q1, 0,0, false, bg_alpha);  // ur
-    builder.buildDisc(pan_geom, bg_color, OSG::Pnt2f(1,9), 0, 1, 16, q1, q2, 0,0, false, bg_alpha);  // ul
-    builder.buildDisc(pan_geom, bg_color, OSG::Pnt2f(1,1), 0, 1, 16, q2, q3, 0,0, false, bg_alpha);  // ll
-    builder.buildDisc(pan_geom, bg_color, OSG::Pnt2f(9,1), 0, 1, 16, q3, q4, 0,0, false, bg_alpha);  // lr
-    
+
+    //builder.buildRoundedRectangle(pan_geom, white, OSG::Pnt2f(0,0), OSG::Pnt2f(10,10), 0, 1, 8, true, 0, -0.5, 1.0);
+
+    /*
+    builder.buildRoundedRectangle(pan_geom, OSG::Color3f(0,1,0), OSG::Pnt2f(0,15), OSG::Pnt2f(10,20), 0.25, 0.75, 8, false, 0, -0.5, 1.0);
+
+    builder.buildRoundedRectangle(pan_geom, OSG::Color3f(0,0.2,0.6), OSG::Pnt2f(15,0), OSG::Pnt2f(25,10), 0, 0.75, 8, true, 0, 0, 1.0);
+    */
+
 
     panel_node->setCore(pan_geom);
     ui_group->addChild(panel_node);
@@ -186,7 +178,7 @@ int main(int argc, char* argv[])
     OSG::NodePtr norm_node = OSG::calcVertexNormalsGeo(pan_geom, 0.2f);
     OSG::GeometryPtr norm_geo = OSG::GeometryPtr::dcast(norm_node->getCore());
     OSG:SimpleMaterialPtr norm_mat = SimpleMaterial::create();
-    
+
     norm_mat->setLit(false);
     norm_mat->setDiffuse(OSG::Color3f(1,1,1));
     norm_geo->setMaterial(norm_mat);
