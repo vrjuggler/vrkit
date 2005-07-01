@@ -56,6 +56,18 @@ void splitStr(
 class StatusPanel
 {
 public:
+   StatusPanel();
+
+   /** Initialize scene graph, fonts and everything else that is used. */
+   void initialize();
+
+   OSG::NodeRefPtr getPanelRoot()
+   { return mRootPanelNode; }
+
+   void setHeaderTitle(std::string txt);
+   void setCenterTitle(std::string txt);
+   void setBottomTitle(std::string txt);
+
    /** The text for the header. */
    void setHeaderText(std::string header);
 
@@ -65,24 +77,171 @@ public:
    /** Add another message to the status panel. */
    void addStatusMessage(std::string msg);
 
-protected:
    void updatePanelScene();
 
 protected:
+   inf::UiBuilder        mBuilder;
+
+   OSG::NodeRefPtr       mRootPanelNode;
+   OSG::NodeRefPtr       mPanelGeomNode;
+   OSG::GeometryRefPtr   mPanelGeomCore;
+   OSG::NodeRefPtr       mTextGeomNode;
+   OSG::GeometryRefPtr   mTextGeomCore;
+
+   inf::UiBuilder::Font* mFont;
+
+   std::string    mHeaderTitle;
+   std::string    mCenterTitle;
+   std::string    mBottomTitle;
+
+   std::string    mHeaderText;
+   std::string    mCenterText;
+   std::deque<std::string> mStatusLines;
+
+   /** Panel sizes are in OpenSG units.
+    * Everything else is in normalized percentages or discrete num of's (ie. num lines).
+    * Thus all real sizes are derived based on the panel size set.
+    * This "should" make it possible to resize the panel and get good results.
+    */
+   float    mPanWidth, mPanHeight;  /**< Panel size in OpenSG units. */
+   float    mBorderWidth;           /**< Width of the border in real units. */
+
+   float    mTitleHeight;           /**< Height to make the titles. */
+
+   float    mStatusHeight;          /**< Size of the status section. */
+   float    mHeaderHeight;          /**< Size of the header section. */
+
+   unsigned mStatusHistorySize;  /**< Number of status lines to keep around. */
+   float    mStatusTextHeight;     /**< Fixed height (in OpenSG coords) of status text. */
+
+
+   // Colors/theming
+   OSG::Color3f   mBgColor;      /**< Color of the background. */
+   float          mBgAlpha;
+   OSG::Color3f   mBorderColor;
+   OSG::Color3f   mTitleColor;
+   OSG::Color3f   mTextColor;
 
 };
 
+StatusPanel::StatusPanel()
+{
+   mFont = NULL;
+
+   mPanWidth = 10.0f;
+   mPanHeight = 15.0f;
+   mBorderWidth = 0.4f;
+
+   mTitleHeight = 0.05f;
+   mStatusHeight = 0.30f;
+   mHeaderHeight = 0.20f;
+   mStatusHistorySize = 20;
+   mStatusTextHeight = 0.1f;
+
+   mBgColor.setValuesRGB(0.5, 0.5, 0.5);
+   mBgAlpha = 0.5f;
+   mBorderColor.setValuesRGB(1,1,1);
+   mTitleColor.setValuesRGB(1,0.5,0);
+   mTextColor.setValuesRGB(1,1,1);
+
+   mHeaderTitle = "Header";
+   mCenterTitle = "Center";
+   mBottomTitle = "Bottom";
+
+   mHeaderText  = "Header\nText";
+   mCenterText  = "Center\nText\nhere";
+}
+
+
+void StatusPanel::initialize()
+{
+
+   mRootPanelNode = OSG::Node::create();
+   mPanelGeomNode = OSG::Node::create();
+   mPanelGeomCore = mBuilder.createGeomGeo();
+
+   mTextGeomNode = OSG::Node::create();
+   mTextGeomCore = mBuilder.createTextGeom();
+
+   OSG::CPEditor rpne(mRootPanelNode);
+   OSG::CPEditor pgne(mPanelGeomNode);
+   OSG::CPEditor pgce(mPanelGeomCore);
+   OSG::CPEditor tgne(mTextGeomNode);
+   OSG::CPEditor tgce(mTextGeomCore);
+
+   mPanelGeomNode->setCore(mPanelGeomCore);
+   mTextGeomNode->setCore(mTextGeomCore);
+
+   mRootPanelNode->setCore(mTextGeomCore);
+   mRootPanelNode->setCore(mPanelGeomCore);
+
+   mFont = new inf::UiBuilder::Font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
+}
+
+void StatusPanel::setHeaderTitle(std::string txt)
+{
+   mHeaderTitle = txt;
+   updatePanelScene();
+}
+
+void StatusPanel::setCenterTitle(std::string txt)
+{
+   mCenterTitle = txt;
+   updatePanelScene();
+}
+
+void StatusPanel::setBottomTitle(std::string txt)
+{
+   mBottomTitle = txt;
+   updatePanelScene();
+}
+
+
 void StatusPanel::setHeaderText(std::string header)
 {
+   mHeaderText = header;
+   updatePanelScene();
 }
 
 void StatusPanel::setControlText(std::string text)
 {
-
+   mCenterText = text;
+   updatePanelScene();
 }
 
 void StatusPanel::addStatusMessage(std::string msg)
 {
+   mStatusLines.push_front(msg);
+
+   // Shrink status lines to fit.
+   while(mStatusLines.size() > mStatusHistorySize)
+   {
+      mStatusLines.pop_back();
+   }
+   updatePanelScene();
+}
+
+void StatusPanel::updatePanelScene()
+{
+   // Draw the panel outline
+   OSG::Vec2f panel_ll(0,0), panel_ul(0,mPanHeight), panel_ur(mPanWidth,mPanHeight), panel_rl(mPanWidth,0);
+
+   const float inner_rad(0.2f);
+   unsigned    num_segs(8);
+   const float front_depth(0.1f), back_depth(-0.1f);
+
+   mBuilder.buildRoundedRectangle(mPanelGeomCore, mBorderColor, panel_ll, panel_ur, inner_rad, inner_rad+mBorderWidth,
+                                 num_segs, false, front_depth, back_depth, 1.0);
+   mBuilder.buildRoundedRectangle(mPanelGeomCore, mBgColor,     panel_ll, panel_ur, 0.0, inner_rad+(mBorderWidth*2),
+                                 num_segs, true,  0,      0, mBgAlpha);
+
+
+   /*
+   OSG::Pnt2f header_title_pos(
+   builder.buildText(text_geom, font, "This is\na\ntest.", OSG::Vec2f(3,8), text_color, 1.0f, 1.0f);
+   builder.addText(text_geom, font, "More text here.\nIn YELLOW!!!", OSG::Vec2f(2,5), OSG::Color3f(1,1,0), 1.0f, 1.0f);
+   */
+
 
 }
 
@@ -135,6 +294,7 @@ int main(int argc, char* argv[])
     OSG::NodePtr panel_node = OSG::Node::create();
 
     //
+    /*
     OSG::Color3f white(1,1,1);
     OSG::GeometryPtr pan_geom = builder.createGeomGeo();
 
@@ -155,7 +315,7 @@ int main(int argc, char* argv[])
     panel_node->setCore(pan_geom);
     ui_group->addChild(panel_node);
 
-    /*
+#ifdef 0
     // Normal geometry
     OSG::NodePtr norm_node = OSG::calcVertexNormalsGeo(pan_geom, 0.2f);
     OSG::GeometryPtr norm_geo = OSG::GeometryPtr::dcast(norm_node->getCore());
@@ -166,7 +326,7 @@ int main(int argc, char* argv[])
     norm_geo->setMaterial(norm_mat);
 
     ui_group->addChild(norm_node);
-    */
+#endif
 
     OSG::Color3f text_color(1,1,1);
     OSG::GeometryPtr text_geom = builder.createTextGeom();
@@ -179,6 +339,15 @@ int main(int argc, char* argv[])
     ui_group->addChild(text_node);
 
     scene->addChild(ui_group);
+    */
+
+    // Status panel
+    StatusPanel status_panel;
+    status_panel.initialize();
+    status_panel.updatePanelScene();
+
+    scene->addChild(status_panel.getPanelRoot());
+
 
     OSG::VerifyGeoGraphOp verify_op("verify", false);
     bool verify = verify_op.traverse(scene);
