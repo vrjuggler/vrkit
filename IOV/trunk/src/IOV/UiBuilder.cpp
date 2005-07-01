@@ -213,10 +213,10 @@ void UiBuilder::buildRoundedRectangle(OSG::GeometryPtr geom, const OSG::Color3f 
    buildDisc(geom, color, lr_corner, innerRad, outerRad, numSegs, pi*1.5f, pi*2.0f, frontDepth, backDepth, true, alpha);
 
    // Build edges
-   buildRectangle(geom, color, OSG::Pnt2f(minPt.x()-outerRad,minPt.y()), OSG::Pnt2f(maxPt.x()-innerRad,maxPt.y()), frontDepth, backDepth, alpha);  //left
+   buildRectangle(geom, color, OSG::Pnt2f(minPt.x()-outerRad,minPt.y()), OSG::Pnt2f(minPt.x()-innerRad,maxPt.y()), frontDepth, backDepth, alpha);  //left
    buildRectangle(geom, color, OSG::Pnt2f(maxPt.x()+innerRad,minPt.y()), OSG::Pnt2f(maxPt.x()+outerRad,maxPt.y()), frontDepth, backDepth, alpha);  //right
-   buildRectangle(geom, color, OSG::Pnt2f(minPt.x(),minPt.y()-outerRad), OSG::Pnt2f(maxPt.x(),maxPt.y()-innerRad), frontDepth, backDepth, alpha);  //bottom
-   buildRectangle(geom, color, OSG::Pnt2f(minPt.x(),minPt.y()+innerRad), OSG::Pnt2f(maxPt.x(),maxPt.y()+outerRad), frontDepth, backDepth, alpha);  //top
+   buildRectangle(geom, color, OSG::Pnt2f(minPt.x(),minPt.y()-outerRad), OSG::Pnt2f(maxPt.x(),minPt.y()-innerRad), frontDepth, backDepth, alpha);  //bottom
+   buildRectangle(geom, color, OSG::Pnt2f(minPt.x(),maxPt.y()+innerRad), OSG::Pnt2f(maxPt.x(),maxPt.y()+outerRad), frontDepth, backDepth, alpha);  //top
 
    // Build center (if needed)
    if(filled)
@@ -262,9 +262,11 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const
    float angle_delta((endAngle-startAngle)/float(numSegs));
    OSG::Pnt2f inner_pt, outer_pt;                                 // Inner and outer computed pts
 
+   const float angle_eps(0.05f);    // Espilon to make sure we don't actually get right up to the end of the final triangle
+
    // For each angle in range (except final angle)
    // - Compute inner and outer pts and add them to the list
-   for(float angle=startAngle; angle < endAngle; angle += angle_delta)
+   for(float angle=startAngle; angle < (endAngle-angle_eps); angle += angle_delta)
    {
       OSG::Vec2f dir(gmtl::Math::cos(angle), gmtl::Math::sin(angle));
       inner_pt = center + (dir*innerRad);
@@ -410,12 +412,7 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const
          mfc->push_back(used_color);   mfc->push_back(used_color);
          mfc->push_back(used_color);   mfc->push_back(used_color);
       }
-
-
-
    }
-
-
 }
 
 
