@@ -629,6 +629,8 @@ void StatusPanel::updatePanelScene()
    const float title_indent(0.1 * mPanWidth);
    OSG::Vec2f header_title_pos(title_indent,mPanHeight-abs_title_height);
 
+   OSG::Vec2f txt_local =
+      mBuilder.getTextSize(*mFont, mHeaderTitle, text_spacing);
    mBuilder.buildText(mTextGeomCore.get(), *mFont, mHeaderTitle, header_title_pos, mTitleColor, abs_title_height, text_spacing);
 
 }
