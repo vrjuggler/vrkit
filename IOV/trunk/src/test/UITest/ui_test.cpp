@@ -560,6 +560,7 @@ void StatusPanel::initialize()
    mPanelGeomNode->setCore(mPanelGeomCore);
    mTextGeomNode->setCore(mTextGeomCore);
 
+   mRootPanelNode->setCore(OSG::Group::create());
    mRootPanelNode->addChild(mPanelGeomNode);
    mRootPanelNode->addChild(mTextGeomNode);
 
