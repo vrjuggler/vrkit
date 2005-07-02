@@ -10,6 +10,7 @@
 #include <OpenSG/OSGGLUTWindow.h>
 #include <OpenSG/OSGSimpleSceneManager.h>
 #include <OpenSG/OSGSceneFileHandler.h>
+#include <OpenSG/OSGSimpleAttachments.h>
 
 #include <OpenSG/OSGTextTXFFace.h>
 #include <OpenSG/OSGTextTXFGlyph.h>
@@ -20,6 +21,8 @@
 #include <OpenSG/OSGChunkMaterial.h>
 #include <OpenSG/OSGTextureChunk.h>
 #include <OpenSG/OSGImage.h>
+
+#include <OpenSG/OSGPrimitiveIterator.h>
 
 #include <OpenSG/OSGGeoFunctions.h>
 
@@ -51,6 +54,384 @@ void splitStr(
       right = s.find_first_of( sep, left );
    }
 }
+
+
+class VerifyTraverser
+{
+public:
+   VerifyTraverser()
+      : mVerbose(true), mRepair(false), mNumErrors(0)
+   {;}
+
+   void setVerbose(bool val)
+   { mVerbose = val; }
+
+   void setRepair(bool val)
+   { mRepair = val; }
+
+   std::vector<OSG::NodePtr> getCorruptedNodes()
+   { return mCorruptedNodes; }
+
+   std::vector<OSG::GeometryPtr> getCorruptedGeos()
+   { return mCorruptedGeos; }
+
+   /*!
+    * \brief
+    * \param
+    * \return
+    */
+   OSG::UInt32 verify(OSG::NodePtr &node)
+   {
+       if(node == NullFC)
+           return 0;
+
+       mCorruptedNodes.clear();
+       mCorruptedGeos.clear();
+       mNumErrors = 0;
+
+       if(mVerbose)
+       {
+          std::cout << "Starting Verifier..." << std::endl;
+       }
+
+       //traverse(node, OSG::osgTypedFunctionFunctor1CPtrRef<OSG::Action::ResultE, OSG::NodePtr>(verifyCB));
+       traverse(node,
+                  OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<Action::ResultE,
+                                                 VerifyTraverser,
+                                                 NodePtr>(
+                                                     this,
+                                                     &VerifyTraverser::verifyCB));
+
+
+       if(mRepair)
+       {
+          repairGeometry();      // Repair any corrupted geometry nodes
+       }
+
+       if(mVerbose)
+       {
+          std::cout << "Verifier completed. Errors found:" << mNumErrors << std::endl;
+       }
+
+       return mNumErrors;
+   }
+
+   /** Callback for each node. */
+   OSG::Action::ResultE verifyCB(OSG::NodePtr &node)
+   {
+      if(OSG::NullFC == node)
+      {
+         std::cout << "verify CB called with NULL node, skipping." << std::endl;
+         return OSG::Action::Continue;
+      }
+
+      // Verify basic node structure
+      std::string node_name;
+      if(OSG::getName(node) != NULL)
+      { node_name = std::string(OSG::getName(node)); }
+
+      OSG::NodeCorePtr node_core = node->getCore();
+      if(OSG::NullFC == node_core)
+      {
+         mCorruptedNodes.push_back(node);
+         mNumErrors += 1;
+         if(mVerbose)
+         { std::cout << "Node: [" << node_name << "] has NULL core." << std::endl; }
+         if(mRepair)
+         {
+            if(mVerbose) std::cout << "  Repairing node.  Adding group core." << std::endl;
+            OSG::beginEditCP(node);
+            node->setCore(OSG::Group::create());
+            OSG::endEditCP(node);
+            std::string new_name = node_name + "_FIXED";
+            OSG::setName(node, new_name);
+         }
+      }
+
+      // Check based on core types
+      if(OSG::NullFC != node_core)
+      {
+         if(GeometryPtr::dcast(node_core) != OSG::NullFC)
+         {
+            return verifyGeometryCB(node);
+         }
+      }
+
+      return OSG::Action::Continue;
+
+   }
+
+protected:  // -- Geom --- //
+
+
+
+   /** Verify geometry method. */
+   OSG::Action::ResultE verifyGeometryCB(NodePtr &node)
+   {
+       GeometryPtr geo = GeometryPtr::dcast(node->getCore());
+
+       if(geo == NullFC)
+           return OSG::Action::Continue;
+
+       if(geo->getPositions() == NullFC)
+           return OSG::Action::Continue;
+
+       OSG::UInt32 start_errors = mNumErrors;
+
+       OSG::Int32 positions_size = geo->getPositions()->getSize();
+
+       OSG::Int32 normals_size = 0;
+       if(geo->getNormals() != NullFC)
+           normals_size = geo->getNormals()->getSize();
+
+       OSG::Int32 colors_size = 0;
+       if(geo->getColors() != NullFC)
+           colors_size = geo->getColors()->getSize();
+
+       OSG::Int32 secondary_colors_size = 0;
+       if(geo->getSecondaryColors() != NullFC)
+           secondary_colors_size = geo->getSecondaryColors()->getSize();
+
+       OSG::Int32 texccords_size = 0;
+       if(geo->getTexCoords() != NullFC)
+           texccords_size = geo->getTexCoords()->getSize();
+
+       OSG::Int32 texccords1_size = 0;
+       if(geo->getTexCoords1() != NullFC)
+           texccords1_size = geo->getTexCoords1()->getSize();
+
+       OSG::Int32 texccords2_size = 0;
+       if(geo->getTexCoords2() != NullFC)
+           texccords2_size = geo->getTexCoords2()->getSize();
+
+       OSG::Int32 texccords3_size = 0;
+       if(geo->getTexCoords3() != NullFC)
+           texccords3_size = geo->getTexCoords3()->getSize();
+
+       OSG::UInt32 pos_errors = 0;
+       OSG::UInt32 norm_errors = 0;
+       OSG::UInt32 col_errors = 0;
+       OSG::UInt32 col2_errors = 0;
+       OSG::UInt32 tex0_errors = 0;
+       OSG::UInt32 tex1_errors = 0;
+       OSG::UInt32 tex2_errors = 0;
+       OSG::UInt32 tex3_errors = 0;
+
+       OSG::PrimitiveIterator it;
+       for(it = geo->beginPrimitives(); it != geo->endPrimitives(); ++it)
+       {
+           for(OSG::UInt32 v=0; v < it.getLength(); ++v)
+           {
+               if(it.getPositionIndex(v) >= positions_size)
+                   ++pos_errors;
+               if(it.getNormalIndex(v) >= normals_size)
+                   ++norm_errors;
+               if(it.getColorIndex(v) >= colors_size)
+                   ++col_errors;
+               if(it.getSecondaryColorIndex(v) >= secondary_colors_size)
+                   ++col2_errors;
+               if(it.getTexCoordsIndex(v) >= texccords_size)
+                   ++tex0_errors;
+               if(it.getTexCoordsIndex1(v) >= texccords1_size)
+                   ++tex1_errors;
+               if(it.getTexCoordsIndex2(v) >= texccords2_size)
+                   ++tex2_errors;
+               if(it.getTexCoordsIndex3(v) >= texccords3_size)
+                   ++tex3_errors;
+           }
+       }
+
+
+       if(norm_errors > 0)
+       {
+           norm_errors = 0;
+           if(mVerbose) std::cout << "removed corrupted normals!\n";
+           beginEditCP(geo);
+               geo->setNormals(NullFC);
+           endEditCP(geo);
+       }
+
+       if(col_errors > 0)
+       {
+           col_errors = 0;
+           if(mVerbose) std::cout << "removed corrupted colors!\n";
+           beginEditCP(geo);
+               geo->setColors(NullFC);
+           endEditCP(geo);
+       }
+
+       if(tex0_errors > 0)
+       {
+           tex0_errors = 0;
+           if(mVerbose) std::cout << "removed corrupted tex coords0!\n";
+           beginEditCP(geo);
+               geo->setTexCoords(NullFC);
+           endEditCP(geo);
+       }
+
+       mNumErrors += (pos_errors + norm_errors + col_errors +
+                       col2_errors + tex0_errors + tex1_errors +
+                       tex2_errors + tex3_errors);
+
+       // found some errors.
+       if(mNumErrors > start_errors)
+       { mCorruptedGeos.push_back(geo); }
+
+       // ok we found no errors now check for missing index map.
+       bool need_repair(false);
+       if(!verifyIndexMap(geo, need_repair))
+       {
+           if(need_repair)
+           { std::cerr << "verifyGeometryCB : added missing index map!"; }
+           else
+           { std::cerr << "verifyGeometryCB : couldn't add missing index map!\n"; }
+       }
+
+       return OSG::Action::Continue;
+   }
+
+
+   bool verifyIndexMap(GeometryPtr &geo, bool &repair)
+   {
+       repair = false;
+
+       if(geo == NullFC)
+           return true;
+
+       if(geo->getIndices() == NullFC)
+           return true;
+
+       if(!geo->getIndexMapping().empty())
+           return true;
+
+       if(geo->getPositions() == NullFC)
+           return true;
+
+       OSG::UInt32 positions_size = geo->getPositions()->getSize();
+
+       OSG::UInt32 normals_size = 0;
+       if(geo->getNormals() != NullFC)
+           normals_size = geo->getNormals()->getSize();
+
+       OSG::UInt32 colors_size = 0;
+       if(geo->getColors() != NullFC)
+           colors_size = geo->getColors()->getSize();
+
+       OSG::UInt32 secondary_colors_size = 0;
+       if(geo->getSecondaryColors() != NullFC)
+           secondary_colors_size = geo->getSecondaryColors()->getSize();
+
+       OSG::UInt32 texccords_size = 0;
+       if(geo->getTexCoords() != NullFC)
+           texccords_size = geo->getTexCoords()->getSize();
+
+       OSG::UInt32 texccords1_size = 0;
+       if(geo->getTexCoords1() != NullFC)
+           texccords1_size = geo->getTexCoords1()->getSize();
+
+       OSG::UInt32 texccords2_size = 0;
+       if(geo->getTexCoords2() != NullFC)
+           texccords2_size = geo->getTexCoords2()->getSize();
+
+       OSG::UInt32 texccords3_size = 0;
+       if(geo->getTexCoords3() != NullFC)
+           texccords3_size = geo->getTexCoords3()->getSize();
+
+       /*
+       printf("sizes: %u %u %u %u %u %u %u %u\n", positions_size, normals_size,
+                                      colors_size, secondary_colors_size,
+                                      texccords_size, texccords1_size,
+                                      texccords2_size, texccords3_size);
+       */
+       if((positions_size == normals_size || normals_size == 0) &&
+          (positions_size == colors_size || colors_size == 0) &&
+          (positions_size == secondary_colors_size || secondary_colors_size == 0) &&
+          (positions_size == texccords_size || texccords_size == 0) &&
+          (positions_size == texccords1_size || texccords1_size == 0) &&
+          (positions_size == texccords2_size || texccords2_size == 0) &&
+          (positions_size == texccords3_size || texccords3_size == 0))
+       {
+           OSG::UInt16 indexmap = 0;
+           if(positions_size > 0)
+               indexmap |= Geometry::MapPosition;
+           if(normals_size > 0)
+               indexmap |= Geometry::MapNormal;
+           if(colors_size > 0)
+               indexmap |= Geometry::MapColor;
+           if(secondary_colors_size > 0)
+               indexmap |= Geometry::MapSecondaryColor;
+           if(texccords_size > 0)
+               indexmap |= Geometry::MapTexCoords;
+           if(texccords1_size > 0)
+               indexmap |= Geometry::MapTexCoords1;
+           if(texccords2_size > 0)
+               indexmap |= Geometry::MapTexCoords2;
+           if(texccords3_size > 0)
+               indexmap |= Geometry::MapTexCoords3;
+
+           beginEditCP(geo, Geometry::IndexMappingFieldMask);
+               geo->getIndexMapping().push_back(indexmap);
+           endEditCP(geo, Geometry::IndexMappingFieldMask);
+           repair = true;
+           return false;
+       }
+       else
+       {
+           return false;
+       }
+
+       return true;
+   }
+
+
+   /*!
+    * \brief Replaces corrupted geometrie nodes with group nodes.
+    * \return true if something was repaired.
+    */
+   bool repairGeometry()
+   {
+      if (!mCorruptedGeos.empty())
+      {
+         if (mVerbose)
+         { std::cout << "Repairing corrupted geos:" << std::endl; }
+
+         for (OSG::UInt32 i=0;i<mCorruptedGeos.size();++i)
+         {
+            // now replace corrupted geometry core with a group core.
+            for (OSG::UInt32 j=0;j<mCorruptedGeos[i]->getParents().size();++j)
+            {
+               NodePtr parent = mCorruptedGeos[i]->getParents()[j];
+               if (parent != NullFC)
+               {
+                  std::string nname;
+                  if(OSG::getName(parent) != NULL)
+                  { nname = OSG::getName(parent); }
+                  if (mVerbose)
+                  { std::cout << "Removing corrupted geom from node: " << nname << std::endl; }
+                  nname += "_CORRUPTED";
+                  OSG::setName(parent, nname.c_str());
+                  beginEditCP(parent, Node::CoreFieldMask);
+                  parent->setCore(Group::create());
+                  endEditCP(parent, Node::CoreFieldMask);
+               }
+            }
+         }
+         return true;
+      }
+
+      return false;
+   }
+
+protected:
+   bool        mVerbose;   /**< If true, output verbose information about the verify. */
+   bool        mRepair;    /**< If true, attempt to repair things. */
+
+   OSG::UInt32 mNumErrors;  /**< The running total of errors found. */
+
+   std::vector<OSG::GeometryPtr> mCorruptedGeos;
+   std::vector<OSG::NodePtr>     mCorruptedNodes;
+
+};
 
 
 class StatusPanel
@@ -163,6 +544,12 @@ void StatusPanel::initialize()
 
    mTextGeomNode = OSG::Node::create();
    mTextGeomCore = mBuilder.createTextGeom();
+
+   OSG::setName(mRootPanelNode, "RootPanelNode");
+   OSG::setName(mPanelGeomNode, "PanelGeomNode");
+   OSG::setName(mTextGeomNode, "TextGeomNode");
+   OSG::setName(mPanelGeomCore, "PanelGeomCore");
+   OSG::setName(mTextGeomCore, "TextGeomCore");
 
    OSG::CPEditor rpne(mRootPanelNode);
    OSG::CPEditor pgne(mPanelGeomNode);
@@ -289,9 +676,11 @@ int main(int argc, char* argv[])
 
     inf::UiBuilder builder;
     OSG::NodePtr ui_group = OSG::Node::create();
+    OSG::setName(ui_group, "ui_group");
     ui_group->setCore(OSG::Group::create());
 
     OSG::NodePtr panel_node = OSG::Node::create();
+    OSG::setName(panel_node, "panel_node");
 
     //
     /*
@@ -347,6 +736,12 @@ int main(int argc, char* argv[])
     status_panel.updatePanelScene();
 
     scene->addChild(status_panel.getPanelRoot());
+
+    VerifyTraverser verifier;
+    verifier.setVerbose(true);
+    verifier.setRepair(true);
+
+    verifier.verify(scene);
 
 
     OSG::VerifyGeoGraphOp verify_op("verify", false);
