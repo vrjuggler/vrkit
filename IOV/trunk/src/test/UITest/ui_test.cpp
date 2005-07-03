@@ -242,7 +242,7 @@ protected:  // -- Geom --- //
        }
 
 
-       if(norm_errors > 0)
+       if((norm_errors > 0) && mRepair)
        {
            norm_errors = 0;
            if(mVerbose) std::cout << "removed corrupted normals!\n";
@@ -251,7 +251,7 @@ protected:  // -- Geom --- //
            endEditCP(geo);
        }
 
-       if(col_errors > 0)
+       if((col_errors > 0) && mRepair)
        {
            col_errors = 0;
            if(mVerbose) std::cout << "removed corrupted colors!\n";
@@ -260,7 +260,7 @@ protected:  // -- Geom --- //
            endEditCP(geo);
        }
 
-       if(tex0_errors > 0)
+       if((tex0_errors > 0) && mRepair)
        {
            tex0_errors = 0;
            if(mVerbose) std::cout << "removed corrupted tex coords0!\n";
@@ -490,10 +490,10 @@ protected:
    // -- Percentages -- //
    float    mTitleHeight;           /**< Height to make the titles. */
 
-   float    mStatusHeight;          /**< Size of the status section. */
-   float    mHeaderHeight;          /**< Size of the header section. */
+   float    mHeaderHeight;          /**< Size of the header section (percentage). */
+   float    mStatusHeight;          /**< Size of the status section (percentage). */   
 
-   unsigned mStatusHistorySize;  /**< Number of status lines to keep around. */
+   unsigned mStatusHistorySize;    /**< Number of status lines to keep around. */
    float    mStatusTextHeight;     /**< Fixed height (in OpenSG coords) of status text. */
 
 
@@ -627,11 +627,45 @@ void StatusPanel::updatePanelScene()
    const float text_spacing(0.7);
    float abs_title_height = mTitleHeight*mPanHeight;
    const float title_indent(0.1 * mPanWidth);
-   OSG::Vec2f header_title_pos(title_indent,mPanHeight-abs_title_height);
 
+   OSG::Color3f dbg_color(1,0,0);
+      
+   // ---- Header --- //
+   // Title
+   float total_header_height = mHeaderHeight * mPanHeight;
+   float total_status_height = mStatusHeight * mPanHeight;
+   float total_center_height = (1.0f - mHeaderHeight - mStatusHeight) * mPanHeight;
+   float header_pan_height = total_header_height-abs_title_height;
+   float center_pan_height = total_center_height-abs_title_height;
+   float status_pan_height = total_status_height-abs_title_height;
+
+   OSG::Vec2f header_title_ul(title_indent, mPanHeight);
+   OSG::Vec2f header_ul(0, header_title_ul.y()-abs_title_height);
+   OSG::Vec2f center_title_ul(title_indent, header_title_ul.y()-total_header_height);
+   OSG::Vec2f center_ul(0, center_title_ul.y()-abs_title_height);
+   OSG::Vec2f status_title_ul(title_indent, center_title_ul.y()-total_center_height);
+   OSG::Vec2f status_ul(0, status_title_ul.y()-abs_title_height);
+   
    OSG::Vec2f txt_local =
       mBuilder.getTextSize(*mFont, mHeaderTitle, text_spacing);
-   mBuilder.buildText(mTextGeomCore.get(), *mFont, mHeaderTitle, header_title_pos, mTitleColor, abs_title_height, text_spacing);
+   mBuilder.buildText(mTextGeomCore.get(), *mFont, mHeaderTitle, header_title_ul, mTitleColor, abs_title_height, text_spacing);
+   
+   //mBuilder.buildRectangle(mTextGeomCore, dbg_color, status_title_ul, OSG::Vec2f(mPanWidth,, 0.05, 0.05);    // Center
+
+   //txt_local = mBuilder.getTextSize(*mFont, mHeaderText, 
+   //OSG::Vec2f header_pos(0, header_title_pos.y()-
+
+   // Draw debug outlines
+   mBuilder.buildRectangleOutline(mPanelGeomCore, dbg_color, panel_ll, panel_ur, 0.2);
+   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(1,1,0), 
+                                                  OSG::Vec2f(0,header_title_ul.y()-total_header_height),
+                                                  OSG::Vec2f(mPanWidth, header_title_ul.y()), 0.3);       // Header
+   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(0,1,0), 
+                                                  OSG::Vec2f(0,center_title_ul.y()-total_center_height),
+                                                  OSG::Vec2f(mPanWidth, center_title_ul.y()), 0.4);       // Center
+   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(0,0,1), 
+                                                  OSG::Vec2f(0,status_title_ul.y()-total_status_height),
+                                                  OSG::Vec2f(mPanWidth, status_title_ul.y()), 0.3);       // Status
 
 }
 
@@ -686,28 +720,40 @@ int main(int argc, char* argv[])
     OSG::setName(panel_node, "panel_node");
 
     //
-    /*
-    OSG::Color3f white(1,1,1);
+#if 0
+    OSG::Color3f white(0.4,0.4,0.4);
     OSG::GeometryPtr pan_geom = builder.createGeomGeo();
-
-    builder.buildDisc(pan_geom,  OSG::Color3f(0.0, 0.7, 0.2), OSG::Pnt2f(-5,4), 0.5, 2.0, 17, 0, gmtl::Math::PI_OVER_2, 0.5, -0.5, true, 1.0f);
-    builder.buildDisc(pan_geom,  OSG::Color3f(0.0, 0.7, 0.7), OSG::Pnt2f(-7,3), 0, 1.7, 17, 0, gmtl::Math::PI_OVER_2, 0.5, -0.5, true, 1.0f);
-    builder.buildDisc(pan_geom,  OSG::Color3f(0.0, 0.2, 0.8), OSG::Pnt2f(-5,-4),0.0, 1.5, 32, 0, gmtl::Math::TWO_PI, 0.5, -0.5, true, 1.0f);
-    builder.buildDisc(pan_geom,  OSG::Color3f(0.5, 0.0, 0.8), OSG::Pnt2f(-8,0), 0.0, 1.5, 32, 0, gmtl::Math::PI *0.75 , 0, 0, true, 1.0f);
 
     OSG::Color3f bg_color(0.4, 0.4, 0.4);
     float bg_alpha(0.4);
 
+    /*
     builder.buildRoundedRectangle(pan_geom, OSG::Color3f(0,1,0), OSG::Pnt2f(0,15), OSG::Pnt2f(10,20), 0.25, 0.75, 8, false, 0, -0.5, 1.0);
     builder.buildRoundedRectangle(pan_geom, OSG::Color3f(0,0.3,0.4), OSG::Pnt2f(15,0), OSG::Pnt2f(25,10), 0.5, 0.75, 8, true, 0, 0, 1.0);
 
     builder.buildRoundedRectangle(pan_geom, white,    OSG::Pnt2f(0,0), OSG::Pnt2f(10,10), 0.3, 0.6, 8, false, 0.2, -0.1, 1.0);
     builder.buildRoundedRectangle(pan_geom, bg_color, OSG::Pnt2f(0,0), OSG::Pnt2f(10,10), 0.0, 1.0, 8, true,  0,      0, bg_alpha);
+    */
+    builder.buildRectangle(pan_geom, white, OSG::Pnt2f(0,0), OSG::Pnt2f(10,10), -0.1,-0.1);
 
     panel_node->setCore(pan_geom);
     ui_group->addChild(panel_node);
+    
+    OSG::Color3f text_color(0,1,0);
+    OSG::GeometryPtr text_geom = builder.createTextGeom();
+    inf::UiBuilder::Font font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
 
-#ifdef 0
+    builder.buildText(text_geom, font, "At 0,0\nText", OSG::Vec2f(0,0), text_color, 1.0f, 1.0f);
+    builder.addText(text_geom, font, "At 0,10\nText", OSG::Vec2f(0,10), OSG::Color3f(0,1,1), 1.0f, 1.0f);
+
+    OSG::NodePtr text_node = OSG::Node::create();
+    text_node->setCore(text_geom);
+    ui_group->addChild(text_node);
+
+    scene->addChild(ui_group);
+#endif
+
+#if 0
     // Normal geometry
     OSG::NodePtr norm_node = OSG::calcVertexNormalsGeo(pan_geom, 0.2f);
     OSG::GeometryPtr norm_geo = OSG::GeometryPtr::dcast(norm_node->getCore());
@@ -720,33 +766,21 @@ int main(int argc, char* argv[])
     ui_group->addChild(norm_node);
 #endif
 
-    OSG::Color3f text_color(1,1,1);
-    OSG::GeometryPtr text_geom = builder.createTextGeom();
-    inf::UiBuilder::Font font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
-    builder.buildText(text_geom, font, "This is\na\ntest.", OSG::Vec2f(3,8), text_color, 1.0f, 1.0f);
-    builder.addText(text_geom, font, "More text here.\nIn YELLOW!!!", OSG::Vec2f(2,5), OSG::Color3f(1,1,0), 1.0f, 1.0f);
-
-    OSG::NodePtr text_node = OSG::Node::create();
-    text_node->setCore(text_geom);
-    ui_group->addChild(text_node);
-
-    scene->addChild(ui_group);
-    */
-
     // Status panel
+   ///*
     StatusPanel status_panel;
     status_panel.initialize();
     status_panel.updatePanelScene();
 
     scene->addChild(status_panel.getPanelRoot());
+    //*/
+    
 
     VerifyTraverser verifier;
     verifier.setVerbose(true);
-    verifier.setRepair(true);
-
+    verifier.setRepair(false);
     verifier.verify(scene);
-
-
+    
     OSG::VerifyGeoGraphOp verify_op("verify", false);
     bool verify = verify_op.traverse(scene);
     if(!verify)

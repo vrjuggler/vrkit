@@ -87,7 +87,7 @@ OSG::GeometryPtr UiBuilder::createGeomGeo()
    return geo_core;
 }
 
-void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float alpha)
+void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float depth, float alpha)
 {
    OSG::GeoPTypesPtr types = OSG::GeoPTypesUI8Ptr::dcast(geom->getTypes());
    OSG::GeoPLengthsPtr lens = OSG::GeoPLengthsUI32Ptr::dcast(geom->getLengths());
@@ -110,14 +110,15 @@ void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom, OSG::Color3f color,
    OSG::CPEditor colors_ed(colors);
    OSG::CPEditor norms_ed(norms);
 
-   OSG::Pnt3f ll(minPt.x(), minPt.y(), 0.0f), lr(maxPt.x(), minPt.y(), 0.0f),
-              ul(minPt.x(), maxPt.y(), 0.0f), ur(maxPt.x(), maxPt.y(), 0.0f);
+   OSG::Pnt3f ll(minPt.x(), minPt.y(), depth), lr(maxPt.x(), minPt.y(), depth),
+              ul(minPt.x(), maxPt.y(), depth), ur(maxPt.x(), maxPt.y(), depth);
    OSG::Color4f used_color(color.red(), color.green(), color.blue(), alpha);
 
-   const unsigned num_verts(4);
+   const unsigned num_verts(5);
 
    types->addValue(GL_LINE_STRIP);
    lens->addValue(num_verts);
+   verts->addValue(ll);
    verts->addValue(lr); verts->addValue(ur);
    verts->addValue(ul); verts->addValue(ll);
    for(unsigned i=0;i<num_verts;++i)
@@ -513,7 +514,13 @@ void UiBuilder::buildText( OSG::GeometryPtr geom, UiBuilder::Font& font,
    splitStr(text,"\n",std::back_inserter(lines));
 
    font.mFace->layout(lines, layout_param, layout_result);
-   font.mFace->fillGeo(geom, layout_result, scale, offset, color);
+   
+   // Compute extra offset since we are passing in offset of upperleft and opensg wants lower left of first line
+   float line_height = layout_result.textBounds.y()/float(lines.size());
+   line_height *= scale;
+   OSG::Vec2f single_line_offset(0,line_height);
+
+   font.mFace->fillGeo(geom, layout_result, scale, offset-single_line_offset, color);
 
    OSG::ChunkMaterialPtr mat = OSG::ChunkMaterialPtr::dcast(geom->getMaterial());
    vprASSERT(OSG::NullFC != mat);

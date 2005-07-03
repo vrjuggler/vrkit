@@ -35,10 +35,11 @@ public:
     * @PARAM geom    The geometry to add to.
     * @PARAM minPt   Minimum pt on the rectangle.
     * @PARAM maxPt   Maximum pt on the rectangle.
+    * @PARAM depth   The depth to use when drawing.
     * @PARAM alpha   Uniform alpha to apply to all vert colors.
     * @PARAM filled  If true the rectangle is a filled tri list, else it is a line loop.
     */
-   void buildRectangleOutline(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float alpha=1.0);
+   void buildRectangleOutline(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float depth=0.0, float alpha=1.0);
 
    /** Build a 3D box.
     * @PARAM geom    The geometry to add to.
