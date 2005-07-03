@@ -479,6 +479,7 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
       mat_chunk->setSpecular(OSG::Color4f(0.f, 0.f, 0.f, 1.f));
       mat_chunk->setColorMaterial(GL_AMBIENT_AND_DIFFUSE);
       mat_chunk->setShininess(0);
+      //mat_chunk->setLit(false);
    }
    OSG::endEditCP(mat_chunk);
 
@@ -546,7 +547,13 @@ void UiBuilder::addText( OSG::GeometryPtr geom, UiBuilder::Font& font,
    splitStr(text,"\n",std::back_inserter(lines));
 
    font.mFace->layout(lines, layout_param, layout_result);
-   font.mFace->addToGeom(geom, layout_result, scale, offset, color);
+   
+   // Compute extra offset since we are passing in offset of upperleft and opensg wants lower left of first line
+   float line_height = layout_result.textBounds.y()/float(lines.size());
+   line_height *= scale;
+   OSG::Vec2f single_line_offset(0,line_height);
+
+   font.mFace->addToGeom(geom, layout_result, scale, offset-single_line_offset, color);
 }
 
 
