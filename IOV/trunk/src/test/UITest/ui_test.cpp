@@ -531,7 +531,7 @@ StatusPanel::StatusPanel()
    mBottomTitle = "Status";
 
    mHeaderText  = "Header\nText";
-   mCenterText  = "Center\nText\nhere";
+   mCenterText  = "Controls:\n1 - Forward\n2 - Rotate\n3 - Viewport Cycle\n4 - Switch Mode\nReally long line of text here to test it.";
 }
 
 
@@ -654,11 +654,13 @@ void StatusPanel::updatePanelScene()
    
    // Header section
    OSG::Vec2f bounds = mBuilder.getTextSize(*mFont, mHeaderText, text_spacing);
-   mBuilder.addText(mTextGeomCore, *mFont, mHeaderText, header_ul, mTextColor, header_pan_height/bounds.y(), text_spacing);
+   float pan_scale = OSG::osgMin( (header_pan_height/bounds.y()), (mPanWidth/bounds.x()));
+   mBuilder.addText(mTextGeomCore, *mFont, mHeaderText, header_ul, mTextColor, pan_scale, text_spacing);
 
    // Center section
    bounds = mBuilder.getTextSize(*mFont, mCenterText, text_spacing); 
-   mBuilder.addText(mTextGeomCore, *mFont, mCenterText, center_ul, mTextColor, center_pan_height/bounds.y(), text_spacing);
+   pan_scale = OSG::osgMin( (center_pan_height/bounds.y()), (mPanWidth/bounds.x()));
+   mBuilder.addText(mTextGeomCore, *mFont, mCenterText, center_ul, mTextColor, pan_scale, text_spacing);
 
    //txt_local = mBuilder.getTextSize(*mFont, mHeaderText, 
    //OSG::Vec2f header_pos(0, header_title_pos.y()-
