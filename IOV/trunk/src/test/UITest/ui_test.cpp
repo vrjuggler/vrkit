@@ -21,6 +21,7 @@
 #include <OpenSG/OSGChunkMaterial.h>
 #include <OpenSG/OSGTextureChunk.h>
 #include <OpenSG/OSGImage.h>
+#include <OpenSG/OSGClipPlaneChunk.h>
 
 #include <OpenSG/OSGPrimitiveIterator.h>
 
@@ -29,8 +30,10 @@
 #include <OpenSG/OSGVerifyGeoGraphOp.h>
 
 #include <IOV/UiBuilder.h>
+#include <vpr/vprConfig.h>
+#include <vpr/Util/Assert.h>
 #include <sstream>
-
+#include <algorithm>
 
 OSG::SimpleSceneManager* mgr;
 
@@ -491,7 +494,7 @@ protected:
    float    mTitleHeight;           /**< Height to make the titles. */
 
    float    mHeaderHeight;          /**< Size of the header section (percentage). */
-   float    mStatusHeight;          /**< Size of the status section (percentage). */   
+   float    mStatusHeight;          /**< Size of the status section (percentage). */
 
    unsigned mStatusHistorySize;    /**< Number of status lines to keep around. */
    float    mStatusTextHeight;     /**< Fixed height (in OpenSG coords) of status text. */
@@ -518,7 +521,7 @@ StatusPanel::StatusPanel()
    mStatusHeight = 0.30f;
    mHeaderHeight = 0.20f;
    mStatusHistorySize = 20;
-   mStatusTextHeight = 0.1f;
+   mStatusTextHeight = 0.5f;
 
    mBgColor.setValuesRGB(0.5, 0.5, 0.5);
    mBgAlpha = 1.0f;
@@ -565,6 +568,30 @@ void StatusPanel::initialize()
    mRootPanelNode->addChild(mTextGeomNode);
 
    mFont = new inf::UiBuilder::Font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
+   //mFont = new inf::UiBuilder::Font("MONO", OSG::TextFace::STYLE_PLAIN, 64);
+
+   OSG::ChunkMaterialPtr text_mat = OSG::ChunkMaterialPtr::dcast(mTextGeomCore->getMaterial());
+   vprASSERT(OSG::NullFC != text_mat);
+
+   OSG::ClipPlaneChunkPtr clip_right = ClipPlaneChunk::create();
+   beginEditCP(clip_right);
+   clip_right->setEquation(Vec4f(-1,0,0,mPanWidth));      // X clip plane <= right size
+   clip_right->setEnable(true);
+   clip_right->setBeacon(mTextGeomNode);
+   endEditCP(clip_right);
+
+   OSG::ClipPlaneChunkPtr clip_bottom = ClipPlaneChunk::create();
+   beginEditCP(clip_bottom);
+   clip_bottom->setEquation(Vec4f(0,1,0,0));         // Y clip plane on Y>=0
+   clip_bottom->setEnable(true);
+   clip_bottom->setBeacon(mTextGeomNode);
+   endEditCP(clip_bottom);
+
+   OSG::beginEditCP(text_mat);
+   text_mat->addChunk(clip_right);
+   text_mat->addChunk(clip_bottom);
+   OSG::endEditCP(text_mat);
+
 }
 
 void StatusPanel::setHeaderTitle(std::string txt)
@@ -618,19 +645,19 @@ void StatusPanel::updatePanelScene()
    const float inner_rad(0.2f);
    unsigned    num_segs(8);
    const float front_depth(0.1f), back_depth(-0.1f);
-   const float bg_depth(-0.1f);
+   //const float bg_depth(-0.1f);
 
    mBuilder.buildRoundedRectangle(mPanelGeomCore, mBorderColor, panel_ll, panel_ur, inner_rad, inner_rad+mBorderWidth,
                                  num_segs, false, front_depth, back_depth, 1.0);
    //mBuilder.buildRoundedRectangle(mPanelGeomCore, mBgColor,     panel_ll, panel_ur, 0.0, inner_rad+(mBorderWidth*2),
-   //                              num_segs, true,  bg_depth,    bg_depth, mBgAlpha);
+   //                              num_segs, true,  back_depth,    back_depth, mBgAlpha);
 
    const float text_spacing(0.7);
    float abs_title_height = mTitleHeight*mPanHeight;
    const float title_indent(0.1 * mPanWidth);
 
    OSG::Color3f dbg_color(1,0,0);
-      
+
    // ---- Header --- //
    // Title
    float total_header_height = mHeaderHeight * mPanHeight;
@@ -646,34 +673,41 @@ void StatusPanel::updatePanelScene()
    OSG::Vec2f center_ul(0, center_title_ul.y()-abs_title_height);
    OSG::Vec2f status_title_ul(title_indent, center_title_ul.y()-total_center_height);
    OSG::Vec2f status_ul(0, status_title_ul.y()-abs_title_height);
-   
+
    // Headers
    mBuilder.buildText(mTextGeomCore, *mFont, mHeaderTitle, header_title_ul, mTitleColor, abs_title_height, text_spacing);
    mBuilder.addText(mTextGeomCore, *mFont, mCenterTitle, center_title_ul, mTitleColor, abs_title_height, text_spacing);
    mBuilder.addText(mTextGeomCore, *mFont, mBottomTitle, status_title_ul, mTitleColor, abs_title_height, text_spacing);
-   
+
    // Header section
    OSG::Vec2f bounds = mBuilder.getTextSize(*mFont, mHeaderText, text_spacing);
    float pan_scale = OSG::osgMin( (header_pan_height/bounds.y()), (mPanWidth/bounds.x()));
    mBuilder.addText(mTextGeomCore, *mFont, mHeaderText, header_ul, mTextColor, pan_scale, text_spacing);
 
    // Center section
-   bounds = mBuilder.getTextSize(*mFont, mCenterText, text_spacing); 
+   bounds = mBuilder.getTextSize(*mFont, mCenterText, text_spacing);
    pan_scale = OSG::osgMin( (center_pan_height/bounds.y()), (mPanWidth/bounds.x()));
    mBuilder.addText(mTextGeomCore, *mFont, mCenterText, center_ul, mTextColor, pan_scale, text_spacing);
 
-   //txt_local = mBuilder.getTextSize(*mFont, mHeaderText, 
-   //OSG::Vec2f header_pos(0, header_title_pos.y()-
+   // Status panel
+   unsigned num_lines(unsigned(status_pan_height/mStatusTextHeight));
+   if(num_lines > mStatusLines.size())
+   { num_lines = mStatusLines.size(); }
+
+   std::vector<std::string> potential_lines;
+   potential_lines.insert(potential_lines.end(), mStatusLines.begin(), mStatusLines.begin()+num_lines);
+   mBuilder.addText(mTextGeomCore, *mFont, potential_lines, status_ul, mTextColor, mStatusTextHeight, text_spacing);
+
 
    // --- Draw debug outlines --- //
    mBuilder.buildRectangleOutline(mPanelGeomCore, dbg_color, panel_ll, panel_ur, 0.2);
-   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(1,1,0), 
+   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(1,1,0),
                                                   OSG::Vec2f(0,header_title_ul.y()-total_header_height),
                                                   OSG::Vec2f(mPanWidth, header_title_ul.y()), 0.3);       // Header
-   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(0,1,0), 
+   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(0,1,0),
                                                   OSG::Vec2f(0,center_title_ul.y()-total_center_height),
                                                   OSG::Vec2f(mPanWidth, center_title_ul.y()), 0.4);       // Center
-   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(0,0,1), 
+   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(0,0,1),
                                                   OSG::Vec2f(0,status_title_ul.y()-total_status_height),
                                                   OSG::Vec2f(mPanWidth, status_title_ul.y()), 0.3);       // Status
 
@@ -721,7 +755,6 @@ int main(int argc, char* argv[])
     OSG::NodePtr scene = OSG::Node::create();
     scene->setCore(OSG::Group::create());
 
-    inf::UiBuilder builder;
     OSG::NodePtr ui_group = OSG::Node::create();
     OSG::setName(ui_group, "ui_group");
     ui_group->setCore(OSG::Group::create());
@@ -731,6 +764,8 @@ int main(int argc, char* argv[])
 
     //
 #if 0
+    inf::UiBuilder builder;
+
     OSG::Color3f white(0.4,0.4,0.4);
     OSG::GeometryPtr pan_geom = builder.createGeomGeo();
 
@@ -748,7 +783,7 @@ int main(int argc, char* argv[])
 
     panel_node->setCore(pan_geom);
     ui_group->addChild(panel_node);
-    
+
     OSG::Color3f text_color(0,1,0);
     OSG::GeometryPtr text_geom = builder.createTextGeom();
     inf::UiBuilder::Font font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
@@ -780,17 +815,44 @@ int main(int argc, char* argv[])
    ///*
     StatusPanel status_panel;
     status_panel.initialize();
+
+
+    std::stringstream status_stream;
+
+    for (unsigned i=0;i<20;++i)
+    {
+       status_stream << "Output number: " << i << std::endl;
+       status_stream << "   more info here." << std::endl;
+       status_panel.addStatusMessage(status_stream.str());
+       status_stream.str("");
+    }
+
+    status_stream << "Initialized StatusPanel." << std::endl;
+    status_panel.addStatusMessage(status_stream.str());
+    status_stream.str("");
+
+    status_stream << "StatusPanel::Init: Called with param x: this,that.  Then it executed a really long line of text." << std::endl;
+    status_panel.addStatusMessage(status_stream.str());
+    status_stream.str("");
+
+    status_stream << "Current window status:\n"
+                  << "    size: 10:\n"
+                  << "    pos: 10,10\n"
+                  << "    open: yes\n" << std::endl;
+    status_panel.addStatusMessage(status_stream.str());
+    status_stream.str("");
+
     status_panel.updatePanelScene();
 
     scene->addChild(status_panel.getPanelRoot());
     //*/
-    
+
 
     VerifyTraverser verifier;
     verifier.setVerbose(true);
     verifier.setRepair(false);
     verifier.verify(scene);
-    
+
     OSG::VerifyGeoGraphOp verify_op("verify", false);
     bool verify = verify_op.traverse(scene);
     if(!verify)
@@ -901,7 +963,7 @@ int setupGLUT(int *argc, char *argv[])
 {
     glutInit(argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH | GLUT_DOUBLE);
-    
+
 
     int winid = glutCreateWindow("IOV UI Test");
 

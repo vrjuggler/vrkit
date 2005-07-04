@@ -495,7 +495,7 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
 
    text_mat->addChunk(texture_chunk);
    text_mat->addChunk(mat_chunk);
-   text_mat->addChunk(poly_chunk);
+   //text_mat->addChunk(poly_chunk);
    text_mat->addChunk(blend_chunk);
 
    text_geom->setMaterial(text_mat);
@@ -507,15 +507,27 @@ void UiBuilder::buildText( OSG::GeometryPtr geom, UiBuilder::Font& font,
                            std::string text, OSG::Vec2f offset,
                            OSG::Color3f color, float scale, float spacing)
 {
+   std::vector<std::string> lines;
+   lines.push_back(text);
+   buildText(geom,font,lines,offset,color,scale,spacing);
+}
+
+void UiBuilder::buildText( OSG::GeometryPtr geom, UiBuilder::Font& font,
+                           std::vector<std::string> textLines, OSG::Vec2f offset,
+                           OSG::Color3f color, float scale, float spacing)
+{
    OSG::TextLayoutResult layout_result;
    OSG::TextLayoutParam layout_param;
    layout_param.spacing = spacing;
 
    std::vector<std::string> lines;
-   splitStr(text,"\n",std::back_inserter(lines));
+   for(unsigned i=0;i<textLines.size();++i)
+   {
+      splitStr(textLines[i],"\n",std::back_inserter(lines));
+   }
 
    font.mFace->layout(lines, layout_param, layout_result);
-   
+
    // Compute extra offset since we are passing in offset of upperleft and opensg wants lower left of first line
    float line_height = layout_result.textBounds.y()/float(lines.size());
    line_height *= scale;
@@ -536,7 +548,16 @@ void UiBuilder::buildText( OSG::GeometryPtr geom, UiBuilder::Font& font,
 }
 
 void UiBuilder::addText( OSG::GeometryPtr geom, UiBuilder::Font& font,
-                         std::string text, OSG::Vec2f offset,
+                           std::string text, OSG::Vec2f offset,
+                           OSG::Color3f color, float scale, float spacing)
+{
+   std::vector<std::string> lines;
+   lines.push_back(text);
+   addText(geom,font,lines,offset,color,scale,spacing);
+}
+
+void UiBuilder::addText( OSG::GeometryPtr geom, UiBuilder::Font& font,
+                         std::vector<std::string> textLines, OSG::Vec2f offset,
                          OSG::Color3f color, float scale, float spacing)
 {
    OSG::TextLayoutResult layout_result;
@@ -544,10 +565,13 @@ void UiBuilder::addText( OSG::GeometryPtr geom, UiBuilder::Font& font,
    layout_param.spacing = spacing;
 
    std::vector<std::string> lines;
-   splitStr(text,"\n",std::back_inserter(lines));
+   for(unsigned i=0;i<textLines.size();++i)
+   {
+      splitStr(textLines[i],"\n",std::back_inserter(lines));
+   }
 
    font.mFace->layout(lines, layout_param, layout_result);
-   
+
    // Compute extra offset since we are passing in offset of upperleft and opensg wants lower left of first line
    float line_height = layout_result.textBounds.y()/float(lines.size());
    line_height *= scale;
@@ -556,15 +580,24 @@ void UiBuilder::addText( OSG::GeometryPtr geom, UiBuilder::Font& font,
    font.mFace->addToGeom(geom, layout_result, scale, offset-single_line_offset, color);
 }
 
-
 OSG::Vec2f UiBuilder::getTextSize(UiBuilder::Font& font, std::string text, float spacing)
+{
+   std::vector<std::string> lines;
+   lines.push_back(text);
+   return getTextSize(font,lines,spacing);
+}
+
+OSG::Vec2f UiBuilder::getTextSize(UiBuilder::Font& font, std::vector<std::string> textLines, float spacing)
 {
    OSG::TextLayoutResult layout_result;
    OSG::TextLayoutParam layout_param;
    layout_param.spacing = spacing;
 
    std::vector<std::string> lines;
-   splitStr(text,"\n",std::back_inserter(lines));
+   for(unsigned i=0;i<textLines.size();++i)
+   {
+      splitStr(textLines[i],"\n",std::back_inserter(lines));
+   }
 
    font.mFace->layout(lines, layout_param, layout_result);
    return layout_result.textBounds;

@@ -115,15 +115,21 @@ public:
    void buildText(OSG::GeometryPtr geom, UiBuilder::Font& font, std::string text, OSG::Vec2f offset=OSG::Vec2f(0,0),
                   OSG::Color3f color=OSG::Color3f(1,1,1), float scale=1.0f, float spacing=1.0f);
 
+   void buildText(OSG::GeometryPtr geom, UiBuilder::Font& font, std::vector<std::string> textLines, OSG::Vec2f offset=OSG::Vec2f(0,0),
+                  OSG::Color3f color=OSG::Color3f(1,1,1), float scale=1.0f, float spacing=1.0f);
+
    /** Add text to the geometry.
     * @note The font is NOT used to set the texture.  It must be the same as what you used to build the text geom.
     */
    void addText(OSG::GeometryPtr geom, UiBuilder::Font& font, std::string text, OSG::Vec2f offset=OSG::Vec2f(0,0),
                   OSG::Color3f color=OSG::Color3f(1,1,1), float scale=1.0f, float spacing=1.0f);
+   void addText(OSG::GeometryPtr geom, UiBuilder::Font& font, std::vector<std::string> textLines, OSG::Vec2f offset=OSG::Vec2f(0,0),
+                  OSG::Color3f color=OSG::Color3f(1,1,1), float scale=1.0f, float spacing=1.0f);
 
 
    /** Get the size that the text will take up on screen. */
    OSG::Vec2f getTextSize(UiBuilder::Font& font, std::string text, float spacing=1.0f);
+   OSG::Vec2f getTextSize(UiBuilder::Font& font, std::vector<std::string> textLines, float spacing=1.0f);
 
 };
 
