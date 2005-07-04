@@ -521,14 +521,14 @@ StatusPanel::StatusPanel()
    mStatusTextHeight = 0.1f;
 
    mBgColor.setValuesRGB(0.5, 0.5, 0.5);
-   mBgAlpha = 0.5f;
+   mBgAlpha = 1.0f;
    mBorderColor.setValuesRGB(1,1,1);
    mTitleColor.setValuesRGB(1,0.5,0);
    mTextColor.setValuesRGB(1,1,1);
 
    mHeaderTitle = "Header";
    mCenterTitle = "Center";
-   mBottomTitle = "Bottom";
+   mBottomTitle = "Status";
 
    mHeaderText  = "Header\nText";
    mCenterText  = "Center\nText\nhere";
@@ -618,11 +618,12 @@ void StatusPanel::updatePanelScene()
    const float inner_rad(0.2f);
    unsigned    num_segs(8);
    const float front_depth(0.1f), back_depth(-0.1f);
+   const float bg_depth(-0.1f);
 
    mBuilder.buildRoundedRectangle(mPanelGeomCore, mBorderColor, panel_ll, panel_ur, inner_rad, inner_rad+mBorderWidth,
                                  num_segs, false, front_depth, back_depth, 1.0);
-   mBuilder.buildRoundedRectangle(mPanelGeomCore, mBgColor,     panel_ll, panel_ur, 0.0, inner_rad+(mBorderWidth*2),
-                                 num_segs, true,  0,      0, mBgAlpha);
+   //mBuilder.buildRoundedRectangle(mPanelGeomCore, mBgColor,     panel_ll, panel_ur, 0.0, inner_rad+(mBorderWidth*2),
+   //                              num_segs, true,  bg_depth,    bg_depth, mBgAlpha);
 
    const float text_spacing(0.7);
    float abs_title_height = mTitleHeight*mPanHeight;
@@ -646,16 +647,23 @@ void StatusPanel::updatePanelScene()
    OSG::Vec2f status_title_ul(title_indent, center_title_ul.y()-total_center_height);
    OSG::Vec2f status_ul(0, status_title_ul.y()-abs_title_height);
    
-   OSG::Vec2f txt_local =
-      mBuilder.getTextSize(*mFont, mHeaderTitle, text_spacing);
-   mBuilder.buildText(mTextGeomCore.get(), *mFont, mHeaderTitle, header_title_ul, mTitleColor, abs_title_height, text_spacing);
+   // Headers
+   mBuilder.buildText(mTextGeomCore, *mFont, mHeaderTitle, header_title_ul, mTitleColor, abs_title_height, text_spacing);
+   mBuilder.addText(mTextGeomCore, *mFont, mCenterTitle, center_title_ul, mTitleColor, abs_title_height, text_spacing);
+   mBuilder.addText(mTextGeomCore, *mFont, mBottomTitle, status_title_ul, mTitleColor, abs_title_height, text_spacing);
    
-   //mBuilder.buildRectangle(mTextGeomCore, dbg_color, status_title_ul, OSG::Vec2f(mPanWidth,, 0.05, 0.05);    // Center
+   // Header section
+   OSG::Vec2f bounds = mBuilder.getTextSize(*mFont, mHeaderText, text_spacing);
+   mBuilder.addText(mTextGeomCore, *mFont, mHeaderText, header_ul, mTextColor, header_pan_height/bounds.y(), text_spacing);
+
+   // Center section
+   bounds = mBuilder.getTextSize(*mFont, mCenterText, text_spacing); 
+   mBuilder.addText(mTextGeomCore, *mFont, mCenterText, center_ul, mTextColor, center_pan_height/bounds.y(), text_spacing);
 
    //txt_local = mBuilder.getTextSize(*mFont, mHeaderText, 
    //OSG::Vec2f header_pos(0, header_title_pos.y()-
 
-   // Draw debug outlines
+   // --- Draw debug outlines --- //
    mBuilder.buildRectangleOutline(mPanelGeomCore, dbg_color, panel_ll, panel_ur, 0.2);
    mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(1,1,0), 
                                                   OSG::Vec2f(0,header_title_ul.y()-total_header_height),
@@ -890,9 +898,12 @@ void initgl(void)
 int setupGLUT(int *argc, char *argv[])
 {
     glutInit(argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH | GLUT_DOUBLE);
+    
 
     int winid = glutCreateWindow("IOV UI Test");
+
+    std::cout << "Depth size: " << glutGet(GLUT_WINDOW_DEPTH_SIZE) << std::endl;
 
     initgl();
     glutReshapeFunc(reshape);
