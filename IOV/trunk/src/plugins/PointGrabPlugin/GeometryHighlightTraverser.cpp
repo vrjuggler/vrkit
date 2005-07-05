@@ -39,6 +39,13 @@ addHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> highlightMat)
       OSG::MultiPassMaterialPtr mpass_mat;
       OSG::MaterialPtr mat = (*c)->getMaterial();
 
+      // If the geometry node has no material at all, we have to
+      // inject a dummy material to ensure that the geometry is
+      // rendered before the highlighting is rendered.  This
+      // material will be left in the tree even when the highlighting
+      // is enabled since it is not obvious (to me) how to distinguish
+      // between this dummy material and the case when the geometry
+      // has a single material.
       if ( mat == OSG::NullFC )
       {
          mpass_mat = OSG::MultiPassMaterial::create();

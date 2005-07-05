@@ -309,8 +309,6 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
                updateHighlight(lit_node);
             }
 
-            // XXX: I wish that there was a way to do this that would preserve
-            // the reference count for mIsectHighlightMaterial...
             OSG::RefPtr<OSG::MaterialPtr> highlight_mat(
                mIsectHighlightMaterial.get()
             );
@@ -510,8 +508,6 @@ PointGrabPlugin::PointGrabPlugin()
 void PointGrabPlugin::
 changeHighlightMaterial(OSG::RefPtr<OSG::ChunkMaterialPtr> newMat)
 {
-   // XXX: I wish that there was a way to do this that would preserve the
-   // reference count for newMat...
    OSG::RefPtr<OSG::MaterialPtr> highlight_mat(newMat.get());
    mGeomTraverser.changeHighlightMaterial(highlight_mat);
 }
