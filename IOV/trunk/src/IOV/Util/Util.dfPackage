@@ -21,6 +21,16 @@ class reference21 {
 @__modelType reference 
 */
 class reference22 {
+}/**
+@__ref <oiref:cpp#Class#inf::Exception:oiref><oihard>
+@__modelType reference 
+*/
+class reference7 {
+}/**
+@__ref <oiref:cpp#Class#inf::PluginException:oiref><oihard>
+@__modelType reference 
+*/
+class reference8 {
 }}/**
 @__tags
 @shapeType ClassDiagram 

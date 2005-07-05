@@ -57,11 +57,6 @@ class reference12 {
 */
 class reference13 {
 }/**
-@__ref <oiref:cpp#Class#::ElementRemovePredicate:oiref><oihard>
-@__modelType reference 
-*/
-class reference14 {
-}/**
 @__ref <oiref:cpp#Class#inf::ResourceMgr:oiref><oihard>
 @__modelType reference 
 */
@@ -87,6 +82,28 @@ class reference19 {
 @__fqn <oiref:#Package#IOV.Util:oiref> 
 */
 class reference20 {
+}/**
+@__ref <oiref:design#Class#idmiyzeas8xdj4eas8zftu.diagram:oiref><oihard>
+@__modelType reference
+@__fqn <oiref:#Package#IOV.Plugin:oiref> 
+*/
+class reference1 {
+}/**
+@__ref <oiref:cpp#Class#StatusPanel:oiref><oihard>
+@__modelType reference 
+*/
+class reference2 {
+}/**
+@__ref <oiref:design#Class#id43lxweas8xdj4eas8zfuf.diagram:oiref><oihard>
+@__modelType reference
+@__fqn <oiref:#Package#IOV.Slave:oiref> 
+*/
+class reference4 {
+}/**
+@__ref <oiref:cpp#Class#inf::UiBuilder:oiref><oihard>
+@__modelType reference 
+*/
+class reference6 {
 }}/**
 @__tags
 @shapeType ClassDiagram 
@@ -97,40 +114,44 @@ class __tags {
 */
 class __options {
 }/**
-@__positions <oigroup:<oiref:cpp#Class#inf::SceneData:oiref>=210,500,200,118,1:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::Scene#lnkSceneData:oiref>=355,433,355,500:oigroup>
-<oigroup:<oiref:cpp#Class#inf::PluginFactory:oiref>=490,580,200,202,1:oigroup>
-<oigroup:<oiref:cpp#Class#inf::ResourceMgr:oiref>=1011,640,131,79,1:oigroup>
-<oigroup:Composite#stereotype#MemberLink#<oiref:cpp#Member#inf::DeviceInterface#lnkDeviceInterface:oiref>=874,100,113,13,0:oigroup>
-<oigroup:<oiref:cpp#Class#inf::CollideData:oiref>=230,215,122,79,1:oigroup>
-<oigroup:<oiref:cpp#Class#inf::Scene:oiref>=170,140,200,293,1:oigroup>
-<oigroup:Composite#supplierCardinality#MemberLink#<oiref:cpp#Member#inf::Viewer#lnkPlugin:oiref>=1,493,30,13,0:oigroup>
-<oigroup:<oiref:cpp#Class#inf::Viewer:oiref>=-80,29,200,384,1:oigroup>
-<oigroup:<oiref:cpp#Class#inf::DeviceInterface:oiref>=960,71,149,92,1:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::User#mViewPlatform:oiref>=530,216,530,261:oigroup>
-<oigroup:<oiref:design#Class#id1mjq6e8ohlp2ee8oi0wwb.diagram:oiref>=-50,769,174,88,1:oigroup>
-<oigroup:<oiref:cpp#Class#::ElementRemovePredicate:oiref>=1000,470,197,111,1:oigroup>
-<oigroup:<oiref:cpp#Extends#inf::GrabData#inf::SceneData:oiref>=370,691,370,618:oigroup>
-<oigroup:<oiref:cpp#Class#inf::PluginCreator:oiref>=750,530,200,257,1:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkConfiguration:oiref>=120,59,240,59:oigroup>
-<oigroup:<oiref:cpp#Class#inf::InterfaceTrader:oiref>=701,60,200,114,1:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::User#mInterfaceTrader:oiref>=631,117,701,117:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkPlugin:oiref>=35,413,35,510:oigroup>
-<oigroup:<oiref:cpp#Class#inf::User:oiref>=431,40,200,176,1:oigroup>
-<oigroup:<oiref:cpp#Class#inf::WandInterface:oiref>=880,240,200,153,1:oigroup>
+@__positions <oigroup:Composite#supplierCardinality#MemberLink#<oiref:cpp#Member#inf::Viewer#lnkUser:oiref>=460,131,16,13,0:oigroup>
+<oigroup:<oiref:cpp#Class#inf::Scene:oiref>=210,200,200,293,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::PluginFactory:oiref>=490,580,200,228,1:oigroup>
 <oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#mConfiguration:oiref>=120,59,240,59:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkUser:oiref>=120,128,431,128:oigroup>
-<oigroup:<oiref:cpp#Extends#inf::WandInterface#inf::DeviceInterface:oiref>=1020,240,1020,163:oigroup>
-<oigroup:<oiref:cpp#Class#inf::Grabber:oiref>=1109,10,96,79,1:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::DeviceInterface#lnkDeviceInterface:oiref>=960,117,901,117:oigroup>
-<oigroup:<oiref:cpp#Class#inf::Configuration:oiref>=240,10,139,79,1:oigroup>
-<oigroup:Composite#supplierCardinality#MemberLink#<oiref:cpp#Member#inf::Viewer#lnkScene:oiref>=150,253,16,13,0:oigroup>
-<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkScene:oiref>=120,270,170,270:oigroup>
-<oigroup:<oiref:cpp#Class#inf::Plugin:oiref>=-50,510,185,228,1:oigroup>
-<oigroup:<oiref:cpp#Class#inf::ViewPlatform:oiref>=430,261,200,153,1:oigroup>
-<oigroup:Composite#supplierCardinality#MemberLink#<oiref:cpp#Member#inf::Viewer#lnkUser:oiref>=411,111,16,13,0:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::User#mInterfaceTrader:oiref>=680,117,730,117:oigroup>
+<oigroup:<oiref:design#Class#idmiyzeas8xdj4eas8zftu.diagram:oiref>=1040,470,80,61,1:oigroup>
 <oigroup:<oiref:cpp#Extends#inf::CollideData#inf::SceneData:oiref>=291,215,291,128:oigroup>
-<oigroup:<oiref:cpp#Class#inf::GrabData:oiref>=210,691,200,150,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::GrabData:oiref>=210,710,200,150,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::User:oiref>=480,60,200,176,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::WandInterface:oiref>=880,240,200,166,1:oigroup>
+<oigroup:<oiref:design#Class#id1mjq6e8ohlp2ee8oi0wwb.diagram:oiref>=-50,769,174,114,1:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::DeviceInterface#lnkDeviceInterface:oiref>=990,126,930,126:oigroup>
+<oigroup:Composite#stereotype#MemberLink#<oiref:cpp#Member#inf::DeviceInterface#lnkDeviceInterface:oiref>=904,109,113,13,0:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkPlugin:oiref>=35,478,35,510:oigroup>
+<oigroup:<oiref:cpp#Class#inf::Plugin:oiref>=-50,510,185,215,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::Grabber:oiref>=1109,10,96,79,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::ViewPlatform:oiref>=500,290,200,153,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::DeviceInterface:oiref>=990,80,149,92,1:oigroup>
+<oigroup:<oiref:cpp#Class#StatusPanel:oiref>=962,793,200,543,1:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#StatusPanel#mBuilder:oiref>=962,1055,860,1055:oigroup>
+<oigroup:<oiref:cpp#Class#inf::SceneData:oiref>=210,560,200,118,1:oigroup>
+<oigroup:Composite#supplierCardinality#MemberLink#<oiref:cpp#Member#inf::Viewer#lnkScene:oiref>=190,322,16,13,0:oigroup>
+<oigroup:<oiref:cpp#Extends#inf::GrabData#inf::SceneData:oiref>=310,710,310,678:oigroup>
+<oigroup:<oiref:cpp#Class#inf::ResourceMgr:oiref>=1011,640,131,79,1:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::User#mViewPlatform:oiref>=590,236,590,290:oigroup>
+<oigroup:<oiref:cpp#Class#inf::PluginCreator:oiref>=750,530,200,257,1:oigroup>
+<oigroup:<oiref:cpp#Class#inf::UiBuilder:oiref>=660,930,200,251,1:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkScene:oiref>=120,339,210,339:oigroup>
+<oigroup:<oiref:cpp#Class#inf::Configuration:oiref>=240,10,200,111,1:oigroup>
+<oigroup:<oiref:design#Class#id43lxweas8xdj4eas8zfuf.diagram:oiref>=1030,540,91,61,1:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkConfiguration:oiref>=120,59,240,59:oigroup>
+<oigroup:<oiref:cpp#Class#inf::InterfaceTrader:oiref>=730,60,200,114,1:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::Viewer#lnkUser:oiref>=120,148,480,148:oigroup>
+<oigroup:<oiref:cpp#Class#inf::CollideData:oiref>=230,215,122,79,1:oigroup>
+<oigroup:Composite#supplierCardinality#MemberLink#<oiref:cpp#Member#inf::Viewer#lnkPlugin:oiref>=1,493,30,13,0:oigroup>
+<oigroup:MemberLink#<oiref:cpp#Member#inf::Scene#lnkSceneData:oiref>=310,493,310,560:oigroup>
+<oigroup:<oiref:cpp#Class#inf::Viewer:oiref>=-80,29,200,449,1:oigroup>
+<oigroup:<oiref:cpp#Extends#inf::WandInterface#inf::DeviceInterface:oiref>=1035,240,1035,172:oigroup>
 */
 class __positions {
 }
