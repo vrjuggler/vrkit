@@ -1,6 +1,7 @@
 #include <OpenSG/OSGNodeCore.h>
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGMultiPassMaterial.h>
+#include <OpenSG/OSGSimpleMaterial.h>
 
 #include "GeometryHighlightTraverser.h"
 
@@ -41,6 +42,8 @@ addHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> highlightMat)
       if ( mat == OSG::NullFC )
       {
          mpass_mat = OSG::MultiPassMaterial::create();
+         OSG::SimpleMaterialPtr empty_mat = OSG::SimpleMaterial::create();
+         mpass_mat->addMaterial(empty_mat);
       }
       // If we already have a multi-pass material, we will use it for
       // mpass_mat.
