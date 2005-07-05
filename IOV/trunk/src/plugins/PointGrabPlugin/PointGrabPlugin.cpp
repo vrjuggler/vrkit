@@ -255,7 +255,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       {
          // If mIntersectedObj's node is non-NULL, then we may need to detach
          // the highlight node from mIntersectedObj.
-         if ( mIntersectedObj.node() != OSG::NullFC )
+         if ( mIntersectedObj.node() != OSG::NullFC && ! mUsingShader )
          {
             OSG::Int32 highlight_index =
                mIntersectedObj.node()->findChild(mCoredHighlightNode);
