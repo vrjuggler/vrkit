@@ -12,6 +12,7 @@
 #include <boost/filesystem/exception.hpp>
 
 #include <OpenSG/OSGSHLChunk.h>
+#include <OpenSG/OSGPolygonChunk.h>
 
 #include <gmtl/Generate.h>
 #include <gmtl/Matrix.h>
@@ -95,7 +96,7 @@ void PointGrabPlugin::init(ViewerPtr viewer)
       config(cfg_elt);
    }
 
-   bool use_bbox(false);
+   bool use_scribe(false);
 
    if ( mEnableShaders )
    {
@@ -109,20 +110,18 @@ void PointGrabPlugin::init(ViewerPtr viewer)
       catch (std::exception& ex)
       {
          std::cerr << ex.what() << std::endl;
-         std::cout << "Falling back on bounding box highlighting."
+         std::cout << "Falling back on highlighting through scribing."
                    << std::endl;
-         use_bbox = true;
+         use_scribe = true;
       }
    }
    else
    {
-      use_bbox = true;
+      use_scribe = true;
    }
 
-   if ( use_bbox )
+   if ( use_scribe )
    {
-      mUsingShader = false;
-
       // Set up the highlight materials.
       OSG::SimpleMaterialPtr isect_highlight_mat =
          OSG::SimpleMaterial::create();
@@ -132,8 +131,6 @@ void PointGrabPlugin::init(ViewerPtr viewer)
          isect_highlight_mat->setDiffuse(mIntersectColor);
       OSG::endEditCP(isect_highlight_mat);
 
-      mIsectHighlightMaterial = isect_highlight_mat;
-
       OSG::SimpleMaterialPtr grab_highlight_mat =
          OSG::SimpleMaterial::create();
 
@@ -142,65 +139,26 @@ void PointGrabPlugin::init(ViewerPtr viewer)
          grab_highlight_mat->setDiffuse(mGrabColor);
       OSG::endEditCP(grab_highlight_mat);
 
+      OSG::PolygonChunkPtr scribe_chunk = OSG::PolygonChunk::create();
+      OSG::beginEditCP(scribe_chunk);
+         scribe_chunk->setFrontMode(GL_LINE);
+         scribe_chunk->setOffsetLine(true);
+         scribe_chunk->setOffsetFill(false);
+         scribe_chunk->setOffsetPoint(false);
+         scribe_chunk->setOffsetFactor(0.05f);
+         scribe_chunk->setOffsetBias(1.0f);
+      OSG::endEditCP(scribe_chunk);
+
+      OSG::beginEditCP(isect_highlight_mat);
+         isect_highlight_mat->addChunk(scribe_chunk);
+      OSG::endEditCP(isect_highlight_mat);
+
+      OSG::beginEditCP(grab_highlight_mat);
+         grab_highlight_mat->addChunk(scribe_chunk);
+      OSG::endEditCP(grab_highlight_mat);
+
       mIsectHighlightMaterial = isect_highlight_mat;
       mGrabHighlightMaterial  = grab_highlight_mat;
-
-      // Set up the highlight bounding box.
-      OSG::GeoPTypesPtr type = OSG::GeoPTypesUI8::create();
-      OSG::beginEditCP(type);
-         type->push_back(GL_LINE_STRIP);
-         type->push_back(GL_LINES);
-      OSG::endEditCP(type);
-
-      OSG::GeoPLengthsPtr lens = OSG::GeoPLengthsUI32::create();
-      OSG::beginEditCP(lens);
-         lens->push_back(10);
-         lens->push_back(6);
-      OSG::endEditCP(lens);
-
-      OSG::GeoIndicesUI32Ptr index = OSG::GeoIndicesUI32::create();
-      OSG::beginEditCP(index);
-         index->getFieldPtr()->push_back(0);
-         index->getFieldPtr()->push_back(1);
-         index->getFieldPtr()->push_back(3);
-         index->getFieldPtr()->push_back(2);
-         index->getFieldPtr()->push_back(0);
-         index->getFieldPtr()->push_back(4);
-         index->getFieldPtr()->push_back(5);
-         index->getFieldPtr()->push_back(7);
-         index->getFieldPtr()->push_back(6);
-         index->getFieldPtr()->push_back(4);
-
-         index->getFieldPtr()->push_back(1);
-         index->getFieldPtr()->push_back(5);
-         index->getFieldPtr()->push_back(2);
-         index->getFieldPtr()->push_back(6);
-         index->getFieldPtr()->push_back(3);
-         index->getFieldPtr()->push_back(7);
-      OSG::endEditCP(index);
-
-      mHighlightPoints = OSG::GeoPositions3f::create();
-      OSG::beginEditCP(mHighlightPoints);
-         mHighlightPoints->push_back(OSG::Pnt3f(-1, -1, -1));
-         mHighlightPoints->push_back(OSG::Pnt3f( 1, -1, -1));
-         mHighlightPoints->push_back(OSG::Pnt3f(-1,  1, -1));
-         mHighlightPoints->push_back(OSG::Pnt3f( 1,  1, -1));
-         mHighlightPoints->push_back(OSG::Pnt3f(-1, -1,  1));
-         mHighlightPoints->push_back(OSG::Pnt3f( 1, -1,  1));
-         mHighlightPoints->push_back(OSG::Pnt3f(-1,  1,  1));
-         mHighlightPoints->push_back(OSG::Pnt3f( 1,  1,  1));
-      OSG::endEditCP(mHighlightPoints);
-
-      OSG::GeometryPtr geo = OSG::Geometry::create();
-      OSG::beginEditCP(geo);
-         geo->setTypes(type);
-         geo->setLengths(lens);
-         geo->setIndices(index);
-         geo->setPositions(mHighlightPoints);
-      OSG::endEditCP(geo);
-      OSG::addRefCP(geo);
-
-      mCoredHighlightNode = inf::CoredGeomPtr(geo);
    }
 }
 
@@ -253,21 +211,6 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       // the application and scene state.
       if ( intersect_obj.node() != mIntersectedObj.node() )
       {
-         // If mIntersectedObj's node is non-NULL, then we may need to detach
-         // the highlight node from mIntersectedObj.
-         if ( mIntersectedObj.node() != OSG::NullFC && ! mUsingShader )
-         {
-            OSG::Int32 highlight_index =
-               mIntersectedObj.node()->findChild(mCoredHighlightNode);
-
-            if ( highlight_index != -1 )
-            {
-               OSG::beginEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
-                  mIntersectedObj.node()->subChild(highlight_index);
-               OSG::endEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
-            }
-         }
-
          // Change the intersected object to the one we found above.
          mIntersectedObj = intersect_obj;
 
@@ -284,30 +227,13 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
 
             mGeomTraverser.reset();
 
-            if ( mUsingShader )
-            {
-               OSG::traverse(lit_node,
-                             OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
-                                OSG::Action::ResultE,
-                                GeometryHighlightTraverser,
-                                OSG::NodePtr
-                             >(&mGeomTraverser,
-                               &GeometryHighlightTraverser::enter));
-            }
-            else
-            {
-               OSG::traverse(mCoredHighlightNode,
-                             OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
-                                OSG::Action::ResultE,
-                                GeometryHighlightTraverser,
-                                OSG::NodePtr
-                             >(&mGeomTraverser,
-                               &GeometryHighlightTraverser::enter));
-               OSG::beginEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
-                  mIntersectedObj.node()->addChild(mCoredHighlightNode);
-               OSG::endEditCP(mIntersectedObj, OSG::Node::ChildrenFieldMask);
-               updateHighlight(lit_node);
-            }
+            OSG::traverse(lit_node,
+                          OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
+                             OSG::Action::ResultE,
+                             GeometryHighlightTraverser,
+                             OSG::NodePtr
+                          >(&mGeomTraverser,
+                            &GeometryHighlightTraverser::enter));
 
             OSG::RefPtr<OSG::MaterialPtr> highlight_mat(
                mIsectHighlightMaterial.get()
@@ -500,7 +426,6 @@ PointGrabPlugin::PointGrabPlugin()
    , mGrabbing(false)
    , mIntersectColor(1.0f, 1.0f, 0.0f)
    , mGrabColor(1.0f, 0.0f, 1.0f)
-   , mUsingShader(false)
 {
    /* Do nothing. */ ;
 }
@@ -510,35 +435,6 @@ changeHighlightMaterial(OSG::RefPtr<OSG::ChunkMaterialPtr> newMat)
 {
    OSG::RefPtr<OSG::MaterialPtr> highlight_mat(newMat.get());
    mGeomTraverser.changeHighlightMaterial(highlight_mat);
-}
-
-// The implementation of this helper method is adapted from
-// OSG::SimpleSceneManager::updateHighlight() in OpenSG 1.4.0.
-void PointGrabPlugin::updateHighlight(OSG::NodePtr highlightNode)
-{
-   if ( highlightNode == OSG::NullFC )
-   {
-      return;
-   }
-
-   const OSG::DynamicVolume& vol = highlightNode->getVolume();
-
-   OSG::Pnt3f min, max;
-   vol.getBounds(min, max);
-
-   OSG::beginEditCP(mHighlightPoints);
-      mHighlightPoints->setValue(OSG::Pnt3f(min[0], min[1], min[2]), 0);
-      mHighlightPoints->setValue(OSG::Pnt3f(max[0], min[1], min[2]), 1);
-      mHighlightPoints->setValue(OSG::Pnt3f(min[0], max[1], min[2]), 2);
-      mHighlightPoints->setValue(OSG::Pnt3f(max[0], max[1], min[2]), 3);
-      mHighlightPoints->setValue(OSG::Pnt3f(min[0], min[1], max[2]), 4);
-      mHighlightPoints->setValue(OSG::Pnt3f(max[0], min[1], max[2]), 5);
-      mHighlightPoints->setValue(OSG::Pnt3f(min[0], max[1], max[2]), 6);
-      mHighlightPoints->setValue(OSG::Pnt3f(max[0], max[1], max[2]), 7);
-   OSG::endEditCP(mHighlightPoints);
-
-   OSG::beginEditCP(mCoredHighlightNode, OSG::Geometry::PositionsFieldMask);
-   OSG::endEditCP(mCoredHighlightNode, OSG::Geometry::PositionsFieldMask);
 }
 
 OSG::RefPtr<OSG::ChunkMaterialPtr>
@@ -599,8 +495,6 @@ PointGrabPlugin::createShader(const std::string& vertexShader,
          material->addChunk(shl_chunk);
          material->addChunk(blend_chunk);
       OSG::endEditCP(material);
-
-      mUsingShader = true;
 
       return material;
    }

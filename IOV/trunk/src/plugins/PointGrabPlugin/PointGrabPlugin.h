@@ -28,8 +28,6 @@
 namespace inf
 {
 
-typedef OSG::CoredNodePtr<OSG::Geometry> CoredGeomPtr;
-
 class PointGrabPlugin
    : public inf::Plugin
    , public boost::enable_shared_from_this<PointGrabPlugin>
@@ -93,8 +91,6 @@ private:
 
    void changeHighlightMaterial(OSG::RefPtr<OSG::ChunkMaterialPtr> newMat);
 
-   void updateHighlight(OSG::NodePtr highlightNode);
-
    OSG::RefPtr<OSG::ChunkMaterialPtr> createShader(const std::string& vertexShader,
                                                    const std::string& fragmentShader)
       throw(std::exception);
@@ -130,8 +126,6 @@ private:
    OSG::Color3f mIntersectColor;
    OSG::Color3f mGrabColor;
 
-   bool mUsingShader;
-   inf::CoredGeomPtr                  mCoredHighlightNode;
    OSG::GeoPositions3fPtr             mHighlightPoints;
    OSG::RefPtr<OSG::ChunkMaterialPtr> mIsectHighlightMaterial;
    OSG::RefPtr<OSG::ChunkMaterialPtr> mGrabHighlightMaterial;
