@@ -125,6 +125,11 @@ void StatusPanelPlugin::init(inf::ViewerPtr viewer)
    // Register with status
    StatusOutputter status_outputter(shared_from_this());
    inf::Status::instance()->addOutputter(status_outputter);
+
+   // Register with scene data
+   StatusPanelPluginDataPtr status_panel_data =
+      scene_obj->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
+   status_panel_data->mStatusPanelPlugin = shared_from_this();
 }
 
 void StatusPanelPlugin::updateState(inf::ViewerPtr viewer)
@@ -140,6 +145,18 @@ void StatusPanelPlugin::run(inf::ViewerPtr viewer)
 void StatusPanelPlugin::destroy()
 {
    delete this;
+}
+
+const vpr::GUID StatusPanelPluginData::type_guid("758a1730-7f05-4c99-ae5d-46502479882d");
+
+StatusPanelPluginData::StatusPanelPluginData()
+{
+   ;
+}
+
+StatusPanelPluginData::~StatusPanelPluginData()
+{
+   ;
 }
 
 } // namespace inf

@@ -22,6 +22,9 @@
 #include <IOV/PluginFactory.h>
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Status.h>
+#include <IOV/StatusPanelPlugin.h>
+
+#include <sstream>
 
 #include "ModeSwitchPlugin.h"
 
@@ -49,6 +52,11 @@ IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
 }
 //@}
 
+}
+
+namespace
+{
+   const vpr::GUID mode_switch_status_id("8c0034da-b613-4bd0-9c30-f8c35f48ba1a");
 }
 
 namespace inf
@@ -186,7 +194,7 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
       mModeNames.resize(mMaxMode+1, std::string("Unknown Mode"));
    }
 
-   switchToMode(0);
+   switchToMode(0, viewer);
 }
 
 void ModeSwitchPlugin::updateState(inf::ViewerPtr viewer)
@@ -199,7 +207,7 @@ void ModeSwitchPlugin::updateState(inf::ViewerPtr viewer)
       unsigned new_mode(0);
       if(mMaxMode != 0)
       { new_mode = (mCurrentMode + 1) % (mMaxMode+1); }
-      switchToMode(new_mode);
+      switchToMode(new_mode, viewer);
    }
 
    for(unsigned i=0; i<mPlugins.size(); ++i)
@@ -221,8 +229,9 @@ void ModeSwitchPlugin::run(inf::ViewerPtr viewer)
 }
 
 
-void ModeSwitchPlugin::switchToMode(unsigned modeNum)
+void ModeSwitchPlugin::switchToMode(unsigned modeNum, inf::ViewerPtr viewer)
 {
+   //mode_switch_status_id
    if(modeNum > mMaxMode)
    {
       std::cerr << "ModeSwitchPlugin: Attempted to switch out of range to: "
@@ -231,6 +240,17 @@ void ModeSwitchPlugin::switchToMode(unsigned modeNum)
    }
 
    IOV_STATUS << "ModeSwitchPlugin: Switching to mode: " << mModeNames[modeNum] << std::endl;
+
+
+   StatusPanelPluginDataPtr status_panel_data =
+      viewer->getSceneObj()->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
+   if(status_panel_data->mStatusPanelPlugin)
+   {
+      inf::StatusPanel& panel = status_panel_data->mStatusPanelPlugin->getPanel();
+      std::ostringstream stream;
+      stream << "Mode: " << mModeNames[modeNum];
+      panel.setHeaderText(stream.str());
+   }
 
    for(unsigned i=0; i<mPlugins.size(); ++i)
    {

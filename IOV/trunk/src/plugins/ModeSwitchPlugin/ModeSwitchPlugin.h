@@ -65,7 +65,7 @@ protected:
    /** Internal helper for mode switching.
    * Switch to the given mode. Activates and deactivates the plugins needed.
    */
-   void switchToMode(unsigned modeNum);
+   void switchToMode(unsigned modeNum, inf::ViewerPtr viewer);
 
    /**
     * Deletes this object.  This is an implementation of the pure virtual

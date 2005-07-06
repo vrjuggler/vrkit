@@ -2,10 +2,17 @@
 #define _STATUS_PANEL_PLUGIN_H_
 
 #include <IOV/Plugin.h>
+#include <IOV/StatusPanel.h>
+#include <IOV/SceneData.h>
+
+#include <OpenSG/OSGTransform.h>
+
+#include <vpr/vpr.h>
+#include <vpr/Util/GUID.h>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
-#include <IOV/StatusPanel.h>
-#include <OpenSG/OSGTransform.h>
+
 
 namespace inf
 {
@@ -13,7 +20,7 @@ class StatusPanelPlugin;
 typedef boost::shared_ptr<StatusPanelPlugin> StatusPanelPluginPtr;
 typedef boost::weak_ptr<StatusPanelPlugin> StatusPanelPluginWeakPtr;
 
-class StatusPanelPlugin
+class IOV_CLASS_API StatusPanelPlugin
    : public inf::Plugin, public boost::enable_shared_from_this<StatusPanelPlugin>
 {
 public:
@@ -43,6 +50,27 @@ protected:
    virtual void destroy();
 };
 
+
+class StatusPanelPluginData;
+typedef boost::shared_ptr<StatusPanelPluginData> StatusPanelPluginDataPtr;
+
+class IOV_CLASS_API StatusPanelPluginData : public inf::SceneData
+{
+public:
+   static const vpr::GUID type_guid;
+
+   static StatusPanelPluginDataPtr create()
+   {
+      return StatusPanelPluginDataPtr(new StatusPanelPluginData);
+   }
+
+   StatusPanelPluginData();
+
+   virtual ~StatusPanelPluginData();
+
+public:
+   StatusPanelPluginPtr    mStatusPanelPlugin;  /**< Pointer to the plugin (if registered). */
+};
 
 }
 
