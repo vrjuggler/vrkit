@@ -32,6 +32,21 @@ public:
 private:
    std::vector< OSG::RefPtr<OSG::NodePtr> > mGeomNodes;
    std::vector< OSG::RefPtr<OSG::GeometryPtr> > mGeomCores;
+
+   template<typename T>
+   struct RefPtrCompare
+   {
+      bool operator()(OSG::RefPtr<T> p0, OSG::RefPtr<T> p1) const
+      {
+         return p0.get() < p1.get();
+      }
+   };
+
+   typedef std::map< OSG::RefPtr<OSG::GeometryPtr>,
+                     OSG::RefPtr<OSG::MaterialPtr>,
+                     RefPtrCompare<OSG::GeometryPtr> >
+      core_mat_table_t;
+   core_mat_table_t mOrigMaterials;
 };
 
 }

@@ -39,13 +39,13 @@ addHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> highlightMat)
       OSG::MultiPassMaterialPtr mpass_mat;
       OSG::MaterialPtr mat = (*c)->getMaterial();
 
-      // If the geometry node has no material at all, we have to
-      // inject a dummy material to ensure that the geometry is
-      // rendered before the highlighting is rendered.  This
-      // material will be left in the tree even when the highlighting
-      // is enabled since it is not obvious (to me) how to distinguish
-      // between this dummy material and the case when the geometry
-      // has a single material.
+      // Save the core's current material so that we can restore it later in
+      // removeHighlightMaterial().
+      mOrigMaterials[*c] = OSG::RefPtr<OSG::MaterialPtr>(mat);
+
+      // If the geometry node has no material at all, we have to inject a
+      // dummy material to ensure that the geometry is rendered before the
+      // highlighting is rendered.
       if ( mat == OSG::NullFC )
       {
          mpass_mat = OSG::MultiPassMaterial::create();
@@ -102,32 +102,30 @@ void GeometryHighlightTraverser::removeHighlightMaterial()
       OSG::MaterialPtr mat = (*c)->getMaterial();
       OSG::MultiPassMaterialPtr mpass_mat =
          OSG::MultiPassMaterialPtr::dcast(mat);
+
+      // Get the multi-field for the materials and remove the last material
+      // from the multi-pass material.  This will be the one that we added in
+      // addHighlightMaterial().
       OSG::MFMaterialPtr& materials(mpass_mat->getMaterials());
       OSG::RefPtr<OSG::MaterialPtr> highlight_mat(
          mpass_mat->getMaterials(materials.getSize() - 1)
       );
       mpass_mat->subMaterial(highlight_mat);
 
-      if ( materials.getSize() == 1 )
-      {
-         OSG::RefPtr<OSG::MaterialPtr> temp_mat(
-            mpass_mat->getMaterials(0)
-         );
-         (*c)->setMaterial(temp_mat);
-      }
-      // This should never happen.
-      else if ( materials.getSize() == 0 )
-      {
-         assert(false);
-         (*c)->setMaterial(OSG::NullFC);
-      }
+      // Restore the material back to whatever it was originally.
+      // NOTE: This will be the same as mpass_mat if the geometry core already
+      // had a multi-pass material.
+      (*c)->setMaterial(mOrigMaterials[*c]);
    }
+
+   mOrigMaterials.clear();
 }
 
 void GeometryHighlightTraverser::reset()
 {
    mGeomCores.clear();
    mGeomNodes.clear();
+   mOrigMaterials.clear();
 }
 
 }
