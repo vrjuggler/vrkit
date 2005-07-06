@@ -11,6 +11,9 @@
 #include <IOV/ViewerPtr.h>
 #include <IOV/PluginPtr.h>
 
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
+
 #define INF_PLUGIN_API_MAJOR    1
 #define INF_PLUGIN_API_MINOR    0
 
@@ -105,7 +108,7 @@ protected:
       /* Do nothing. */ ;
    }
 
-   bool mIsFocused;
+   bool mIsFocused;              /**< If true, the plugin has "focus". */
 };
 
 }

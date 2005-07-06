@@ -21,6 +21,7 @@
 #include <IOV/PluginCreator.h>
 #include <IOV/PluginFactory.h>
 #include <IOV/Util/Exceptions.h>
+#include <IOV/Status.h>
 
 #include "ModeSwitchPlugin.h"
 
@@ -229,7 +230,7 @@ void ModeSwitchPlugin::switchToMode(unsigned modeNum)
       return;
    }
 
-   std::cout << "ModeSwitchPlugin: Switching to mode: " << mModeNames[modeNum] << std::endl;
+   IOV_STATUS << "ModeSwitchPlugin: Switching to mode: " << mModeNames[modeNum] << std::endl;
 
    for(unsigned i=0; i<mPlugins.size(); ++i)
    {

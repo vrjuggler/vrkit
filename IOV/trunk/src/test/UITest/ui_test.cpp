@@ -538,7 +538,7 @@ int main(int argc, char* argv[])
 
     // Status panel
    ///*
-    StatusPanel status_panel;
+    inf::StatusPanel status_panel;
     status_panel.initialize();
 
 
@@ -567,7 +567,7 @@ int main(int argc, char* argv[])
     status_panel.addStatusMessage(status_stream.str());
     status_stream.str("");
 
-    status_panel.updatePanelScene();
+    status_panel.update();
 
     scene->addChild(status_panel.getPanelRoot());
     //*/

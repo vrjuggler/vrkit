@@ -5,6 +5,7 @@
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGColor.h>
+#include <OpenSG/OSGClipPlaneChunk.h>
 
 #include <IOV/UiBuilder.h>
 
@@ -14,6 +15,8 @@
 #include <vector>
 #include <deque>
 
+namespace inf
+{
 
 class StatusPanel
 {
@@ -39,10 +42,22 @@ public:
    /** Add another message to the status panel. */
    void addStatusMessage(std::string msg);
 
+   /** Set the panel to dirty.  Next update will rebuild. */
+   void setDirty();
+
+   /** Update the status panel if it is needed. */
+   void update();
+
+public:  // Configuration params //
+
+   void setWidthHeight(float w, float h);
+
+protected:
    void updatePanelScene();
 
 protected:
    inf::UiBuilder        mBuilder;
+   bool                  mIsDirty;     /**< When true, we need a rebuild of the panel. */
 
    OSG::NodeRefPtr       mRootPanelNode;
    OSG::NodeRefPtr       mPanelGeomNode;
@@ -85,7 +100,16 @@ protected:
    OSG::Color3f   mTitleColor;
    OSG::Color3f   mTextColor;
 
+   bool           mDrawDebug;    /**< If true, draw debug geometry. */
+
+protected:
+   OSG::ClipPlaneChunkPtr mClipRight;
+   OSG::ClipPlaneChunkPtr mClipBottom;
+
+
 };
+
+}
 
 #endif
 

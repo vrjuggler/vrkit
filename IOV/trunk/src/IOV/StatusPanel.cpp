@@ -7,8 +7,12 @@
 
 #include <algorithm>
 
+namespace inf
+{
+
 StatusPanel::StatusPanel()
 {
+   mIsDirty = true;
    mFont = NULL;
 
    mPanWidth = 10.0f;
@@ -21,8 +25,8 @@ StatusPanel::StatusPanel()
    mStatusHistorySize = 20;
    mStatusTextHeight = 0.5f;
 
-   mBgColor.setValuesRGB(0.5, 0.5, 0.5);
-   mBgAlpha = 1.0f;
+   mBgColor.setValuesRGB(0.2, 0.2, 0.2);
+   mBgAlpha = 0.6f;
    mBorderColor.setValuesRGB(1,1,1);
    mTitleColor.setValuesRGB(1,0.5,0);
    mTextColor.setValuesRGB(1,1,1);
@@ -33,6 +37,8 @@ StatusPanel::StatusPanel()
 
    mHeaderText  = "Header\nText";
    mCenterText  = "Controls:\n1 - Forward\n2 - Rotate\n3 - Viewport Cycle\n4 - Switch Mode\nReally long line of text here to test it.";
+
+   mDrawDebug = false;
 }
 
 
@@ -71,56 +77,56 @@ void StatusPanel::initialize()
    OSG::ChunkMaterialPtr text_mat = OSG::ChunkMaterialPtr::dcast(mTextGeomCore->getMaterial());
    vprASSERT(OSG::NullFC != text_mat);
 
-   OSG::ClipPlaneChunkPtr clip_right = OSG::ClipPlaneChunk::create();
-   beginEditCP(clip_right);
-   clip_right->setEquation(OSG::Vec4f(-1,0,0,mPanWidth));      // X clip plane <= right size
-   clip_right->setEnable(true);
-   clip_right->setBeacon(mTextGeomNode);
-   endEditCP(clip_right);
+   mClipRight = OSG::ClipPlaneChunk::create();
+   beginEditCP(mClipRight);
+   mClipRight->setEquation(OSG::Vec4f(-1,0,0,mPanWidth));      // X clip plane <= right size
+   mClipRight->setEnable(true);
+   mClipRight->setBeacon(mTextGeomNode);
+   endEditCP(mClipRight);
 
-   OSG::ClipPlaneChunkPtr clip_bottom = OSG::ClipPlaneChunk::create();
-   beginEditCP(clip_bottom);
-   clip_bottom->setEquation(OSG::Vec4f(0,1,0,0));         // Y clip plane on Y>=0
-   clip_bottom->setEnable(true);
-   clip_bottom->setBeacon(mTextGeomNode);
-   endEditCP(clip_bottom);
+   mClipBottom = OSG::ClipPlaneChunk::create();
+   beginEditCP(mClipBottom);
+   mClipBottom->setEquation(OSG::Vec4f(0,1,0,0));         // Y clip plane on Y>=0
+   mClipBottom->setEnable(true);
+   mClipBottom->setBeacon(mTextGeomNode);
+   endEditCP(mClipBottom);
 
    OSG::beginEditCP(text_mat);
-   text_mat->addChunk(clip_right);
-   text_mat->addChunk(clip_bottom);
+   text_mat->addChunk(mClipBottom);
+   text_mat->addChunk(mClipRight);
    OSG::endEditCP(text_mat);
-
+   setDirty();
 }
 
 void StatusPanel::setHeaderTitle(std::string txt)
 {
    mHeaderTitle = txt;
-   updatePanelScene();
+   setDirty();
 }
 
 void StatusPanel::setCenterTitle(std::string txt)
 {
    mCenterTitle = txt;
-   updatePanelScene();
+   setDirty();
 }
 
 void StatusPanel::setBottomTitle(std::string txt)
 {
    mBottomTitle = txt;
-   updatePanelScene();
+   setDirty();
 }
 
 
 void StatusPanel::setHeaderText(std::string header)
 {
    mHeaderText = header;
-   updatePanelScene();
+   setDirty();
 }
 
 void StatusPanel::setControlText(std::string text)
 {
    mCenterText = text;
-   updatePanelScene();
+   setDirty();
 }
 
 void StatusPanel::addStatusMessage(std::string msg)
@@ -132,7 +138,29 @@ void StatusPanel::addStatusMessage(std::string msg)
    {
       mStatusLines.pop_back();
    }
-   updatePanelScene();
+   setDirty();
+}
+
+void StatusPanel::setDirty()
+{
+   mIsDirty = true;
+}
+
+
+void StatusPanel::update()
+{
+   if(mIsDirty)
+   {
+      updatePanelScene();
+      mIsDirty = false;
+   }
+}
+
+void StatusPanel::setWidthHeight(float w, float h)
+{
+   mPanWidth = w;
+   mPanHeight = h;
+   setDirty();
 }
 
 void StatusPanel::updatePanelScene()
@@ -147,8 +175,8 @@ void StatusPanel::updatePanelScene()
 
    mBuilder.buildRoundedRectangle(mPanelGeomCore, mBorderColor, panel_ll, panel_ur, inner_rad, inner_rad+mBorderWidth,
                                  num_segs, false, front_depth, back_depth, 1.0);
-   //mBuilder.buildRoundedRectangle(mPanelGeomCore, mBgColor,     panel_ll, panel_ur, 0.0, inner_rad+(mBorderWidth*2),
-   //                              num_segs, true,  back_depth,    back_depth, mBgAlpha);
+   mBuilder.buildRoundedRectangle(mPanelGeomCore, mBgColor,     panel_ll, panel_ur, 0.0, inner_rad+(mBorderWidth*2),
+                                 num_segs, true,  back_depth,    back_depth, mBgAlpha);
 
    const float text_spacing(0.7);
    float abs_title_height = mTitleHeight*mPanHeight;
@@ -196,17 +224,30 @@ void StatusPanel::updatePanelScene()
    potential_lines.insert(potential_lines.end(), mStatusLines.begin(), mStatusLines.begin()+num_lines);
    mBuilder.addText(mTextGeomCore, *mFont, potential_lines, status_ul, mTextColor, mStatusTextHeight, text_spacing);
 
+   // -- Update the materials and other properties --- //
+   beginEditCP(mClipRight);
+   mClipRight->setEquation(OSG::Vec4f(-1,0,0,mPanWidth));      // X clip plane <= right size
+   endEditCP(mClipRight);
+
+   beginEditCP(mClipBottom);
+   mClipBottom->setEquation(OSG::Vec4f(0,1,0,0));         // Y clip plane on Y>=0
+   endEditCP(mClipBottom);
 
    // --- Draw debug outlines --- //
-   mBuilder.buildRectangleOutline(mPanelGeomCore, dbg_color, panel_ll, panel_ur, 0.2);
-   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(1,1,0),
-                                                  OSG::Vec2f(0,header_title_ul.y()-total_header_height),
-                                                  OSG::Vec2f(mPanWidth, header_title_ul.y()), 0.3);       // Header
-   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(0,1,0),
-                                                  OSG::Vec2f(0,center_title_ul.y()-total_center_height),
-                                                  OSG::Vec2f(mPanWidth, center_title_ul.y()), 0.4);       // Center
-   mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(0,0,1),
-                                                  OSG::Vec2f(0,status_title_ul.y()-total_status_height),
-                                                  OSG::Vec2f(mPanWidth, status_title_ul.y()), 0.3);       // Status
-
+   if(mDrawDebug)
+   {
+      mBuilder.buildRectangleOutline(mPanelGeomCore, dbg_color, panel_ll, panel_ur, 0.2);
+      mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(1,1,0),
+                                                     OSG::Vec2f(0,header_title_ul.y()-total_header_height),
+                                                     OSG::Vec2f(mPanWidth, header_title_ul.y()), 0.3);       // Header
+      mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(0,1,0),
+                                                     OSG::Vec2f(0,center_title_ul.y()-total_center_height),
+                                                     OSG::Vec2f(mPanWidth, center_title_ul.y()), 0.4);       // Center
+      mBuilder.buildRectangleOutline(mPanelGeomCore, OSG::Color3f(0,0,1),
+                                                     OSG::Vec2f(0,status_title_ul.y()-total_status_height),
+                                                     OSG::Vec2f(mPanWidth, status_title_ul.y()), 0.3);       // Status
+   }
 }
+
+} // namespace inf
+

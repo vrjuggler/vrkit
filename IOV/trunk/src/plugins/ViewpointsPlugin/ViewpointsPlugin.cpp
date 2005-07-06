@@ -21,6 +21,7 @@
 #include <IOV/WandInterface.h>
 #include <IOV/ViewPlatform.h>
 #include <IOV/Util/Exceptions.h>
+#include <IOV/Status.h>
 
 #include "ViewpointsPlugin.h"
 
@@ -164,10 +165,10 @@ void ViewpointsPlugin::updateState(inf::ViewerPtr viewer)
       vprASSERT(mNextViewpoint < mViewpoints.size());
       Viewpoint vp = mViewpoints[mNextViewpoint];
 
-      std::cout << boost::format("Selecting new viewpoint: [%s] %s") % mNextViewpoint % vp.mName << std::endl;
+      IOV_STATUS << boost::format("Selecting new viewpoint: [%s] %s") % mNextViewpoint % vp.mName << std::endl;
 
       gmtl::Coord3fXYZ new_coord = gmtl::make<gmtl::Coord3fXYZ>(vp.mXform);
-      std::cout << "   New pos: " << new_coord << std::endl;
+      IOV_STATUS << "   New pos: " << new_coord << std::endl;
 
       inf::ViewPlatform& viewplatform = viewer->getUser()->getViewPlatform();
       viewplatform.setCurPos(vp.mXform);

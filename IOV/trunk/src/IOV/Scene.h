@@ -25,8 +25,11 @@
 namespace inf
 {
 
-   typedef OSG::CoredNodePtr<OSG::Group>       CoredGroupPtr;
-   typedef OSG::CoredNodePtr<OSG::Transform>   CoredTransformPtr;
+   typedef OSG::CoredNodePtr<OSG::Group>     CoredGroupPtr;
+   typedef OSG::CoredNodePtr<OSG::Transform> CoredTransformPtr;
+
+   //typedef OSG::GroupNodePtr     CoredGroupPtr;
+   //typedef OSG::TransformNodePtr CoredTransformPtr;
 
 /**
  * Class to store the data for the scene.

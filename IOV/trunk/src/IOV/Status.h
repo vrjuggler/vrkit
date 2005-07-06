@@ -1,0 +1,81 @@
+#ifndef _IOV_STATUS_H_
+#define _IOV_STATUS_H_
+
+#include <string>
+#include <iostream>
+#include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
+#include <vpr/Util/Singleton.h>
+#include <vector>
+#include <sstream>
+
+
+namespace inf
+{
+
+/** Status output class.
+ */
+class Status
+{
+vprSingletonHeader(Status);
+
+public:
+   /**< Typedef for status output functor type. */
+   typedef boost::function<void (const std::string&)> status_func_t;
+
+protected:
+   Status();
+
+public:
+   /** Write a status message.. */
+   void writeStatusMsg(const std::string& msg);
+
+   /** Registery a listener that will be called with status updates. */
+   void addOutputter(status_func_t newFunc);
+
+public:
+   /** Allows writing to status as a stream.
+    * Uses a guard idiom for status output.
+    */
+   struct StatusStreamer
+   {
+      StatusStreamer(Status* status)
+         : mStream(new std::ostringstream), mStatus(status)
+      {;}
+
+      StatusStreamer(const StatusStreamer& rhs)
+         : mStream(rhs.mStream), mStatus(rhs.mStatus)
+      {;}
+
+      ~StatusStreamer()
+      {
+         if(mStream)
+         {
+            mStatus->writeStatusMsg(mStream->str());
+            delete mStream;
+         }
+         mStream = NULL;
+         mStatus = NULL;
+      }
+
+      std::ostringstream* stream()
+      { return mStream; }
+
+    private:
+       std::ostringstream* mStream;    /**< Stream to use. */
+       Status*             mStatus;    /**< Status we are to call. */
+   };
+
+   StatusStreamer getStreamer()
+   { return StatusStreamer(this); }
+
+private:
+   std::vector<status_func_t>  mOutputFuncs;    /**< List of listeners to pass messages. */
+};
+
+}  // namespace inf
+
+#define IOV_STATUS (*(inf::Status::instance()->getStreamer().stream()))
+
+#endif
+

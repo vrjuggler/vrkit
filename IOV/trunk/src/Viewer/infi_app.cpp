@@ -28,6 +28,8 @@
 #include <IOV/Scene.h>
 #include <IOV/GrabData.h>
 
+#include <IOV/Status.h>
+
 
 class OpenSgViewer;
 typedef boost::shared_ptr<OpenSgViewer> OpenSgViewerPtr;
@@ -283,9 +285,11 @@ int main(int argc, char* argv[])
             jdef_dir = iov_base_dir + std::string("/share/IOV/definitions");
          }
       }
+      IOV_STATUS << "Using jdef path: " << jdef_dir << std::endl;
 
       if ( ! jdef_dir.empty() )
       {
+         IOV_STATUS << "Scanning for definitions." << std::endl;
          kernel->scanForConfigDefinitions(jdef_dir);
       }
 
@@ -322,6 +326,8 @@ int main(int argc, char* argv[])
          std::string filename = vm["file"].as<std::string>();
          app->setFilename(filename);
       }
+
+      IOV_STATUS << "Starting the kernel." << std::endl;
 
       kernel->start();                         // Start the kernel thread
       kernel->setApplication(app.get());       // Give application to kernel

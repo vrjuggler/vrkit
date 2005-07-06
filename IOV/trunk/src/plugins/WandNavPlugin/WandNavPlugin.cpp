@@ -28,6 +28,7 @@
 #include <IOV/WandInterface.h>
 #include <IOV/User.h>
 #include <IOV/Util/Exceptions.h>
+#include <IOV/Status.h>
 
 #include "WandNavPlugin.h"
 
@@ -210,7 +211,7 @@ void WandNavPlugin::updateNavState(ViewerPtr viewer,
    if ( mModeBtn.test(gadget::Digital::TOGGLE_ON) )
    {
       mNavMode = (mNavMode == WALK ? FLY : WALK);
-      std::cout << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
+      IOV_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
                 << std::endl;
    }
    // If the accelerate button and the rotate button are pressed together,

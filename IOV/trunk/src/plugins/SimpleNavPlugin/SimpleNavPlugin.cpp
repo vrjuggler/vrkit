@@ -23,6 +23,7 @@
 #include <IOV/WandInterface.h>
 #include <IOV/User.h>
 #include <IOV/Util/Exceptions.h>
+#include <IOV/Status.h>
 
 #include "SimpleNavPlugin.h"
 
@@ -161,7 +162,7 @@ void SimpleNavPlugin::updateNavState(ViewerPtr viewer,
    if ( mode_button->getData() == gadget::Digital::TOGGLE_ON )
    {
       mNavMode = (mNavMode == WALK ? FLY : WALK);
-      std::cout << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
+      IOV_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
                 << std::endl;
    }
 

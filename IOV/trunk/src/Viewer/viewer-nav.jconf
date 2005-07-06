@@ -5,6 +5,7 @@
       <infiscape_opensg_viewer name="Viewer" version="1">
          <root_name>RootNode</root_name>
          <plugin>ModeSwitchPlugin</plugin>
+         <plugin>StatusPanelPlugin</plugin>
          <listen_port>34000</listen_port>
          <slave_count>0</slave_count>
       </infiscape_opensg_viewer>
@@ -155,6 +156,17 @@
          <mode_names>Navigation Mode</mode_names>
          <mode_names>Cycling Mode</mode_names>
       </mode_switch_plugin>
+      <status_panel_plugin name="StatusPanel" version="1">
+         <grab_button_num>-1</grab_button_num>
+         <initial_size>8.0</initial_size>
+         <initial_size>12.0</initial_size>
+         <initial_pos>5.0</initial_pos>
+         <initial_pos>5.0</initial_pos>
+         <initial_pos>-5.0</initial_pos>
+         <initial_rot>0.0</initial_rot>
+         <initial_rot>0.0</initial_rot>
+         <initial_rot>0.0</initial_rot>
+      </status_panel_plugin>
    </elements>
 </configuration>
 

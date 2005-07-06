@@ -21,6 +21,9 @@
 #include <IOV/PluginFactory.h>
 #include <IOV/Viewer.h>
 
+// Embedded plugins
+#include <IOV/StatusPanelPlugin.h>
+
 
 namespace fs = boost::filesystem;
 
@@ -67,6 +70,10 @@ void Viewer::init()
    // Create and initialize the base scene object
    mScene = Scene::create();
    mScene->init();
+
+   // Load plugins embedded in library
+   getPluginFactory()->registerCreator(new inf::PluginCreator(&inf::StatusPanelPlugin::create,"StatusPanelPlugin"),
+                                                          "StatusPanelPlugin");
 
    // Load the app configuration and then...
    // - Setup scene root for networking
