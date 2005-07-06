@@ -1,7 +1,7 @@
 #include <OpenSG/OSGNodeCore.h>
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGMultiPassMaterial.h>
-#include <OpenSG/OSGSimpleMaterial.h>
+#include <OpenSG/OSGSimpleGeometry.h>
 
 #include "GeometryHighlightTraverser.h"
 
@@ -49,8 +49,7 @@ addHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> highlightMat)
       if ( mat == OSG::NullFC )
       {
          mpass_mat = OSG::MultiPassMaterial::create();
-         OSG::SimpleMaterialPtr empty_mat = OSG::SimpleMaterial::create();
-         mpass_mat->addMaterial(empty_mat);
+         mpass_mat->addMaterial(OSG::getDefaultMaterial());
       }
       // If we already have a multi-pass material, we will use it for
       // mpass_mat.
@@ -103,7 +102,7 @@ void GeometryHighlightTraverser::removeHighlightMaterial()
       OSG::MaterialPtr mat = (*c)->getMaterial();
       OSG::MultiPassMaterialPtr mpass_mat =
          OSG::MultiPassMaterialPtr::dcast(mat);
-      OSG::MFMaterialPtr materials = mpass_mat->getMaterials();
+      OSG::MFMaterialPtr& materials(mpass_mat->getMaterials());
       OSG::RefPtr<OSG::MaterialPtr> highlight_mat(
          mpass_mat->getMaterials(materials.getSize() - 1)
       );
@@ -111,11 +110,15 @@ void GeometryHighlightTraverser::removeHighlightMaterial()
 
       if ( materials.getSize() == 1 )
       {
-         OSG::MaterialPtr temp_mat = mpass_mat->getMaterials(0);
+         OSG::RefPtr<OSG::MaterialPtr> temp_mat(
+            mpass_mat->getMaterials(0)
+         );
          (*c)->setMaterial(temp_mat);
       }
+      // This should never happen.
       else if ( materials.getSize() == 0 )
       {
+         assert(false);
          (*c)->setMaterial(OSG::NullFC);
       }
    }
