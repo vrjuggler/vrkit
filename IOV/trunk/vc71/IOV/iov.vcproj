@@ -162,6 +162,15 @@
 				RelativePath="..\..\src\Iov\Slave\SlaveViewer.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Status.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\StatusPanel.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\StatusPanelPlugin.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\UiBuilder.cpp">
 			</File>
 			<File
@@ -245,6 +254,15 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Slave\SlaveViewer.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Status.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\StatusPanel.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\StatusPanelPlugin.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\UiBuilder.h">
