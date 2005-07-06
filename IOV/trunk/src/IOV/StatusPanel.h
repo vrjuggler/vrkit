@@ -1,6 +1,11 @@
 #ifndef _IOV_STATUS_PANEL_H_
 #define _IOV_STATUS_PANEL_H_
 
+#include <IOV/Config.h>
+
+#include <vector>
+#include <deque>
+
 #include <OpenSG/OSGConfig.h>
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGGeometry.h>
@@ -12,13 +17,11 @@
 #include <vpr/vprConfig.h>
 #include <vpr/Util/Assert.h>
 
-#include <vector>
-#include <deque>
 
 namespace inf
 {
 
-class StatusPanel
+class IOV_CLASS_API StatusPanel
 {
 public:
    StatusPanel();

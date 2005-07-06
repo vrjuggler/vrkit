@@ -1,13 +1,15 @@
 #ifndef _IOV_STATUS_H_
 #define _IOV_STATUS_H_
 
+#include <IOV/Config.h>
+
 #include <string>
 #include <iostream>
+#include <vector>
+#include <sstream>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 #include <vpr/Util/Singleton.h>
-#include <vector>
-#include <sstream>
 
 
 namespace inf
@@ -15,7 +17,7 @@ namespace inf
 
 /** Status output class.
  */
-class Status
+class IOV_CLASS_API Status
 {
 vprSingletonHeader(Status);
 
