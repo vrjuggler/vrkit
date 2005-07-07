@@ -48,24 +48,24 @@
 #define IOV_ZEROFILL(a)      0 ## a
 #define IOV_XZEROFILL(a)     IOV_ZEROFILL(a)
 
-// Fix up the major version by doing a zero left fill
-#if IOV_VERSION_MAJOR < 10
-#  define IOV_VERSION_MAJOR_FILLED \
-               IOV_XZEROFILL(IOV_XZEROFILL(IOV_VERSION_MAJOR))
-#elif IOV_VERSION_MAJOR < 100
-#  define IOV_VERSION_MAJOR_FILLED IOV_XZEROFILL(IOV_VERSION_MAJOR)
+#if IOV_VERSION_MAJOR == 0
+#  define IOV_VERSION_MAJOR_FILLED
 #else
 #  define IOV_VERSION_MAJOR_FILLED IOV_VERSION_MAJOR
 #endif
 
 // Fix up the minor version by doing a zero left fill
-#if IOV_VERSION_MINOR < 10
-#  define IOV_VERSION_MINOR_FILLED \
-               IOV_XZEROFILL(IOV_XZEROFILL(IOV_VERSION_MINOR))
-#elif IOV_VERSION_MINOR < 100
-#  define IOV_VERSION_MINOR_FILLED IOV_XZEROFILL(IOV_VERSION_MINOR)
-#else
+#if IOV_VERSION_MAJOR == 0
 #  define IOV_VERSION_MINOR_FILLED IOV_VERSION_MINOR
+#else
+#  if IOV_VERSION_MINOR < 10
+#     define IOV_VERSION_MINOR_FILLED \
+                  IOV_XZEROFILL(IOV_XZEROFILL(IOV_VERSION_MINOR))
+#  elif IOV_VERSION_MINOR < 100
+#     define IOV_VERSION_MINOR_FILLED IOV_XZEROFILL(IOV_VERSION_MINOR)
+#  else
+#     define IOV_VERSION_MINOR_FILLED IOV_VERSION_MINOR
+#  endif
 #endif
 
 // Fix up the patch version by doing a zero left fill
@@ -103,18 +103,19 @@
 //--------------------------------------------------------------------------
 // Declare a version string constant that can be used at runtime.
 //--------------------------------------------------------------------------
-namespace gmtl
+namespace inf
 {
    inline const char* getVersion()
    {
       return IOV_XSTR(IOV_VERSION_STRING);
    }
-} // end namespace gmtl
+} // end namespace inf
 
 //--------------------------------------------------------------------------
 // Cleanup after ourselves and undef all internal macros.
 //--------------------------------------------------------------------------
 
+/*
 // Undef the all helper macros
 #undef IOV_XGLUE
 #undef IOV_GLUE
@@ -132,10 +133,6 @@ namespace gmtl
 #undef IOV_VERSION_MAJOR_FILLED
 #undef IOV_VERSION_MINOR_FILLED
 #undef IOV_VERSION_PATCH_FILLED
-
-// Undef the macro for each version part
-#undef IOV_VERSION_MAJOR
-#undef IOV_VERSION_MINOR
-#undef IOV_VERSION_PATCH
+*/
 
 #endif
