@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #ifndef _IOV_STATUS_H_
 #define _IOV_STATUS_H_
 

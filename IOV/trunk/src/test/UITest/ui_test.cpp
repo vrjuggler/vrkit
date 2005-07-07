@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 // Test for UI code
 //
 // Just use simple scene manager and create a ui

@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #include <OpenSG/OSGNodeCore.h>
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGMultiPassMaterial.h>

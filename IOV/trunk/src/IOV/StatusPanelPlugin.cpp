@@ -1,3 +1,4 @@
+// Copyright (C) Infiscape Corporation 2005
 
 #include <IOV/StatusPanelPlugin.h>
 #include <IOV/StatusPanel.h>

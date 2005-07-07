@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005
+
 #include <IOV/UiBuilder.h>
 
 #include <OpenSG/OSGNode.h>
