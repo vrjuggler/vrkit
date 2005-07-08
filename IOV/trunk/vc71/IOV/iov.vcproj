@@ -141,6 +141,9 @@
 				RelativePath="..\..\src\Iov\Util\Exceptions.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\GeometryHighlightTraverser.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\GrabData.cpp">
 			</File>
 			<File
@@ -206,6 +209,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\ExitCodes.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\GeometryHighlightTraverser.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\GrabData.h">
