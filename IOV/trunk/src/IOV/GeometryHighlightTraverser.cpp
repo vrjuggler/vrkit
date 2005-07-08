@@ -5,7 +5,7 @@
 #include <OpenSG/OSGMultiPassMaterial.h>
 #include <OpenSG/OSGSimpleGeometry.h>
 
-#include "GeometryHighlightTraverser.h"
+#include <IOV/GeometryHighlightTraverser.h>
 
 
 namespace inf

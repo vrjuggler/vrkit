@@ -21,8 +21,7 @@
 
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
-
-#include "GeometryHighlightTraverser.h"
+#include <IOV/GeometryHighlightTraverser.h>
 
 
 namespace inf

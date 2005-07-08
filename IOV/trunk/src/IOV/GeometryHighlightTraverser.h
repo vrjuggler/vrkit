@@ -3,6 +3,8 @@
 #ifndef _INF_GEOMETRY_HIGHLIGHT_TRAVERSER_H_
 #define _INF_GEOMETRY_HIGHLIGHT_TRAVERSER_H_
 
+#include <IOV/Config.h>
+
 #include <vector>
 
 #include <OpenSG/OSGNode.h>
@@ -14,7 +16,7 @@
 namespace inf
 {
 
-class GeometryHighlightTraverser
+class IOV_CLASS_API GeometryHighlightTraverser
 {
 public:
    GeometryHighlightTraverser();
