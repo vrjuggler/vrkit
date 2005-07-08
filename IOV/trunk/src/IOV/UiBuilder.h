@@ -92,7 +92,7 @@ public:
 
 
    /** Helper class to use as a parameter to the text building methods. */
-   class Font
+   class IOV_CLASS_API Font
    {
    public:
       Font(std::string family, OSG::TextFace::Style style = OSG::TextFace::STYLE_PLAIN, unsigned size = 48);
