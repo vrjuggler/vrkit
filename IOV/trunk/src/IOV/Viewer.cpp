@@ -27,10 +27,8 @@
 
 namespace fs = boost::filesystem;
 
-
 namespace inf
 {
-
 
 Viewer::Viewer()
    : vrj::OpenSGApp(NULL)
@@ -72,8 +70,11 @@ void Viewer::init()
    mScene->init();
 
    // Load plugins embedded in library
-   getPluginFactory()->registerCreator(new inf::PluginCreator(&inf::StatusPanelPlugin::create,"StatusPanelPlugin"),
-                                                          "StatusPanelPlugin");
+   getPluginFactory()->registerCreator(
+      new inf::PluginCreator(&inf::StatusPanelPlugin::create,
+                             "StatusPanelPlugin"),
+      "StatusPanelPlugin"
+   );
 
    // Load the app configuration and then...
    // - Setup scene root for networking
@@ -285,7 +286,6 @@ void Viewer::deallocate()
 
 }
 
-
 /**
  * See @ref SlaveCommunicationProtocol for details of the communication.
  */
@@ -320,7 +320,8 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
       }
       else
       {
-         throw inf::Exception("Could not get local host address", IOV_LOCATION);
+         throw inf::Exception("Could not get local host address",
+                              IOV_LOCATION);
       }
 
       mChannels.resize(slave_count);
