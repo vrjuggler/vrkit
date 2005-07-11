@@ -314,8 +314,6 @@ void PointGrabPlugin::run(inf::ViewerPtr viewer)
       );
       const gmtl::Matrix44f vw_M_wand = vw_M_vp * vp_M_wand;
 
-      gmtl::Matrix44f cur_obj_mat;
-      gmtl::set(cur_obj_mat, mIntersectedObj->getMatrix());
       gmtl::Matrix44f new_obj_mat = vw_M_wand * m_wand_M_obj;
 
       osg::Matrix obj_mat_osg;
