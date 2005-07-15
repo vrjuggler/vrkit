@@ -26,8 +26,8 @@ void GeometryHighlightTraverser::traverse(OSG::NodePtr node)
    OSG::traverse(node,
                  OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
                     OSG::Action::ResultE, GeometryHighlightTraverser,
-                     OSG::NodePtr
-                  >(this, &GeometryHighlightTraverser::enter));
+                    OSG::NodePtr
+                 >(this, &GeometryHighlightTraverser::enter));
 }
 
 OSG::Action::ResultE GeometryHighlightTraverser::enter(OSG::NodePtr& node)
