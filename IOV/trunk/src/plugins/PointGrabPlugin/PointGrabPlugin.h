@@ -12,10 +12,8 @@
 #include <boost/filesystem/path.hpp>
 #include <gmtl/Matrix.h>
 
-#include <OpenSG/OSGGeoPropPtrs.h>
-#include <OpenSG/OSGSimpleGeometry.h>
-#include <OpenSG/OSGSimpleMaterial.h>
-#include <OpenSG/OSGMaterialGroup.h>
+#include <OpenSG/OSGChunkMaterial.h>
+#include <OpenSG/OSGRefPtr.h>
 
 #include <snx/SoundHandle.h>
 
@@ -125,7 +123,6 @@ private:
    OSG::Color3f mIntersectColor;
    OSG::Color3f mGrabColor;
 
-   OSG::GeoPositions3fPtr             mHighlightPoints;
    OSG::RefPtr<OSG::ChunkMaterialPtr> mIsectHighlightMaterial;
    OSG::RefPtr<OSG::ChunkMaterialPtr> mGrabHighlightMaterial;
 

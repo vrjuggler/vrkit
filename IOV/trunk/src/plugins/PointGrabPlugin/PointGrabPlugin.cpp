@@ -11,8 +11,10 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/exception.hpp>
 
+#include <OpenSG/OSGBlendChunk.h>
 #include <OpenSG/OSGSHLChunk.h>
 #include <OpenSG/OSGPolygonChunk.h>
+#include <OpenSG/OSGSimpleMaterial.h>
 
 #include <gmtl/Generate.h>
 #include <gmtl/Matrix.h>
