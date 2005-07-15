@@ -230,7 +230,6 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
             // Traverse the sub-tree for lit_node and apply
             // mIsectHighlightMaterial accordingly.
             mGeomTraverser.traverse(lit_node);
-            std::cout << "Applying highlight" << std::endl;
             OSG::RefPtr<OSG::MaterialPtr> highlight_mat(
                mIsectHighlightMaterial.get()
             );
