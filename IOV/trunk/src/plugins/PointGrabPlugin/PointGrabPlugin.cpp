@@ -238,7 +238,10 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
          // Otherwise, we are intersecting nothing.
          else
          {
-            mGeomTraverser.removeHighlightMaterial();
+            OSG::RefPtr<OSG::MaterialPtr> mat(
+               mIsectHighlightMaterial.get()
+            );
+            mGeomTraverser.removeHighlightMaterial(mat);
             mIntersecting = false;
          }
       }
@@ -252,7 +255,8 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       mGrabSound.trigger();
       mGrabbing   = true;
 
-      changeHighlightMaterial(mGrabHighlightMaterial);
+      changeHighlightMaterial(mIsectHighlightMaterial,
+                              mGrabHighlightMaterial);
 
       // m_wand_M_obj is the offset between the wand and the grabbed object's
       // center point:
@@ -282,7 +286,8 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       // intersecting state and clear mIntersectedObj.
       if ( mIntersectedObj.node() != OSG::NullFC )
       {
-         changeHighlightMaterial(mIsectHighlightMaterial);
+         changeHighlightMaterial(mGrabHighlightMaterial,
+                                 mIsectHighlightMaterial);
          gmtl::identity(m_wand_M_obj);
       }
    }
@@ -424,10 +429,12 @@ PointGrabPlugin::PointGrabPlugin()
 }
 
 void PointGrabPlugin::
-changeHighlightMaterial(OSG::RefPtr<OSG::ChunkMaterialPtr> newMat)
+changeHighlightMaterial(OSG::RefPtr<OSG::ChunkMaterialPtr> oldMat,
+                        OSG::RefPtr<OSG::ChunkMaterialPtr> newMat)
 {
-   OSG::RefPtr<OSG::MaterialPtr> highlight_mat(newMat.get());
-   mGeomTraverser.changeHighlightMaterial(highlight_mat);
+   OSG::RefPtr<OSG::MaterialPtr> old_mat(oldMat.get());
+   OSG::RefPtr<OSG::MaterialPtr> new_mat(newMat.get());
+   mGeomTraverser.swapHighlightMaterial(old_mat, new_mat);
 }
 
 OSG::RefPtr<OSG::ChunkMaterialPtr>

@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-15 patrickh Refactored inf::GeometryHighlightTraverser so that uesrs of
+                    the class can add and remove multiple materials.
+                    -- VERSION -- 0.4.0
 2005-07-15 patrickh Changed the interface of inf::GeometryHighlightTraverser
                     so that it performs the sub-tree traversal itself.
                     -- VERSION -- 0.3.1

@@ -38,9 +38,10 @@ public:
 
    void addHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> highlightMat);
 
-   void changeHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> newHighlightMat);
+   void swapHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> oldHighlightMat,
+                              OSG::RefPtr<OSG::MaterialPtr> newHighlightMat);
 
-   void removeHighlightMaterial();
+   void removeHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> highlightMat);
 
 private:
    void reset();

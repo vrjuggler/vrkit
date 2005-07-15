@@ -86,7 +86,8 @@ private:
       std::vector<int>       mButtonVec;
    };
 
-   void changeHighlightMaterial(OSG::RefPtr<OSG::ChunkMaterialPtr> newMat);
+   void changeHighlightMaterial(OSG::RefPtr<OSG::ChunkMaterialPtr> oldMat,
+                                OSG::RefPtr<OSG::ChunkMaterialPtr> newMat);
 
    OSG::RefPtr<OSG::ChunkMaterialPtr> createShader(const std::string& vertexShader,
                                                    const std::string& fragmentShader)
