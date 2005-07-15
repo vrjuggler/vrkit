@@ -20,6 +20,16 @@ GeometryHighlightTraverser::~GeometryHighlightTraverser()
    reset();
 }
 
+void GeometryHighlightTraverser::traverse(OSG::NodePtr node)
+{
+   reset();
+   OSG::traverse(node,
+                 OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
+                    OSG::Action::ResultE, GeometryHighlightTraverser,
+                     OSG::NodePtr
+                  >(this, &GeometryHighlightTraverser::enter));
+}
+
 OSG::Action::ResultE GeometryHighlightTraverser::enter(OSG::NodePtr& node)
 {
    if ( node->getCore()->getType().isDerivedFrom(OSG::Geometry::getClassType()) )
@@ -86,7 +96,7 @@ changeHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> newHighlightMat)
       OSG::MultiPassMaterialPtr mpass_mat =
          OSG::MultiPassMaterialPtr::dcast(mat);
 
-      OSG::MFMaterialPtr materials = mpass_mat->getMaterials();
+      OSG::MFMaterialPtr& materials(mpass_mat->getMaterials());
       OSG::RefPtr<OSG::MaterialPtr> old_highlight_mat(
          mpass_mat->getMaterials(materials.getSize() - 1)
       );

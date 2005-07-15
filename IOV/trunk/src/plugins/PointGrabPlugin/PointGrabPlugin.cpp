@@ -227,16 +227,10 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
             // XXX: Is there any cleaner way to do this?
             OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
 
-            mGeomTraverser.reset();
-
-            OSG::traverse(lit_node,
-                          OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
-                             OSG::Action::ResultE,
-                             GeometryHighlightTraverser,
-                             OSG::NodePtr
-                          >(&mGeomTraverser,
-                            &GeometryHighlightTraverser::enter));
-
+            // Traverse the sub-tree for lit_node and apply
+            // mIsectHighlightMaterial accordingly.
+            mGeomTraverser.traverse(lit_node);
+            std::cout << "Applying highlight" << std::endl;
             OSG::RefPtr<OSG::MaterialPtr> highlight_mat(
                mIsectHighlightMaterial.get()
             );

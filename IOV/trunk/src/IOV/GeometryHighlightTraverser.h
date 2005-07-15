@@ -23,6 +23,17 @@ public:
 
    ~GeometryHighlightTraverser();
 
+   /**
+    * Performs a new traversal rooted at the given node and stores
+    * the necessary information for later use with material
+    * applications.
+    *
+    * @see addHighlightMaterial()
+    * @see changeHighlightMaterial()
+    * @see removeHighlightMaterial()
+    */
+   void traverse(OSG::NodePtr node);
+
    OSG::Action::ResultE enter(OSG::NodePtr& node);
 
    void addHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> highlightMat);
@@ -31,9 +42,9 @@ public:
 
    void removeHighlightMaterial();
 
+private:
    void reset();
 
-private:
    std::vector< OSG::RefPtr<OSG::NodePtr> > mGeomNodes;
    std::vector< OSG::RefPtr<OSG::GeometryPtr> > mGeomCores;
 

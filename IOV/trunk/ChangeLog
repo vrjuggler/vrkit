@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-15 patrickh Changed the interface of inf::GeometryHighlightTraverser
+                    so that it performs the sub-tree traversal itself.
+                    -- VERSION -- 0.3.1
 2005-06-15 allenb   MERGE: rev:247
                     Fix to make viewpoints start at first one.
 2005-06-14 allenb   New version for development.
