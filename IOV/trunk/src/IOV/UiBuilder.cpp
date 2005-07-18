@@ -89,6 +89,27 @@ OSG::GeometryPtr UiBuilder::createGeomGeo()
    return geo_core;
 }
 
+void UiBuilder::resetGeomGeo(OSG::GeometryPtr geom)
+{
+   vprASSERT(geom != OSG::NullFC);
+
+   OSG::GeoPTypesPtr type = OSG::GeoPTypesUI8::create();
+   OSG::GeoPLengthsPtr lens = OSG::GeoPLengthsUI32::create();
+   OSG::GeoPositions3fPtr pnts = OSG::GeoPositions3f::create();
+   OSG::GeoColors4fPtr colors = OSG::GeoColors4f::create();
+   OSG::GeoNormals3fPtr norms = OSG::GeoNormals3f::create();
+
+   OSG::beginEditCP(geom);
+   {
+       geom->setTypes(type);
+       geom->setLengths(lens);
+       geom->setPositions(pnts);
+       geom->setColors(colors);
+       geom->setNormals(norms);
+   }
+   OSG::endEditCP(geom);
+}
+
 void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float depth, float alpha)
 {
    OSG::GeoPTypesPtr types = OSG::GeoPTypesUI8Ptr::dcast(geom->getTypes());

@@ -33,6 +33,13 @@ public:
     */
    OSG::GeometryPtr createGeomGeo();
 
+   /**
+    * Resets the attributes of the given geometry core.
+    *
+    * @param geom The core that will have its attributes reset.
+    */
+   void resetGeomGeo(OSG::GeometryPtr geom);
+
    /** Build a rectangle.
     * @PARAM geom    The geometry to add to.
     * @PARAM minPt   Minimum pt on the rectangle.
