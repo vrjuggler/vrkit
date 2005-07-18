@@ -123,26 +123,32 @@ removeHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> highlightMat)
    for ( c = mGeomCores.begin(); c != mGeomCores.end(); ++c )
    {
       OSG::MaterialPtr mat = (*c)->getMaterial();
-      OSG::MultiPassMaterialPtr mpass_mat =
-         OSG::MultiPassMaterialPtr::dcast(mat);
 
-      // Ensure that mpass_mat has the given material to be removed and
-      // then remove it.
-      if ( mpass_mat->hasMaterial(highlightMat) )
+      if ( OSG::NullFC != mat )
       {
-         mpass_mat->subMaterial(highlightMat);
-      }
+         OSG::MultiPassMaterialPtr mpass_mat =
+            OSG::MultiPassMaterialPtr::dcast(mat);
 
-      // If the number of materials remaining in mpass_mat is 1, then we
-      // may have reached the point where we need to restore the original
-      // material.  We only do this if the original material was not the
-      // multi-pass material we have been manipulating.
-      OSG::MFMaterialPtr& materials(mpass_mat->getMaterials());
-      if ( materials.getSize() == 1 && mpass_mat != mOrigMaterials[*c] )
-      {
-         std::cout << "Restoring original material " << mOrigMaterials[*c] << std::endl;
-         // Restore the material back to whatever it was originally.
-         (*c)->setMaterial(mOrigMaterials[*c]);
+         // Ensure that mpass_mat has the given material to be removed and
+         // then remove it.
+         if ( OSG::NullFC != mpass_mat &&
+              mpass_mat->hasMaterial(highlightMat) )
+         {
+            mpass_mat->subMaterial(highlightMat);
+
+            // If the number of materials remaining in mpass_mat is 1, then we
+            // may have reached the point where we need to restore the original
+            // material.  We only do this if the original material was not the
+            // multi-pass material we have been manipulating.
+            OSG::MFMaterialPtr& materials(mpass_mat->getMaterials());
+            if ( materials.getSize() == 1 && mpass_mat != mOrigMaterials[*c] )
+            {
+               std::cout << "Restoring original material "
+                         << mOrigMaterials[*c] << std::endl;
+               // Restore the material back to whatever it was originally.
+               (*c)->setMaterial(mOrigMaterials[*c]);
+            }
+         }
       }
    }
 
