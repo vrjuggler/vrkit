@@ -143,8 +143,8 @@ removeHighlightMaterial(OSG::RefPtr<OSG::MaterialPtr> highlightMat)
             OSG::MFMaterialPtr& materials(mpass_mat->getMaterials());
             if ( materials.getSize() == 1 && mpass_mat != mOrigMaterials[*c] )
             {
-               std::cout << "Restoring original material "
-                         << mOrigMaterials[*c] << std::endl;
+//               std::cout << "Restoring original material "
+//                         << mOrigMaterials[*c] << std::endl;
                // Restore the material back to whatever it was originally.
                (*c)->setMaterial(mOrigMaterials[*c]);
             }
