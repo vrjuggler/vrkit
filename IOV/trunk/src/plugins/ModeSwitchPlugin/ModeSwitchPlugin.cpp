@@ -22,9 +22,8 @@
 #include <IOV/PluginFactory.h>
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Status.h>
+#include <IOV/StatusPanel.h>
 #include <IOV/StatusPanelPlugin.h>
-
-#include <sstream>
 
 #include "ModeSwitchPlugin.h"
 
