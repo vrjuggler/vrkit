@@ -5,7 +5,7 @@
 
 #include <IOV/Config.h>
 
-#include <vector>
+#include <string>
 #include <deque>
 
 #include <OpenSG/OSGConfig.h>
@@ -15,9 +15,6 @@
 #include <OpenSG/OSGClipPlaneChunk.h>
 
 #include <IOV/UiBuilder.h>
-
-#include <vpr/vprConfig.h>
-#include <vpr/Util/Assert.h>
 
 
 namespace inf

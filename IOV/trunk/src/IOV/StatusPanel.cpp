@@ -2,12 +2,16 @@
 
 #include <IOV/StatusPanel.h>
 
+#include <vector>
+#include <algorithm>
+
 #include <OpenSG/OSGGroup.h>
 #include <OpenSG/OSGChunkMaterial.h>
 #include <OpenSG/OSGClipPlaneChunk.h>
 #include <OpenSG/OSGSimpleAttachments.h>
 
-#include <algorithm>
+#include <vpr/Util/Assert.h>
+
 
 namespace inf
 {
