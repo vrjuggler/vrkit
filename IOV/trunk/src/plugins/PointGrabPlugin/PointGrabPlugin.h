@@ -7,13 +7,9 @@
 
 #include <string>
 #include <vector>
-#include <exception>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/filesystem/path.hpp>
 #include <gmtl/Matrix.h>
-
-#include <OpenSG/OSGChunkMaterial.h>
-#include <OpenSG/OSGRefPtr.h>
 
 #include <snx/SoundHandle.h>
 
@@ -86,15 +82,6 @@ private:
       std::vector<int>       mButtonVec;
    };
 
-   void changeHighlightMaterial(OSG::RefPtr<OSG::ChunkMaterialPtr> oldMat,
-                                OSG::RefPtr<OSG::ChunkMaterialPtr> newMat);
-
-   OSG::RefPtr<OSG::ChunkMaterialPtr> createShader(const std::string& vertexShader,
-                                                   const std::string& fragmentShader)
-      throw(std::exception);
-
-   boost::filesystem::path getCompleteShaderFile(const std::string& filename);
-
    void configButtons(jccl::ConfigElementPtr elt, const std::string& propName,
                       DigitalHolder& holder);
 
@@ -121,11 +108,10 @@ private:
    inf::CoredTransformPtr mIntersectedObj;
 
    GeometryHighlightTraverser mGeomTraverser;
+   unsigned int mIsectHighlightID;
+   unsigned int mGrabHighlightID;
    OSG::Color3f mIntersectColor;
    OSG::Color3f mGrabColor;
-
-   OSG::RefPtr<OSG::ChunkMaterialPtr> mIsectHighlightMaterial;
-   OSG::RefPtr<OSG::ChunkMaterialPtr> mGrabHighlightMaterial;
 
    gmtl::Matrix44f m_wand_M_obj;
 

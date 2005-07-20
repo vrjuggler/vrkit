@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-20 patrickh Added material management to the class
+                    inf::GeometryHighlightTraverser.
+                    -- VERSION -- 0.5.0
 2005-07-20 patrickh Extended inf::StatusPanel to account for application units.
                     -- VERSION -- 0.4.2
 2005-07-18 patrickh Added inf::UiBuilder::resetGeomGeo().

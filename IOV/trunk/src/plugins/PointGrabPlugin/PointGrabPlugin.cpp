@@ -4,16 +4,10 @@
 #include <sstream>
 #include <numeric>
 #include <algorithm>
-#include <stdexcept>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/exception.hpp>
 
-#include <OpenSG/OSGBlendChunk.h>
-#include <OpenSG/OSGSHLChunk.h>
-#include <OpenSG/OSGPolygonChunk.h>
 #include <OpenSG/OSGSimpleMaterial.h>
 
 #include <gmtl/Generate.h>
@@ -104,12 +98,15 @@ void PointGrabPlugin::init(ViewerPtr viewer)
    {
       try
       {
-         mIsectHighlightMaterial = createShader(mIsectVertexShaderFile,
-                                                mIsectFragmentShaderFile);
-         mGrabHighlightMaterial = createShader(mGrabVertexShaderFile,
-                                               mGrabFragmentShaderFile);
+         mGeomTraverser.extendShaderSearchPath(mShaderSearchPath);
+         mIsectHighlightID =
+            mGeomTraverser.createSHLMaterial(mIsectVertexShaderFile,
+                                             mIsectFragmentShaderFile);
+         mGrabHighlightID =
+            mGeomTraverser.createSHLMaterial(mGrabVertexShaderFile,
+                                             mGrabFragmentShaderFile);
       }
-      catch (std::exception& ex)
+      catch (inf::Exception& ex)
       {
          std::cerr << ex.what() << std::endl;
          std::cout << "Falling back on highlighting through scribing."
@@ -124,43 +121,35 @@ void PointGrabPlugin::init(ViewerPtr viewer)
 
    if ( use_scribe )
    {
+      mIsectHighlightID = GeometryHighlightTraverser::HIGHLIGHT0;
+      mGrabHighlightID  = GeometryHighlightTraverser::HIGHLIGHT1;
+
       // Set up the highlight materials.
-      OSG::SimpleMaterialPtr isect_highlight_mat =
-         OSG::SimpleMaterial::create();
+      OSG::RefPtr<OSG::MaterialPtr> mat0 =
+         mGeomTraverser.getHighlight(mIsectHighlightID);
+      if ( mat0->getType().isDerivedFrom(OSG::SimpleMaterial::getClassType()) )
+      {
+         OSG::SimpleMaterialPtr isect_highlight_mat =
+            OSG::SimpleMaterialPtr::dcast(mat0.get());
 
-      OSG::beginEditCP(isect_highlight_mat);
-         isect_highlight_mat->setLit(false);
-         isect_highlight_mat->setDiffuse(mIntersectColor);
-      OSG::endEditCP(isect_highlight_mat);
+         OSG::beginEditCP(isect_highlight_mat);
+            isect_highlight_mat->setLit(false);
+            isect_highlight_mat->setDiffuse(mIntersectColor);
+         OSG::endEditCP(isect_highlight_mat);
+      }
 
-      OSG::SimpleMaterialPtr grab_highlight_mat =
-         OSG::SimpleMaterial::create();
+      OSG::RefPtr<OSG::MaterialPtr> mat1 =
+         mGeomTraverser.getHighlight(mGrabHighlightID);
+      if ( mat1->getType().isDerivedFrom(OSG::SimpleMaterial::getClassType()) )
+      {
+         OSG::SimpleMaterialPtr grab_highlight_mat =
+            OSG::SimpleMaterialPtr::dcast(mat1.get());
 
-      OSG::beginEditCP(grab_highlight_mat);
-         grab_highlight_mat->setLit(false);
-         grab_highlight_mat->setDiffuse(mGrabColor);
-      OSG::endEditCP(grab_highlight_mat);
-
-      OSG::PolygonChunkPtr scribe_chunk = OSG::PolygonChunk::create();
-      OSG::beginEditCP(scribe_chunk);
-         scribe_chunk->setFrontMode(GL_LINE);
-         scribe_chunk->setOffsetLine(true);
-         scribe_chunk->setOffsetFill(false);
-         scribe_chunk->setOffsetPoint(false);
-         scribe_chunk->setOffsetFactor(0.05f);
-         scribe_chunk->setOffsetBias(1.0f);
-      OSG::endEditCP(scribe_chunk);
-
-      OSG::beginEditCP(isect_highlight_mat);
-         isect_highlight_mat->addChunk(scribe_chunk);
-      OSG::endEditCP(isect_highlight_mat);
-
-      OSG::beginEditCP(grab_highlight_mat);
-         grab_highlight_mat->addChunk(scribe_chunk);
-      OSG::endEditCP(grab_highlight_mat);
-
-      mIsectHighlightMaterial = isect_highlight_mat;
-      mGrabHighlightMaterial  = grab_highlight_mat;
+         OSG::beginEditCP(grab_highlight_mat);
+            grab_highlight_mat->setLit(false);
+            grab_highlight_mat->setDiffuse(mGrabColor);
+         OSG::endEditCP(grab_highlight_mat);
+      }
    }
 }
 
@@ -230,18 +219,12 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
             // Traverse the sub-tree for lit_node and apply
             // mIsectHighlightMaterial accordingly.
             mGeomTraverser.traverse(lit_node);
-            OSG::RefPtr<OSG::MaterialPtr> highlight_mat(
-               mIsectHighlightMaterial.get()
-            );
-            mGeomTraverser.addHighlightMaterial(highlight_mat);
+            mGeomTraverser.addHighlightMaterial(mIsectHighlightID);
          }
          // Otherwise, we are intersecting nothing.
          else
          {
-            OSG::RefPtr<OSG::MaterialPtr> mat(
-               mIsectHighlightMaterial.get()
-            );
-            mGeomTraverser.removeHighlightMaterial(mat);
+            mGeomTraverser.removeHighlightMaterial(mIsectHighlightID);
             mIntersecting = false;
          }
       }
@@ -253,10 +236,10 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
         mGrabBtn.test(gadget::Digital::TOGGLE_ON) )
    {
       mGrabSound.trigger();
-      mGrabbing   = true;
+      mGrabbing = true;
 
-      changeHighlightMaterial(mIsectHighlightMaterial,
-                              mGrabHighlightMaterial);
+      mGeomTraverser.swapHighlightMaterial(mIsectHighlightID,
+                                           mGrabHighlightID);
 
       // m_wand_M_obj is the offset between the wand and the grabbed object's
       // center point:
@@ -286,8 +269,8 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       // intersecting state and clear mIntersectedObj.
       if ( mIntersectedObj.node() != OSG::NullFC )
       {
-         changeHighlightMaterial(mGrabHighlightMaterial,
-                                 mIsectHighlightMaterial);
+         mGeomTraverser.swapHighlightMaterial(mGrabHighlightID,
+                                              mIsectHighlightID);
          gmtl::identity(m_wand_M_obj);
       }
    }
@@ -422,111 +405,12 @@ PointGrabPlugin::PointGrabPlugin()
    , mGrabFragmentShaderFile("highlight.fs")
    , mIntersecting(false)
    , mGrabbing(false)
+   , mIsectHighlightID(GeometryHighlightTraverser::HIGHLIGHT0)
+   , mGrabHighlightID(GeometryHighlightTraverser::HIGHLIGHT1)
    , mIntersectColor(1.0f, 1.0f, 0.0f)
    , mGrabColor(1.0f, 0.0f, 1.0f)
 {
    /* Do nothing. */ ;
-}
-
-void PointGrabPlugin::
-changeHighlightMaterial(OSG::RefPtr<OSG::ChunkMaterialPtr> oldMat,
-                        OSG::RefPtr<OSG::ChunkMaterialPtr> newMat)
-{
-   OSG::RefPtr<OSG::MaterialPtr> old_mat(oldMat.get());
-   OSG::RefPtr<OSG::MaterialPtr> new_mat(newMat.get());
-   mGeomTraverser.swapHighlightMaterial(old_mat, new_mat);
-}
-
-OSG::RefPtr<OSG::ChunkMaterialPtr>
-PointGrabPlugin::createShader(const std::string& vertexShader,
-                              const std::string& fragmentShader)
-   throw(std::exception)
-{
-   fs::path vs_file_path(getCompleteShaderFile(vertexShader));
-   fs::path fs_file_path(getCompleteShaderFile(fragmentShader));
-
-   fs::ifstream vs_file(vs_file_path);
-   fs::ifstream fs_file(fs_file_path);
-
-   if ( ! vs_file || ! fs_file )
-   {
-      if ( ! vs_file )
-      {
-         std::cerr << "WARNING: Could not open '"
-                   << vs_file_path.string() << "'" << std::endl;
-      }
-
-      if ( ! fs_file )
-      {
-         std::cerr << "WARNING: Could not open '"
-                   << fs_file_path.string() << "'" << std::endl;
-      }
-
-      throw std::runtime_error("Failed to find shader programs");
-   }
-   else
-   {
-      OSG::RefPtr<OSG::SHLChunkPtr> shl_chunk;
-      shl_chunk = OSG::SHLChunk::create();
-      {
-         OSG::CPEdit(shl_chunk, OSG::ShaderChunk::VertexProgramFieldMask |
-                                OSG::ShaderChunk::FragmentProgramFieldMask);
-
-         if ( ! shl_chunk->readVertexProgram(vs_file) )
-         {
-            throw std::runtime_error("Failed to read vertex program");
-         }
-
-         if ( ! shl_chunk->readFragmentProgram(fs_file) )
-         {
-            throw std::runtime_error("Failed to read fragment program");
-         }
-      }
-
-      OSG::RefPtr<OSG::BlendChunkPtr> blend_chunk;
-      blend_chunk = OSG::BlendChunk::create();
-      OSG::beginEditCP(blend_chunk);
-         blend_chunk->setSrcFactor(GL_SRC_ALPHA);
-         blend_chunk->setDestFactor(GL_ONE);
-      OSG::endEditCP(blend_chunk);
-
-      OSG::RefPtr<OSG::ChunkMaterialPtr> material(OSG::ChunkMaterial::create());
-      OSG::beginEditCP(material);
-         material->addChunk(shl_chunk);
-         material->addChunk(blend_chunk);
-      OSG::endEditCP(material);
-
-      return material;
-   }
-}
-
-fs::path PointGrabPlugin::getCompleteShaderFile(const std::string& filename)
-{
-   fs::path file_path(filename, fs::native);
-
-   if ( ! file_path.is_complete() )
-   {
-      for ( std::vector<fs::path>::iterator i = mShaderSearchPath.begin();
-            i != mShaderSearchPath.end();
-            ++i )
-      {
-         try
-         {
-            fs::path cur_path(*i / filename);
-            if ( fs::exists(cur_path) )
-            {
-               file_path = cur_path;
-               break;
-            }
-         }
-         catch (fs::filesystem_error& ex)
-         {
-            std::cerr << ex.what() << std::endl;
-         }
-      }
-   }
-
-   return file_path;
 }
 
 struct StringToInt
