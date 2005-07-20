@@ -34,18 +34,18 @@ public:
    OSG::NodeRefPtr getPanelRoot()
    { return mRootPanelNode; }
 
-   void setHeaderTitle(std::string txt);
-   void setCenterTitle(std::string txt);
-   void setBottomTitle(std::string txt);
+   void setHeaderTitle(const std::string& txt);
+   void setCenterTitle(const std::string& txt);
+   void setBottomTitle(const std::string& txt);
 
    /** The text for the header. */
-   void setHeaderText(std::string header);
+   void setHeaderText(const std::string& header);
 
    /** Set text for the control section of the panel. */
-   void setControlText(std::string text);
+   void setControlText(const std::string& text);
 
    /** Add another message to the status panel. */
-   void addStatusMessage(std::string msg);
+   void addStatusMessage(const std::string& msg);
 
    /** Set the panel to dirty.  Next update will rebuild. */
    void setDirty();
@@ -55,7 +55,7 @@ public:
 
 public:  // Configuration params //
 
-   void setWidthHeight(float w, float h);
+   void setWidthHeight(const float w, const float h);
 
 protected:
    void updatePanelScene();
@@ -96,7 +96,7 @@ protected:
    float    mHeaderHeight;          /**< Size of the header section (percentage). */
    float    mStatusHeight;          /**< Size of the status section (percentage). */
 
-   unsigned mStatusHistorySize;    /**< Number of status lines to keep around. */
+   unsigned int mStatusHistorySize; /**< Number of status lines to keep around. */
    float    mStatusTextHeight;     /**< Fixed height (in OpenSG coords) of status text. */
 
 

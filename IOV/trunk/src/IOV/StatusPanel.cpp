@@ -103,38 +103,38 @@ void StatusPanel::initialize()
    setDirty();
 }
 
-void StatusPanel::setHeaderTitle(std::string txt)
+void StatusPanel::setHeaderTitle(const std::string& txt)
 {
    mHeaderTitle = txt;
    setDirty();
 }
 
-void StatusPanel::setCenterTitle(std::string txt)
+void StatusPanel::setCenterTitle(const std::string& txt)
 {
    mCenterTitle = txt;
    setDirty();
 }
 
-void StatusPanel::setBottomTitle(std::string txt)
+void StatusPanel::setBottomTitle(const std::string& txt)
 {
    mBottomTitle = txt;
    setDirty();
 }
 
 
-void StatusPanel::setHeaderText(std::string header)
+void StatusPanel::setHeaderText(const std::string& header)
 {
    mHeaderText = header;
    setDirty();
 }
 
-void StatusPanel::setControlText(std::string text)
+void StatusPanel::setControlText(const std::string& text)
 {
    mCenterText = text;
    setDirty();
 }
 
-void StatusPanel::addStatusMessage(std::string msg)
+void StatusPanel::addStatusMessage(const std::string& msg)
 {
    mStatusLines.push_front(msg);
 
@@ -170,13 +170,15 @@ void StatusPanel::setWidthHeight(float w, float h)
 
 void StatusPanel::updatePanelScene()
 {
+   mBuilder.resetGeomGeo(mPanelGeomCore);
+
    // Draw the panel outline
    OSG::Vec2f panel_ll(0,0), panel_ul(0,mPanHeight), panel_ur(mPanWidth,mPanHeight), panel_rl(mPanWidth,0);
 
    const float feet_to_app_units(0.3048f * mMetersToAppUnits);
 
    const float inner_rad(0.2f * feet_to_app_units);
-   unsigned    num_segs(8);
+   unsigned int num_segs(8);
    const float front_depth(0.1f * feet_to_app_units);
    const float back_depth(-0.1f * feet_to_app_units);
    //const float bg_depth(-0.1f * feet_to_app_units);
@@ -224,9 +226,11 @@ void StatusPanel::updatePanelScene()
    mBuilder.addText(mTextGeomCore, *mFont, mCenterText, center_ul, mTextColor, pan_scale, text_spacing);
 
    // Status panel
-   unsigned num_lines(unsigned(status_pan_height/mStatusTextHeight));
-   if(num_lines > mStatusLines.size())
-   { num_lines = mStatusLines.size(); }
+   unsigned int num_lines(unsigned int(status_pan_height/mStatusTextHeight));
+   if ( num_lines > mStatusLines.size() )
+   {
+      num_lines = mStatusLines.size();
+   }
 
    std::vector<std::string> potential_lines;
    potential_lines.insert(potential_lines.end(), mStatusLines.begin(), mStatusLines.begin()+num_lines);
