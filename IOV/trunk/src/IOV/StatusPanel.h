@@ -26,7 +26,7 @@ namespace inf
 class IOV_CLASS_API StatusPanel
 {
 public:
-   StatusPanel();
+   StatusPanel(const float metersToAppUnits);
 
    /** Initialize scene graph, fonts and everything else that is used. */
    void initialize();
@@ -79,6 +79,8 @@ protected:
    std::string    mHeaderText;
    std::string    mCenterText;
    std::deque<std::string> mStatusLines;
+
+   float mMetersToAppUnits;
 
    /** Panel sizes are in OpenSG units.
     * Everything else is in normalized percentages or discrete num of's (ie. num lines).

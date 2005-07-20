@@ -12,14 +12,17 @@
 namespace inf
 {
 
-StatusPanel::StatusPanel()
+StatusPanel::StatusPanel(const float metersToAppUnits)
+   : mMetersToAppUnits(metersToAppUnits)
 {
    mIsDirty = true;
    mFont = NULL;
 
-   mPanWidth = 10.0f;
-   mPanHeight = 15.0f;
-   mBorderWidth = 0.4f;
+   const float feet_to_app_units(0.3048f * mMetersToAppUnits);
+
+   mPanWidth = 10.0f * feet_to_app_units;
+   mPanHeight = 15.0f * feet_to_app_units;
+   mBorderWidth = 0.4f * feet_to_app_units;
 
    mTitleHeight = 0.05f;
    mStatusHeight = 0.30f;
@@ -170,10 +173,13 @@ void StatusPanel::updatePanelScene()
    // Draw the panel outline
    OSG::Vec2f panel_ll(0,0), panel_ul(0,mPanHeight), panel_ur(mPanWidth,mPanHeight), panel_rl(mPanWidth,0);
 
-   const float inner_rad(0.2f);
+   const float feet_to_app_units(0.3048f * mMetersToAppUnits);
+
+   const float inner_rad(0.2f * feet_to_app_units);
    unsigned    num_segs(8);
-   const float front_depth(0.1f), back_depth(-0.1f);
-   //const float bg_depth(-0.1f);
+   const float front_depth(0.1f * feet_to_app_units);
+   const float back_depth(-0.1f * feet_to_app_units);
+   //const float bg_depth(-0.1f * feet_to_app_units);
 
    mBuilder.buildRoundedRectangle(mPanelGeomCore, mBorderColor, panel_ll, panel_ur, inner_rad, inner_rad+mBorderWidth,
                                  num_segs, false, front_depth, back_depth, 1.0);

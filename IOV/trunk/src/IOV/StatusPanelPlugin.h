@@ -4,20 +4,23 @@
 #define _STATUS_PANEL_PLUGIN_H_
 
 #include <IOV/Plugin.h>
-#include <IOV/StatusPanel.h>
-#include <IOV/SceneData.h>
+
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 #include <OpenSG/OSGTransform.h>
 
 #include <vpr/vpr.h>
 #include <vpr/Util/GUID.h>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <IOV/SceneData.h>
 
 
 namespace inf
 {
+
+class StatusPanel;
+
 class StatusPanelPlugin;
 typedef boost::shared_ptr<StatusPanelPlugin> StatusPanelPluginPtr;
 typedef boost::weak_ptr<StatusPanelPlugin> StatusPanelPluginWeakPtr;
@@ -43,7 +46,7 @@ public:
    StatusPanel& getPanel();
 
 protected:
-   StatusPanel             mStatusPanel;     /**< The status panel we are using. */
+   StatusPanel*            mStatusPanel;     /**< The status panel we are using. */
    OSG::TransformNodePtr   mPanelXformNode;  /**< Root node of panel. */
 
 protected:

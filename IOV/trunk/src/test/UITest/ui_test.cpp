@@ -540,7 +540,8 @@ int main(int argc, char* argv[])
 
     // Status panel
    ///*
-    inf::StatusPanel status_panel;
+    // Use feet as the unit.
+    inf::StatusPanel status_panel(3.28f);
     status_panel.initialize();
 
 

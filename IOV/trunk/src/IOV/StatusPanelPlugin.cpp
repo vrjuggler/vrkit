@@ -1,14 +1,15 @@
 // Copyright (C) Infiscape Corporation 2005
 
-#include <IOV/StatusPanelPlugin.h>
-#include <IOV/StatusPanel.h>
-#include <IOV/Status.h>
-#include <IOV/Scene.h>
-#include <IOV/Viewer.h>
+#include <boost/weak_ptr.hpp>
+
 #include <gmtl/gmtl.h>
 #include <gmtl/External/OpenSGConvert.h>
 
-#include <boost/weak_ptr.hpp>
+#include <IOV/Status.h>
+#include <IOV/Scene.h>
+#include <IOV/Viewer.h>
+#include <IOV/StatusPanel.h>
+#include <IOV/StatusPanelPlugin.h>
 
 
 namespace
@@ -42,11 +43,17 @@ namespace inf
 {
 
 StatusPanelPlugin::StatusPanelPlugin()
+   : mStatusPanel(NULL)
 {
 }
 
 StatusPanelPlugin::~StatusPanelPlugin()
 {
+   if ( NULL != mStatusPanel )
+   {
+      delete mStatusPanel;
+      mStatusPanel = NULL;
+   }
 }
 
 inf::PluginPtr StatusPanelPlugin::create()
@@ -61,19 +68,19 @@ std::string StatusPanelPlugin::getDescription()
 
 StatusPanel& StatusPanelPlugin::getPanel()
 {
-   return mStatusPanel;
+   return *mStatusPanel;
 }
-
 
 void StatusPanelPlugin::init(inf::ViewerPtr viewer)
 {
    IOV_STATUS << "StatusPanelPlugin::init: Initializing plugin." << std::endl;
 
+   mStatusPanel = new StatusPanel(viewer->getDrawScaleFactor());
+
    // Initialize panel
-   mStatusPanel.initialize();
+   mStatusPanel->initialize();
 
    mPanelXformNode = OSG::TransformNodePtr::create();
-
 
    // XXX: Read the configuration
    jccl::ConfigElementPtr elt = viewer->getConfiguration().getConfigElement(status_panel_elt_tkn);
@@ -82,11 +89,13 @@ void StatusPanelPlugin::init(inf::ViewerPtr viewer)
    {
       vprASSERT(elt->getID() == status_panel_elt_tkn);
 
+      const float feet_to_app_units(0.3048f * viewer->getDrawScaleFactor());
 
       float w,h;
       w = elt->getProperty<float>(initial_size_prop,0);
       h = elt->getProperty<float>(initial_size_prop,1);
-      mStatusPanel.setWidthHeight(w,h);
+      mStatusPanel->setWidthHeight(w * feet_to_app_units,
+                                   h * feet_to_app_units);
 
       float xt = elt->getProperty<float>(initial_pos_prop, 0);
       float yt = elt->getProperty<float>(initial_pos_prop, 1);
@@ -95,9 +104,10 @@ void StatusPanelPlugin::init(inf::ViewerPtr viewer)
       float xr = elt->getProperty<float>(initial_rot_prop, 0);
       float yr = elt->getProperty<float>(initial_rot_prop, 1);
       float zr = elt->getProperty<float>(initial_rot_prop, 2);
-
       gmtl::Coord3fXYZ vp_coord;
-      vp_coord.pos().set(xt,yt,zt);
+      vp_coord.pos().set(xt * feet_to_app_units,
+                         yt * feet_to_app_units,
+                         zt * feet_to_app_units);
       vp_coord.rot().set(gmtl::Math::deg2Rad(xr),
                          gmtl::Math::deg2Rad(yr),
                          gmtl::Math::deg2Rad(zr));
@@ -116,7 +126,7 @@ void StatusPanelPlugin::init(inf::ViewerPtr viewer)
    OSG::GroupNodePtr dec_root = scene_obj->getDecoratorRoot();
 
    OSG::beginEditCP(mPanelXformNode);
-      mPanelXformNode.node()->addChild(mStatusPanel.getPanelRoot());
+      mPanelXformNode.node()->addChild(mStatusPanel->getPanelRoot());
    OSG::endEditCP(mPanelXformNode);
 
    OSG::beginEditCP(dec_root);
@@ -140,7 +150,7 @@ void StatusPanelPlugin::updateState(inf::ViewerPtr viewer)
 
 void StatusPanelPlugin::run(inf::ViewerPtr viewer)
 {
-   mStatusPanel.update();        // Do any updates that we need from this frame
+   mStatusPanel->update();        // Do any updates that we need from this frame
 }
 
 void StatusPanelPlugin::destroy()
