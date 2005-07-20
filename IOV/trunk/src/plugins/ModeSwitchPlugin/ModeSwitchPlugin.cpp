@@ -133,23 +133,24 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
 
    // Get mode names
    const unsigned int num_mode_names(elt->getNum(mode_names_prop));
-   mMaxMode = num_mode_names-1;
-   for(unsigned i=0; i<num_mode_names; ++i)
+   mMaxMode = num_mode_names - 1;
+   for ( unsigned int i = 0; i < num_mode_names; ++i )
    {
-      std::string mode_name = elt->getProperty<std::string>(mode_names_prop,i);
+      std::string mode_name = elt->getProperty<std::string>(mode_names_prop, i);
       mModeNames.push_back(mode_name);
    }
 
    // --- Load the managed plugins --- //
-   const unsigned num_plugins(elt->getNum(plugins_prop));
+   const unsigned int num_plugins(elt->getNum(plugins_prop));
 
    // Attempt to load each plugin
    // - Get creator and create plugin
    // - Push onto plugin list
-   for ( unsigned i = 0; i < num_plugins; ++i )
+   for ( unsigned int i = 0; i < num_plugins; ++i )
    {
       PluginData plugin_data;
-      jccl::ConfigElementPtr plg_elt = elt->getProperty<jccl::ConfigElementPtr>(plugins_prop,i);
+      jccl::ConfigElementPtr plg_elt =
+         elt->getProperty<jccl::ConfigElementPtr>(plugins_prop, i);
       plugin_data.mName = plg_elt->getProperty<std::string>(plugin_prop);
       try
       {
@@ -161,12 +162,16 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
             plugin_data.mPlugin = creator->createPlugin();
             plugin_data.mPlugin->init(viewer);
 
-            const unsigned num_active_modes = plg_elt->getNum(active_modes_prop);
-            for(unsigned m=0; m<num_active_modes; ++m)
+            const unsigned int num_active_modes =
+               plg_elt->getNum(active_modes_prop);
+            for ( unsigned int m = 0; m < num_active_modes; ++m )
             {
-               unsigned mode_num = plg_elt->getProperty<unsigned>(active_modes_prop,m);
-               if(mode_num > mMaxMode)
-               {  mMaxMode = mode_num; }
+               unsigned int mode_num =
+                  plg_elt->getProperty<unsigned int>(active_modes_prop,m);
+               if ( mode_num > mMaxMode )
+               {
+                  mMaxMode = mode_num;
+               }
 
                plugin_data.mActiveModes.push_back(mode_num);
             }
@@ -203,15 +208,17 @@ void ModeSwitchPlugin::updateState(inf::ViewerPtr viewer)
 
    if ( switch_button->getData() == gadget::Digital::TOGGLE_ON )
    {
-      unsigned new_mode(0);
-      if(mMaxMode != 0)
-      { new_mode = (mCurrentMode + 1) % (mMaxMode+1); }
+      unsigned int new_mode(0);
+      if ( mMaxMode != 0 )
+      {
+         new_mode = (mCurrentMode + 1) % (mMaxMode + 1);
+      }
       switchToMode(new_mode, viewer);
    }
 
-   for(unsigned i=0; i<mPlugins.size(); ++i)
+   for ( unsigned int i = 0; i < mPlugins.size(); ++i )
    {
-      if(mPlugins[i].mPlugin->isFocused())
+      if ( mPlugins[i].mPlugin->isFocused() )
       {
          mPlugins[i].mPlugin->updateState(viewer);
       }
@@ -228,7 +235,8 @@ void ModeSwitchPlugin::run(inf::ViewerPtr viewer)
 }
 
 
-void ModeSwitchPlugin::switchToMode(unsigned modeNum, inf::ViewerPtr viewer)
+void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
+                                    inf::ViewerPtr viewer)
 {
    //mode_switch_status_id
    if(modeNum > mMaxMode)
@@ -238,8 +246,8 @@ void ModeSwitchPlugin::switchToMode(unsigned modeNum, inf::ViewerPtr viewer)
       return;
    }
 
-   IOV_STATUS << "ModeSwitchPlugin: Switching to mode: " << mModeNames[modeNum] << std::endl;
-
+   IOV_STATUS << "ModeSwitchPlugin: Switching to mode: " << mModeNames[modeNum]
+              << std::endl;
 
    StatusPanelPluginDataPtr status_panel_data =
       viewer->getSceneObj()->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
@@ -251,7 +259,7 @@ void ModeSwitchPlugin::switchToMode(unsigned modeNum, inf::ViewerPtr viewer)
       panel.setHeaderText(stream.str());
    }
 
-   for(unsigned i=0; i<mPlugins.size(); ++i)
+   for ( unsigned int i = 0; i < mPlugins.size(); ++i )
    {
       PluginData plugin = mPlugins[i];
 
