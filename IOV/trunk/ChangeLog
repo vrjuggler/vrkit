@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-21 patrickh Added the helper method for creating scribe materials
+                    inf::GeometryHighlightTraverser::createScribeMaterial().
+                    -- VERSION -- 0.5.1
 2005-07-20 patrickh Added material management to the class
                     inf::GeometryHighlightTraverser.
                     -- VERSION -- 0.5.0

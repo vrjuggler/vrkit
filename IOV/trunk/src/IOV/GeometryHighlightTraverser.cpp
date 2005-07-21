@@ -113,6 +113,39 @@ createSHLMaterial(const std::string& vertexShaderFile,
 }
 
 unsigned int GeometryHighlightTraverser::
+createScribeMaterial(const bool isLit, const unsigned int frontMode,
+                     const bool offsetLine, const bool offsetFill,
+                     const bool offsetPoint, const float offsetFactor,
+                     const float offsetBias, const OSG::Color3f& diffuseColor)
+{
+   // Set up the highlight materials.
+   OSG::SimpleMaterialPtr mat = OSG::SimpleMaterial::create();
+
+   OSG::beginEditCP(mat, OSG::SimpleMaterial::LitFieldMask |
+                         OSG::SimpleMaterial::DiffuseFieldMask);
+      mat->setLit(isLit);
+      mat->setDiffuse(diffuseColor);
+   OSG::endEditCP(mat, OSG::SimpleMaterial::LitFieldMask |
+                       OSG::SimpleMaterial::DiffuseFieldMask);
+
+   OSG::PolygonChunkPtr scribe_chunk = OSG::PolygonChunk::create();
+   OSG::beginEditCP(scribe_chunk);
+      scribe_chunk->setFrontMode(frontMode);
+      scribe_chunk->setOffsetLine(offsetLine);
+      scribe_chunk->setOffsetFill(offsetFill);
+      scribe_chunk->setOffsetPoint(offsetPoint);
+      scribe_chunk->setOffsetFactor(offsetFactor);
+      scribe_chunk->setOffsetBias(offsetBias);
+   OSG::endEditCP(scribe_chunk);
+
+   OSG::beginEditCP(mat, OSG::SimpleMaterial::ChunksFieldMask);
+      mat->addChunk(scribe_chunk);
+   OSG::endEditCP(mat, OSG::SimpleMaterial::ChunksFieldMask);
+
+   return registerMaterial(OSG::MaterialRefPtr(mat));
+}
+
+unsigned int GeometryHighlightTraverser::
 registerMaterial(OSG::MaterialRefPtr mat)
 {
    unsigned int id(mMaterials.size());

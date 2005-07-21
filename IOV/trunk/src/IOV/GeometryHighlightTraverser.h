@@ -46,6 +46,31 @@ public:
                                   const std::string& fragmentShaderFile)
       throw(inf::Exception);
 
+   /**
+    * Creates and registers a very simple scribing material.
+    *
+    * @param isLit        Whether the new material will be lit.
+    * @param frontMode    The front mode for the polygons (e.g., GL_LINE).
+    * @param offsetLine   Enable/disable polygon line offset.
+    * @param offsetFill   Enable/disable polygon fill offset.
+    * @param offsetPoint  Enable/disable polygon point offset.
+    * @param offsetFactor The polygon offset factor.
+    * @param offsetBias   The poloygon offset bias.
+    * @param diffuseColor The diffuse color for the new material.
+    *
+    * @return The unique ID for the newly created scribe material.
+    *
+    * @since 0.5.1
+    */
+   unsigned int createScribeMaterial(const bool isLit,
+                                     const unsigned int frontMode,
+                                     const bool offsetLine,
+                                     const bool offsetFill,
+                                     const bool offsetPoint,
+                                     const float offsetFactor,
+                                     const float offsetBias,
+                                     const OSG::Color3f& diffuseColor);
+
    unsigned int registerMaterial(OSG::MaterialRefPtr mat);
 
    /** Return the material with the given id. */

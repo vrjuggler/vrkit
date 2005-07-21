@@ -121,35 +121,16 @@ void PointGrabPlugin::init(ViewerPtr viewer)
 
    if ( use_scribe )
    {
-      mIsectHighlightID = GeometryHighlightTraverser::HIGHLIGHT0;
-      mGrabHighlightID  = GeometryHighlightTraverser::HIGHLIGHT1;
-
-      // Set up the highlight materials.
-      OSG::RefPtr<OSG::MaterialPtr> mat0 =
-         mGeomTraverser.getHighlight(mIsectHighlightID);
-      if ( mat0->getType().isDerivedFrom(OSG::SimpleMaterial::getClassType()) )
-      {
-         OSG::SimpleMaterialPtr isect_highlight_mat =
-            OSG::SimpleMaterialPtr::dcast(mat0.get());
-
-         OSG::beginEditCP(isect_highlight_mat);
-            isect_highlight_mat->setLit(false);
-            isect_highlight_mat->setDiffuse(mIntersectColor);
-         OSG::endEditCP(isect_highlight_mat);
-      }
-
-      OSG::RefPtr<OSG::MaterialPtr> mat1 =
-         mGeomTraverser.getHighlight(mGrabHighlightID);
-      if ( mat1->getType().isDerivedFrom(OSG::SimpleMaterial::getClassType()) )
-      {
-         OSG::SimpleMaterialPtr grab_highlight_mat =
-            OSG::SimpleMaterialPtr::dcast(mat1.get());
-
-         OSG::beginEditCP(grab_highlight_mat);
-            grab_highlight_mat->setLit(false);
-            grab_highlight_mat->setDiffuse(mGrabColor);
-         OSG::endEditCP(grab_highlight_mat);
-      }
+      mIsectHighlightID = mGeomTraverser.createScribeMaterial(false, GL_LINE,
+                                                              true, false,
+                                                              false, 0.05f,
+                                                              1.0f,
+                                                              mIntersectColor);
+      mGrabHighlightID  = mGeomTraverser.createScribeMaterial(false, GL_LINE,
+                                                              true, false,
+                                                              false, 0.05f,
+                                                              1.0f,
+                                                              mGrabColor);
    }
 }
 
