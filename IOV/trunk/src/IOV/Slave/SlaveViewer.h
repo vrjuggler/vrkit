@@ -20,9 +20,6 @@
 namespace inf
 {
 
-typedef OSG::CoredNodePtr<OSG::Group> CoredGroupPtr;
-
-
 /** Viewer class/app for the slave side of cluster communication.
  *
  * This class implements the slave side of the cluster protocol.
@@ -83,7 +80,7 @@ private:
    std::string mMasterAddr;
    std::string mRootNodeName;
 
-   CoredGroupPtr mSceneRoot;
+   OSG::GroupNodePtr mSceneRoot;
 
    OSG::RemoteAspect        mAspect;
    OSG::PointConnection*    mConnection;

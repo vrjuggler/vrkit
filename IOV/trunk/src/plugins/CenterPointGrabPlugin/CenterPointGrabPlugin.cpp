@@ -46,7 +46,7 @@ IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
 namespace inf
 {
 
-const inf::CoredTransformPtr CenterPointGrabPlugin::sEmptyCoredXformNode;
+const OSG::TransformNodePtr CenterPointGrabPlugin::sEmptyCoredXformNode;
 
 void CenterPointGrabPlugin::init(ViewerPtr viewer)
 {
@@ -119,7 +119,7 @@ void CenterPointGrabPlugin::init(ViewerPtr viewer)
    OSG::endEditCP(geo);
    OSG::addRefCP(geo);
 
-   mCoredHighlightNode = inf::CoredGeomPtr(geo);
+   mCoredHighlightNode = OSG::GeometryNodePtr(geo);
 
    // Configure
    std::string elt_type_name = getElementType();
@@ -146,7 +146,7 @@ void CenterPointGrabPlugin::updateState(ViewerPtr viewer)
          mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
       );
 
-      inf::CoredTransformPtr intersect_obj;
+      OSG::TransformNodePtr intersect_obj;
 
       const GrabData::object_list_t& objects = mGrabData->getObjects();
 

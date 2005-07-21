@@ -20,8 +20,6 @@
 namespace inf
 {
 
-typedef OSG::CoredNodePtr<OSG::Geometry> CoredGeomPtr;
-
 class CenterPointGrabPlugin
    : public inf::Plugin
    , public boost::enable_shared_from_this<CenterPointGrabPlugin>
@@ -89,7 +87,7 @@ private:
 
    const int GRAB_BUTTON;
 
-   static const inf::CoredTransformPtr sEmptyCoredXformNode;
+   static const OSG::TransformNodePtr sEmptyCoredXformNode;
 
    inf::GrabDataPtr mGrabData;
 
@@ -97,13 +95,13 @@ private:
 
    bool mIntersecting;
    bool mGrabbing;
-   inf::CoredTransformPtr mIntersectedObj;
-   inf::CoredTransformPtr mGrabbedObj;
+   OSG::TransformNodePtr mIntersectedObj;
+   OSG::TransformNodePtr mGrabbedObj;
 
    OSG::Color3f mIntersectColor;
    OSG::Color3f mGrabColor;
 
-   inf::CoredGeomPtr      mCoredHighlightNode;
+   OSG::GeometryNodePtr   mCoredHighlightNode;
    OSG::GeoPositions3fPtr mHighlightPoints;
    OSG::SimpleMaterialPtr mHighlightMaterial;
 };

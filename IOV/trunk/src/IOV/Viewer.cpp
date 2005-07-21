@@ -93,7 +93,7 @@ void Viewer::init()
 
          // This has to be done before the slave connections are received so
          // that this change is included with the initial sync.
-         CoredGroupPtr root_node = mScene->getSceneRoot();
+         OSG::GroupNodePtr root_node = mScene->getSceneRoot();
          OSG::beginEditCP(root_node);
             OSG::setName(root_node.node(), root_name);
          OSG::endEditCP(root_node);

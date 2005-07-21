@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-21 patrichk Switch to using OpenSG typdef's for instantiations of
+                    OSG::CoredNodePtr<T>.
+                    -- VERSION -- 0.5.2
 2005-07-21 patrickh Added the helper method for creating scribe materials
                     inf::GeometryHighlightTraverser::createScribeMaterial().
                     -- VERSION -- 0.5.1

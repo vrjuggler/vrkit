@@ -147,7 +147,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
    // if we are not already grabbing an object.
    if ( ! mGrabbing )
    {
-      inf::CoredTransformPtr intersect_obj;
+      OSG::TransformNodePtr intersect_obj;
 
       const GrabData::object_list_t& objects = mGrabData->getObjects();
 

@@ -116,8 +116,7 @@ void OpenSgViewer::init()
       model_xform_core->setMatrix(model_pos);
    OSG::endEditCP(model_xform_core, OSG::Transform::MatrixFieldMask);
 
-   inf::CoredTransformPtr model_xform =
-      inf::CoredTransformPtr(model_xform_core);
+   OSG::TransformNodePtr model_xform = OSG::TransformNodePtr(model_xform_core);
 
    OSG::beginEditCP(model_xform);
       model_xform.node()->addChild(model_root);
@@ -168,7 +167,7 @@ void OpenSgViewer::init()
 
    // create the root part of the scene
    inf::ScenePtr scene = getSceneObj();
-   inf::CoredTransformPtr scene_transform_root = scene->getTransformRoot();
+   OSG::TransformNodePtr scene_transform_root = scene->getTransformRoot();
 
    // Set up the root node
    osg::beginEditCP(scene_transform_root.node());

@@ -105,7 +105,7 @@ private:
 
    bool mIntersecting;
    bool mGrabbing;
-   inf::CoredTransformPtr mIntersectedObj;
+   OSG::TransformNodePtr mIntersectedObj;
 
    GeometryHighlightTraverser mGeomTraverser;
    unsigned int mIsectHighlightID;

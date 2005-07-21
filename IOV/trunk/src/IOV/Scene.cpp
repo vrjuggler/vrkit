@@ -13,9 +13,9 @@ ScenePtr Scene::create()
 
 void Scene::init()
 {
-   mSceneRoot     = CoredGroupPtr::create();
-   mDecoratorRoot = CoredGroupPtr::create();
-   mTransformRoot = CoredTransformPtr::create();
+   mSceneRoot     = OSG::GroupNodePtr::create();
+   mDecoratorRoot = OSG::GroupNodePtr::create();
+   mTransformRoot = OSG::TransformNodePtr::create();
 
    OSG::beginEditCP(mSceneRoot);
       mSceneRoot.node()->addChild(mDecoratorRoot.node());

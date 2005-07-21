@@ -19,12 +19,12 @@
 namespace inf
 {
 
-typedef OSG::CoredNodePtr<OSG::Transform>   CoredTransformPtr;
+typedef OSG::TransformNodePtr CoredTransformPtr;
 
 class IOV_CLASS_API GrabData : public inf::SceneData
 {
 public:
-   typedef std::vector<CoredTransformPtr> object_list_t;
+   typedef std::vector<OSG::TransformNodePtr> object_list_t;
 
    /**
     * The unique type identifier for scene data used by plug-ins that manage
@@ -39,7 +39,7 @@ public:
 
    virtual ~GrabData();
 
-   void addObject(CoredTransformPtr obj)
+   void addObject(OSG::TransformNodePtr obj)
    {
       mObjects.push_back(obj);
    }

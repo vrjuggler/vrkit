@@ -25,11 +25,8 @@
 namespace inf
 {
 
-   typedef OSG::CoredNodePtr<OSG::Group>     CoredGroupPtr;
-   typedef OSG::CoredNodePtr<OSG::Transform> CoredTransformPtr;
-
-   //typedef OSG::GroupNodePtr     CoredGroupPtr;
-   //typedef OSG::TransformNodePtr CoredTransformPtr;
+   typedef OSG::GroupNodePtr     CoredGroupPtr;
+   typedef OSG::TransformNodePtr CoredTransformPtr;
 
 /**
  * Class to store the data for the scene.
@@ -58,29 +55,29 @@ public:
 
    /** Getter/Setters for the scene data. */
    //@{
-   CoredGroupPtr getSceneRoot()
+   OSG::GroupNodePtr getSceneRoot()
    {
       return mSceneRoot;
    }
-   void setSceneRoot(CoredGroupPtr scene)
+   void setSceneRoot(OSG::GroupNodePtr scene)
    {
       mSceneRoot = scene;
    }
 
-   CoredGroupPtr getDecoratorRoot()
+   OSG::GroupNodePtr getDecoratorRoot()
    {
       return mDecoratorRoot;
    }
-   void setDecoratorRoot(CoredGroupPtr root)
+   void setDecoratorRoot(OSG::GroupNodePtr root)
    {
       mDecoratorRoot = root;
    }
 
-   CoredTransformPtr getTransformRoot()
+   OSG::TransformNodePtr getTransformRoot()
    {
       return mTransformRoot;
    }
-   void setTransformRoot(CoredTransformPtr root)
+   void setTransformRoot(OSG::TransformNodePtr root)
    {
       mTransformRoot = root;
    }
@@ -176,9 +173,9 @@ protected:
    // So DecoratorRoot is in the rw coordinate system and
    //    Everything under the TransformCore is in the virtual world coordinate system
    //
-   CoredGroupPtr        mSceneRoot;
-   CoredGroupPtr        mDecoratorRoot;
-   CoredTransformPtr    mTransformRoot;
+   OSG::GroupNodePtr        mSceneRoot;
+   OSG::GroupNodePtr        mDecoratorRoot;
+   OSG::TransformNodePtr    mTransformRoot;
 
    //std::map<std::string, OSG::NodePtr>  scene_or_model_nodes;  // ???
 
