@@ -47,8 +47,6 @@ void Viewer::init()
 {
    // This has to be called before OSG::osgInit(), which is done by
    // vrj::OpenSGApp::init().
-   // XXX: Does this open up a memory leak in the case where we don't use
-   // networking??
    OSG::ChangeList::setReadWriteDefault();
 
    vrj::OpenSGApp::init();
@@ -138,7 +136,7 @@ void Viewer::latePreFrame()
 
    OSG::Connection::Channel channel;
 
-   // If we have networking to do
+   // If we have networking to do then do it
    if ( NULL != mConnection )
    {
       try
@@ -159,8 +157,6 @@ void Viewer::latePreFrame()
          }
 
          mConnection->resetSelection();
-
-         OSG::Thread::getCurrentChangeList()->clearAll();
       }
       catch (OSG::Exception& ex)
       {
@@ -174,6 +170,10 @@ void Viewer::latePreFrame()
          mConnection = NULL;
       }
    }
+
+   // We are using writeable change lists, so we need to clear them out
+   // We do this here because it should be after anything else that the user may want to do
+   OSG::Thread::getCurrentChangeList()->clearAll();
 }
 
 void Viewer::sendDataToSlaves(OSG::BinaryDataHandler& writer)

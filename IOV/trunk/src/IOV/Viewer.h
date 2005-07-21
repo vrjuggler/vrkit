@@ -80,6 +80,8 @@ public:
 
    /** Called after cluster data sync and after preFrame is complete.
     * We use it to send out OpenSG scene graph updates to the other nodes.
+    * @post: OpenSG data (changelist) has been sent to all remote nodes.
+    *        Local change list has been cleared (after send).
     */
    virtual void latePreFrame();
 
