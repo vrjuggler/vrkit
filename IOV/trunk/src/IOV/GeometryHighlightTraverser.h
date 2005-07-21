@@ -31,7 +31,7 @@ public:
    enum HighlightId
    {
       HIGHLIGHT0,    /**< OSG::SimpleMaterialPtr with scribing */
-      HIGHLIGHT1,    /**< Another OSG::SimpleMaterialPtr with scribing and 
+      HIGHLIGHT1,    /**< Another OSG::SimpleMaterialPtr with scribing and
                           a different diffuse color */
       LAST_HIGHLIGHT /**< Internal use only! Not a valid highlight ID! */
    };
@@ -48,10 +48,11 @@ public:
 
    unsigned int registerMaterial(OSG::RefPtr<OSG::MaterialPtr> mat);
 
-   OSG::RefPtr<OSG::MaterialPtr> getHighlight(const unsigned int id)
-   {
-      return mMaterials[id];
-   }
+   /** Return the material with the given id. */
+   OSG::MaterialRefPtr getHighlight(const unsigned int id);
+
+   /** Return the number of materials current registered. */
+   unsigned int getNumMaterials();
 
    /**
     * Performs a new traversal rooted at the given node and stores
@@ -84,12 +85,13 @@ private:
 
    void validateMaterialID(const unsigned int id) throw(inf::Exception);
 
+private:
    std::vector<boost::filesystem::path> mShaderSearchPath;
 
-   std::vector< OSG::RefPtr<OSG::MaterialPtr> > mMaterials;
+   std::vector< OSG::MaterialRefPtr > mMaterials;
 
-   std::vector< OSG::RefPtr<OSG::NodePtr> > mGeomNodes;
-   std::vector< OSG::RefPtr<OSG::GeometryPtr> > mGeomCores;
+   std::vector< OSG::NodeRefPtr > mGeomNodes;
+   std::vector< OSG::GeometryRefPtr > mGeomCores;
 
    template<typename T>
    struct RefPtrCompare

@@ -120,6 +120,17 @@ registerMaterial(OSG::RefPtr<OSG::MaterialPtr> mat)
    return id;
 }
 
+OSG::MaterialRefPtr GeometryHighlightTraverser::getHighlight(const unsigned int id)
+{
+   return mMaterials[id];
+}
+
+unsigned int GeometryHighlightTraverser::getNumMaterials()
+{
+   return mMaterials.size();
+}
+
+
 void GeometryHighlightTraverser::traverse(OSG::NodePtr node)
 {
    reset();
