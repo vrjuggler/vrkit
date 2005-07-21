@@ -73,7 +73,7 @@ protected:
 
    SimpleNavPlugin();
 
-   virtual void focusChanged();
+   virtual void focusChanged(inf::ViewerPtr viewer);
 
    virtual void updateNavState(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
@@ -96,6 +96,11 @@ protected:
    int mRevBtn;      /**< Button for reverse. */
    int mRotateBtn;   /**< Button for rotate. */
    int mModeBtn;     /**< Button for swapping mode. */
+
+   std::string mForwardText;
+   std::string mReverseText;
+   std::string mRotateText;
+   std::string mModeText;
 };
 
 }

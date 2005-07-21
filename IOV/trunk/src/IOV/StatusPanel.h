@@ -7,6 +7,7 @@
 
 #include <string>
 #include <deque>
+#include <map>
 
 #include <OpenSG/OSGConfig.h>
 #include <OpenSG/OSGNode.h>
@@ -23,6 +24,16 @@ namespace inf
 class IOV_CLASS_API StatusPanel
 {
 public:
+   enum ControlTextLine
+   {
+      LINE1 = 0,
+      LINE2 = LINE1 + 1,
+      LINE3 = LINE2 + 1,
+      LINE4 = LINE3 + 1,
+      LINE5 = LINE4 + 1,
+      END
+   };
+
    StatusPanel(const float metersToAppUnits);
 
    /** Initialize scene graph, fonts and everything else that is used. */
@@ -38,8 +49,41 @@ public:
    /** The text for the header. */
    void setHeaderText(const std::string& header);
 
-   /** Set text for the control section of the panel. */
-   void setControlText(const std::string& text);
+   /**
+    * Sets text for the named line of the panel's control section.  This
+    * overwrites whatever was previously in the buffer for the named line.
+    *
+    * @since 0.6.0
+    */
+   void setControlText(const ControlTextLine line, const std::string& text);
+
+   /**
+    * Adds the given text to the named line of the panel's control section.
+    *
+    * @since 0.6.0
+    */
+   void addControlText(const ControlTextLine line, const std::string& text,
+                       const unsigned int priority = 1);
+
+   /**
+    * Removes the given text from the named line of the panel's control
+    * section.  If the given text is not in the named line, this has no
+    * effect.
+    *
+    * @since 0.6.0
+    */
+   void removeControlText(const ControlTextLine line, const std::string& text);
+
+   /**
+    * Determines if the named line contains the given text.
+    *
+    * @since 0.6.0
+    */
+   bool hasControlText(const ControlTextLine line, const std::string& text)
+   {
+      std::vector<std::string>& vec = mCenterText[line];
+      return std::find(vec.begin(), vec.end(), text) != vec.end();
+   }
 
    /** Add another message to the status panel. */
    void addStatusMessage(const std::string& msg);
@@ -74,7 +118,7 @@ protected:
    std::string    mBottomTitle;
 
    std::string    mHeaderText;
-   std::string    mCenterText;
+   std::map<ControlTextLine, std::vector<std::string> > mCenterText;
    std::deque<std::string> mStatusLines;
 
    float mMetersToAppUnits;
@@ -109,8 +153,6 @@ protected:
 protected:
    OSG::ClipPlaneChunkPtr mClipRight;
    OSG::ClipPlaneChunkPtr mClipBottom;
-
-
 };
 
 }

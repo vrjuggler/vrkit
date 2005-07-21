@@ -24,6 +24,8 @@
 #include <IOV/User.h>
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Status.h>
+#include <IOV/StatusPanel.h>
+#include <IOV/StatusPanelPlugin.h>
 
 #include "SimpleNavPlugin.h"
 
@@ -62,6 +64,10 @@ SimpleNavPlugin::SimpleNavPlugin()
    , mRevBtn(-1)
    , mRotateBtn(-1)
    , mModeBtn(-1)
+   , mForwardText("Forward")
+   , mReverseText("Reverse")
+   , mRotateText("Rotate")
+   , mModeText("Toggle Walk/Fly")
 {
    mCanNavigate = isFocused();
 }
@@ -106,14 +112,94 @@ void SimpleNavPlugin::init(ViewerPtr viewer)
    mModeBtn = elt->getProperty<int>(mode_btn_prop);
 }
 
-void SimpleNavPlugin::focusChanged()
+void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
 {
+   inf::ScenePtr scene = viewer->getSceneObj();
+   StatusPanelPluginDataPtr status_panel_data =
+      scene->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
+
    // We can only navigate when we have focus.
    mCanNavigate = isFocused();
 
    if ( ! mCanNavigate )
    {
       mVelocity = 0.0f;
+
+      if ( status_panel_data->mStatusPanelPlugin )
+      {
+         inf::StatusPanel& panel =
+            status_panel_data->mStatusPanelPlugin->getPanel();
+
+         if ( mForBtn != -1 )
+         {
+            panel.removeControlText((StatusPanel::ControlTextLine) mForBtn,
+                                    mForwardText);
+         }
+
+         if ( mRevBtn != -1 )
+         {
+            panel.removeControlText((StatusPanel::ControlTextLine) mRevBtn,
+                                    mReverseText);
+         }
+
+         if ( mRotateBtn != -1 )
+         {
+            panel.removeControlText((StatusPanel::ControlTextLine) mRotateBtn,
+                                    mRotateText);
+         }
+
+         if ( mModeBtn != -1 )
+         {
+            panel.removeControlText((StatusPanel::ControlTextLine) mModeBtn,
+                                    mModeText);
+         }
+      }
+   }
+   else
+   {
+      if ( status_panel_data->mStatusPanelPlugin )
+      {
+         inf::StatusPanel& panel =
+            status_panel_data->mStatusPanelPlugin->getPanel();
+
+         StatusPanel::ControlTextLine line_num;
+
+         if ( mForBtn != -1 )
+         {
+            line_num = (StatusPanel::ControlTextLine) mForBtn;
+            if ( ! panel.hasControlText(line_num, mForwardText) )
+            {
+               panel.addControlText(line_num, mForwardText);
+            }
+         }
+
+         if ( mRevBtn != -1 )
+         {
+            line_num = (StatusPanel::ControlTextLine) mRevBtn;
+            if ( ! panel.hasControlText(line_num, mReverseText) )
+            {
+               panel.addControlText(line_num, mReverseText);
+            }
+         }
+
+         if ( mRotateBtn != -1 )
+         {
+            line_num = (StatusPanel::ControlTextLine) mRotateBtn;
+            if ( ! panel.hasControlText(line_num, mRotateText) )
+            {
+               panel.addControlText(line_num, mRotateText);
+            }
+         }
+
+         if ( mModeBtn != -1 )
+         {
+            line_num = (StatusPanel::ControlTextLine) mModeBtn;
+            if ( ! panel.hasControlText(line_num, mModeText) )
+            {
+               panel.addControlText(line_num, mModeText);
+            }
+         }
+      }
    }
 }
 

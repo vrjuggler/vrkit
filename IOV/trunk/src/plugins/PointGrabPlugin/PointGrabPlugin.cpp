@@ -1,7 +1,6 @@
 // Copyright (C) Infiscape Corporation 2005
 
 #include <string.h>
-#include <sstream>
 #include <numeric>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
@@ -28,6 +27,8 @@
 #include <IOV/InterfaceTrader.h>
 #include <IOV/WandInterface.h>
 #include <IOV/ViewPlatform.h>
+#include <IOV/StatusPanel.h>
+#include <IOV/StatusPanelPlugin.h>
 #include <IOV/Util/Exceptions.h>
 
 #include "PointGrabPlugin.h"
@@ -384,6 +385,7 @@ PointGrabPlugin::PointGrabPlugin()
    , mIsectFragmentShaderFile("highlight.fs")
    , mGrabVertexShaderFile("highlight.vs")
    , mGrabFragmentShaderFile("highlight.fs")
+   , mGrabText("Grab/Release Toggle")
    , mIntersecting(false)
    , mGrabbing(false)
    , mIsectHighlightID(GeometryHighlightTraverser::HIGHLIGHT0)
@@ -392,6 +394,47 @@ PointGrabPlugin::PointGrabPlugin()
    , mGrabColor(1.0f, 0.0f, 1.0f)
 {
    /* Do nothing. */ ;
+}
+
+void PointGrabPlugin::focusChanged(inf::ViewerPtr viewer)
+{
+   // If we have focus and our grab/release button is configured, we
+   // will update the status panel to include our command.
+   if ( isFocused() && mGrabBtn.mButtonVec[0] != -1 )
+   {
+      inf::ScenePtr scene = viewer->getSceneObj();
+      StatusPanelPluginDataPtr status_panel_data =
+         scene->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
+
+      if ( status_panel_data->mStatusPanelPlugin )
+      {
+         inf::StatusPanel& panel =
+            status_panel_data->mStatusPanelPlugin->getPanel();
+         StatusPanel::ControlTextLine line_num =
+            (StatusPanel::ControlTextLine) mGrabBtn.mButtonVec[0];
+         if ( ! panel.hasControlText(line_num, mGrabText) )
+         {
+            panel.addControlText(line_num, mGrabText);
+         }
+      }
+   }
+   else if ( ! isFocused() )
+   {
+      inf::ScenePtr scene = viewer->getSceneObj();
+      StatusPanelPluginDataPtr status_panel_data =
+         scene->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
+
+      if ( status_panel_data->mStatusPanelPlugin )
+      {
+         inf::StatusPanel& panel =
+            status_panel_data->mStatusPanelPlugin->getPanel();
+
+         // Status panel line numbers are 1-based; buttons are 0-based.
+         unsigned int line_num = mGrabBtn.mButtonVec[0] + 1;
+         panel.removeControlText((StatusPanel::ControlTextLine) line_num,
+                                  mGrabText);
+      }
+   }
 }
 
 struct StringToInt

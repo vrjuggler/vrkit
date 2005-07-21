@@ -246,17 +246,20 @@ void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
       return;
    }
 
-   IOV_STATUS << "ModeSwitchPlugin: Switching to mode: " << mModeNames[modeNum]
-              << std::endl;
+   IOV_STATUS << "Switching to mode: " << mModeNames[modeNum] << std::endl;
 
    StatusPanelPluginDataPtr status_panel_data =
       viewer->getSceneObj()->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
    if(status_panel_data->mStatusPanelPlugin)
    {
       inf::StatusPanel& panel = status_panel_data->mStatusPanelPlugin->getPanel();
+      panel.setHeaderTitle("Mode");
+      panel.setCenterTitle("Controls");
       std::ostringstream stream;
-      stream << "Mode: " << mModeNames[modeNum];
+      stream << mModeNames[modeNum];
       panel.setHeaderText(stream.str());
+      panel.setControlText((StatusPanel::ControlTextLine) mSwitchButton,
+                           "Switch Mode");
    }
 
    for ( unsigned int i = 0; i < mPlugins.size(); ++i )
@@ -267,11 +270,11 @@ void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
       if(std::find(plugin.mActiveModes.begin(), plugin.mActiveModes.end(), modeNum)
             != plugin.mActiveModes.end())
       {
-         plugin.mPlugin->setFocused(true);
+         plugin.mPlugin->setFocused(viewer, true);
       }
       else
       {
-         plugin.mPlugin->setFocused(false);
+         plugin.mPlugin->setFocused(viewer, false);
       }
    }
 

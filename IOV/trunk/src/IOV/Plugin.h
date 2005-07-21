@@ -15,7 +15,7 @@
 #include <boost/shared_ptr.hpp>
 
 #define INF_PLUGIN_API_MAJOR    1
-#define INF_PLUGIN_API_MINOR    0
+#define INF_PLUGIN_API_MINOR    1
 
 namespace inf
 {
@@ -68,12 +68,12 @@ public:
    /**
     * Changes the focus state of this plug-in.
     */
-   void setFocused(const bool focused)
+   void setFocused(inf::ViewerPtr viewer, const bool focused)
    {
       if ( mIsFocused != focused )
       {
          mIsFocused = focused;
-         focusChanged();
+         focusChanged(viewer);
       }
    }
 
@@ -103,7 +103,7 @@ protected:
 
    Plugin();
 
-   virtual void focusChanged()
+   virtual void focusChanged(inf::ViewerPtr viewer)
    {
       /* Do nothing. */ ;
    }

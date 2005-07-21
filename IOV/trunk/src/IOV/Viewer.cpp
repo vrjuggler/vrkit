@@ -421,7 +421,7 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
          if ( NULL != creator )
          {
             inf::PluginPtr plugin = creator->createPlugin();
-            plugin->setFocused(true);
+            plugin->setFocused(shared_from_this(), true);
             // Initialize the plugin, and configure it.
             plugin->init(shared_from_this());
             mPlugins.push_back(plugin);

@@ -2,8 +2,10 @@
 
 #include <IOV/StatusPanel.h>
 
+#include <sstream>
 #include <vector>
 #include <algorithm>
+#include <boost/concept_check.hpp>
 
 #include <OpenSG/OSGGroup.h>
 #include <OpenSG/OSGChunkMaterial.h>
@@ -45,11 +47,9 @@ StatusPanel::StatusPanel(const float metersToAppUnits)
    mBottomTitle = "Status";
 
    mHeaderText  = "Header\nText";
-   mCenterText  = "Controls:\n1 - Forward\n2 - Rotate\n3 - Viewport Cycle\n4 - Switch Mode\nReally long line of text here to test it.";
 
    mDrawDebug = false;
 }
-
 
 void StatusPanel::initialize()
 {
@@ -132,10 +132,31 @@ void StatusPanel::setHeaderText(const std::string& header)
    setDirty();
 }
 
-void StatusPanel::setControlText(const std::string& text)
+void StatusPanel::setControlText(const StatusPanel::ControlTextLine line,
+                                 const std::string& text)
 {
-   mCenterText = text;
+   mCenterText[line].clear();
+   mCenterText[line].push_back(text);
    setDirty();
+}
+
+void StatusPanel::addControlText(const StatusPanel::ControlTextLine line,
+                                 const std::string& text,
+                                 const unsigned int priority)
+{
+   // XXX: I don't know how to make a robust priority queue that allows
+   // iteration.
+   boost::ignore_unused_variable_warning(priority);
+   mCenterText[line].push_back(text);
+   setDirty();
+}
+
+void StatusPanel::removeControlText(const StatusPanel::ControlTextLine line,
+                                    const std::string& text)
+{
+   std::vector<std::string>::iterator i;
+   std::vector<std::string>& vec = mCenterText[line];
+   vec.erase(std::remove(vec.begin(), vec.end(), text), vec.end());
 }
 
 void StatusPanel::addStatusMessage(const std::string& msg)
@@ -225,9 +246,24 @@ void StatusPanel::updatePanelScene()
    mBuilder.addText(mTextGeomCore, *mFont, mHeaderText, header_ul, mTextColor, pan_scale, text_spacing);
 
    // Center section
-   bounds = mBuilder.getTextSize(*mFont, mCenterText, text_spacing);
+   std::stringstream center_text_stream;
+   for ( unsigned int l = LINE1; l < END; ++l )
+   {
+      ControlTextLine line = (ControlTextLine) l;
+      std::vector<std::string>::iterator ti;
+      center_text_stream << (l + 1) << " - ";
+      for ( ti = mCenterText[line].begin(); ti != mCenterText[line].end(); ++ti )
+      {
+         center_text_stream << (*ti) << "; ";
+      }
+      center_text_stream << "\n";
+   }
+
+   bounds = mBuilder.getTextSize(*mFont, center_text_stream.str(),
+                                 text_spacing);
    pan_scale = OSG::osgMin( (center_pan_height/bounds.y()), (mPanWidth/bounds.x()));
-   mBuilder.addText(mTextGeomCore, *mFont, mCenterText, center_ul, mTextColor, pan_scale, text_spacing);
+   mBuilder.addText(mTextGeomCore, *mFont, center_text_stream.str(),
+                    center_ul, mTextColor, pan_scale, text_spacing);
 
    // Status panel
    unsigned int num_lines(status_pan_height/mStatusTextHeight);

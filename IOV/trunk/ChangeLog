@@ -1,5 +1,10 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-21 patrickh Extended inf::StatusPanel with functionality needed for
+                    interactive plug-ins to be able to display their controls.
+                    Changed the signature of inf::Plugin::focusChanged() to
+                    take a parameter of type inf::ViewerPtr.
+                    -- VERSION -- 0.6.0
 2005-07-21 patrichk Switch to using OpenSG typdef's for instantiations of
                     OSG::CoredNodePtr<T>.
                     -- VERSION -- 0.5.2

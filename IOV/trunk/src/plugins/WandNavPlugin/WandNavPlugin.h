@@ -96,7 +96,7 @@ protected:
 
    WandNavPlugin();
 
-   virtual void focusChanged();
+   virtual void focusChanged(inf::ViewerPtr viewer);
 
    virtual void updateNavState(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
@@ -128,6 +128,12 @@ protected:
    DigitalHolder mRotateBtn;   /**< Button for rotate. */
    DigitalHolder mModeBtn;     /**< Button for swapping mode. */
    DigitalHolder mResetBtn;    /**< Button for resetting location. */
+
+   std::string mForwardText;
+   std::string mReverseText;
+   std::string mRotateText;
+   std::string mModeText;
+   std::string mResetText;
 };
 
 }

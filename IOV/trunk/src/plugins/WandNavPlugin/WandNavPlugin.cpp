@@ -29,6 +29,8 @@
 #include <IOV/User.h>
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Status.h>
+#include <IOV/StatusPanel.h>
+#include <IOV/StatusPanelPlugin.h>
 
 #include "WandNavPlugin.h"
 
@@ -80,6 +82,11 @@ WandNavPlugin::WandNavPlugin()
    , mAcceleration(0.005f)
    , mRotationSensitivity(0.5f)
    , mNavMode(WALK)
+   , mForwardText("Forward")
+   , mReverseText("Reverse")
+   , mRotateText("Rotate")
+   , mModeText("Toggle Walk/Fly")
+   , mResetText("Reset")
 {
    mCanNavigate = isFocused();
 }
@@ -167,14 +174,97 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    return true;
 }
 
-void WandNavPlugin::focusChanged()
+void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
 {
+   inf::ScenePtr scene = viewer->getSceneObj();
+   StatusPanelPluginDataPtr status_panel_data =
+      scene->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
+
    // We can only navigate when we have focus.
    mCanNavigate = isFocused();
 
    if ( ! mCanNavigate )
    {
       mVelocity = 0.0f;
+
+      if ( status_panel_data->mStatusPanelPlugin )
+      {
+         inf::StatusPanel& panel =
+            status_panel_data->mStatusPanelPlugin->getPanel();
+
+         if ( mForwardBtn.mButtonVec[0] != -1 )
+         {
+            unsigned int line_num = mForwardBtn.mButtonVec[0];
+            panel.removeControlText((StatusPanel::ControlTextLine) line_num,
+                                    mForwardText);
+         }
+
+         if ( mReverseBtn.mButtonVec[0] != -1 )
+         {
+            unsigned int line_num = mReverseBtn.mButtonVec[0];
+            panel.removeControlText((StatusPanel::ControlTextLine) line_num,
+                                    mReverseText);
+         }
+
+         if ( mRotateBtn.mButtonVec[0] != -1 )
+         {
+            unsigned int line_num = mRotateBtn.mButtonVec[0];
+            panel.removeControlText((StatusPanel::ControlTextLine) line_num,
+                                    mRotateText);
+         }
+
+         if ( mModeBtn.mButtonVec[0] != -1 )
+         {
+            unsigned int line_num = mModeBtn.mButtonVec[0];
+            panel.removeControlText((StatusPanel::ControlTextLine) line_num,
+                                    mModeText);
+         }
+      }
+   }
+   else
+   {
+      if ( status_panel_data->mStatusPanelPlugin )
+      {
+         inf::StatusPanel& panel =
+            status_panel_data->mStatusPanelPlugin->getPanel();
+         StatusPanel::ControlTextLine line_num;
+
+         if ( mForwardBtn.mButtonVec[0] != -1 )
+         {
+            line_num = (StatusPanel::ControlTextLine) mForwardBtn.mButtonVec[0];
+            if ( ! panel.hasControlText(line_num, mForwardText) )
+            {
+               panel.addControlText(line_num, mForwardText);
+            }
+         }
+
+         if ( mReverseBtn.mButtonVec[0] != -1 )
+         {
+            line_num = (StatusPanel::ControlTextLine) mReverseBtn.mButtonVec[0];
+            if ( ! panel.hasControlText(line_num, mReverseText) )
+            {
+               panel.addControlText(line_num, mReverseText);
+            }
+         }
+
+         if ( mRotateBtn.mButtonVec[0] != -1 )
+         {
+            line_num = (StatusPanel::ControlTextLine) mRotateBtn.mButtonVec[0];
+            if ( ! panel.hasControlText(line_num, mRotateText) )
+            {
+               panel.addControlText(line_num, mRotateText);
+            }
+         }
+
+         if ( mModeBtn.mButtonVec[0] != -1 )
+         {
+            line_num = (StatusPanel::ControlTextLine) mModeBtn.mButtonVec[0];
+            if ( ! panel.hasControlText(line_num, mModeText) )
+            {
+               panel.addControlText(line_num, mModeText);
+            }
+         }
+      }
    }
 }
 

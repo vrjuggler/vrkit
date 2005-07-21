@@ -70,6 +70,8 @@ protected:
 
    PointGrabPlugin();
 
+   void focusChanged(inf::ViewerPtr viewer);
+
 private:
    struct DigitalHolder
    {
@@ -102,6 +104,7 @@ private:
    WandInterfacePtr mWandInterface;
 
    DigitalHolder mGrabBtn;  /**< Button for grabbing and releasing objects. */
+   std::string mGrabText;
 
    bool mIntersecting;
    bool mGrabbing;
