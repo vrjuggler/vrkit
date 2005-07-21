@@ -230,7 +230,7 @@ void StatusPanel::updatePanelScene()
    mBuilder.addText(mTextGeomCore, *mFont, mCenterText, center_ul, mTextColor, pan_scale, text_spacing);
 
    // Status panel
-   unsigned int num_lines(unsigned int(status_pan_height/mStatusTextHeight));
+   unsigned int num_lines(status_pan_height/mStatusTextHeight);
    if ( num_lines > mStatusLines.size() )
    {
       num_lines = mStatusLines.size();

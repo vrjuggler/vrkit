@@ -203,6 +203,7 @@ void GeometryHighlightTraverser::addHighlightMaterial(const unsigned int id)
 
 void GeometryHighlightTraverser::swapHighlightMaterial(const unsigned int oldID,
                                                        const unsigned int newID)
+            throw(inf::Exception)
 {
    validateMaterialID(oldID);
    validateMaterialID(newID);
