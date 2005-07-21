@@ -52,7 +52,9 @@ public:
    OSG::MaterialRefPtr getHighlight(const unsigned int id);
 
    /** Return the number of materials current registered. */
-   unsigned int getNumMaterials();
+   unsigned int getNumMaterials() const;
+
+   bool hasHighlight(OSG::RefPtr<OSG::MaterialPtr> mat) const;
 
    /**
     * Performs a new traversal rooted at the given node and stores

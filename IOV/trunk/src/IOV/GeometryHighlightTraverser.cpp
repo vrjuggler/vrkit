@@ -125,11 +125,30 @@ OSG::MaterialRefPtr GeometryHighlightTraverser::getHighlight(const unsigned int 
    return mMaterials[id];
 }
 
-unsigned int GeometryHighlightTraverser::getNumMaterials()
+unsigned int GeometryHighlightTraverser::getNumMaterials() const
 {
    return mMaterials.size();
 }
 
+bool GeometryHighlightTraverser::
+hasHighlight(OSG::RefPtr<OSG::MaterialPtr> mat) const
+{
+   bool result(false);
+   std::vector< OSG::RefPtr<OSG::MaterialPtr> >::const_iterator i;
+   for ( i = mMaterials.begin(); i != mMaterials.end(); ++i )
+   {
+      if ( (*i).get() == mat.get() )
+      {
+         result = true;
+         break;
+      }
+   }
+   return result;
+
+   // XXX: This does not compile for some reason, even with an
+   // overload of operator== for OSG::MaterialRefPtr.
+//   return std::find(mMaterials.begin(), mMaterials.end(), mat) != mMaterials.end();
+}
 
 void GeometryHighlightTraverser::traverse(OSG::NodePtr node)
 {
