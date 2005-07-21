@@ -46,7 +46,7 @@ public:
                                   const std::string& fragmentShaderFile)
       throw(inf::Exception);
 
-   unsigned int registerMaterial(OSG::RefPtr<OSG::MaterialPtr> mat);
+   unsigned int registerMaterial(OSG::MaterialRefPtr mat);
 
    /** Return the material with the given id. */
    OSG::MaterialRefPtr getHighlight(const unsigned int id);
@@ -54,7 +54,7 @@ public:
    /** Return the number of materials current registered. */
    unsigned int getNumMaterials() const;
 
-   bool hasHighlight(OSG::RefPtr<OSG::MaterialPtr> mat) const;
+   bool hasHighlight(OSG::MaterialRefPtr mat) const;
 
    /**
     * Performs a new traversal rooted at the given node and stores
@@ -104,8 +104,7 @@ private:
       }
    };
 
-   typedef std::map< OSG::RefPtr<OSG::GeometryPtr>,
-                     OSG::RefPtr<OSG::MaterialPtr>,
+   typedef std::map< OSG::GeometryRefPtr, OSG::MaterialRefPtr,
                      RefPtrCompare<OSG::GeometryPtr> >
       core_mat_table_t;
    core_mat_table_t mOrigMaterials;

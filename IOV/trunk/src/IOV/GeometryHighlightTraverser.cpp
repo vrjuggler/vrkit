@@ -104,7 +104,7 @@ createSHLMaterial(const std::string& vertexShaderFile,
          chunk_material->addChunk(blend_chunk);
       OSG::endEditCP(chunk_material);
 
-      OSG::RefPtr<OSG::MaterialPtr> material(chunk_material.get());
+      OSG::MaterialRefPtr material(chunk_material.get());
       id = mMaterials.size();
       mMaterials.push_back(material);
    }
@@ -113,7 +113,7 @@ createSHLMaterial(const std::string& vertexShaderFile,
 }
 
 unsigned int GeometryHighlightTraverser::
-registerMaterial(OSG::RefPtr<OSG::MaterialPtr> mat)
+registerMaterial(OSG::MaterialRefPtr mat)
 {
    unsigned int id(mMaterials.size());
    mMaterials.push_back(mat);
@@ -130,11 +130,10 @@ unsigned int GeometryHighlightTraverser::getNumMaterials() const
    return mMaterials.size();
 }
 
-bool GeometryHighlightTraverser::
-hasHighlight(OSG::RefPtr<OSG::MaterialPtr> mat) const
+bool GeometryHighlightTraverser::hasHighlight(OSG::MaterialRefPtr mat) const
 {
    bool result(false);
-   std::vector< OSG::RefPtr<OSG::MaterialPtr> >::const_iterator i;
+   std::vector<OSG::MaterialRefPtr>::const_iterator i;
    for ( i = mMaterials.begin(); i != mMaterials.end(); ++i )
    {
       if ( (*i).get() == mat.get() )
@@ -164,9 +163,9 @@ OSG::Action::ResultE GeometryHighlightTraverser::enter(OSG::NodePtr& node)
 {
    if ( node->getCore()->getType().isDerivedFrom(OSG::Geometry::getClassType()) )
    {
-      mGeomNodes.push_back(OSG::RefPtr<OSG::NodePtr>(node));
+      mGeomNodes.push_back(OSG::NodeRefPtr(node));
       OSG::GeometryPtr geom = OSG::GeometryPtr::dcast(node->getCore());
-      mGeomCores.push_back(OSG::RefPtr<OSG::GeometryPtr>(geom));
+      mGeomCores.push_back(OSG::GeometryRefPtr(geom));
    }
 
    return OSG::Action::Continue;
@@ -177,7 +176,7 @@ void GeometryHighlightTraverser::addHighlightMaterial(const unsigned int id)
 {
    validateMaterialID(id);
 
-   std::vector< OSG::RefPtr<OSG::GeometryPtr> >::iterator c;
+   std::vector<OSG::GeometryRefPtr>::iterator c;
    for ( c = mGeomCores.begin(); c != mGeomCores.end(); ++c )
    {
       OSG::MultiPassMaterialPtr mpass_mat;
@@ -190,7 +189,7 @@ void GeometryHighlightTraverser::addHighlightMaterial(const unsigned int id)
          // Save the core's current material so that we can restore it later
          // in removeHighlightMaterial().
          OSG::MaterialPtr mat = (*c)->getMaterial();
-         mOrigMaterials[*c] = OSG::RefPtr<OSG::MaterialPtr>(mat);
+         mOrigMaterials[*c] = OSG::MaterialRefPtr(mat);
 
          // If the geometry node has no material at all, we have to inject a
          // dummy material to ensure that the geometry is rendered before the
@@ -238,7 +237,7 @@ void GeometryHighlightTraverser::swapHighlightMaterial(const unsigned int oldID,
    validateMaterialID(oldID);
    validateMaterialID(newID);
 
-   std::vector< OSG::RefPtr<OSG::GeometryPtr> >::iterator c;
+   std::vector<OSG::GeometryRefPtr>::iterator c;
    for ( c = mGeomCores.begin(); c != mGeomCores.end(); ++c )
    {
       OSG::MaterialPtr mat = (*c)->getMaterial();
@@ -257,7 +256,7 @@ void GeometryHighlightTraverser::removeHighlightMaterial(unsigned int id)
 {
    validateMaterialID(id);
 
-   std::vector< OSG::RefPtr<OSG::GeometryPtr> >::iterator c;
+   std::vector<OSG::GeometryRefPtr>::iterator c;
    for ( c = mGeomCores.begin(); c != mGeomCores.end(); ++c )
    {
       OSG::MaterialPtr mat = (*c)->getMaterial();
