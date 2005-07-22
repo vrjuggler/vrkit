@@ -81,6 +81,21 @@ public:
 
    bool hasHighlight(OSG::MaterialRefPtr mat) const;
 
+   void addHighlightMaterial(OSG::NodePtr node, const unsigned int id)
+      throw(inf::Exception);
+
+   void swapHighlightMaterial(OSG::NodePtr node, const unsigned int oldId,
+                              const unsigned int newId)
+      throw(inf::Exception);
+
+   void removeHighlightMaterial(OSG::NodePtr node, const unsigned int id)
+      throw(inf::Exception);
+
+private:
+   void createDefaultMaterials();
+
+   void reset();
+
    /**
     * Performs a new traversal rooted at the given node and stores
     * the necessary information for later use with material
@@ -94,45 +109,16 @@ public:
 
    OSG::Action::ResultE enter(OSG::NodePtr& node);
 
-   void addHighlightMaterial(const unsigned int id) throw(inf::Exception);
-
-   void swapHighlightMaterial(const unsigned int oldId,
-                              const unsigned int newId)
-      throw(inf::Exception);
-
-   void removeHighlightMaterial(const unsigned int id)
-      throw(inf::Exception);
-
-private:
-   void createDefaultMaterials();
-
-   void reset();
-
    boost::filesystem::path getCompleteShaderFile(const std::string& filename);
 
    void validateMaterialID(const unsigned int id) throw(inf::Exception);
 
 private:
+   std::vector<OSG::GeometryRefPtr> mGeomCores;
+
    std::vector<boost::filesystem::path> mShaderSearchPath;
+   std::vector<OSG::MaterialRefPtr> mMaterials;
 
-   std::vector< OSG::MaterialRefPtr > mMaterials;
-
-   std::vector< OSG::NodeRefPtr > mGeomNodes;
-   std::vector< OSG::GeometryRefPtr > mGeomCores;
-
-   template<typename T>
-   struct RefPtrCompare
-   {
-      bool operator()(OSG::RefPtr<T> p0, OSG::RefPtr<T> p1) const
-      {
-         return p0.get() < p1.get();
-      }
-   };
-
-   typedef std::map< OSG::GeometryRefPtr, OSG::MaterialRefPtr,
-                     RefPtrCompare<OSG::GeometryPtr> >
-      core_mat_table_t;
-   core_mat_table_t mOrigMaterials;
 };
 
 }

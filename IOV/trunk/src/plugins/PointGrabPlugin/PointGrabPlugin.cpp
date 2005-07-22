@@ -184,6 +184,14 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       // the application and scene state.
       if ( intersect_obj.node() != mIntersectedObj.node() )
       {
+         if ( mIntersectedObj.node() != OSG::NullFC )
+         {
+            // XXX: Is there any cleaner way to do this?
+            OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
+            mGeomTraverser.removeHighlightMaterial(lit_node,
+                                                   mIsectHighlightID);
+         }
+
          // Change the intersected object to the one we found above.
          mIntersectedObj = intersect_obj;
 
@@ -198,15 +206,12 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
             // XXX: Is there any cleaner way to do this?
             OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
 
-            // Traverse the sub-tree for lit_node and apply
-            // mIsectHighlightMaterial accordingly.
-            mGeomTraverser.traverse(lit_node);
-            mGeomTraverser.addHighlightMaterial(mIsectHighlightID);
+            // Apply mIsectHighlightMaterial.
+            mGeomTraverser.addHighlightMaterial(lit_node, mIsectHighlightID);
          }
          // Otherwise, we are intersecting nothing.
          else
          {
-            mGeomTraverser.removeHighlightMaterial(mIsectHighlightID);
             mIntersecting = false;
          }
       }
@@ -220,7 +225,9 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       mGrabSound.trigger();
       mGrabbing = true;
 
-      mGeomTraverser.swapHighlightMaterial(mIsectHighlightID,
+      // XXX: Is there any cleaner way to do this?
+      OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
+      mGeomTraverser.swapHighlightMaterial(lit_node, mIsectHighlightID,
                                            mGrabHighlightID);
 
       // m_wand_M_obj is the offset between the wand and the grabbed object's
@@ -251,7 +258,9 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       // intersecting state and clear mIntersectedObj.
       if ( mIntersectedObj.node() != OSG::NullFC )
       {
-         mGeomTraverser.swapHighlightMaterial(mGrabHighlightID,
+         // XXX: Is there any cleaner way to do this?
+         OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
+         mGeomTraverser.swapHighlightMaterial(lit_node, mGrabHighlightID,
                                               mIsectHighlightID);
          gmtl::identity(m_wand_M_obj);
       }
