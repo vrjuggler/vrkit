@@ -45,6 +45,15 @@ public:
    /** Get status panel for direct usage. */
    StatusPanel& getPanel();
 
+   /**
+    * Invokes the global scope delete operator.  This is required for proper
+    * releasing of memory in DLLs on Win32.
+    */
+   void operator delete(void* p)
+   {
+      ::operator delete(p);
+   }
+
 protected:
    StatusPanel*            mStatusPanel;     /**< The status panel we are using. */
    OSG::TransformNodePtr   mPanelXformNode;  /**< Root node of panel. */
