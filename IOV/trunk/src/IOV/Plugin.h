@@ -1,18 +1,14 @@
 // Copyright (C) Infiscape Corporation 2005
 
-#ifndef PLUGIN_H
-#define PLUGIN_H
+#ifndef _INF_PLUGIN_H_
+#define _INF_PLUGIN_H_
 
 #include <IOV/Config.h>
 
 #include <string>
-#include <jccl/Config/ConfigElementPtr.h>
 
 #include <IOV/ViewerPtr.h>
 #include <IOV/PluginPtr.h>
-
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
 
 #define INF_PLUGIN_API_MAJOR    1
 #define INF_PLUGIN_API_MINOR    1
