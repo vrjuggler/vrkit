@@ -502,7 +502,7 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
       mat_chunk->setSpecular(OSG::Color4f(0.f, 0.f, 0.f, 1.f));
       mat_chunk->setColorMaterial(GL_AMBIENT_AND_DIFFUSE);
       mat_chunk->setShininess(0);
-      //mat_chunk->setLit(false);
+      mat_chunk->setLit(false);
    }
    OSG::endEditCP(mat_chunk);
 
