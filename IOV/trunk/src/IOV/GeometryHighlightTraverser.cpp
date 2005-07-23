@@ -37,7 +37,7 @@ GeometryHighlightTraverser::~GeometryHighlightTraverser()
 void GeometryHighlightTraverser::
 extendShaderSearchPath(const std::vector<fs::path>& path)
 {
-   std::copy(path.begin(), path.end(), mShaderSearchPath.end());
+   mShaderSearchPath.insert(mShaderSearchPath.end(), path.begin(), path.end());
 }
 
 unsigned int GeometryHighlightTraverser::
