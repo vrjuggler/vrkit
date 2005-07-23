@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-23 patrickh Added uniform parameters (color, exponent, and scale) to
+           terry    to the GLSL shader files data/shaders/highlight.vs and
+                    data/shaders/highlight.vs.
 2005-07-23 patrickh Extended the flexibility of the method
                     inf::GeometryHighlightTraverser::createSHLMaterial().  The
                     chunk material by this method no longer has a hard-coded

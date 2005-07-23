@@ -100,12 +100,49 @@ void PointGrabPlugin::init(ViewerPtr viewer)
       try
       {
          mGeomTraverser.extendShaderSearchPath(mShaderSearchPath);
+
+         std::vector<OSG::StateChunkRefPtr> chunks;
+
+         OSG::RefPtr<OSG::BlendChunkPtr> blend_chunk;
+         blend_chunk = OSG::BlendChunk::create();
+         OSG::beginEditCP(blend_chunk);
+            blend_chunk->setSrcFactor(GL_SRC_ALPHA);
+            blend_chunk->setDestFactor(GL_ONE);
+         OSG::endEditCP(blend_chunk);
+
+         chunks.push_back(OSG::StateChunkRefPtr(blend_chunk.get()));
+
+         OSG::Vec3f isect_color_vec(mIntersectColor[0], mIntersectColor[1],
+                                    mIntersectColor[2]);
+         OSG::SHLChunkRefPtr isect_shl_chunk(OSG::SHLChunk::create());
+         OSG::beginEditCP(isect_shl_chunk);
+            isect_shl_chunk->setUniformParameter("color", isect_color_vec);
+            isect_shl_chunk->setUniformParameter("scale", 1.0f);
+            // 1.0 keeps the same alpha value.  A higher value gives thinner
+            // strips at the sides (more alpha in the middle, less at the
+            // sides).
+            isect_shl_chunk->setUniformParameter("exponent", 1.0f);
+         OSG::endEditCP(isect_shl_chunk);
          mIsectHighlightID =
             mGeomTraverser.createSHLMaterial(mIsectVertexShaderFile,
-                                             mIsectFragmentShaderFile);
+                                             mIsectFragmentShaderFile,
+                                             isect_shl_chunk, chunks);
+
+         OSG::Vec3f grab_color_vec(mGrabColor[0], mGrabColor[1],
+                                   mGrabColor[2]);
+         OSG::SHLChunkRefPtr grab_shl_chunk(OSG::SHLChunk::create());
+         OSG::beginEditCP(grab_shl_chunk);
+            grab_shl_chunk->setUniformParameter("color", grab_color_vec);
+            grab_shl_chunk->setUniformParameter("scale", 1.0f);
+            // 1.0 keeps the same alpha value.  A higher value gives thinner
+            // strips at the sides (more alpha in the middle, less at the
+            // sides).
+            grab_shl_chunk->setUniformParameter("exponent", 1.0f);
+         OSG::endEditCP(grab_shl_chunk);
          mGrabHighlightID =
             mGeomTraverser.createSHLMaterial(mGrabVertexShaderFile,
-                                             mGrabFragmentShaderFile);
+                                             mGrabFragmentShaderFile,
+                                             grab_shl_chunk, chunks);
       }
       catch (inf::Exception& ex)
       {

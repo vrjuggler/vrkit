@@ -1,7 +1,8 @@
 varying float alpha;
+uniform vec3 color;
 
 
 void main(void)
 {
-    gl_FragColor = vec4(1.0, 1.0, 0.0, alpha);
+    gl_FragColor = vec4(color, alpha);
 }
