@@ -14,7 +14,7 @@
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGMaterial.h>
 #include <OpenSG/OSGChunkMaterial.h>
-#include <OpenSG/OSGRefPtr.h>
+#include <OpenSG/OSGSHLChunk.h>
 
 #include <IOV/Util/Exceptions.h>
 
@@ -44,6 +44,39 @@ public:
 
    unsigned int createSHLMaterial(const std::string& vertexShaderFile,
                                   const std::string& fragmentShaderFile)
+      throw(inf::Exception);
+
+   /**
+    * Creates an OSG::ChunkMaterialPtr using the given OSG::SHLChunkPtr as
+    * a starting point.  The primary purpose of this method is to hide the
+    * details of loading the vertex and fragment programs and adding them to
+    * the given SHL chunk.
+    *
+    * @since 0.7.1
+    */
+   unsigned int createSHLMaterial(const std::string& vertexShaderFile,
+                                  const std::string& fragmentShaderFile,
+                                  OSG::SHLChunkRefPtr shlChunk)
+      throw(inf::Exception)
+   {
+      std::vector<OSG::StateChunkRefPtr> vec;
+      return createSHLMaterial(vertexShaderFile, fragmentShaderFile, shlChunk,
+                               vec);
+   }
+
+   /**
+    * Creates an OSG::ChunkMaterialPtr using the given OSG::SHLChunkPtr as
+    * a starting point.  The primary purpose of this method is to hide the
+    * details of loading the vertex and fragment programs and adding them to
+    * the given SHL chunk.  Finally, the vector of additional state chunks is
+    * added to the newly created OSG::ChunkMaterialPtr.
+    *
+    * @since 0.7.1
+    */
+   unsigned int createSHLMaterial(const std::string& vertexShaderFile,
+                                  const std::string& fragmentShaderFile,
+                                  OSG::SHLChunkRefPtr shlChunk,
+                                  const std::vector<OSG::StateChunkRefPtr>& extraChunks)
       throw(inf::Exception);
 
    /**

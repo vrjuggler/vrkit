@@ -1,5 +1,10 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-23 patrickh Extended the flexibility of the method
+                    inf::GeometryHighlightTraverser::createSHLMaterial().  The
+                    chunk material by this method no longer has a hard-coded
+                    blend chunk.
+                    -- VERSION -- 0.7.1
 2005-07-22 patrickh Refactored inf::GeometryHighlightTraverser yet again so
                     that the node's subtree is traversed automatically before
                     every material modification.

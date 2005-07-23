@@ -45,6 +45,17 @@ createSHLMaterial(const std::string& vertexShaderFile,
                   const std::string& fragmentShaderFile)
    throw(inf::Exception)
 {
+   OSG::RefPtr<OSG::SHLChunkPtr> shl_chunk(OSG::SHLChunk::create());
+   return createSHLMaterial(vertexShaderFile, fragmentShaderFile, shl_chunk);
+}
+
+unsigned int GeometryHighlightTraverser::
+createSHLMaterial(const std::string& vertexShaderFile,
+                  const std::string& fragmentShaderFile,
+                  OSG::SHLChunkRefPtr shlChunk,
+                  const std::vector<OSG::StateChunkRefPtr>& chunks)
+   throw(inf::Exception)
+{
    unsigned int id(0);
    fs::path vs_file_path(getCompleteShaderFile(vertexShaderFile));
    fs::path fs_file_path(getCompleteShaderFile(fragmentShaderFile));
@@ -70,38 +81,33 @@ createSHLMaterial(const std::string& vertexShaderFile,
    }
    else
    {
-      OSG::RefPtr<OSG::SHLChunkPtr> shl_chunk;
-      shl_chunk = OSG::SHLChunk::create();
       {
-         OSG::CPEdit(shl_chunk, OSG::ShaderChunk::VertexProgramFieldMask |
-                                OSG::ShaderChunk::FragmentProgramFieldMask);
+         OSG::CPEdit(shlChunk, OSG::ShaderChunk::VertexProgramFieldMask |
+                               OSG::ShaderChunk::FragmentProgramFieldMask);
 
-         if ( ! shl_chunk->readVertexProgram(vs_file) )
+         if ( ! shlChunk->readVertexProgram(vs_file) )
          {
             throw inf::Exception("Failed to read vertex program",
                                  IOV_LOCATION);
          }
 
-         if ( ! shl_chunk->readFragmentProgram(fs_file) )
+         if ( ! shlChunk->readFragmentProgram(fs_file) )
          {
             throw inf::Exception("Failed to read fragment program",
                                  IOV_LOCATION);
          }
       }
 
-      OSG::RefPtr<OSG::BlendChunkPtr> blend_chunk;
-      blend_chunk = OSG::BlendChunk::create();
-      OSG::beginEditCP(blend_chunk);
-         blend_chunk->setSrcFactor(GL_SRC_ALPHA);
-         blend_chunk->setDestFactor(GL_ONE);
-      OSG::endEditCP(blend_chunk);
-
       OSG::RefPtr<OSG::ChunkMaterialPtr> chunk_material(
          OSG::ChunkMaterial::create()
       );
       OSG::beginEditCP(chunk_material);
-         chunk_material->addChunk(shl_chunk);
-         chunk_material->addChunk(blend_chunk);
+         chunk_material->addChunk(shlChunk);
+         std::vector<OSG::StateChunkRefPtr>::const_iterator ci;
+         for ( ci = chunks.begin(); ci != chunks.end(); ++ci )
+         {
+            chunk_material->addChunk(*ci);
+         }
       OSG::endEditCP(chunk_material);
 
       OSG::MaterialRefPtr material(chunk_material.get());
