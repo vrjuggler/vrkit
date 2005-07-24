@@ -286,8 +286,15 @@ void StatusPanel::updatePanelScene()
    }
 
    std::vector<std::string> potential_lines;
-   potential_lines.insert(potential_lines.end(), mStatusLines.begin(), mStatusLines.begin()+num_lines);
-   mBuilder.addText(mTextGeomCore, *mFont, potential_lines, status_ul, mTextColor, mStatusTextHeight, text_spacing);
+   potential_lines.insert(potential_lines.end(), mStatusLines.begin(),
+                          mStatusLines.begin() + num_lines);
+
+   bounds = mBuilder.getTextSize(*mFont, potential_lines, text_spacing);
+   float status_pan_scale = OSG::osgMin(status_pan_height / bounds.y(),
+                                        mPanWidth / bounds.x());
+
+   mBuilder.addText(mTextGeomCore, *mFont, potential_lines, status_ul,
+                    mTextColor, status_pan_scale, text_spacing);
 
    // -- Update the materials and other properties --- //
    beginEditCP(mClipRight);
