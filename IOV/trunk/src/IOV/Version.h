@@ -19,7 +19,7 @@
 // The major/minor/patch version (up to 3 digits each).
 #define IOV_VERSION_MAJOR    0
 #define IOV_VERSION_MINOR    7
-#define IOV_VERSION_PATCH    1
+#define IOV_VERSION_PATCH    2
 
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------------

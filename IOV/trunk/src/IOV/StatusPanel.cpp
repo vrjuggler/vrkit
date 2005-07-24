@@ -186,10 +186,16 @@ void StatusPanel::update()
    }
 }
 
-void StatusPanel::setWidthHeight(float w, float h)
+void StatusPanel::setWidthHeight(const float w, const float h)
 {
    mPanWidth = w;
    mPanHeight = h;
+   setDirty();
+}
+
+void StatusPanel::setStatusHistorySize(const unsigned int size)
+{
+   mStatusHistorySize = size;
    setDirty();
 }
 

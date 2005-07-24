@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-24 patrickh Added inf::StatusPanel::setStatusHistorySize().
+                    -- VERSION -- 0.7.2
 2005-07-23 patrickh Added uniform parameters (color, exponent, and scale) to
            terry    to the GLSL shader files data/shaders/highlight.vs and
                     data/shaders/highlight.vs.

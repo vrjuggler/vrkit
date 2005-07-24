@@ -98,6 +98,14 @@ public:  // Configuration params //
 
    void setWidthHeight(const float w, const float h);
 
+   /**
+    * Sets the size of the buffer for the status history.  This
+    * affects the number of status lines displayed.
+    *
+    * @since 0.7.2
+    */
+   void setStatusHistorySize(const unsigned int size);
+
 protected:
    void updatePanelScene();
 
