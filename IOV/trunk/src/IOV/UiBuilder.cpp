@@ -110,7 +110,11 @@ void UiBuilder::resetGeomGeo(OSG::GeometryPtr geom)
    OSG::endEditCP(geom);
 }
 
-void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float depth, float alpha)
+void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom,
+                                      const OSG::Color3f& color,
+                                      const OSG::Pnt2f& minPt,
+                                      const OSG::Pnt2f& maxPt,
+                                      const float depth, const float alpha)
 {
    OSG::GeoPTypesPtr types = OSG::GeoPTypesUI8Ptr::dcast(geom->getTypes());
    OSG::GeoPLengthsPtr lens = OSG::GeoPLengthsUI32Ptr::dcast(geom->getLengths());
@@ -137,22 +141,25 @@ void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom, OSG::Color3f color,
               ul(minPt.x(), maxPt.y(), depth), ur(maxPt.x(), maxPt.y(), depth);
    OSG::Color4f used_color(color.red(), color.green(), color.blue(), alpha);
 
-   const unsigned num_verts(5);
+   const unsigned int num_verts(5);
 
    types->addValue(GL_LINE_STRIP);
    lens->addValue(num_verts);
    verts->addValue(ll);
    verts->addValue(lr); verts->addValue(ur);
    verts->addValue(ul); verts->addValue(ll);
-   for(unsigned i=0;i<num_verts;++i)
+   for ( unsigned int i = 0; i < num_verts; ++i )
    {
       mfc->push_back(used_color);
       norms->addValue(OSG::Vec3f(0,0,-1));
    }
 }
 
-void UiBuilder::buildRectangle(OSG::GeometryPtr geom, const OSG::Color3f color, const OSG::Pnt2f minPt, const OSG::Pnt2f maxPt,
-                         const float frontDepth, const float backDepth, const float alpha)
+void UiBuilder::buildRectangle(OSG::GeometryPtr geom,
+                               const OSG::Color3f& color,
+                               const OSG::Pnt2f& minPt,
+                               const OSG::Pnt2f& maxPt, const float frontDepth,
+                               const float backDepth, const float alpha)
 {
    OSG::GeoPTypesPtr types = OSG::GeoPTypesUI8Ptr::dcast(geom->getTypes());
    OSG::GeoPLengthsPtr lens = OSG::GeoPLengthsUI32Ptr::dcast(geom->getLengths());
@@ -202,7 +209,7 @@ void UiBuilder::buildRectangle(OSG::GeometryPtr geom, const OSG::Color3f color, 
 
    #define ADD_SIDE(a,b,c,d) ADD_TRI(a,b,c);  ADD_TRI(c,d,a)
 
-   const unsigned num_verts((3*2)*(only_front_flag?1:6));
+   const unsigned int num_verts(3 * 2 * (only_front_flag ? 1 : 6));
 
    types->addValue(GL_TRIANGLES);
    lens->addValue(num_verts);
@@ -221,10 +228,16 @@ void UiBuilder::buildRectangle(OSG::GeometryPtr geom, const OSG::Color3f color, 
    #undef ADD_TRI
 }
 
-void UiBuilder::buildRoundedRectangle(OSG::GeometryPtr geom, const OSG::Color3f color,
-                                      const OSG::Pnt2f minPt, const OSG::Pnt2f maxPt,
-                                      const float innerRad, const float outerRad, const unsigned numSegs, const bool filled,
-                                      const float frontDepth, const float backDepth, const float alpha)
+void UiBuilder::buildRoundedRectangle(OSG::GeometryPtr geom,
+                                      const OSG::Color3f& color,
+                                      const OSG::Pnt2f& minPt,
+                                      const OSG::Pnt2f& maxPt,
+                                      const float innerRad,
+                                      const float outerRad,
+                                      const unsigned int numSegs,
+                                      const bool filled,
+                                      const float frontDepth,
+                                      const float backDepth, const float alpha)
 {
    OSG::Pnt2f ul_corner(minPt[0], maxPt[1]), lr_corner(maxPt[0], minPt[1]);
 
@@ -250,8 +263,9 @@ void UiBuilder::buildRoundedRectangle(OSG::GeometryPtr geom, const OSG::Color3f 
 
 }
 
-void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const OSG::Pnt2f center,
-                          const float innerRad, const float outerRad, const unsigned numSegs,
+void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f& color,
+                          const OSG::Pnt2f& center, const float innerRad,
+                          const float outerRad, const unsigned int numSegs,
                           const float startAngle, const float endAngle,
                           const float frontDepth, const float backDepth,
                           const bool capIt, const float alpha)
@@ -308,7 +322,7 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const
 
    // Now build up the geometry
    bool only_front_flag = (frontDepth==backDepth);    // If front and back are the same, then only do front surface
-   const unsigned num_verts_per_strip(inner_edge.size()*2);
+   const unsigned int num_verts_per_strip(inner_edge.size() * 2);
 
    // --- Build tri strips ---- //
    // - For each strip
@@ -318,15 +332,19 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const
    std::vector<OSG::Pnt2f> *bottom_verts(NULL), *top_verts(NULL);
 
    // Create the 4 strips (1-front,2-outer,3-back,4-inner)
-   for(unsigned strip=0; strip<4; ++strip)
+   for ( unsigned int strip = 0; strip < 4; ++strip )
    {
       // Early abort if we only want one face
       if((1==strip) && only_front_flag)
-      {  break; }
+      {
+         break;
+      }
 
       // Skip inner if inner rad is 0 (since it would just be a bunch of tris on top of each other)
       if((0.0 == innerRad) && (3 == strip))
-      { continue; }
+      {
+         continue;
+      }
 
       // Setup the correct source data to use for this strip
       switch(strip)
@@ -355,7 +373,7 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const
       // Add the geometry data
       types->addValue(GL_TRIANGLE_STRIP);
       lens->addValue(num_verts_per_strip);
-      for(unsigned i=0; i<(*bottom_verts).size(); ++i)
+      for ( unsigned int i = 0; i < (*bottom_verts).size(); ++i )
       {
          OSG::Vec3f bottom_vert( (*bottom_verts)[i].x(), (*bottom_verts)[i].y(), bottom_depth);
          OSG::Vec3f top_vert( (*top_verts)[i].x(), (*top_verts)[i].y(), top_depth);
@@ -439,9 +457,8 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const
    }
 }
 
-
-
-UiBuilder::Font::Font(std::string family, OSG::TextFace::Style style, unsigned size)
+UiBuilder::Font::Font(const std::string& family, OSG::TextFace::Style style,
+                      const unsigned int size)
 {
    mFace = NULL;
    mParams.size = size;
@@ -526,25 +543,27 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
    return text_geom;
 }
 
-void UiBuilder::buildText( OSG::GeometryPtr geom, UiBuilder::Font& font,
-                           std::string text, OSG::Vec2f offset,
-                           OSG::Color3f color, float scale, float spacing)
+void UiBuilder::buildText(OSG::GeometryPtr geom, UiBuilder::Font& font,
+                          const std::string& text, OSG::Vec2f offset,
+                          OSG::Color3f color, const float scale,
+                          const float spacing)
 {
    std::vector<std::string> lines;
    lines.push_back(text);
    buildText(geom,font,lines,offset,color,scale,spacing);
 }
 
-void UiBuilder::buildText( OSG::GeometryPtr geom, UiBuilder::Font& font,
-                           std::vector<std::string> textLines, OSG::Vec2f offset,
-                           OSG::Color3f color, float scale, float spacing)
+void UiBuilder::buildText(OSG::GeometryPtr geom, UiBuilder::Font& font,
+                          const std::vector<std::string>& textLines,
+                          OSG::Vec2f offset, OSG::Color3f color,
+                          const float scale, const float spacing)
 {
    OSG::TextLayoutResult layout_result;
    OSG::TextLayoutParam layout_param;
    layout_param.spacing = spacing;
 
    std::vector<std::string> lines;
-   for(unsigned i=0;i<textLines.size();++i)
+   for ( unsigned int i = 0; i < textLines.size(); ++i )
    {
       splitStr(textLines[i],"\n",std::back_inserter(lines));
    }
@@ -570,25 +589,27 @@ void UiBuilder::buildText( OSG::GeometryPtr geom, UiBuilder::Font& font,
    tex_chunk->setImage(face_image);
 }
 
-void UiBuilder::addText( OSG::GeometryPtr geom, UiBuilder::Font& font,
-                           std::string text, OSG::Vec2f offset,
-                           OSG::Color3f color, float scale, float spacing)
+void UiBuilder::addText(OSG::GeometryPtr geom, UiBuilder::Font& font,
+                        const std::string& text, OSG::Vec2f offset,
+                        OSG::Color3f color, const float scale,
+                        const float spacing)
 {
    std::vector<std::string> lines;
    lines.push_back(text);
    addText(geom,font,lines,offset,color,scale,spacing);
 }
 
-void UiBuilder::addText( OSG::GeometryPtr geom, UiBuilder::Font& font,
-                         std::vector<std::string> textLines, OSG::Vec2f offset,
-                         OSG::Color3f color, float scale, float spacing)
+void UiBuilder::addText(OSG::GeometryPtr geom, UiBuilder::Font& font,
+                        const std::vector<std::string>& textLines,
+                        OSG::Vec2f offset, OSG::Color3f color,
+                        const float scale, const float spacing)
 {
    OSG::TextLayoutResult layout_result;
    OSG::TextLayoutParam layout_param;
    layout_param.spacing = spacing;
 
    std::vector<std::string> lines;
-   for(unsigned i=0;i<textLines.size();++i)
+   for ( unsigned int i = 0; i < textLines.size(); ++i )
    {
       splitStr(textLines[i],"\n",std::back_inserter(lines));
    }
@@ -603,21 +624,24 @@ void UiBuilder::addText( OSG::GeometryPtr geom, UiBuilder::Font& font,
    font.mFace->addToGeom(geom, layout_result, scale, offset-single_line_offset, color);
 }
 
-OSG::Vec2f UiBuilder::getTextSize(UiBuilder::Font& font, std::string text, float spacing)
+OSG::Vec2f UiBuilder::getTextSize(UiBuilder::Font& font,
+                                  const std::string& text, const float spacing)
 {
    std::vector<std::string> lines;
    lines.push_back(text);
    return getTextSize(font,lines,spacing);
 }
 
-OSG::Vec2f UiBuilder::getTextSize(UiBuilder::Font& font, std::vector<std::string> textLines, float spacing)
+OSG::Vec2f UiBuilder::getTextSize(UiBuilder::Font& font,
+                                  const std::vector<std::string>& textLines,
+                                  const float spacing)
 {
    OSG::TextLayoutResult layout_result;
    OSG::TextLayoutParam layout_param;
    layout_param.spacing = spacing;
 
    std::vector<std::string> lines;
-   for(unsigned i=0;i<textLines.size();++i)
+   for ( unsigned int i = 0; i < textLines.size(); ++i )
    {
       splitStr(textLines[i],"\n",std::back_inserter(lines));
    }
@@ -627,5 +651,3 @@ OSG::Vec2f UiBuilder::getTextSize(UiBuilder::Font& font, std::vector<std::string
 }
 
 }  // namespace inf
-
-

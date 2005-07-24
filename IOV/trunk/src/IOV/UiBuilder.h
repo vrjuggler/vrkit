@@ -48,7 +48,9 @@ public:
     * @PARAM alpha   Uniform alpha to apply to all vert colors.
     * @PARAM filled  If true the rectangle is a filled tri list, else it is a line loop.
     */
-   void buildRectangleOutline(OSG::GeometryPtr geom, OSG::Color3f color, OSG::Pnt2f minPt, OSG::Pnt2f maxPt, float depth=0.0, float alpha=1.0);
+   void buildRectangleOutline(OSG::GeometryPtr geom, const OSG::Color3f& color,
+                              const OSG::Pnt2f& minPt, const OSG::Pnt2f& maxPt,
+                              const float depth = 0.0, const float alpha = 1.0);
 
    /** Build a 3D box.
     * @PARAM geom    The geometry to add to.
@@ -59,9 +61,10 @@ public:
     * @PARAM alpha   Uniform alpha to apply to all vert colors.
     * @note If front and back depth are equal, then we only draw front facing surface.
     */
-   void buildRectangle(OSG::GeometryPtr geom, const OSG::Color3f color,
-                       const OSG::Pnt2f minPt, const OSG::Pnt2f maxPt,
-                       const float frontDepth=0, const float backDepth=0, const float alpha=1.0f);
+   void buildRectangle(OSG::GeometryPtr geom, const OSG::Color3f& color,
+                       const OSG::Pnt2f& minPt, const OSG::Pnt2f& maxPt,
+                       const float frontDepth = 0.0f,
+                       const float backDepth = 0.0f, const float alpha = 1.0f);
 
    /** Build a 3D box with rounded corners.
     * @PARAM geom    The geometry to add to.
@@ -75,10 +78,13 @@ public:
     * @PARAM alpha   Uniform alpha to apply to all vert colors.
     * @note If front and back depth are equal, then we only draw front facing surface.
     */
-   void buildRoundedRectangle(OSG::GeometryPtr geom, const OSG::Color3f color,
-                              const OSG::Pnt2f minPt, const OSG::Pnt2f maxPt,
-                              const float innerRad, const float outerRad, const unsigned numSegs, const bool filled,
-                              const float frontDepth=0, const float backDepth=0, const float alpha=1.0f);
+   void buildRoundedRectangle(OSG::GeometryPtr geom, const OSG::Color3f& color,
+                              const OSG::Pnt2f& minPt, const OSG::Pnt2f& maxPt,
+                              const float innerRad, const float outerRad,
+                              const unsigned int numSegs, const bool filled,
+                              const float frontDepth = 0.0f,
+                              const float backDepth = 0.0f,
+                              const float alpha = 1.0f);
 
    /** Build a 3D disc.
     * @PARAM geom    The geometry to add to.
@@ -93,16 +99,22 @@ public:
     * @PARAM backDepth   Z value of the back surface.
     * @note If front and back depth are equal, then we only draw front facing surface.
     */
-   void buildDisc(OSG::GeometryPtr geom, const OSG::Color3f color, const OSG::Pnt2f center,
-                  const float innerRad, const float outerRad, const unsigned numSegs, const float startAngle=0, const float endAngle=gmtl::Math::TWO_PI,
-                  const float frontDepth=0.5, const float backDepth=-0.5, const bool capIt=true, const float alpha=1.0f);
+   void buildDisc(OSG::GeometryPtr geom, const OSG::Color3f& color,
+                  const OSG::Pnt2f& center, const float innerRad,
+                  const float outerRad, const unsigned int numSegs,
+                  const float startAngle = 0.0f,
+                  const float endAngle = gmtl::Math::TWO_PI,
+                  const float frontDepth = 0.5f, const float backDepth = -0.5f,
+                  const bool capIt = true, const float alpha = 1.0f);
 
 
    /** Helper class to use as a parameter to the text building methods. */
    class IOV_CLASS_API Font
    {
    public:
-      Font(std::string family, OSG::TextFace::Style style = OSG::TextFace::STYLE_PLAIN, unsigned size = 48);
+      Font(const std::string& family,
+           OSG::TextFace::Style style = OSG::TextFace::STYLE_PLAIN,
+           const unsigned int size = 48);
 
       void update();
 
@@ -121,27 +133,41 @@ public:
    /** Replace the geomtetry in the area here.
     * @note The font passed is used to update the geom texture for the glyphs.
     */
-   void buildText(OSG::GeometryPtr geom, UiBuilder::Font& font, std::string text, OSG::Vec2f offset=OSG::Vec2f(0,0),
-                  OSG::Color3f color=OSG::Color3f(1,1,1), float scale=1.0f, float spacing=1.0f);
+   void buildText(OSG::GeometryPtr geom, UiBuilder::Font& font,
+                  const std::string& text,
+                  OSG::Vec2f offset = OSG::Vec2f(0.0f, 0.0f),
+                  OSG::Color3f color = OSG::Color3f(1.0f, 1.0f, 1.0f),
+                  const float scale = 1.0f, const float spacing = 1.0f);
 
-   void buildText(OSG::GeometryPtr geom, UiBuilder::Font& font, std::vector<std::string> textLines, OSG::Vec2f offset=OSG::Vec2f(0,0),
-                  OSG::Color3f color=OSG::Color3f(1,1,1), float scale=1.0f, float spacing=1.0f);
+   void buildText(OSG::GeometryPtr geom, UiBuilder::Font& font,
+                  const std::vector<std::string>& textLines,
+                  OSG::Vec2f offset = OSG::Vec2f(0.0f, 0.0f),
+                  OSG::Color3f color = OSG::Color3f(1.0f, 1.0f, 1.0f),
+                  const float scale = 1.0f, const float spacing = 1.0f);
 
    /** Add text to the geometry.
     * @note The font is NOT used to set the texture.  It must be the same as what you used to build the text geom.
     */
-   void addText(OSG::GeometryPtr geom, UiBuilder::Font& font, std::string text, OSG::Vec2f offset=OSG::Vec2f(0,0),
-                  OSG::Color3f color=OSG::Color3f(1,1,1), float scale=1.0f, float spacing=1.0f);
-   void addText(OSG::GeometryPtr geom, UiBuilder::Font& font, std::vector<std::string> textLines, OSG::Vec2f offset=OSG::Vec2f(0,0),
-                  OSG::Color3f color=OSG::Color3f(1,1,1), float scale=1.0f, float spacing=1.0f);
-
+   void addText(OSG::GeometryPtr geom, UiBuilder::Font& font,
+                const std::string& text,
+                OSG::Vec2f offset = OSG::Vec2f(0.0f, 0.0f),
+                OSG::Color3f color = OSG::Color3f(1.0f, 1.0f, 1.0f),
+                const float scale = 1.0f, const float spacing = 1.0f);
+   void addText(OSG::GeometryPtr geom, UiBuilder::Font& font,
+                const std::vector<std::string>& textLines,
+                OSG::Vec2f offset = OSG::Vec2f(0.0f, 0.0f),
+                OSG::Color3f color = OSG::Color3f(1.0f, 1.0f, 1.0f),
+                const float scale = 1.0f, const float spacing = 1.0f);
 
    /** Get the size that the text will take up on screen. */
-   OSG::Vec2f getTextSize(UiBuilder::Font& font, std::string text, float spacing=1.0f);
-   OSG::Vec2f getTextSize(UiBuilder::Font& font, std::vector<std::string> textLines, float spacing=1.0f);
+   OSG::Vec2f getTextSize(UiBuilder::Font& font,
+                          const std::string& text, const float spacing = 1.0f);
+   OSG::Vec2f getTextSize(UiBuilder::Font& font,
+                          const std::vector<std::string>& textLines,
+                          const float spacing = 1.0f);
 
 };
 
 }  // namespace IOV
-#endif
 
+#endif
