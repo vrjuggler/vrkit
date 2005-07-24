@@ -196,6 +196,13 @@ void StatusPanel::setWidthHeight(const float w, const float h)
 void StatusPanel::setStatusHistorySize(const unsigned int size)
 {
    mStatusHistorySize = size;
+
+   // Shrink status lines to fit.
+   while ( mStatusLines.size() > mStatusHistorySize )
+   {
+      mStatusLines.pop_back();
+   }
+
    setDirty();
 }
 
