@@ -459,11 +459,11 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f& color,
 
 UiBuilder::Font::Font(const std::string& family, OSG::TextFace::Style style,
                       const unsigned int size)
+   : mFamilyName(family)
+   , mStyle(style)
+   , mFace(NULL)
 {
-   mFace = NULL;
    mParams.size = size;
-   mFamilyName = family;
-   mStyle = style;
 
    update();
 }
