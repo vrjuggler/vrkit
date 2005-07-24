@@ -10,7 +10,8 @@
 //#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-#define IOV_LOCATION std::string(__FILE__) + std::string(BOOST_PP_STRINGIZE(__LINE__))
+#define IOV_LOCATION std::string(__FILE__) + std::string(":") + \
+           std::string(BOOST_PP_STRINGIZE(__LINE__))
 
 // Example:
 //  throw inf::Exception("ObjectProxy not ready in Node::objProxy_checked", IOV_LOCATION);
