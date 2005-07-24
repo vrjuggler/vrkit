@@ -51,6 +51,8 @@ public:
       return mDrawScaleFactor;
    }
 
+   virtual void exit();
+
 public:
    /** @name Cluster app data methods.
     * These methods are used to communicate data over an OpenSG network connection
@@ -82,7 +84,10 @@ private:
 
    OSG::GroupNodePtr mSceneRoot;
 
-   OSG::RemoteAspect        mAspect;
+   // NOTE: mAspect is allocated dynamically so that we can control when it
+   // is deleted.  This is necessary to avoid crash-on-exit problems with
+   // OpenSG.
+   OSG::RemoteAspect*       mAspect;
    OSG::PointConnection*    mConnection;
    OSG::Connection::Channel mChannel;
 

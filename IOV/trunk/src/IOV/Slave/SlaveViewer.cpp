@@ -75,6 +75,7 @@ SlaveViewer::SlaveViewer(const std::string& masterAddr,
    , mDrawScaleFactor(gadget::PositionUnitConversion::ConvertToFeet)
    , mMasterAddr(masterAddr)
    , mRootNodeName(rootNodeName)
+   , mAspect(new OSG::RemoteAspect())
    , mConnection(NULL)
 #ifdef _DEBUG
    , mNodes(0)
@@ -113,9 +114,9 @@ void SlaveViewer::initScene()
          OSG::FieldContainerFactory::the()->findType(i);
       if ( NULL != fct )
       {
-         mAspect.registerChanged(*fct, changed);
-         mAspect.registerDestroyed(*fct, destroyed);
-         mAspect.registerCreated(*fct, created);
+         mAspect->registerChanged(*fct, changed);
+         mAspect->registerDestroyed(*fct, destroyed);
+         mAspect->registerCreated(*fct, created);
       }
    }
 
@@ -129,7 +130,7 @@ void SlaveViewer::initScene()
 
       mConnection->wait();
       mConnection->getValue(mDrawScaleFactor);
-      mAspect.receiveSync(*mConnection);
+      mAspect->receiveSync(*mConnection);
 
       OSG::Thread::getCurrentChangeList()->clearAll();
       OSG::UInt8 finish(false);
@@ -207,7 +208,7 @@ void SlaveViewer::latePreFrame()
 
       if ( mConnection->wait() )
       {
-         mAspect.receiveSync(*mConnection);
+         mAspect->receiveSync(*mConnection);
          OSG::Thread::getCurrentChangeList()->clearAll();
          mConnection->getValue(finish);
          readDataFromMaster(*mConnection);
@@ -234,6 +235,14 @@ void SlaveViewer::latePreFrame()
       OSG::osgExit();
       ::exit(inf::EXIT_ERR_COMM);
    }
+}
+
+void SlaveViewer::exit()
+{
+   mSceneRoot = OSG::NullFC;
+   shutdown();
+   mMaybeNamedFcs.clear();
+   vrj::OpenSGApp::exit();
 }
 
 void SlaveViewer::sendDataToMaster(OSG::BinaryDataHandler& writer)
@@ -415,6 +424,12 @@ void SlaveViewer::shutdown()
       mConnection->disconnect();
       delete mConnection;
       mConnection = NULL;
+   }
+
+   if ( NULL != mAspect )
+   {
+      delete mAspect;
+      mAspect = NULL;
    }
 }
 
