@@ -414,6 +414,7 @@ void SlaveViewer::shutdown()
    {
       mConnection->disconnect();
       delete mConnection;
+      mConnection = NULL;
    }
 }
 
