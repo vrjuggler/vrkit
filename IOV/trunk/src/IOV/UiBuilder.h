@@ -14,6 +14,9 @@
 
 #include <gmtl/Math.h>
 
+#include <IOV/Util/Exceptions.h>
+
+
 namespace inf
 {
 
@@ -114,9 +117,10 @@ public:
    public:
       Font(const std::string& family,
            OSG::TextFace::Style style = OSG::TextFace::STYLE_PLAIN,
-           const unsigned int size = 48);
+           const unsigned int size = 48)
+         throw(inf::Exception);
 
-      void update();
+      void update() throw(inf::Exception);
 
    public:
       std::string          mFamilyName;

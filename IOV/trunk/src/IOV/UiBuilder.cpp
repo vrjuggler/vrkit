@@ -459,6 +459,7 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f& color,
 
 UiBuilder::Font::Font(const std::string& family, OSG::TextFace::Style style,
                       const unsigned int size)
+   throw(inf::Exception)
    : mFamilyName(family)
    , mStyle(style)
    , mFace(NULL)
@@ -468,12 +469,12 @@ UiBuilder::Font::Font(const std::string& family, OSG::TextFace::Style style,
    update();
 }
 
-void UiBuilder::Font::update()
+void UiBuilder::Font::update() throw(inf::Exception)
 {
    OSG::TextTXFFace* new_face = OSG::TextTXFFace::create(mFamilyName, mStyle, mParams);
    if (NULL == new_face)
    {
-      std::cerr << "ERROR: Failed to allocate face." << std::endl;
+      throw inf::Exception("ERROR: Failed to allocate face.", IOV_LOCATION);
    }
    subRefP(mFace);
    mFace = new_face;
