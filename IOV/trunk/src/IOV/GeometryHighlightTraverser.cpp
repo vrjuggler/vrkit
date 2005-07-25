@@ -211,7 +211,10 @@ void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
       if ( mat == OSG::NullFC )
       {
          mpass_mat = OSG::MultiPassMaterial::create();
-         mpass_mat->addMaterial(OSG::getDefaultMaterial());
+         OSG::beginEditCP(mpass_mat,
+                          OSG::MultiPassMaterial::MaterialsFieldMask);
+            mpass_mat->addMaterial(OSG::getDefaultMaterial());
+         OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
       }
       // If we already have a multi-pass material, we will use it for
       // mpass_mat.
@@ -225,15 +228,22 @@ void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
       else
       {
          mpass_mat = OSG::MultiPassMaterial::create();
-         mpass_mat->addMaterial(mat);
+         OSG::beginEditCP(mpass_mat,
+                          OSG::MultiPassMaterial::MaterialsFieldMask);
+            mpass_mat->addMaterial(mat);
+         OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
       }
 
       // Finally, we set the material for the geometry core.
-      (*c)->setMaterial(mpass_mat);
+      OSG::beginEditCP(*c, OSG::Geometry::MaterialFieldMask);
+         (*c)->setMaterial(mpass_mat);
+      OSG::endEditCP(*c, OSG::Geometry::MaterialFieldMask);
 
 //      std::cout << "Ading material " << mMaterials[id] << std::endl;
       // Now, we add the highlight material.
-      mpass_mat->addMaterial(mMaterials[id]);
+      OSG::beginEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+         mpass_mat->addMaterial(mMaterials[id]);
+      OSG::beginEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
    }
 }
 
@@ -255,8 +265,11 @@ void GeometryHighlightTraverser::swapHighlightMaterial(OSG::NodePtr node,
          OSG::MultiPassMaterialPtr::dcast(mat);
       if ( mpass_mat->hasMaterial(mMaterials[oldID]) )
       {
-         mpass_mat->subMaterial(mMaterials[oldID]);
-         mpass_mat->addMaterial(mMaterials[newID]);
+         OSG::beginEditCP(mpass_mat,
+                          OSG::MultiPassMaterial::MaterialsFieldMask);
+            mpass_mat->subMaterial(mMaterials[oldID]);
+            mpass_mat->addMaterial(mMaterials[newID]);
+         OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
       }
    }
 }
@@ -285,7 +298,11 @@ void GeometryHighlightTraverser::removeHighlightMaterial(OSG::NodePtr node,
               mpass_mat->hasMaterial(mMaterials[id]) )
          {
 //            std::cout << "Removing material " << mMaterials[id] << std::endl;
-            mpass_mat->subMaterial(mMaterials[id]);
+            OSG::beginEditCP(mpass_mat,
+                             OSG::MultiPassMaterial::MaterialsFieldMask);
+               mpass_mat->subMaterial(mMaterials[id]);
+            OSG::endEditCP(mpass_mat,
+                           OSG::MultiPassMaterial::MaterialsFieldMask);
 
             // If the number of materials remaining in mpass_mat is 1, then we
             // have reached the point where we need to restore the original
@@ -297,7 +314,9 @@ void GeometryHighlightTraverser::removeHighlightMaterial(OSG::NodePtr node,
 //               std::cout << "Restoring original material "
 //                         << orig_mat.get() << std::endl;
                // Restore the material back to whatever it was originally.
-               (*c)->setMaterial(orig_mat);
+               OSG::beginEditCP(*c, OSG::Geometry::MaterialFieldMask);
+                  (*c)->setMaterial(orig_mat);
+               OSG::endEditCP(*c, OSG::Geometry::MaterialFieldMask);
             }
          }
       }
