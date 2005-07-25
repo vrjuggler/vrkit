@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-25 patrickh Send the near/far projection settings to the slaves every
+                    frame when running in a cluster configuration.
+                    -- VERSION -- 0.8.0
 2005-07-24 patrickh Fixed serious cluster bugs tied to the class
                     inf::GeometryHighlightTraverser.
                     -- VERSION -- 0.7.3

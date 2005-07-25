@@ -255,6 +255,10 @@ void SlaveViewer::readDataFromMaster(OSG::BinaryDataHandler& reader)
 {
    OSG::UInt8 junk;
    reader.getValue(junk);
+   float near_val, far_val;
+   reader.getValue(near_val);
+   reader.getValue(far_val);
+   vrj::Projection::setNearFar(near_val, far_val);
 }
 
 void SlaveViewer::initGl()

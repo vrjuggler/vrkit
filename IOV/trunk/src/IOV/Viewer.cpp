@@ -180,6 +180,10 @@ void Viewer::sendDataToSlaves(OSG::BinaryDataHandler& writer)
 {
    OSG::UInt8 junk(false);
    writer.putValue(junk);
+   float near_val, far_val;
+   vrj::Projection::getNearFar(near_val, far_val);
+   writer.putValue(near_val);
+   writer.putValue(far_val);
 }
 
 void Viewer::readDataFromSlave(OSG::BinaryDataHandler& reader)
