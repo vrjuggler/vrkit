@@ -29,6 +29,7 @@ StatusPanel::StatusPanel(const float metersToAppUnits)
    mPanWidth = 10.0f * feet_to_app_units;
    mPanHeight = 15.0f * feet_to_app_units;
    mBorderWidth = 0.4f * feet_to_app_units;
+   mBorderDepth = 0.2f * feet_to_app_units;
 
    mTitleHeight = 0.05f;
    mStatusHeight = 0.30f;
@@ -186,10 +187,18 @@ void StatusPanel::update()
    }
 }
 
-void StatusPanel::setWidthHeight(const float w, const float h)
+void StatusPanel::setWidthHeight(const float w, const float h, const float borderWidth)
 {
    mPanWidth = w;
    mPanHeight = h;
+
+   mBorderWidth = borderWidth;
+   if(0.0f == borderWidth)
+   {
+      mBorderWidth = ((mPanWidth+mPanHeight)/2.0f)/20.0f;
+   }
+   mBorderDepth = mBorderWidth/2.0f;
+
    setDirty();
 }
 
@@ -217,13 +226,13 @@ void StatusPanel::updatePanelScene()
 
    const float inner_rad(0.2f * feet_to_app_units);
    unsigned int num_segs(8);
-   const float front_depth(0.1f * feet_to_app_units);
-   const float back_depth(-0.1f * feet_to_app_units);
+   const float front_depth( mBorderDepth/2.0f);
+   const float back_depth (-mBorderDepth/2.0f);
    //const float bg_depth(-0.1f * feet_to_app_units);
 
    mBuilder.buildRoundedRectangle(mPanelGeomCore, mBorderColor, panel_ll, panel_ur, inner_rad, inner_rad+mBorderWidth,
                                  num_segs, false, front_depth, back_depth, 1.0);
-   mBuilder.buildRoundedRectangle(mPanelGeomCore, mBgColor,     panel_ll, panel_ur, 0.0, inner_rad+(mBorderWidth*2),
+   mBuilder.buildRoundedRectangle(mPanelGeomCore, mBgColor,     panel_ll, panel_ur, 0.0, inner_rad+(mBorderWidth*1.5f),
                                  num_segs, true,  back_depth,    back_depth, mBgAlpha);
 
    const float text_spacing(0.7);

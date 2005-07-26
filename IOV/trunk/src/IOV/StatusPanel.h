@@ -96,7 +96,7 @@ public:
 
 public:  // Configuration params //
 
-   void setWidthHeight(const float w, const float h);
+   void setWidthHeight(const float w, const float h, const float borderWidth=0.0f);
 
    /**
     * Sets the size of the buffer for the status history.  This
@@ -138,6 +138,7 @@ protected:
     */
    float    mPanWidth, mPanHeight;  /**< Panel size in OpenSG units. */
    float    mBorderWidth;           /**< Width of the border in real units. */
+   float    mBorderDepth;           /**< Depth of the border in real units. */
 
    // -- Percentages -- //
    float    mTitleHeight;           /**< Height to make the titles. */

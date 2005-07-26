@@ -68,6 +68,7 @@ OSG::GeometryPtr UiBuilder::createGeomGeo()
       mat->addChunk(mat_chunk);
       mat->addChunk(blend_chunk);
       mat->addChunk(depth_chunk);
+      mat->setSortKey(20);
    OSG::endEditCP(mat);
 
    // XXX: Handle transparency
@@ -538,6 +539,7 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
    text_mat->addChunk(mat_chunk);
    //text_mat->addChunk(poly_chunk);
    text_mat->addChunk(blend_chunk);
+   text_mat->setSortKey(21);
 
    text_geom->setMaterial(text_mat);
 
