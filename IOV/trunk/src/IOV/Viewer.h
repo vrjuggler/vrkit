@@ -37,9 +37,11 @@ namespace inf
 /**
  * Main viewer class.
  * This class controls the rest of the classes in the system.
- * It is called by the VRJ application object.
  *
- * (It may actually be a VRJ app object in the future)
+ * It is an OpenSG VRJ application object that has been customized
+ * and extended to support a "standard" usage scenario
+ * across a wide-range of applications.  In effect it provides
+ * a framework for VRJ OpenSG applications.
  *
  * The viewer class supports a slave communication protocol
  * for clustering.  See @ref SlaveCommunicationProtocol
