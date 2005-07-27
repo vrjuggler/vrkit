@@ -11,7 +11,7 @@
 
 #include <vpr/vpr.h>
 #include <vpr/System.h>
-#include <vpr/DynLoad/LibraryLoader.h>
+#include <vpr/Util/FileUtils.h>
 #include <vpr/IO/Socket/InetAddr.h>
 #include <jccl/Config/Configuration.h>
 
@@ -401,9 +401,8 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
 
    for ( unsigned int i = 0; i < num_paths; ++i )
    {
-      search_path.push_back(
-         appCfg->getProperty<std::string>(plugin_path_prop, i)
-      );
+      std::string dir = appCfg->getProperty<std::string>(plugin_path_prop, i);
+      search_path.push_back(vpr::replaceEnvVars(dir));
    }
 
    mPluginFactory->init(search_path);
