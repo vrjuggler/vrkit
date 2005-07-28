@@ -280,6 +280,9 @@
 				RelativePath="..\..\src\Iov\UserPtr.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Version.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Viewer.h">
 			</File>
 			<File
