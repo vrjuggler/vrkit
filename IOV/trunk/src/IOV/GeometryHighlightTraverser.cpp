@@ -205,34 +205,21 @@ void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
       // in removeHighlightMaterial().
       OSG::MaterialPtr mat = (*c)->getMaterial();
 
-      // If the geometry node has no material at all, we have to inject a
-      // dummy material to ensure that the geometry is rendered before the
-      // highlighting is rendered.
-      if ( mat == OSG::NullFC )
+      // If the geometry node has no material at all or its material is not a
+      // multi-pass material, then we need to create a new mulit-pass material
+      // and make the geometry's current material the first material of
+      // mpass_mat.
+      if ( OSG::NullFC == mat ||
+           ! mat->getType().isDerivedFrom(OSG::MultiPassMaterial::getClassType()) )
       {
-         mpass_mat = OSG::MultiPassMaterial::create();
-         OSG::beginEditCP(mpass_mat,
-                          OSG::MultiPassMaterial::MaterialsFieldMask);
-            mpass_mat->addMaterial(OSG::getDefaultMaterial());
-         OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+         // If the geometry node has no material at all, we have to inject a
+         // dummy material to ensure that the geometry is rendered before the
+         // highlighting is rendered.
+         if ( OSG::NullFC == mat )
+         {
+            mat = OSG::getDefaultMaterial();
+         }
 
-         // Replace the material for the geometry core with the new
-         // multi-pass material.
-         OSG::beginEditCP(*c, OSG::Geometry::MaterialFieldMask);
-            (*c)->setMaterial(mpass_mat);
-         OSG::endEditCP(*c, OSG::Geometry::MaterialFieldMask);
-      }
-      // If we already have a multi-pass material, we will use it for
-      // mpass_mat.
-      else if ( mat->getType().isDerivedFrom(OSG::MultiPassMaterial::getClassType()) )
-      {
-         mpass_mat = OSG::MultiPassMaterialPtr::dcast(mat);
-      }
-      // Otherwise, we need to create a new mulit-pass material and
-      // make the geometry's current material the first material of
-      // mpass_mat.
-      else
-      {
          mpass_mat = OSG::MultiPassMaterial::create();
          OSG::beginEditCP(mpass_mat,
                           OSG::MultiPassMaterial::MaterialsFieldMask);
@@ -244,6 +231,12 @@ void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
          OSG::beginEditCP(*c, OSG::Geometry::MaterialFieldMask);
             (*c)->setMaterial(mpass_mat);
          OSG::endEditCP(*c, OSG::Geometry::MaterialFieldMask);
+      }
+      // If we already have a multi-pass material, we will use it for
+      // mpass_mat.
+      else
+      {
+         mpass_mat = OSG::MultiPassMaterialPtr::dcast(mat);
       }
 
 //      std::cout << "Ading material " << mMaterials[id] << std::endl;
