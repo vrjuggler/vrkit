@@ -6,8 +6,10 @@
 #include <IOV/Config.h>
 
 #include <string>
+#include <map>
 #include <vector>
 #include <boost/filesystem/path.hpp>
+#include <boost/variant.hpp>
 
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGAction.h>
@@ -36,47 +38,77 @@ public:
       LAST_HIGHLIGHT /**< Internal use only! Not a valid highlight ID! */
    };
 
+   /**
+    *
+    * @since 0.9.0
+    */
+   typedef boost::variant<bool, OSG::Int32, OSG::Real32, OSG::Vec2f,
+                          OSG::Vec3f, OSG::Vec4f>
+      uniform_variant_t;
+
+   /**
+    *
+    * @since 0.9.0
+    */
+   typedef std::map<std::string, uniform_variant_t> uniform_map_t;
+
    GeometryHighlightTraverser();
 
    ~GeometryHighlightTraverser();
 
    void extendShaderSearchPath(const std::vector<boost::filesystem::path>& path);
 
-   unsigned int createSHLMaterial(const std::string& vertexShaderFile,
-                                  const std::string& fragmentShaderFile)
-      throw(inf::Exception);
-
    /**
-    * Creates an OSG::ChunkMaterialPtr using the given OSG::SHLChunkPtr as
-    * a starting point.  The primary purpose of this method is to hide the
-    * details of loading the vertex and fragment programs and adding them to
-    * the given SHL chunk.
+    * Creates an OSG::ChunkMaterialPtr using the given information.  The
+    * parameters \p vertexShaderFile and \p fragmentShaderFile name the files
+    * containing vertex and fragment programs respectively.  The vector of
+    * OSG::StateChunkRefPtr objects provides additional state chunks that are
+    * added to the OSG::ChunkMaterialPtr that is created.  The map of uniform
+    * parameters (mapping uniform parameter name to uniform parameter value)
+    * is used to set any uniform parameters for the shader.  Finally, the
+    * OSG::SHLChunkRefPtr, if provided, is used as the SHL state chunk for the
+    * created OSG::ChunkMaterialPtr.  If \p shlChunk is not provided, one is
+    * created and set up internally.
     *
-    * @since 0.7.1
+    * @param vertexShaderFile   The name of the file containing the vertex
+    *                           shader program.  If this is not an absolute
+    *                           path and the file does not exist in the current
+    *                           working directory, then the shader search path
+    *                           will be used to find the file.
+    * @param fragmentShaderFile The name of the file containing the fragment
+    *                           shader program.  If this is not an absolute
+    *                           path and the file does not exist in the current
+    *                           working directory, then the shader search path
+    *                           will be used to find the file.
+    * @param chunks             A vector of state chunks that will be added to
+    *                           the OSG::ChunkMaterialPtr object that is
+    *                           created by this method.  This parameter is
+    *                           optional.
+    * @param uniformParams      A map of uniform parameter names to uniform
+    *                           parameter values.  The allowed value types are
+    *                           those accepted by
+    *                           OSG::SHLChunk::setUniformParameter().  This
+    *                           parameter is optional.
+    * @param shlChunk           The SHL state chunk to use for the material.
+    *                           This is the state chunk to which the uniform
+    *                           parameters will be applied.  This parameter is
+    *                           optional.  If no value is given, then an
+    *                           OSG::SHLChunkPtr will be created internally
+    *                           and added to the OSG::ChunkMaterialPtr that
+    *                           is created by this method.
+    *
+    * @return The unique identifier (with respect to this instance) for the
+    *         newly created material.
+    *
+    * @see extendShaderSearchPath
+    *
+    * @since 0.9.0
     */
    unsigned int createSHLMaterial(const std::string& vertexShaderFile,
                                   const std::string& fragmentShaderFile,
-                                  OSG::SHLChunkRefPtr shlChunk)
-      throw(inf::Exception)
-   {
-      std::vector<OSG::StateChunkRefPtr> vec;
-      return createSHLMaterial(vertexShaderFile, fragmentShaderFile, shlChunk,
-                               vec);
-   }
-
-   /**
-    * Creates an OSG::ChunkMaterialPtr using the given OSG::SHLChunkPtr as
-    * a starting point.  The primary purpose of this method is to hide the
-    * details of loading the vertex and fragment programs and adding them to
-    * the given SHL chunk.  Finally, the vector of additional state chunks is
-    * added to the newly created OSG::ChunkMaterialPtr.
-    *
-    * @since 0.7.1
-    */
-   unsigned int createSHLMaterial(const std::string& vertexShaderFile,
-                                  const std::string& fragmentShaderFile,
-                                  OSG::SHLChunkRefPtr shlChunk,
-                                  const std::vector<OSG::StateChunkRefPtr>& extraChunks)
+                                  const std::vector<OSG::StateChunkRefPtr>& chunks = std::vector<OSG::StateChunkRefPtr>(),
+                                  uniform_map_t& uniformParams = uniform_map_t(),
+                                  OSG::SHLChunkRefPtr shlChunk = OSG::SHLChunkRefPtr())
       throw(inf::Exception);
 
    /**
@@ -147,11 +179,60 @@ private:
    void validateMaterialID(const unsigned int id) throw(inf::Exception);
 
 private:
+   class UniformVisitor : public boost::static_visitor<>
+   {
+   public:
+      UniformVisitor(OSG::SHLChunkRefPtr shlChunk, const char* name)
+         : mSHLChunk(shlChunk)
+         , mName(name)
+      {
+         /* Do nothing. */ ;
+      }
+
+      ~UniformVisitor()
+      {
+         /* Do nothing. */ ;
+      }
+
+      void operator()(bool& b) const
+      {
+         mSHLChunk->setUniformParameter(mName, b);
+      }
+
+      void operator()(OSG::Int32& i) const
+      {
+         mSHLChunk->setUniformParameter(mName, i);
+      }
+
+      void operator()(OSG::Real32& r) const
+      {
+         mSHLChunk->setUniformParameter(mName, r);
+      }
+
+      void operator()(OSG::Vec2f& v) const
+      {
+         mSHLChunk->setUniformParameter(mName, v);
+      }
+
+      void operator()(OSG::Vec3f& v) const
+      {
+         mSHLChunk->setUniformParameter(mName, v);
+      }
+
+      void operator()(OSG::Vec4f& v) const
+      {
+         mSHLChunk->setUniformParameter(mName, v);
+      }
+
+   private:
+      OSG::SHLChunkRefPtr mSHLChunk;
+      const char*         mName;
+   };
+
    std::vector<OSG::GeometryRefPtr> mGeomCores;
 
    std::vector<boost::filesystem::path> mShaderSearchPath;
    std::vector<OSG::MaterialRefPtr> mMaterials;
-
 };
 
 }

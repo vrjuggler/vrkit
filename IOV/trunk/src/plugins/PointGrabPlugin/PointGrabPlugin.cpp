@@ -114,35 +114,29 @@ void PointGrabPlugin::init(ViewerPtr viewer)
 
          OSG::Vec3f isect_color_vec(mIntersectColor[0], mIntersectColor[1],
                                     mIntersectColor[2]);
-         OSG::SHLChunkRefPtr isect_shl_chunk(OSG::SHLChunk::create());
-         OSG::beginEditCP(isect_shl_chunk);
-            isect_shl_chunk->setUniformParameter("color", isect_color_vec);
-            isect_shl_chunk->setUniformParameter("scale", 1.0f);
-            // 1.0 keeps the same alpha value.  A higher value gives thinner
-            // strips at the sides (more alpha in the middle, less at the
-            // sides).
-            isect_shl_chunk->setUniformParameter("exponent", 1.0f);
-         OSG::endEditCP(isect_shl_chunk);
+         inf::GeometryHighlightTraverser::uniform_map_t isect_uniform_params;
+         isect_uniform_params["color"] = isect_color_vec;
+         isect_uniform_params["scale"] = 1.0f;
+         // 1.0 keeps the same alpha value.  A higher value gives thinner
+         // strips at the sides (more alpha in the middle, less at the sides).
+         isect_uniform_params["exponent"] = 1.0f;
          mIsectHighlightID =
             mGeomTraverser.createSHLMaterial(mIsectVertexShaderFile,
                                              mIsectFragmentShaderFile,
-                                             isect_shl_chunk, chunks);
+                                             chunks, isect_uniform_params);
 
          OSG::Vec3f grab_color_vec(mGrabColor[0], mGrabColor[1],
                                    mGrabColor[2]);
-         OSG::SHLChunkRefPtr grab_shl_chunk(OSG::SHLChunk::create());
-         OSG::beginEditCP(grab_shl_chunk);
-            grab_shl_chunk->setUniformParameter("color", grab_color_vec);
-            grab_shl_chunk->setUniformParameter("scale", 1.0f);
-            // 1.0 keeps the same alpha value.  A higher value gives thinner
-            // strips at the sides (more alpha in the middle, less at the
-            // sides).
-            grab_shl_chunk->setUniformParameter("exponent", 1.0f);
-         OSG::endEditCP(grab_shl_chunk);
+         inf::GeometryHighlightTraverser::uniform_map_t grab_uniform_params;
+         grab_uniform_params["color"] = grab_color_vec;
+         grab_uniform_params["scale"] = 1.0f;
+         // 1.0 keeps the same alpha value.  A higher value gives thinner
+         // strips at the sides (more alpha in the middle, less at the sides).
+         grab_uniform_params["exponent"] = 1.0f;
          mGrabHighlightID =
             mGeomTraverser.createSHLMaterial(mGrabVertexShaderFile,
                                              mGrabFragmentShaderFile,
-                                             grab_shl_chunk, chunks);
+                                             chunks, grab_uniform_params);
       }
       catch (inf::Exception& ex)
       {

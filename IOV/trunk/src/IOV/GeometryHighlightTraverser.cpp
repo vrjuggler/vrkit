@@ -42,18 +42,10 @@ extendShaderSearchPath(const std::vector<fs::path>& path)
 
 unsigned int GeometryHighlightTraverser::
 createSHLMaterial(const std::string& vertexShaderFile,
-                  const std::string& fragmentShaderFile)
-   throw(inf::Exception)
-{
-   OSG::RefPtr<OSG::SHLChunkPtr> shl_chunk(OSG::SHLChunk::create());
-   return createSHLMaterial(vertexShaderFile, fragmentShaderFile, shl_chunk);
-}
-
-unsigned int GeometryHighlightTraverser::
-createSHLMaterial(const std::string& vertexShaderFile,
                   const std::string& fragmentShaderFile,
-                  OSG::SHLChunkRefPtr shlChunk,
-                  const std::vector<OSG::StateChunkRefPtr>& chunks)
+                  const std::vector<OSG::StateChunkRefPtr>& chunks,
+                  GeometryHighlightTraverser::uniform_map_t& uniformParams,
+                  OSG::SHLChunkRefPtr shlChunk)
    throw(inf::Exception)
 {
    unsigned int id(0);
@@ -81,6 +73,11 @@ createSHLMaterial(const std::string& vertexShaderFile,
    }
    else
    {
+      if ( OSG::NullFC == shlChunk.get() )
+      {
+         shlChunk = OSG::SHLChunk::create();
+      }
+
       {
          OSG::CPEdit(shlChunk, OSG::ShaderChunk::VertexProgramFieldMask |
                                OSG::ShaderChunk::FragmentProgramFieldMask);
@@ -98,17 +95,24 @@ createSHLMaterial(const std::string& vertexShaderFile,
          }
       }
 
-      OSG::RefPtr<OSG::ChunkMaterialPtr> chunk_material(
-         OSG::ChunkMaterial::create()
-      );
-      OSG::beginEditCP(chunk_material);
+      OSG::beginEditCP(shlChunk);
+         uniform_map_t::iterator ui;
+         for ( ui = uniformParams.begin(); ui != uniformParams.end(); ++ui )
+         {
+            UniformVisitor visitor(shlChunk, (*ui).first.c_str());
+            boost::apply_visitor(visitor, (*ui).second);
+         }
+      OSG::endEditCP(shlChunk);
+
+      OSG::ChunkMaterialRefPtr chunk_material(OSG::ChunkMaterial::create());
+      OSG::beginEditCP(chunk_material, OSG::ChunkMaterial::ChunksFieldMask);
          chunk_material->addChunk(shlChunk);
          std::vector<OSG::StateChunkRefPtr>::const_iterator ci;
          for ( ci = chunks.begin(); ci != chunks.end(); ++ci )
          {
             chunk_material->addChunk(*ci);
          }
-      OSG::endEditCP(chunk_material);
+      OSG::endEditCP(chunk_material, OSG::ChunkMaterial::ChunksFieldMask);
 
       OSG::MaterialRefPtr material(chunk_material.get());
       id = mMaterials.size();
