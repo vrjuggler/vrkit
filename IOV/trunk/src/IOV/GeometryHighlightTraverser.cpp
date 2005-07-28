@@ -243,7 +243,7 @@ void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
       // Now, we add the highlight material.
       OSG::beginEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
          mpass_mat->addMaterial(mMaterials[id]);
-      OSG::beginEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+      OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
    }
 }
 
