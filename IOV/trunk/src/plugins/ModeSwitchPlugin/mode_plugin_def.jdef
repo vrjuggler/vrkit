@@ -4,7 +4,6 @@
    <definition_version version="1" label="Mode Plugin Description">
       <abstract>false</abstract>
       <help />
-      <category>/Application-Specific/</category>
       <category>/Infiscape/</category>
       <property valuetype="string" variable="false" name="plugin">
          <help>The name of a plug-in to be loaded and used by the Infiscape OpenSG Viewer application.</help>

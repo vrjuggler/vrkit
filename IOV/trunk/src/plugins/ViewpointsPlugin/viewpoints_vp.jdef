@@ -4,7 +4,6 @@
    <definition_version version="1" label="Viewpoint">
       <abstract>false</abstract>
       <help />
-      <category>/Application-Specific/</category>
       <category>/Infiscape/</category>
       <property valuetype="float" variable="false" name="position">
          <help>Viewpoint position</help>

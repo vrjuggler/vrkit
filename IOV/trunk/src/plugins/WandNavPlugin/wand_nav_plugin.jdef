@@ -4,7 +4,6 @@
    <definition_version version="1" label="Infiscape Wand Navigation Plug-In">
       <abstract>false</abstract>
       <help />
-      <category>/Application-Specific/</category>
       <category>/Infiscape/</category>
       <property valuetype="float" variable="false" name="max_velocity">
          <help>Maximum velocity for navigation.</help>
@@ -47,7 +46,6 @@
    <definition_version version="2" label="Infiscape Wand Navigation Plug-In">
       <abstract>false</abstract>
       <help>Plug-in to the Infiscape OpenSG Viewer application for performing wand-based navigation. A wand is expected to be tracked and have four buttons (digital input sources).</help>
-      <category>/Application-Specific/</category>
       <category>/Infiscape/</category>
       <property valuetype="float" variable="false" name="max_velocity">
          <help>Maximum velocity for navigation.</help>

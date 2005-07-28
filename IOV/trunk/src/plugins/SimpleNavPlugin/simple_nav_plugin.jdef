@@ -4,7 +4,6 @@
    <definition_version version="1" label="Infiscape Simple Navigation Plug-In">
       <abstract>false</abstract>
       <help />
-      <category>/Application-Specific/</category>
       <category>/Infiscape/</category>
       <property valuetype="integer" variable="false" name="forward_button_num">
          <help />
