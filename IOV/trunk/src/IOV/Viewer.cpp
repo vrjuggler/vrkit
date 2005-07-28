@@ -132,7 +132,7 @@ void Viewer::preFrame()
 
 void Viewer::latePreFrame()
 {
-   static int iter_num(0);
+   //static int iter_num(0);
 
    OSG::Connection::Channel channel;
 
@@ -360,7 +360,7 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
 
 void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
 {
-   std::cout << "Loading plugins" << std::endl;
+   std::cout << "Viewer: Loading plugins" << std::endl;
 
    const std::string plugin_path_prop("plugin_path");
    const std::string plugin_prop("plugin");
@@ -416,8 +416,7 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
 
       try
       {
-         std::cout << "   Loading plugin: " << plugin_name << " .... "
-                   << std::endl;
+         std::cout << "   Loading plugin: " << plugin_name << " .... ";
          inf::PluginCreator* creator =
             mPluginFactory->getPluginCreator(plugin_name);
 
@@ -428,13 +427,13 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
             // Initialize the plugin, and configure it.
             plugin->init(shared_from_this());
             mPlugins.push_back(plugin);
+            std::cout << "[OK]" << std::endl;
          }
          else
          {
             std::cout << "[ERROR]\n   Plug-in '" << plugin_name
                       << "' has a NULL creator!" << std::endl;
          }
-         std::cout << "[OK]" << std::endl;
       }
       catch (std::runtime_error& ex)
       {
