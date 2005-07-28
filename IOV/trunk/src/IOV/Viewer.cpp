@@ -305,7 +305,7 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
 
    if ( listen_port != 0 && slave_count != 0 )
    {
-      std::cout << "Setting up remove slave network:" << std::endl;
+      std::cout << "Setting up remote slave network:" << std::endl;
 
       vpr::InetAddr local_host_addr;
       if ( vpr::InetAddr::getLocalHost(local_host_addr).success() )
@@ -320,7 +320,7 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
          std::cout << "   Attempting to bind to: " << addr_stream.str()
                    << std::flush;
          mConnection->bind(addr_stream.str());
-         std::cout << "[OK]" << std::endl;
+         std::cout << " [OK]" << std::endl;
       }
       else
       {
