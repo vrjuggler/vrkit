@@ -143,6 +143,8 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
    // --- Load the managed plugins --- //
    const unsigned int num_plugins(elt->getNum(plugins_prop));
 
+   std::cout << "ModeSwitchPlugin: Found " << num_plugins << " plugins to load." << std::endl;
+
    // Attempt to load each plugin
    // - Get creator and create plugin
    // - Push onto plugin list
@@ -154,6 +156,8 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
       plugin_data.mName = plg_elt->getProperty<std::string>(plugin_prop);
       try
       {
+         std::cout << "   Loading plugin: " << plugin_data.mName << " .... ";
+
          inf::PluginCreator* creator =
             plugin_factory->getPluginCreator(plugin_data.mName);
 
@@ -177,17 +181,18 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
             }
 
             mPlugins.push_back(plugin_data);
+            std::cout << "[OK]" << std::endl;
          }
          else
          {
-            std::cerr << "[ModeSwitchPlugin] ERROR: Plug-in '"
+            std::cerr << "[ERROR]\n   ModeSwitchPlugin ERROR: Plug-in '"
                       << plugin_data.mName << "' has a NULL creator!"
                       << std::endl;
          }
       }
       catch (std::runtime_error& ex)
       {
-         std::cerr << "WARNING: ModeSwitchPlugin failed to load plug-in '"
+         std::cerr << "[FAILED]\n   WARNING: ModeSwitchPlugin failed to load plug-in '"
                    << plugin_data.mName << "': " << ex.what() << std::endl;
       }
    }
