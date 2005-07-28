@@ -215,6 +215,12 @@ void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
                           OSG::MultiPassMaterial::MaterialsFieldMask);
             mpass_mat->addMaterial(OSG::getDefaultMaterial());
          OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+
+         // Replace the material for the geometry core with the new
+         // multi-pass material.
+         OSG::beginEditCP(*c, OSG::Geometry::MaterialFieldMask);
+            (*c)->setMaterial(mpass_mat);
+         OSG::endEditCP(*c, OSG::Geometry::MaterialFieldMask);
       }
       // If we already have a multi-pass material, we will use it for
       // mpass_mat.
@@ -232,12 +238,13 @@ void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
                           OSG::MultiPassMaterial::MaterialsFieldMask);
             mpass_mat->addMaterial(mat);
          OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
-      }
 
-      // Finally, we set the material for the geometry core.
-      OSG::beginEditCP(*c, OSG::Geometry::MaterialFieldMask);
-         (*c)->setMaterial(mpass_mat);
-      OSG::endEditCP(*c, OSG::Geometry::MaterialFieldMask);
+         // Replace the material for the geometry core with the new
+         // multi-pass material.
+         OSG::beginEditCP(*c, OSG::Geometry::MaterialFieldMask);
+            (*c)->setMaterial(mpass_mat);
+         OSG::endEditCP(*c, OSG::Geometry::MaterialFieldMask);
+      }
 
 //      std::cout << "Ading material " << mMaterials[id] << std::endl;
       // Now, we add the highlight material.
