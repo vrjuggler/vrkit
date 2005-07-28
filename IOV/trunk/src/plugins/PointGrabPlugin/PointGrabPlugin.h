@@ -96,8 +96,12 @@ private:
    bool mEnableShaders;
    std::string mIsectVertexShaderFile;
    std::string mIsectFragmentShaderFile;
+   float       mIsectUniformScale;
+   float       mIsectUniformExponent;
    std::string mGrabVertexShaderFile;
    std::string mGrabFragmentShaderFile;
+   float       mGrabUniformScale;
+   float       mGrabUniformExponent;
 
    inf::GrabDataPtr mGrabData;
 

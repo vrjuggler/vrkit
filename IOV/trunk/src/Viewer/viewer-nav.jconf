@@ -20,7 +20,7 @@
          <reset_button_nums>0,1</reset_button_nums>
          <initial_mode>Fly</initial_mode>
       </wand_nav_plugin>
-      <point_grab_plugin name="Point Grab Plug-In" version="2">
+      <point_grab_plugin name="Point Grab Plug-In" version="3">
          <grab_button_nums>0</grab_button_nums>
          <intersect_color>1.0</intersect_color>
          <intersect_color>1.0</intersect_color>
@@ -31,8 +31,12 @@
          <enable_highlight_shaders>true</enable_highlight_shaders>
          <intersect_shader>highlight.vs</intersect_shader>
          <intersect_shader>highlight.fs</intersect_shader>
+         <intersect_shader_scale>1.0</intersect_shader_scale>
+         <intersect_shader_exponent>1.0</intersect_shader_exponent>
          <grab_shader>highlight.vs</grab_shader>
          <grab_shader>highlight.fs</grab_shader>
+         <grab_shader_scale>1.0</grab_shader_scale>
+         <grab_shader_exponent>1.0</grab_shader_exponent>
       </point_grab_plugin>
       <viewpoints_plugin name="ViewpointsPlugin" version="1">
          <control_button_num>-1</control_button_num>

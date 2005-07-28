@@ -115,11 +115,9 @@ void PointGrabPlugin::init(ViewerPtr viewer)
          OSG::Vec3f isect_color_vec(mIntersectColor[0], mIntersectColor[1],
                                     mIntersectColor[2]);
          inf::GeometryHighlightTraverser::uniform_map_t isect_uniform_params;
-         isect_uniform_params["color"] = isect_color_vec;
-         isect_uniform_params["scale"] = 1.0f;
-         // 1.0 keeps the same alpha value.  A higher value gives thinner
-         // strips at the sides (more alpha in the middle, less at the sides).
-         isect_uniform_params["exponent"] = 1.0f;
+         isect_uniform_params["color"]    = isect_color_vec;
+         isect_uniform_params["scale"]    = mIsectUniformScale;
+         isect_uniform_params["exponent"] = mIsectUniformExponent;
          mIsectHighlightID =
             mGeomTraverser.createSHLMaterial(mIsectVertexShaderFile,
                                              mIsectFragmentShaderFile,
@@ -128,11 +126,9 @@ void PointGrabPlugin::init(ViewerPtr viewer)
          OSG::Vec3f grab_color_vec(mGrabColor[0], mGrabColor[1],
                                    mGrabColor[2]);
          inf::GeometryHighlightTraverser::uniform_map_t grab_uniform_params;
-         grab_uniform_params["color"] = grab_color_vec;
-         grab_uniform_params["scale"] = 1.0f;
-         // 1.0 keeps the same alpha value.  A higher value gives thinner
-         // strips at the sides (more alpha in the middle, less at the sides).
-         grab_uniform_params["exponent"] = 1.0f;
+         grab_uniform_params["color"]    = grab_color_vec;
+         grab_uniform_params["scale"]    = mGrabUniformScale;
+         grab_uniform_params["exponent"] = mGrabUniformExponent;
          mGrabHighlightID =
             mGeomTraverser.createSHLMaterial(mGrabVertexShaderFile,
                                              mGrabFragmentShaderFile,
@@ -333,7 +329,7 @@ bool PointGrabPlugin::config(jccl::ConfigElementPtr elt)
 {
    vprASSERT(elt->getID() == getElementType());
 
-   const unsigned int req_cfg_version(2);
+   const unsigned int req_cfg_version(3);
 
    // Check for correct version of plugin configuration.
    if ( elt->getVersion() < req_cfg_version )
@@ -348,6 +344,12 @@ bool PointGrabPlugin::config(jccl::ConfigElementPtr elt)
    const std::string grab_btn_prop("grab_button_nums");
    const std::string isect_prop("intersect_color");
    const std::string grab_prop("grab_color");
+   const std::string isect_shader_prop("intersect_shader");
+   const std::string isect_scale_prop("intersect_shader_scale");
+   const std::string isect_exp_prop("intersect_shader_exponent");
+   const std::string grab_shader_prop("grab_shader");
+   const std::string grab_scale_prop("grab_shader_scale");
+   const std::string grab_exp_prop("grab_shader_exponent");
 
    configButtons(elt, grab_btn_prop, mGrabBtn);
 
@@ -407,14 +409,18 @@ bool PointGrabPlugin::config(jccl::ConfigElementPtr elt)
 
    mEnableShaders = elt->getProperty<bool>("enable_highlight_shaders");
    mIsectVertexShaderFile =
-      vpr::replaceEnvVars(elt->getProperty<std::string>("intersect_shader", 0));
+      vpr::replaceEnvVars(elt->getProperty<std::string>(isect_shader_prop, 0));
    mIsectFragmentShaderFile =
-      vpr::replaceEnvVars(elt->getProperty<std::string>("intersect_shader", 1));
+      vpr::replaceEnvVars(elt->getProperty<std::string>(isect_shader_prop, 1));
+   mIsectUniformScale    = elt->getProperty<float>(isect_scale_prop, 0);
+   mIsectUniformExponent = elt->getProperty<float>(isect_exp_prop, 0);
 
    mGrabVertexShaderFile =
-      vpr::replaceEnvVars(elt->getProperty<std::string>("grab_shader", 0));
+      vpr::replaceEnvVars(elt->getProperty<std::string>(grab_shader_prop, 0));
    mGrabFragmentShaderFile =
-      vpr::replaceEnvVars(elt->getProperty<std::string>("grab_shader", 1));
+      vpr::replaceEnvVars(elt->getProperty<std::string>(grab_shader_prop, 1));
+   mGrabUniformScale    = elt->getProperty<float>(grab_scale_prop, 0);
+   mGrabUniformExponent = elt->getProperty<float>(grab_exp_prop, 0);
 
    return true;
 }
@@ -423,8 +429,12 @@ PointGrabPlugin::PointGrabPlugin()
    : mEnableShaders(true)
    , mIsectVertexShaderFile("highlight.vs")
    , mIsectFragmentShaderFile("highlight.fs")
+   , mIsectUniformScale(1.0f)
+   , mIsectUniformExponent(1.0f)
    , mGrabVertexShaderFile("highlight.vs")
    , mGrabFragmentShaderFile("highlight.fs")
+   , mGrabUniformScale(1.0f)
+   , mGrabUniformExponent(1.0f)
    , mGrabText("Grab/Release Toggle")
    , mIntersecting(false)
    , mGrabbing(false)

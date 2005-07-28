@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-28 patrickh Made the intersection and grab shaders for PointGrabPlugin
+                    more configurable through an extension to the config
+                    element for that plug-in.
+                    -- VERSION -- 0.9.1
 2005-07-28 patrickh Handle shader uniform parameters in
                     inf::GeometryHighlightTraverser::createSHLMaterial().
                     -- VERSION -- 0.9.0
