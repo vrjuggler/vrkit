@@ -31,9 +31,9 @@ StatusPanel::StatusPanel(const float metersToAppUnits)
    mBorderWidth = 0.4f * feet_to_app_units;
    mBorderDepth = 0.2f * feet_to_app_units;
 
-   mTitleHeight = 0.05f;
-   mStatusHeight = 0.30f;
-   mHeaderHeight = 0.20f;
+   mTitleHeight = 0.08f;
+   mStatusHeight = 0.375f;
+   mHeaderHeight = 0.175f;
    mStatusHistorySize = 20;
    mStatusTextHeight = 0.5f;
 
