@@ -176,41 +176,8 @@ protected:
    std::string    mBottomTitle;
 
    std::string    mHeaderText;
-/*
-   struct ltvec
-   {
-      bool operator()(const std::vector<int>& v1, const std::vector<int>& v2)
-         const
-      {
-         if ( v1.empty() && v2.empty() )
-         {
-            return true;
-         }
-         else if ( v1.empty() && ! v2.empty() )
-         {
-            return false;
-         }
-         else if ( ! v1.empty() && v2.empty() )
-         {
-            return true;
-         }
-         else
-         {
-            for ( unsigned int i = 0; i < v1.size() && i < v2.size(); ++i )
-            {
-               if ( v1[i] != v2[i] )
-               {
-                  return v1[i] < v2[i];
-               }
-            }
 
-            return false;
-         }
-      }
-   };
-*/
-   typedef std::map<std::vector<int>, std::vector<std::string> >
-      center_text_t;
+   typedef std::map<std::vector<int>, std::vector<std::string> > center_text_t;
    center_text_t mCenterText;
    std::deque<std::string> mStatusLines;
 
