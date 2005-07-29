@@ -263,8 +263,10 @@ void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
       std::ostringstream stream;
       stream << mModeNames[modeNum];
       panel.setHeaderText(stream.str());
-      panel.setControlText((StatusPanel::ControlTextLine) mSwitchButton,
-                           "Switch Mode");
+
+      // The button number mSwitchButton is zero-based, but we would like it
+      // to be one-based in the status panel display.
+      panel.setControlText(mSwitchButton + 1, "Switch Mode");
    }
 
    for ( unsigned int i = 0; i < mPlugins.size(); ++i )

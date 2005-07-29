@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-07-28 patrickh Extended inf::StatusPanel to handle multi-button commands.
+                    -- VERSION -- 0.10.0
 2005-07-28 patrickh Made the intersection and grab shaders for PointGrabPlugin
                     more configurable through an extension to the config
                     element for that plug-in.

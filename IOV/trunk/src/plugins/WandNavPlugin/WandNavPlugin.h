@@ -105,6 +105,8 @@ protected:
    void configButtons(jccl::ConfigElementPtr elt, const std::string& propName,
                       DigitalHolder& holder);
 
+   std::vector<int> transformButtonVec(const std::vector<int>& btns);
+
    static std::string getElementType()
    {
       return std::string("wand_nav_plugin");

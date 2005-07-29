@@ -132,26 +132,22 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
 
          if ( mForBtn != -1 )
          {
-            panel.removeControlText((StatusPanel::ControlTextLine) mForBtn,
-                                    mForwardText);
+            panel.removeControlText(mForBtn + 1, mForwardText);
          }
 
          if ( mRevBtn != -1 )
          {
-            panel.removeControlText((StatusPanel::ControlTextLine) mRevBtn,
-                                    mReverseText);
+            panel.removeControlText(mRevBtn + 1, mReverseText);
          }
 
          if ( mRotateBtn != -1 )
          {
-            panel.removeControlText((StatusPanel::ControlTextLine) mRotateBtn,
-                                    mRotateText);
+            panel.removeControlText(mRotateBtn + 1, mRotateText);
          }
 
          if ( mModeBtn != -1 )
          {
-            panel.removeControlText((StatusPanel::ControlTextLine) mModeBtn,
-                                    mModeText);
+            panel.removeControlText(mModeBtn + 1, mModeText);
          }
       }
    }
@@ -162,41 +158,35 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
          inf::StatusPanel& panel =
             status_panel_data->mStatusPanelPlugin->getPanel();
 
-         StatusPanel::ControlTextLine line_num;
-
          if ( mForBtn != -1 )
          {
-            line_num = (StatusPanel::ControlTextLine) mForBtn;
-            if ( ! panel.hasControlText(line_num, mForwardText) )
+            if ( ! panel.hasControlText(mForBtn + 1, mForwardText) )
             {
-               panel.addControlText(line_num, mForwardText);
+               panel.addControlText(mForBtn + 1, mForwardText);
             }
          }
 
          if ( mRevBtn != -1 )
          {
-            line_num = (StatusPanel::ControlTextLine) mRevBtn;
-            if ( ! panel.hasControlText(line_num, mReverseText) )
+            if ( ! panel.hasControlText(mRevBtn + 1, mReverseText) )
             {
-               panel.addControlText(line_num, mReverseText);
+               panel.addControlText(mRevBtn + 1, mReverseText);
             }
          }
 
          if ( mRotateBtn != -1 )
          {
-            line_num = (StatusPanel::ControlTextLine) mRotateBtn;
-            if ( ! panel.hasControlText(line_num, mRotateText) )
+            if ( ! panel.hasControlText(mRotateBtn + 1, mRotateText) )
             {
-               panel.addControlText(line_num, mRotateText);
+               panel.addControlText(mRotateBtn + 1, mRotateText);
             }
          }
 
          if ( mModeBtn != -1 )
          {
-            line_num = (StatusPanel::ControlTextLine) mModeBtn;
-            if ( ! panel.hasControlText(line_num, mModeText) )
+            if ( ! panel.hasControlText(mModeBtn + 1, mModeText) )
             {
-               panel.addControlText(line_num, mModeText);
+               panel.addControlText(mModeBtn + 1, mModeText);
             }
          }
       }

@@ -24,16 +24,6 @@ namespace inf
 class IOV_CLASS_API StatusPanel
 {
 public:
-   enum ControlTextLine
-   {
-      LINE1 = 0,
-      LINE2 = LINE1 + 1,
-      LINE3 = LINE2 + 1,
-      LINE4 = LINE3 + 1,
-      LINE5 = LINE4 + 1,
-      END
-   };
-
    StatusPanel(const float metersToAppUnits);
 
    /** Initialize scene graph, fonts and everything else that is used. */
@@ -50,39 +40,99 @@ public:
    void setHeaderText(const std::string& header);
 
    /**
-    * Sets text for the named line of the panel's control section.  This
-    * overwrites whatever was previously in the buffer for the named line.
+    * Sets the text description for the command identified by \p cmd.
+    * This overwrites whatever was previously in the buffer for the
+    * identified command.
     *
-    * @since 0.6.0
+    * @since 0.10.0
     */
-   void setControlText(const ControlTextLine line, const std::string& text);
+   void setControlText(const int cmd, const std::string& desc)
+   {
+      std::vector<int> cmds(1, cmd);
+      setControlText(cmds, desc);
+   }
 
    /**
-    * Adds the given text to the named line of the panel's control section.
+    * Sets the text description for the command identified by \p cmds.
+    * This overwrites whatever was previously in the buffer for the
+    * identified command.
     *
-    * @since 0.6.0
+    * @since 0.10.0
     */
-   void addControlText(const ControlTextLine line, const std::string& text,
+   void setControlText(const std::vector<int>& cmds, const std::string& desc);
+
+   /**
+    * Adds the given text description ifor the command identified by \p cmd
+    * to this panel's control section.
+    *
+    * @since 0.10.0
+    */
+   void addControlText(const int cmd, const std::string& desc,
+                       const unsigned int priority = 1)
+   {
+      std::vector<int> cmds(1, cmd);
+      addControlText(cmds, desc, priority);
+   }
+
+   /**
+    * Adds the given text description ifor the command identified by \p cmds
+    * to this panel's control section.
+    *
+    * @since 0.10.0
+    */
+   void addControlText(const std::vector<int>& cmds, const std::string& desc,
                        const unsigned int priority = 1);
 
    /**
-    * Removes the given text from the named line of the panel's control
-    * section.  If the given text is not in the named line, this has no
-    * effect.
+    * Removes the given text description for the command identified by \cmd
+    * from this panel's control section.  If the given text is not associated
+    * with the identified command, this has no effect.
     *
-    * @since 0.6.0
+    * @since 0.10.0
     */
-   void removeControlText(const ControlTextLine line, const std::string& text);
+   void removeControlText(const int cmd, const std::string& desc)
+   {
+      std::vector<int> cmds(1, cmd);
+      removeControlText(cmds, desc);
+   }
+
+   /**
+    * Removes the given text description for the command identified by \cmds
+    * from this panel's control section.  If the given text is not associated
+    * with the identified command, this has no effect.
+    *
+    * @since 0.10.0
+    */
+   void removeControlText(const std::vector<int>& cmds,
+                          const std::string& desc);
 
    /**
     * Determines if the named line contains the given text.
     *
-    * @since 0.6.0
+    * @since 0.10.0
     */
-   bool hasControlText(const ControlTextLine line, const std::string& text)
+   bool hasControlText(const int cmd, const std::string& desc)
    {
-      std::vector<std::string>& vec = mCenterText[line];
-      return std::find(vec.begin(), vec.end(), text) != vec.end();
+      std::vector<int> cmds(1, cmd);
+      return hasControlText(cmds, desc);
+   }
+
+   /**
+    * Determines if the named line contains the given text.
+    *
+    * @since 0.10.0
+    */
+   bool hasControlText(const std::vector<int>& cmds, const std::string& desc)
+   {
+      bool result(false);
+
+      if ( mCenterText.count(cmds) != 0 )
+      {
+         std::vector<std::string>& vec = mCenterText[cmds];
+         result = std::find(vec.begin(), vec.end(), desc) != vec.end();
+      }
+
+      return result;
    }
 
    /** Add another message to the status panel. */
@@ -126,7 +176,42 @@ protected:
    std::string    mBottomTitle;
 
    std::string    mHeaderText;
-   std::map<ControlTextLine, std::vector<std::string> > mCenterText;
+/*
+   struct ltvec
+   {
+      bool operator()(const std::vector<int>& v1, const std::vector<int>& v2)
+         const
+      {
+         if ( v1.empty() && v2.empty() )
+         {
+            return true;
+         }
+         else if ( v1.empty() && ! v2.empty() )
+         {
+            return false;
+         }
+         else if ( ! v1.empty() && v2.empty() )
+         {
+            return true;
+         }
+         else
+         {
+            for ( unsigned int i = 0; i < v1.size() && i < v2.size(); ++i )
+            {
+               if ( v1[i] != v2[i] )
+               {
+                  return v1[i] < v2[i];
+               }
+            }
+
+            return false;
+         }
+      }
+   };
+*/
+   typedef std::map<std::vector<int>, std::vector<std::string> >
+      center_text_t;
+   center_text_t mCenterText;
    std::deque<std::string> mStatusLines;
 
    float mMetersToAppUnits;

@@ -133,31 +133,31 @@ void StatusPanel::setHeaderText(const std::string& header)
    setDirty();
 }
 
-void StatusPanel::setControlText(const StatusPanel::ControlTextLine line,
-                                 const std::string& text)
+void StatusPanel::setControlText(const std::vector<int>& cmds,
+                                 const std::string& desc)
 {
-   mCenterText[line].clear();
-   mCenterText[line].push_back(text);
+   mCenterText[cmds].clear();
+   mCenterText[cmds].push_back(desc);
    setDirty();
 }
 
-void StatusPanel::addControlText(const StatusPanel::ControlTextLine line,
-                                 const std::string& text,
+void StatusPanel::addControlText(const std::vector<int>& cmds,
+                                 const std::string& desc,
                                  const unsigned int priority)
 {
    // XXX: I don't know how to make a robust priority queue that allows
    // iteration.
    boost::ignore_unused_variable_warning(priority);
-   mCenterText[line].push_back(text);
+   mCenterText[cmds].push_back(desc);
    setDirty();
 }
 
-void StatusPanel::removeControlText(const StatusPanel::ControlTextLine line,
-                                    const std::string& text)
+void StatusPanel::removeControlText(const std::vector<int>& cmds,
+                                    const std::string& desc)
 {
    std::vector<std::string>::iterator i;
-   std::vector<std::string>& vec = mCenterText[line];
-   vec.erase(std::remove(vec.begin(), vec.end(), text), vec.end());
+   std::vector<std::string>& vec = mCenterText[cmds];
+   vec.erase(std::remove(vec.begin(), vec.end(), desc), vec.end());
 }
 
 void StatusPanel::addStatusMessage(const std::string& msg)
@@ -269,18 +269,33 @@ void StatusPanel::updatePanelScene()
 
    // Center section
    std::stringstream center_text_stream;
-   for ( unsigned int l = LINE1; l < END; ++l )
+   center_text_t::iterator i;
+   for ( i = mCenterText.begin(); i != mCenterText.end(); ++i )
    {
-      ControlTextLine line = (ControlTextLine) l;
-      if ( ! mCenterText[line].empty() )
+      if ( ! (*i).first.empty() && ! (*i).second.empty() )
       {
-         std::vector<std::string>::iterator ti;
-         center_text_stream << (l + 1) << " - ";
-         for ( ti = mCenterText[line].begin(); ti != mCenterText[line].end(); ++ti )
+         std::stringstream key_stream;
+         for ( unsigned int j = 0; j < (*i).first.size(); ++j )
          {
-            center_text_stream << (*ti) << "; ";
+            key_stream << (*i).first[j];
+            if ( j + 1 < (*i).first.size() )
+            {
+               key_stream << "+";
+            }
          }
-         center_text_stream << "\n";
+
+         std::stringstream cmd_stream;
+         for ( unsigned int j = 0; j < (*i).second.size(); ++j )
+         {
+            cmd_stream << (*i).second[j];
+            if ( j + 1 < (*i).second.size() )
+            {
+               cmd_stream << "; ";
+            }
+         }
+
+         center_text_stream << key_stream.str() << ": " << cmd_stream.str()
+                            << std::endl;
       }
    }
 

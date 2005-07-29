@@ -194,30 +194,42 @@ void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
 
          if ( mForwardBtn.mButtonVec[0] != -1 )
          {
-            unsigned int line_num = mForwardBtn.mButtonVec[0];
-            panel.removeControlText((StatusPanel::ControlTextLine) line_num,
-                                    mForwardText);
+            // The button numbers in mForwardBtn.mButtonVec are zero-based, but
+            // we would like them to be one-based in the status panel display.
+            std::vector<int> btns(transformButtonVec(mForwardBtn.mButtonVec));
+            panel.removeControlText(btns, mForwardText);
          }
 
          if ( mReverseBtn.mButtonVec[0] != -1 )
          {
-            unsigned int line_num = mReverseBtn.mButtonVec[0];
-            panel.removeControlText((StatusPanel::ControlTextLine) line_num,
-                                    mReverseText);
+            // The button numbers in mReverseBtn.mButtonVec are zero-based, but
+            // we would like them to be one-based in the status panel display.
+            std::vector<int> btns(transformButtonVec(mReverseBtn.mButtonVec));
+            panel.removeControlText(btns, mReverseText);
          }
 
          if ( mRotateBtn.mButtonVec[0] != -1 )
          {
-            unsigned int line_num = mRotateBtn.mButtonVec[0];
-            panel.removeControlText((StatusPanel::ControlTextLine) line_num,
-                                    mRotateText);
+            // The button numbers in mRotateBtn.mButtonVec are zero-based, but
+            // we would like them to be one-based in the status panel display.
+            std::vector<int> btns(transformButtonVec(mRotateBtn.mButtonVec));
+            panel.removeControlText(btns, mRotateText);
          }
 
          if ( mModeBtn.mButtonVec[0] != -1 )
          {
-            unsigned int line_num = mModeBtn.mButtonVec[0];
-            panel.removeControlText((StatusPanel::ControlTextLine) line_num,
-                                    mModeText);
+            // The button numbers in mModeBtn.mButtonVec are zero-based, but
+            // we would like them to be one-based in the status panel display.
+            std::vector<int> btns(transformButtonVec(mModeBtn.mButtonVec));
+            panel.removeControlText(btns, mModeText);
+         }
+
+         if ( mResetBtn.mButtonVec[0] != -1 )
+         {
+            // The button numbers in mResetBtn.mButtonVec are zero-based, but
+            // we would like them to be one-based in the status panel display.
+            std::vector<int> btns(transformButtonVec(mResetBtn.mButtonVec));
+            panel.removeControlText(btns, mResetText);
          }
       }
    }
@@ -227,41 +239,49 @@ void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
       {
          inf::StatusPanel& panel =
             status_panel_data->mStatusPanelPlugin->getPanel();
-         StatusPanel::ControlTextLine line_num;
 
          if ( mForwardBtn.mButtonVec[0] != -1 )
          {
-            line_num = (StatusPanel::ControlTextLine) mForwardBtn.mButtonVec[0];
-            if ( ! panel.hasControlText(line_num, mForwardText) )
+            std::vector<int> btns(transformButtonVec(mForwardBtn.mButtonVec));
+            if ( ! panel.hasControlText(btns, mForwardText) )
             {
-               panel.addControlText(line_num, mForwardText);
+               panel.addControlText(btns, mForwardText);
             }
          }
 
          if ( mReverseBtn.mButtonVec[0] != -1 )
          {
-            line_num = (StatusPanel::ControlTextLine) mReverseBtn.mButtonVec[0];
-            if ( ! panel.hasControlText(line_num, mReverseText) )
+            std::vector<int> btns(transformButtonVec(mReverseBtn.mButtonVec));
+            if ( ! panel.hasControlText(btns, mReverseText) )
             {
-               panel.addControlText(line_num, mReverseText);
+               panel.addControlText(btns, mReverseText);
             }
          }
 
          if ( mRotateBtn.mButtonVec[0] != -1 )
          {
-            line_num = (StatusPanel::ControlTextLine) mRotateBtn.mButtonVec[0];
-            if ( ! panel.hasControlText(line_num, mRotateText) )
+            std::vector<int> btns(transformButtonVec(mRotateBtn.mButtonVec));
+            if ( ! panel.hasControlText(btns, mRotateText) )
             {
-               panel.addControlText(line_num, mRotateText);
+               panel.addControlText(btns, mRotateText);
             }
          }
 
          if ( mModeBtn.mButtonVec[0] != -1 )
          {
-            line_num = (StatusPanel::ControlTextLine) mModeBtn.mButtonVec[0];
-            if ( ! panel.hasControlText(line_num, mModeText) )
+            std::vector<int> btns(transformButtonVec(mModeBtn.mButtonVec));
+            if ( ! panel.hasControlText(btns, mModeText) )
             {
-               panel.addControlText(line_num, mModeText);
+               panel.addControlText(btns, mModeText);
+            }
+         }
+
+         if ( mResetBtn.mButtonVec[0] != -1 )
+         {
+            std::vector<int> btns(transformButtonVec(mResetBtn.mButtonVec));
+            if ( ! panel.hasControlText(btns, mResetText) )
+            {
+               panel.addControlText(btns, mResetText);
             }
          }
       }
@@ -450,6 +470,22 @@ void WandNavPlugin::configButtons(jccl::ConfigElementPtr elt,
    holder.mButtonVec.resize(btn_strings.size());
    std::transform(btn_strings.begin(), btn_strings.end(),
                   holder.mButtonVec.begin(), StringToInt());
+}
+
+struct IncValue
+{
+   int operator()(int v)
+   {
+      return v + 1;
+   }
+};
+
+std::vector<int> WandNavPlugin::transformButtonVec(const std::vector<int>& btns)
+{
+   std::vector<int> result(btns.size());
+   IncValue inc;
+   std::transform(btns.begin(), btns.end(), result.begin(), inc);
+   return result;
 }
 
 bool WandNavPlugin::DigitalHolder::test(const gadget::Digital::State testState)

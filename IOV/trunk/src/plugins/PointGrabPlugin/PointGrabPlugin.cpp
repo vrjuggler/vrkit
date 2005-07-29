@@ -446,6 +446,14 @@ PointGrabPlugin::PointGrabPlugin()
    /* Do nothing. */ ;
 }
 
+struct IncValue
+{
+   int operator()(int v)
+   {
+      return v + 1;
+   }
+};
+
 void PointGrabPlugin::focusChanged(inf::ViewerPtr viewer)
 {
    // If we have focus and our grab/release button is configured, we
@@ -460,11 +468,16 @@ void PointGrabPlugin::focusChanged(inf::ViewerPtr viewer)
       {
          inf::StatusPanel& panel =
             status_panel_data->mStatusPanelPlugin->getPanel();
-         StatusPanel::ControlTextLine line_num =
-            (StatusPanel::ControlTextLine) mGrabBtn.mButtonVec[0];
-         if ( ! panel.hasControlText(line_num, mGrabText) )
+         if ( ! panel.hasControlText(mGrabBtn.mButtonVec, mGrabText) )
          {
-            panel.addControlText(line_num, mGrabText);
+            // The button numbers in mGrabBtn.mButtonVec are zero-based, but
+            // we would like them to be one-based in the status panel display.
+            std::vector<int> btns(mGrabBtn.mButtonVec.size());
+            IncValue inc;
+            std::transform(mGrabBtn.mButtonVec.begin(),
+                           mGrabBtn.mButtonVec.end(), btns.begin(), inc);
+
+            panel.addControlText(btns, mGrabText);
          }
       }
    }
@@ -479,10 +492,14 @@ void PointGrabPlugin::focusChanged(inf::ViewerPtr viewer)
          inf::StatusPanel& panel =
             status_panel_data->mStatusPanelPlugin->getPanel();
 
-         // Status panel line numbers are 1-based; buttons are 0-based.
-         unsigned int line_num = mGrabBtn.mButtonVec[0] + 1;
-         panel.removeControlText((StatusPanel::ControlTextLine) line_num,
-                                  mGrabText);
+         // The button numbers in mGrabBtn.mButtonVec are zero-based, but
+         // we would like them to be one-based in the status panel display.
+         std::vector<int> btns(mGrabBtn.mButtonVec.size());
+         IncValue inc;
+         std::transform(mGrabBtn.mButtonVec.begin(),
+                        mGrabBtn.mButtonVec.end(), btns.begin(), inc);
+
+         panel.removeControlText(btns, mGrabText);
       }
    }
 }
