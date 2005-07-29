@@ -272,13 +272,16 @@ void StatusPanel::updatePanelScene()
    for ( unsigned int l = LINE1; l < END; ++l )
    {
       ControlTextLine line = (ControlTextLine) l;
-      std::vector<std::string>::iterator ti;
-      center_text_stream << (l + 1) << " - ";
-      for ( ti = mCenterText[line].begin(); ti != mCenterText[line].end(); ++ti )
+      if ( ! mCenterText[line].empty() )
       {
-         center_text_stream << (*ti) << "; ";
+         std::vector<std::string>::iterator ti;
+         center_text_stream << (l + 1) << " - ";
+         for ( ti = mCenterText[line].begin(); ti != mCenterText[line].end(); ++ti )
+         {
+            center_text_stream << (*ti) << "; ";
+         }
+         center_text_stream << "\n";
       }
-      center_text_stream << "\n";
    }
 
    bounds = mBuilder.getTextSize(*mFont, center_text_stream.str(),
