@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="logo_plugin_logo" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="Logo Plugin Logo">
+      <abstract>false</abstract>
+      <help>A single logo to load.</help>
+      <category>/Infiscape/Internal</category>
+      <property valuetype="string" variable="false" name="image_name">
+         <help>Path and filename of an image file to load.</help>
+         <value label="Image" defaultvalue="" />
+      </property>
+      <property valuetype="string" variable="false" name="model_name">
+         <help>Path and filename of an image of a model to load.</help>
+         <value label="Model" defaultvalue="" />
+      </property>
+      <property valuetype="float" variable="false" name="position">
+         <help>Position of the center of the logo</help>
+         <value label="X" defaultvalue="0.0"/>
+         <value label="Y" defaultvalue="0.0"/>
+         <value label="Z" defaultvalue="0.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="rotation">
+         <help>Rotation of the logo XYZ.</help>
+         <value label="X Rot" defaultvalue="0.0"/>
+         <value label="Y Rot" defaultvalue="0.0"/>
+         <value label="Z Rot" defaultvalue="0.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="scale">
+         <help>Size of the logo.</help>
+         <value label="X scale" defaultvalue="1.0"/>
+         <value label="Y scale" defaultvalue="1.0"/>
+         <value label="Z scale" defaultvalue="1.0"/>
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>
+
