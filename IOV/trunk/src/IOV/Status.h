@@ -44,12 +44,18 @@ public:
    struct StatusStreamer
    {
       StatusStreamer(Status* status)
-         : mStream(new std::ostringstream), mStatus(status)
-      {;}
+         : mStream(new std::ostringstream)
+         , mStatus(status)
+      {
+         /* Do nothing. */ ;
+      }
 
       StatusStreamer(const StatusStreamer& rhs)
-         : mStream(rhs.mStream), mStatus(rhs.mStatus)
-      {;}
+         : mStream(rhs.mStream)
+         , mStatus(rhs.mStatus)
+      {
+         /* Do nothing. */ ;
+      }
 
       ~StatusStreamer()
       {
@@ -62,7 +68,9 @@ public:
       }
 
       std::ostringstream* stream()
-      { return mStream.get(); }
+      {
+         return mStream.get();
+      }
 
     private:
        boost::shared_ptr<std::ostringstream> mStream; /**< Stream to use. */
@@ -70,7 +78,9 @@ public:
    };
 
    StatusStreamer getStreamer()
-   { return StatusStreamer(this); }
+   {
+      return StatusStreamer(this);
+   }
 
 private:
    std::vector<status_func_t>  mOutputFuncs;    /**< List of listeners to pass messages. */
