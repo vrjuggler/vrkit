@@ -56,17 +56,16 @@ public:
          if(mStream)
          {
             mStatus->writeStatusMsg(mStream->str());
-            delete mStream;
          }
-         mStream = NULL;
+
          mStatus = NULL;
       }
 
       std::ostringstream* stream()
-      { return mStream; }
+      { return mStream.get(); }
 
     private:
-       std::ostringstream* mStream;    /**< Stream to use. */
+       boost::shared_ptr<std::ostringstream> mStream; /**< Stream to use. */
        Status*             mStatus;    /**< Status we are to call. */
    };
 
@@ -82,4 +81,3 @@ private:
 #define IOV_STATUS (*(inf::Status::instance()->getStreamer().stream()))
 
 #endif
-
