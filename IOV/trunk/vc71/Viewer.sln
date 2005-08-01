@@ -48,6 +48,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ui_test", "ui_test\ui_test.
 		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Logo Plug-in", "LogoPlugin\LogoPlugin.vcproj", "{32089222-7A08-4558-9178-A900635CC32F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		DebugDLL = DebugDLL
@@ -94,6 +99,10 @@ Global
 		{1FBF9A9D-95E7-43A2-8821-A85EF050DA09}.DebugDLL.Build.0 = DebugDLL|Win32
 		{1FBF9A9D-95E7-43A2-8821-A85EF050DA09}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
 		{1FBF9A9D-95E7-43A2-8821-A85EF050DA09}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
+		{32089222-7A08-4558-9178-A900635CC32F}.DebugDLL.ActiveCfg = DebugDLL|Win32
+		{32089222-7A08-4558-9178-A900635CC32F}.DebugDLL.Build.0 = DebugDLL|Win32
+		{32089222-7A08-4558-9178-A900635CC32F}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
+		{32089222-7A08-4558-9178-A900635CC32F}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
