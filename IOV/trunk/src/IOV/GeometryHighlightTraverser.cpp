@@ -79,8 +79,11 @@ createSHLMaterial(const std::string& vertexShaderFile,
       }
 
       {
-         OSG::CPEdit(shlChunk, OSG::ShaderChunk::VertexProgramFieldMask |
-                               OSG::ShaderChunk::FragmentProgramFieldMask);
+         // CPEditor for shlChunk. This is important because an exception may
+         // be thrown while editing shlChunk.
+         OSG::CPEditor sce(shlChunk,
+                           OSG::ShaderChunk::VertexProgramFieldMask |
+                           OSG::ShaderChunk::FragmentProgramFieldMask);
 
          if ( ! shlChunk->readVertexProgram(vs_file) )
          {
