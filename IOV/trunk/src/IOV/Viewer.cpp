@@ -10,6 +10,7 @@
 #include <OpenSG/OSGSimpleAttachments.h>
 
 #include <vpr/vpr.h>
+#include <vpr/vprParam.h>
 #include <vpr/System.h>
 #include <vpr/Util/FileUtils.h>
 #include <vpr/IO/Socket/InetAddr.h>
@@ -308,25 +309,39 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
       std::cout << "Setting up remote slave network:" << std::endl;
 
       vpr::InetAddr local_host_addr;
-      if ( vpr::InetAddr::getLocalHost(local_host_addr).success() )
-      {
-         mAspect = new OSG::RemoteAspect();
-         mConnection =
-            OSG::ConnectionFactory::the().createGroup("StreamSock");
-         local_host_addr.setPort(listen_port);
-         std::stringstream addr_stream;
-         addr_stream << local_host_addr.getAddressString() << ":"
-                     << listen_port;
-         std::cout << "   Attempting to bind to: " << addr_stream.str()
-                   << std::flush;
-         mConnection->bind(addr_stream.str());
-         std::cout << " [OK]" << std::endl;
-      }
-      else
+      // VPR 1.1.5 introduced exception handling.
+#if __VPR_version < 1001005
+      if ( ! vpr::InetAddr::getLocalHost(local_host_addr).success() )
       {
          throw inf::Exception("Could not get local host address",
                               IOV_LOCATION);
       }
+#else
+      try
+      {
+         vpr::InetAddr::getLocalHost(local_host_addr);
+      }
+      catch (vpr::UnknownHostException& ex)
+      {
+         std::stringstream msg_stream;
+         msg_stream << "Could not get local host address: "
+                    << ex.getDescription();
+         throw inf::Exception(msg_stream.str(), IOV_LOCATION);
+      }
+#endif
+
+      // At this point, local_host_addr holds the local host address.
+      vprASSERT(! local_host_addr.empty());
+
+      mAspect = new OSG::RemoteAspect();
+      mConnection = OSG::ConnectionFactory::the().createGroup("StreamSock");
+      local_host_addr.setPort(listen_port);
+      std::stringstream addr_stream;
+      addr_stream << local_host_addr.getAddressString() << ":" << listen_port;
+      std::cout << "   Attempting to bind to: " << addr_stream.str()
+                << std::flush;
+      mConnection->bind(addr_stream.str());
+      std::cout << " [OK]" << std::endl;
 
       mChannels.resize(slave_count);
 
