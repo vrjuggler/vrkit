@@ -331,8 +331,6 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
 #endif
 
       // At this point, local_host_addr holds the local host address.
-      vprASSERT(! local_host_addr.empty());
-
       mAspect = new OSG::RemoteAspect();
       mConnection = OSG::ConnectionFactory::the().createGroup("StreamSock");
       local_host_addr.setPort(listen_port);
