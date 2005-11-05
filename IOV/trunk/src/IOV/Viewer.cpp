@@ -10,7 +10,6 @@
 #include <OpenSG/OSGSimpleAttachments.h>
 
 #include <vpr/vpr.h>
-#include <vpr/vprParam.h>
 #include <vpr/System.h>
 #include <vpr/Util/FileUtils.h>
 #include <vpr/IO/Socket/InetAddr.h>
@@ -296,48 +295,30 @@ void Viewer::deallocate()
  */
 void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
 {
+   const std::string listen_addr_prop("listen_addr");
    const std::string listen_port_prop("listen_port");
    const std::string slave_count_prop("slave_count");
 
+   const std::string listen_addr =
+      appCfg->getProperty<std::string>(listen_addr_prop);
    const unsigned short listen_port =
       appCfg->getProperty<unsigned short>(listen_port_prop);
    const unsigned int slave_count =
       appCfg->getProperty<unsigned int>(slave_count_prop);
 
-   if ( listen_port != 0 && slave_count != 0 )
+   if ( ! listen_addr.empty() && listen_port != 0 && slave_count != 0 )
    {
       std::cout << "Setting up remote slave network:" << std::endl;
-
-      vpr::InetAddr local_host_addr;
-      // VPR 1.1.5 introduced exception handling.
-#if __VPR_version < 1001005
-      if ( ! vpr::InetAddr::getLocalHost(local_host_addr).success() )
-      {
-         throw inf::Exception("Could not get local host address",
-                              IOV_LOCATION);
-      }
-#else
-      try
-      {
-         vpr::InetAddr::getLocalHost(local_host_addr);
-      }
-      catch (vpr::UnknownHostException& ex)
-      {
-         std::stringstream msg_stream;
-         msg_stream << "Could not get local host address: "
-                    << ex.getDescription();
-         throw inf::Exception(msg_stream.str(), IOV_LOCATION);
-      }
-#endif
-
-      // At this point, local_host_addr holds the local host address.
       mAspect = new OSG::RemoteAspect();
       mConnection = OSG::ConnectionFactory::the().createGroup("StreamSock");
-      local_host_addr.setPort(listen_port);
       std::stringstream addr_stream;
-      addr_stream << local_host_addr.getAddressString() << ":" << listen_port;
+      addr_stream << listen_addr << ":" << listen_port;
       std::cout << "   Attempting to bind to: " << addr_stream.str()
                 << std::flush;
+
+      // To set the IP address to which mConnection will be bound, we have to
+      // do this ridiculous two-step process.
+      mConnection->setInterface(listen_addr);
       mConnection->bind(addr_stream.str());
       std::cout << " [OK]" << std::endl;
 

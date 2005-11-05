@@ -2,10 +2,11 @@
 <?org-vrjuggler-jccl-settings configuration.version="3.0"?>
 <configuration xmlns="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" name="/home/patrick/src/pro/Assembly/src/external/common/OpenSG/VRJ/Viewer/viewer.jconf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.0/configuration http://www.vrjuggler.org/jccl/xsd/3.0/configuration.xsd">
    <elements>
-      <infiscape_opensg_viewer name="Viewer" version="1">
+      <infiscape_opensg_viewer name="Viewer" version="2">
          <root_name>RootNode</root_name>
          <plugin>ModeSwitchPlugin</plugin>
          <plugin>StatusPanelPlugin</plugin>
+         <listen_addr />
          <listen_port>34000</listen_port>
          <slave_count>0</slave_count>
       </infiscape_opensg_viewer>
