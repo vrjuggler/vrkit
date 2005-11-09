@@ -62,7 +62,7 @@
          </enumeration>
       </property>
       <property valuetype="string" variable="false" name="listen_addr">
-         <help>The address on which we will listen for incoming connections from slave viewers (servers in OpenSG terminology). If the value of this property is empty, the local host name will be used to get the address for binding the server socket.</help>
+         <help>The address on which we will listen for incoming connections from slave viewers (servers in OpenSG terminology). If the value of this property is empty, the local host name will be used to get the address for binding the server socket. For a single-homed host, it is suitable to use an empty value for this property.</help>
          <value label="Listen Address" defaultvalue=""/>
       </property>
       <property valuetype="integer" variable="false" name="listen_port">
