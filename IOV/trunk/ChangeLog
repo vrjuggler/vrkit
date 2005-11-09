@@ -1,5 +1,13 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-11-09 patrickh Changed the interpretation of the listen_addr property in
+                    the configuration so that an empty value is treated as a
+                    request to bind to the local machine's standard network
+                    interface.
+                    -- VERSION -- 0.12.1
+2005-11-05 patrickh Fixed a bug in the cluster master connection setup on
+                    multi-homed hosts.
+                    -- VERSION -- 0.12.0
 2005-07-28 patrickh Extended inf::StatusPanel to handle multi-button commands.
                     -- VERSION -- 0.10.0
 2005-07-28 patrickh Made the intersection and grab shaders for PointGrabPlugin

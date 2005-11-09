@@ -306,18 +306,26 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
    const unsigned int slave_count =
       appCfg->getProperty<unsigned int>(slave_count_prop);
 
-   if ( ! listen_addr.empty() && listen_port != 0 && slave_count != 0 )
+   // If we have a port and at least one slave, then we need to set things up
+   // for the incoming slave connections.
+   if ( listen_port != 0 && slave_count != 0 )
    {
       std::cout << "Setting up remote slave network:" << std::endl;
       mAspect = new OSG::RemoteAspect();
       mConnection = OSG::ConnectionFactory::the().createGroup("StreamSock");
+
+      // Construct the binding address to hand off to OpenSG.
+      // At this point, listen_addr may be an empty string. This would give us
+      // the binding address ":<listen_port>", which is fine because
+      // OSG::PointSockConnection::bind() only looks at the port information.
       std::stringstream addr_stream;
       addr_stream << listen_addr << ":" << listen_port;
       std::cout << "   Attempting to bind to: " << addr_stream.str()
                 << std::flush;
 
       // To set the IP address to which mConnection will be bound, we have to
-      // do this ridiculous two-step process.
+      // do this ridiculous two-step process. If listen_addr is empty, then
+      // OSG::PointSockConnection will the local host name.
       mConnection->setInterface(listen_addr);
       mConnection->bind(addr_stream.str());
       std::cout << " [OK]" << std::endl;
