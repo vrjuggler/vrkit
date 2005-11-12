@@ -6,8 +6,13 @@
 #include <boost/filesystem/path.hpp>
 
 #include <vpr/vpr.h>
+#include <vpr/vprParam.h>
 #include <vpr/DynLoad/LibraryFinder.h>
 #include <vpr/Util/Assert.h>
+
+#if __VPR_version >= 1001005
+#  include <vpr/IO/IOException.h>
+#endif
 
 #include <IOV/Plugin.h>
 #include <IOV/PluginFactory.h>
@@ -136,16 +141,31 @@ inf::PluginCreator* PluginFactory::getPluginCreator(const std::string& name)
       }
       else
       {
+#if __VPR_version >= 1001010
+         try
+         {
+            plugin_lib->load();
+            registerCreator(plugin_lib, name);
+         }
+         catch (vpr::IOException& ex)
+         {
+            std::ostringstream msg_stream;
+            msg_stream << "Plug-in '" << name << "' failed to load: "
+                       << ex.getExtendedDescription();
+            throw PluginLoadException(msg_stream.str(), IOV_LOCATION);
+         }
+#else
          if ( plugin_lib->load().success() )
          {
             registerCreator(plugin_lib, name);
          }
          else
          {
-            std::stringstream msg_stream;
+            std::ostringstream msg_stream;
             msg_stream << "Plug-in '" << name << "' failed to load";
             throw PluginLoadException(msg_stream.str(), IOV_LOCATION);
          }
+#endif
       }
 
       i = mPluginCreators.find(name);
