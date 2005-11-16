@@ -157,8 +157,12 @@ if not SConsAddons.Util.hasHelpFlag():
    if boost_options.isAvailable():
       boost_options.updateEnv(baseEnv)
 
-   if SCons.Util.WhereIs('distcc'):
-      baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")
+   # Set up distcc unless we are compiling on Mac OS X.
+   # XXX: distcc is available on Mac OS X but does not work with XCode 2.2 for
+   # some reason. I do not want to try to fix it. -PH 11/16/05
+   if GetPlatform() != 'mac':
+      if SCons.Util.WhereIs('distcc'):
+         baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")
 
    Export('baseEnv', 'build_dir', 'inst_paths')
 
