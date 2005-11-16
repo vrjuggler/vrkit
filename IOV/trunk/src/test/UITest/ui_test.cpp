@@ -89,7 +89,7 @@ public:
     */
    OSG::UInt32 verify(OSG::NodePtr &node)
    {
-       if(node == NullFC)
+       if(node == OSG::NullFC)
            return 0;
 
        mCorruptedNodes.clear();
@@ -103,12 +103,9 @@ public:
 
        //traverse(node, OSG::osgTypedFunctionFunctor1CPtrRef<OSG::Action::ResultE, OSG::NodePtr>(verifyCB));
        traverse(node,
-                  OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<Action::ResultE,
-                                                 VerifyTraverser,
-                                                 NodePtr>(
-                                                     this,
-                                                     &VerifyTraverser::verifyCB));
-
+                OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
+                  OSG::Action::ResultE, VerifyTraverser, OSG::NodePtr
+                >(this, &VerifyTraverser::verifyCB));
 
        if(mRepair)
        {
@@ -158,7 +155,7 @@ public:
       // Check based on core types
       if(OSG::NullFC != node_core)
       {
-         if(GeometryPtr::dcast(node_core) != OSG::NullFC)
+         if(OSG::GeometryPtr::dcast(node_core) != OSG::NullFC)
          {
             return verifyGeometryCB(node);
          }
@@ -173,14 +170,14 @@ protected:  // -- Geom --- //
 
 
    /** Verify geometry method. */
-   OSG::Action::ResultE verifyGeometryCB(NodePtr &node)
+   OSG::Action::ResultE verifyGeometryCB(OSG::NodePtr &node)
    {
-       GeometryPtr geo = GeometryPtr::dcast(node->getCore());
+       OSG::GeometryPtr geo = OSG::GeometryPtr::dcast(node->getCore());
 
-       if(geo == NullFC)
+       if(geo == OSG::NullFC)
            return OSG::Action::Continue;
 
-       if(geo->getPositions() == NullFC)
+       if(geo->getPositions() == OSG::NullFC)
            return OSG::Action::Continue;
 
        OSG::UInt32 start_errors = mNumErrors;
@@ -188,31 +185,31 @@ protected:  // -- Geom --- //
        OSG::Int32 positions_size = geo->getPositions()->getSize();
 
        OSG::Int32 normals_size = 0;
-       if(geo->getNormals() != NullFC)
+       if(geo->getNormals() != OSG::NullFC)
            normals_size = geo->getNormals()->getSize();
 
        OSG::Int32 colors_size = 0;
-       if(geo->getColors() != NullFC)
+       if(geo->getColors() != OSG::NullFC)
            colors_size = geo->getColors()->getSize();
 
        OSG::Int32 secondary_colors_size = 0;
-       if(geo->getSecondaryColors() != NullFC)
+       if(geo->getSecondaryColors() != OSG::NullFC)
            secondary_colors_size = geo->getSecondaryColors()->getSize();
 
        OSG::Int32 texccords_size = 0;
-       if(geo->getTexCoords() != NullFC)
+       if(geo->getTexCoords() != OSG::NullFC)
            texccords_size = geo->getTexCoords()->getSize();
 
        OSG::Int32 texccords1_size = 0;
-       if(geo->getTexCoords1() != NullFC)
+       if(geo->getTexCoords1() != OSG::NullFC)
            texccords1_size = geo->getTexCoords1()->getSize();
 
        OSG::Int32 texccords2_size = 0;
-       if(geo->getTexCoords2() != NullFC)
+       if(geo->getTexCoords2() != OSG::NullFC)
            texccords2_size = geo->getTexCoords2()->getSize();
 
        OSG::Int32 texccords3_size = 0;
-       if(geo->getTexCoords3() != NullFC)
+       if(geo->getTexCoords3() != OSG::NullFC)
            texccords3_size = geo->getTexCoords3()->getSize();
 
        OSG::UInt32 pos_errors = 0;
@@ -253,27 +250,27 @@ protected:  // -- Geom --- //
        {
            norm_errors = 0;
            if(mVerbose) std::cout << "removed corrupted normals!\n";
-           beginEditCP(geo);
-               geo->setNormals(NullFC);
-           endEditCP(geo);
+           OSG::beginEditCP(geo);
+               geo->setNormals(OSG::NullFC);
+           OSG::endEditCP(geo);
        }
 
        if((col_errors > 0) && mRepair)
        {
            col_errors = 0;
            if(mVerbose) std::cout << "removed corrupted colors!\n";
-           beginEditCP(geo);
-               geo->setColors(NullFC);
-           endEditCP(geo);
+           OSG::beginEditCP(geo);
+               geo->setColors(OSG::NullFC);
+           OSG::endEditCP(geo);
        }
 
        if((tex0_errors > 0) && mRepair)
        {
            tex0_errors = 0;
            if(mVerbose) std::cout << "removed corrupted tex coords0!\n";
-           beginEditCP(geo);
-               geo->setTexCoords(NullFC);
-           endEditCP(geo);
+           OSG::beginEditCP(geo);
+               geo->setTexCoords(OSG::NullFC);
+           OSG::endEditCP(geo);
        }
 
        mNumErrors += (pos_errors + norm_errors + col_errors +
@@ -298,50 +295,50 @@ protected:  // -- Geom --- //
    }
 
 
-   bool verifyIndexMap(GeometryPtr &geo, bool &repair)
+   bool verifyIndexMap(OSG::GeometryPtr &geo, bool &repair)
    {
        repair = false;
 
-       if(geo == NullFC)
+       if(geo == OSG::NullFC)
            return true;
 
-       if(geo->getIndices() == NullFC)
+       if(geo->getIndices() == OSG::NullFC)
            return true;
 
        if(!geo->getIndexMapping().empty())
            return true;
 
-       if(geo->getPositions() == NullFC)
+       if(geo->getPositions() == OSG::NullFC)
            return true;
 
        OSG::UInt32 positions_size = geo->getPositions()->getSize();
 
        OSG::UInt32 normals_size = 0;
-       if(geo->getNormals() != NullFC)
+       if(geo->getNormals() != OSG::NullFC)
            normals_size = geo->getNormals()->getSize();
 
        OSG::UInt32 colors_size = 0;
-       if(geo->getColors() != NullFC)
+       if(geo->getColors() != OSG::NullFC)
            colors_size = geo->getColors()->getSize();
 
        OSG::UInt32 secondary_colors_size = 0;
-       if(geo->getSecondaryColors() != NullFC)
+       if(geo->getSecondaryColors() != OSG::NullFC)
            secondary_colors_size = geo->getSecondaryColors()->getSize();
 
        OSG::UInt32 texccords_size = 0;
-       if(geo->getTexCoords() != NullFC)
+       if(geo->getTexCoords() != OSG::NullFC)
            texccords_size = geo->getTexCoords()->getSize();
 
        OSG::UInt32 texccords1_size = 0;
-       if(geo->getTexCoords1() != NullFC)
+       if(geo->getTexCoords1() != OSG::NullFC)
            texccords1_size = geo->getTexCoords1()->getSize();
 
        OSG::UInt32 texccords2_size = 0;
-       if(geo->getTexCoords2() != NullFC)
+       if(geo->getTexCoords2() != OSG::NullFC)
            texccords2_size = geo->getTexCoords2()->getSize();
 
        OSG::UInt32 texccords3_size = 0;
-       if(geo->getTexCoords3() != NullFC)
+       if(geo->getTexCoords3() != OSG::NullFC)
            texccords3_size = geo->getTexCoords3()->getSize();
 
        /*
@@ -360,25 +357,25 @@ protected:  // -- Geom --- //
        {
            OSG::UInt16 indexmap = 0;
            if(positions_size > 0)
-               indexmap |= Geometry::MapPosition;
+               indexmap |= OSG::Geometry::MapPosition;
            if(normals_size > 0)
-               indexmap |= Geometry::MapNormal;
+               indexmap |= OSG::Geometry::MapNormal;
            if(colors_size > 0)
-               indexmap |= Geometry::MapColor;
+               indexmap |= OSG::Geometry::MapColor;
            if(secondary_colors_size > 0)
-               indexmap |= Geometry::MapSecondaryColor;
+               indexmap |= OSG::Geometry::MapSecondaryColor;
            if(texccords_size > 0)
-               indexmap |= Geometry::MapTexCoords;
+               indexmap |= OSG::Geometry::MapTexCoords;
            if(texccords1_size > 0)
-               indexmap |= Geometry::MapTexCoords1;
+               indexmap |= OSG::Geometry::MapTexCoords1;
            if(texccords2_size > 0)
-               indexmap |= Geometry::MapTexCoords2;
+               indexmap |= OSG::Geometry::MapTexCoords2;
            if(texccords3_size > 0)
-               indexmap |= Geometry::MapTexCoords3;
+               indexmap |= OSG::Geometry::MapTexCoords3;
 
-           beginEditCP(geo, Geometry::IndexMappingFieldMask);
+           OSG::beginEditCP(geo, OSG::Geometry::IndexMappingFieldMask);
                geo->getIndexMapping().push_back(indexmap);
-           endEditCP(geo, Geometry::IndexMappingFieldMask);
+           OSG::endEditCP(geo, OSG::Geometry::IndexMappingFieldMask);
            repair = true;
            return false;
        }
@@ -407,8 +404,8 @@ protected:  // -- Geom --- //
             // now replace corrupted geometry core with a group core.
             for (OSG::UInt32 j=0;j<mCorruptedGeos[i]->getParents().size();++j)
             {
-               NodePtr parent = mCorruptedGeos[i]->getParents()[j];
-               if (parent != NullFC)
+               OSG::NodePtr parent = mCorruptedGeos[i]->getParents()[j];
+               if (parent != OSG::NullFC)
                {
                   std::string nname;
                   if(OSG::getName(parent) != NULL)
@@ -417,9 +414,9 @@ protected:  // -- Geom --- //
                   { std::cout << "Removing corrupted geom from node: " << nname << std::endl; }
                   nname += "_CORRUPTED";
                   OSG::setName(parent, nname.c_str());
-                  beginEditCP(parent, Node::CoreFieldMask);
-                  parent->setCore(Group::create());
-                  endEditCP(parent, Node::CoreFieldMask);
+                  OSG::beginEditCP(parent, OSG::Node::CoreFieldMask);
+                     parent->setCore(OSG::Group::create());
+                  OSG::endEditCP(parent, OSG::Node::CoreFieldMask);
                }
             }
          }
