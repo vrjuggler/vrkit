@@ -54,6 +54,7 @@ def BuildDarwinEnvironment():
    "Builds a base environment for other modules to build on set up for Darwin"
    global optimize, profile, builders
 
+   CXX = WhereIs('g++')
    CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions', '-Wunused',
                '-Wno-conversion', '-Ddarwin', '-Wno-long-double']
    LINKFLAGS = []
@@ -71,6 +72,7 @@ def BuildDarwinEnvironment():
 
    return Environment(
       ENV         = os.environ,
+      CXX         = CXX,
       CXXFLAGS    = CXXFLAGS,
       LINKFLAGS   = LINKFLAGS
    )
@@ -157,12 +159,8 @@ if not SConsAddons.Util.hasHelpFlag():
    if boost_options.isAvailable():
       boost_options.updateEnv(baseEnv)
 
-   # Set up distcc unless we are compiling on Mac OS X.
-   # XXX: distcc is available on Mac OS X but does not work with XCode 2.2 for
-   # some reason. I do not want to try to fix it. -PH 11/16/05
-   if GetPlatform() != 'mac':
-      if SCons.Util.WhereIs('distcc'):
-         baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")
+   if SCons.Util.WhereIs('distcc'):
+      baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")
 
    Export('baseEnv', 'build_dir', 'inst_paths')
 
