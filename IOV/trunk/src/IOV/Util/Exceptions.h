@@ -1,18 +1,20 @@
-#ifndef _VRS_IOV_EXCEPTIONS_H_
-#define _VRS_IOV_EXCEPTIONS_H_
+// Copyright (C) Infiscape Corporation 2005
 
-//#include <IOV/Config.h>
+#ifndef _INF_IOV_EXCEPTIONS_H_
+#define _INF_IOV_EXCEPTIONS_H_
+
+#include <IOV/Config.h>
 
 #include <stdexcept>
 
 //#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-#define VRS_LOCATION std::string(__FILE__) + std::string(":") + \
+#define IOV_LOCATION std::string(__FILE__) + std::string(":") + \
            std::string(BOOST_PP_STRINGIZE(__LINE__))
 
 // Example:
-//  throw vrs::Exception("ObjectProxy not ready in Node::objProxy_checked", VRS_LOCATION);
+//  throw inf::Exception("ObjectProxy not ready in Node::objProxy_checked", IOV_LOCATION);
 
 // Exception areas
 // - I/O loading/saving issues
@@ -20,13 +22,12 @@
 // - Invalid data type errors
 
 
-namespace vrs
+namespace inf
 {
 
 /** Base exception for all IOV exceptions.
  */
-//class IOV_CLASS_API Exception : public std::runtime_error
-class Exception : public std::runtime_error
+class IOV_CLASS_API Exception : public std::runtime_error
 {
 public:
    Exception(std::string desc, std::string location) throw();
@@ -54,8 +55,7 @@ protected:
 };
 
 /** Exceptions dealing with plugin handling. */
-//class IOV_CLASS_API PluginException : public Exception
-class PluginException : public Exception
+class IOV_CLASS_API PluginException : public Exception
 {
 public:
    PluginException(const std::string& msg, const std::string& location = "")
@@ -64,7 +64,7 @@ public:
    virtual ~PluginException() throw();
 
    std::string getExceptionName()
-   { return "vrs::PluginException"; }
+   { return "inf::PluginException"; }
 };
 
 /** Exception when loading a plugin. */
@@ -77,7 +77,7 @@ public:
    virtual ~PluginLoadException() throw();
 
    std::string getExceptionName()
-   { return "vrs::PluginLoadException"; }
+   { return "inf::PluginLoadException"; }
 };
 
 /** Exception when we can't find a plugin. */
@@ -90,7 +90,7 @@ public:
    virtual ~NoSuchPluginException() throw();
 
    std::string getExceptionName()
-   { return "vrs::NoSuchPluginException"; }
+   { return "inf::NoSuchPluginException"; }
 };
 
 class PluginInterfaceException : public PluginException
@@ -102,7 +102,7 @@ public:
    virtual ~PluginInterfaceException() throw();
 
    std::string getExceptionName()
-   { return "vrs::PluginInterfaceException";  }
+   { return "infi::PluginInterfaceException";  }
 };
 
 }

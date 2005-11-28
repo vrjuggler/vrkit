@@ -2,9 +2,10 @@
 
 #include <iostream>
 #include <vpr/System.h>
-#include <vrs/Util/Exceptions.h>
+#include <IOV/Util/Exceptions.h>
 
-namespace vrs
+
+namespace inf
 {
 
 Exception::Exception(std::string desc, std::string location) throw()
@@ -23,7 +24,7 @@ const char* Exception::what() const throw()
 }
 
 std::string Exception::getExceptionName() const
-{  return std::string("vrs::Exception"); }
+{  return std::string("infi::Exception"); }
 
 std::string Exception::getDescription() const
 { return mDescription; }
