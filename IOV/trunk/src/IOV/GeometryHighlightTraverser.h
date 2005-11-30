@@ -84,11 +84,53 @@ public:
     *                           the OSG::ChunkMaterialPtr object that is
     *                           created by this method.  This parameter is
     *                           optional.
+    *
+    * @return The unique identifier (with respect to this instance) for the
+    *         newly created material.
+    *
+    * @see extendShaderSearchPath
+    *
+    * @since 0.9.0
+    */
+   unsigned int createSHLMaterial(const std::string& vertexShaderFile,
+                                  const std::string& fragmentShaderFile,
+                                  const std::vector<OSG::StateChunkRefPtr>& chunks = std::vector<OSG::StateChunkRefPtr>())
+      throw (inf::Exception)
+   {
+      uniform_map_t uniform_params;
+      return createSHLMaterial(vertexShaderFile, fragmentShaderFile, chunks,
+                               uniform_params);
+   }
+
+   /**
+    * Creates an OSG::ChunkMaterialPtr using the given information.  The
+    * parameters \p vertexShaderFile and \p fragmentShaderFile name the files
+    * containing vertex and fragment programs respectively.  The vector of
+    * OSG::StateChunkRefPtr objects provides additional state chunks that are
+    * added to the OSG::ChunkMaterialPtr that is created.  The map of uniform
+    * parameters (mapping uniform parameter name to uniform parameter value)
+    * is used to set any uniform parameters for the shader.  Finally, the
+    * OSG::SHLChunkRefPtr, if provided, is used as the SHL state chunk for the
+    * created OSG::ChunkMaterialPtr.  If \p shlChunk is not provided, one is
+    * created and set up internally.
+    *
+    * @param vertexShaderFile   The name of the file containing the vertex
+    *                           shader program.  If this is not an absolute
+    *                           path and the file does not exist in the current
+    *                           working directory, then the shader search path
+    *                           will be used to find the file.
+    * @param fragmentShaderFile The name of the file containing the fragment
+    *                           shader program.  If this is not an absolute
+    *                           path and the file does not exist in the current
+    *                           working directory, then the shader search path
+    *                           will be used to find the file.
+    * @param chunks             A vector of state chunks that will be added to
+    *                           the OSG::ChunkMaterialPtr object that is
+    *                           created by this method.
     * @param uniformParams      A map of uniform parameter names to uniform
     *                           parameter values.  The allowed value types are
     *                           those accepted by
-    *                           OSG::SHLChunk::setUniformParameter().  This
-    *                           parameter is optional.
+    *                           OSG::SHLChunk::setUniformParameter().
     * @param shlChunk           The SHL state chunk to use for the material.
     *                           This is the state chunk to which the uniform
     *                           parameters will be applied.  This parameter is
@@ -106,10 +148,10 @@ public:
     */
    unsigned int createSHLMaterial(const std::string& vertexShaderFile,
                                   const std::string& fragmentShaderFile,
-                                  const std::vector<OSG::StateChunkRefPtr>& chunks = std::vector<OSG::StateChunkRefPtr>(),
-                                  uniform_map_t& uniformParams = uniform_map_t(),
+                                  const std::vector<OSG::StateChunkRefPtr>& chunks,
+                                  uniform_map_t& uniformParams,
                                   OSG::SHLChunkRefPtr shlChunk = OSG::SHLChunkRefPtr())
-      throw(inf::Exception);
+      throw (inf::Exception);
 
    /**
     * Creates and registers a very simple scribing material.
