@@ -229,20 +229,19 @@ int main(int argc, char* argv[])
          ("help", "produce help message")
          ;
 
-      std::string infi_cfg;
       std::string jdef_dir;
 
       po::options_description config("Configuration");
       config.add_options()
          ("jconf,j", po::value< std::vector<std::string> >()->composing(),
-                  "VR Juggler config file")
-         ("app,a",
-                  po::value<std::string>(&infi_cfg)->default_value("viewer.jconf"),
-                  "Viewer configuration file")
+          "VR Juggler config file")
+         ("app,a", po::value< std::vector<std::string> >()->composing(),
+          "Viewer configuration file")
          ("defs,d", po::value<std::string>(&jdef_dir),
-                  "Path to custom config definition (.jdef) files")
-         ("file,f",po::value<std::string>()->default_value("data/scenes/test_scene.osb"),
-                  "File to load in scene")
+          "Path to custom config definition (.jdef) files")
+         ("file,f",
+          po::value<std::string>()->default_value("data/scenes/test_scene.osb"),
+          "File to load in scene")
       ;
 
       po::options_description cmdline_options;
@@ -316,8 +315,15 @@ int main(int argc, char* argv[])
       }
       else
       {
-         // Load named configuration file.
-         app->getConfiguration().loadConfigEltFile(infi_cfg);
+         // Load named application configuration file(s).
+         std::vector<std::string> jconfs =
+            vm["app"].as< std::vector<std::string> >();
+
+         std::vector<std::string>::iterator i;
+         for ( i = jconfs.begin(); i != jconfs.end(); ++i )
+         {
+            app->getConfiguration().loadConfigEltFile(*i);
+         }
       }
 
       if (vm.count("file") != 0)
