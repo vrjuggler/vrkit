@@ -81,6 +81,7 @@ void Viewer::init()
    if ( have_config )
    {
       const std::string app_elt_type("infiscape_opensg_viewer");
+      const std::string cluster_elt_type("iov_cluster");
       const std::string root_name_prop("root_name");
 
       jccl::ConfigElementPtr app_cfg =
@@ -88,6 +89,18 @@ void Viewer::init()
 
       if ( app_cfg )
       {
+         const unsigned int app_cfg_ver(3);
+         if ( app_cfg->getVersion() < app_cfg_ver )
+         {
+            std::cerr << "WARNING: IOV config element '" << app_cfg->getName()
+                      << "' is out of date!" << std::endl
+                      << "         Current config element version is "
+                      << app_cfg_ver << ", but this one is version "
+                      << app_cfg->getVersion() << std::endl
+                      << "         IOV configuration may fail or be incomplete"
+                      << std::endl;
+         }
+
          std::string root_name =
             app_cfg->getProperty<std::string>(root_name_prop);
 
@@ -98,12 +111,18 @@ void Viewer::init()
             OSG::setName(root_node.node(), root_name);
          OSG::endEditCP(root_node);
 
-         // Set ourselves up as a rendering master (or not depending on the
-         // configuration).
-         configureNetwork(app_cfg);
-
          // Setup the plugins that are configured to load
          loadAndInitPlugins(app_cfg);
+      }
+
+      jccl::ConfigElementPtr cluster_cfg =
+         mConfiguration.getConfigElement(cluster_elt_type);
+
+      if ( cluster_cfg )
+      {
+         // Set ourselves up as a rendering master (or not depending on the
+         // configuration).
+         configureNetwork(cluster_cfg);
       }
    }
 }
@@ -293,18 +312,18 @@ void Viewer::deallocate()
 /**
  * See @ref SlaveCommunicationProtocol for details of the communication.
  */
-void Viewer::configureNetwork(jccl::ConfigElementPtr appCfg)
+void Viewer::configureNetwork(jccl::ConfigElementPtr clusterCfg)
 {
    const std::string listen_addr_prop("listen_addr");
    const std::string listen_port_prop("listen_port");
    const std::string slave_count_prop("slave_count");
 
    const std::string listen_addr =
-      appCfg->getProperty<std::string>(listen_addr_prop);
+      clusterCfg->getProperty<std::string>(listen_addr_prop);
    const unsigned short listen_port =
-      appCfg->getProperty<unsigned short>(listen_port_prop);
+      clusterCfg->getProperty<unsigned short>(listen_port_prop);
    const unsigned int slave_count =
-      appCfg->getProperty<unsigned int>(slave_count_prop);
+      clusterCfg->getProperty<unsigned int>(slave_count_prop);
 
    // If we have a port and at least one slave, then we need to set things up
    // for the incoming slave connections.

@@ -101,5 +101,65 @@
          </xsl:stylesheet>
       </upgrade_transform>
    </definition_version>
+   <definition_version version="3" label="Infiscape OpenSG Viewer">
+      <abstract>false</abstract>
+      <help>Configuration for the Infiscape OpenSG viewer application.</help>
+      <category>/Infiscape/</category>
+      <property valuetype="string" variable="false" name="root_name">
+         <help>The name of the root node of the scene that may be shared through OpenSG's clustering feature.</help>
+         <value label="Scene Root Name" defaultvalue="RootNode"/>
+      </property>
+      <property valuetype="string" variable="true" name="plugin_path">
+         <help>Each value adds to the path where dynamically loadable plulg-ins can be found.  The path may make use of environment variables.  For example: &lt;tt&gt;${HOME}/inf-plugins&lt;/tt&gt;.  If no values are set for this property, the default search path will be &lt;tt&gt;${VJ_BASE_DIR}/lib{,32,64}/infiscape/viewer/plugins&lt;/tt&gt; depending on the compile-time application binary interface (ABI).</help>
+         <value label="Plug-In Path" defaultvalue=""/>
+      </property>
+      <property valuetype="string" variable="true" name="plugin">
+         <help>The name of a plug-in to be loaded and used by the Infiscape OpenSG Viewer application.</help>
+         <value label="Module Name" defaultvalue=""/>
+         <enumeration editable="true">
+            <enum label="CenterPointGrabPlugin" value="CenterPointGrabPlugin"/>
+            <enum label="LogoPlugin" value="LogoPlugin"/>
+            <enum label="ModeSwitchPlugin" value="ModeSwitchPlugin"/>
+            <enum label="PointGrabPlugin" value="PointGrabPlugin"/>
+            <enum label="SimpleNavPlugin" value="SimpleNavPlugin"/>
+            <enum label="ViewpointsPlugin" value="ViewpointsPlugin"/>
+            <enum label="WandNavPlugin" value="WandNavPlugin"/>
+         </enumeration>
+      </property>
+      <upgrade_transform>
+         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jconf="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" version="1.0">
+            <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
+            <xsl:variable name="jconf">http://www.vrjuggler.org/jccl/xsd/3.0/configuration</xsl:variable>
+
+            <xsl:template match="/">
+                <xsl:apply-templates/>
+            </xsl:template>
+
+            <xsl:template match="jconf:infiscape_opensg_viewer">
+               <xsl:element namespace="{$jconf}" name="infiscape_opensg_viewer">
+                  <xsl:attribute name="name">
+                     <xsl:value-of select="@name"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="version">3</xsl:attribute>
+                  <xsl:copy-of select="./jconf:root_name" />
+                  <xsl:copy-of select="./jconf:plugin_path" />
+                  <xsl:for-each select="./jconf:plugin">
+                     <xsl:copy-of select="." />
+                  </xsl:for-each>
+               </xsl:element>
+               <xsl:element namespace="{$jconf}" name="iov_cluster">
+                  <xsl:attribute name="name">
+                     <xsl:value-of select="@name"/>
+                     <xsl:text> Cluster Settings</xsl:text>
+                  </xsl:attribute>
+                  <xsl:attribute name="version">1</xsl:attribute>
+                  <xsl:copy-of select="./jconf:listen_addr" />
+                  <xsl:copy-of select="./jconf:listen_port" />
+                  <xsl:copy-of select="./jconf:slave_count" />
+               </xsl:element>
+            </xsl:template>
+         </xsl:stylesheet>
+      </upgrade_transform>
+   </definition_version>
 </definition>
 

@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-12-01 patrickh Split the IOV cluster configuration into a separate
+                    "mix-in" config element type (iov_cluster).
+                    -- VERSION -- 0.13.0
 2005-11-09 patrickh Changed the interpretation of the listen_addr property in
                     the configuration so that an empty value is treated as a
                     request to bind to the local machine's standard network
