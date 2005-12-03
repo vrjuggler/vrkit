@@ -84,6 +84,7 @@ void Viewer::init()
       const std::string cluster_elt_type("iov_cluster");
       const std::string root_name_prop("root_name");
 
+      // -- Configure core application -- //
       jccl::ConfigElementPtr app_cfg =
          mConfiguration.getConfigElement(app_elt_type);
 
@@ -115,6 +116,7 @@ void Viewer::init()
          loadAndInitPlugins(app_cfg);
       }
 
+      // -- Configure cluster support --- //
       jccl::ConfigElementPtr cluster_cfg =
          mConfiguration.getConfigElement(cluster_elt_type);
 
