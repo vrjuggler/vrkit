@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-12-03 allenb   Extended WandInterface to support analog values.
+                    -- VERSION -- 0.14.0
 2005-12-01 patrickh Split the IOV cluster configuration into a separate
                     "mix-in" config element type (iov_cluster).
                     -- VERSION -- 0.13.0
