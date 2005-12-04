@@ -11,6 +11,8 @@
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGSimpleAttachments.h>
+#include <OpenSG/OSGSceneFileHandler.h>
+#include <OpenSG/OSGVerifyGraphOp.h>
 
 #include <vpr/vpr.h>
 #include <vpr/Util/Debug.h>
@@ -18,6 +20,8 @@
 
 #include <IOV/ExitCodes.h>
 #include <IOV/Slave/SlaveViewer.h>
+
+//OSG_USING_NAMESPACE
 
 /** @page SlaveCommunicationProtocol Slave Communication Protocol
  *
@@ -63,6 +67,82 @@ const vpr::DebugCategory infSLAVE_APP(
 
 const int SLAVE_DBG_LVL(vprDBG_STATE_LVL);
 //const int SLAVE_DBG_LVL(0);
+
+
+class travstate
+{
+  public:
+
+    travstate( void ) : _indent(0) {}
+
+    OSG::Action::ResultE enter(OSG::NodePtr& node)
+    {
+        for(OSG::UInt16 i = 0; i < _indent; i++)
+        { std::cout << "    "; }
+
+        std::cout << "entering " << node << "  ";
+
+        const char* node_name = OSG::getName(node);
+
+        if ( NULL == node_name )
+        {
+           std::cout << "name: <NULL>   ";
+        }
+        else
+        {
+           std::cout << "name: " << node_name << "   ";
+        }
+
+        std::cout << " type:" << node->getType().getName().str() << " fc_id:"
+             << node.getFieldContainerId() << "  ";
+
+        OSG::NodeCorePtr core = node->getCore();
+        std::cout << "core: " << core << "  ";
+
+        std::cout << std::endl;
+
+        ++_indent;
+        return OSG::Action::Continue;
+    }
+
+    OSG::Action::ResultE leave(OSG::NodePtr& node, OSG::Action::ResultE res)
+    {
+        --_indent;
+
+        for(OSG::UInt16 i = 0; i < _indent; i++)
+        { std::cout << "    "; }
+
+        std::cout << "leaving " << node << std::endl;
+
+        // you should return the result that you're passed, to propagate Quits
+        return res;
+    }
+
+  private:
+
+    OSG::UInt16 _indent;
+};
+
+// Nice helper method for printing out the graph.
+void printGraph(OSG::NodePtr node)
+{
+   travstate t;
+   std::cout << "------- Scene: root: " << node << " ----------" << std::endl;
+
+   OSG::traverse(node,
+             OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<OSG::Action::ResultE,
+                                                 travstate,
+                                                 OSG::NodePtr>(
+                                                     &t,
+                                                     &travstate::enter),
+             OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<OSG::Action::ResultE,
+                                                 travstate,
+                                                 OSG::NodePtr,
+                                                 OSG::Action::ResultE>(
+                                                     &t,
+                                                     &travstate::leave));
+   std::cout << "--------------------------------------------" << std::endl;
+}
 
 }
 
@@ -126,6 +206,8 @@ void SlaveViewer::initScene()
 
    if ( mChannel != -1 )
    {
+      std::cout << "Slave: Reading first of scene data: " << std::endl;
+
       mConnection->selectChannel();
 
       mConnection->wait();
@@ -136,6 +218,7 @@ void SlaveViewer::initScene()
       OSG::UInt8 finish(false);
       mConnection->getValue(finish);
 
+      /*
       std::cout << "--- Field Containers ---" << std::endl;
       for ( unsigned int i = 0; i < mMaybeNamedFcs.size(); ++i )
       {
@@ -153,6 +236,7 @@ void SlaveViewer::initScene()
          }
       }
       std::cout << "------" << std::endl;
+      */
 
       std::cout << "--- Searching for scene root (name is " << mRootNodeName
                 << ") ---" << std::endl;
@@ -184,6 +268,18 @@ void SlaveViewer::initScene()
       }
 
       std::cout << "------" << std::endl;
+
+      OSG::NodePtr temp_node = mSceneRoot.node();
+      /*
+      std::cout << "--- Verifying initial scene:" << std::endl;
+      OSG::VerifyGraphOp verify_op;
+      verify_op.setVerbose(true);
+      verify_op.setRepair(true);
+      verify_op.traverse(temp_node);
+      */
+
+      //printGraph(temp_node);
+
    }
    else
    {
@@ -208,12 +304,25 @@ void SlaveViewer::latePreFrame()
 
       if ( mConnection->wait() )
       {
+         //std::cout << "-------- Recv data: " << iter_num++ << " --------" << std::endl;
          mAspect->receiveSync(*mConnection);
          OSG::Thread::getCurrentChangeList()->clearAll();
          mConnection->getValue(finish);
          readDataFromMaster(*mConnection);
          sendDataToMaster(*mConnection);
          mConnection->flush();
+
+         /*
+         OSG::NodePtr temp_node = mSceneRoot.node();
+         std::cout << "--- Verifying Graph:" << std::endl;
+         OSG::VerifyGraphOp verify_op;
+         verify_op.setVerbose(true);
+         verify_op.setRepair(true);
+         verify_op.traverse(temp_node);
+         std::cout << "-- Verify complete:" << std::endl;
+         */
+
+         //printGraph(temp_node);
       }
 
       if ( finish )
@@ -235,6 +344,18 @@ void SlaveViewer::latePreFrame()
       OSG::osgExit();
       ::exit(inf::EXIT_ERR_COMM);
    }
+
+   /*
+   std::string file_name;
+   if((iter_num%3)==0)
+   { file_name = std::string("slave_scene.out0.osb"); }
+   else if((iter_num%3) == 1)
+   { file_name = std::string("slave_scene.out1.osb"); }
+   else if((iter_num%3) == 2)
+   { file_name = std::string("slave_scene.out2.osb"); }
+
+   OSG::SceneFileHandler::the().write(getScene(), file_name.c_str());
+   */
 }
 
 void SlaveViewer::exit()
