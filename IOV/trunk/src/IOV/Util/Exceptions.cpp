@@ -8,14 +8,18 @@
 namespace inf
 {
 
-Exception::Exception(std::string desc, std::string location) throw()
-   : std::runtime_error(desc), mDescription(desc), mLocation(location)
+Exception::Exception(std::string desc, std::string location) throw ()
+   : std::runtime_error(desc)
+   , mDescription(desc)
+   , mLocation(location)
 {
    mStackTrace = vpr::System::getCallStack();
 }
 
-Exception::~Exception() throw()
-{;}
+Exception::~Exception() throw ()
+{
+   ;
+}
 
 const char* Exception::what() const throw()
 {
@@ -24,13 +28,19 @@ const char* Exception::what() const throw()
 }
 
 std::string Exception::getExceptionName() const
-{  return std::string("inf::Exception"); }
+{
+   return std::string("inf::Exception");
+}
 
 std::string Exception::getDescription() const
-{ return mDescription; }
+{
+   return mDescription;
+}
 
 void Exception::setDescription(std::string desc)
-{ mDescription = desc; }
+{
+   mDescription = desc;
+}
 
 std::string Exception::getExtendedDescription() const
 {
@@ -38,54 +48,57 @@ std::string Exception::getExtendedDescription() const
 }
 
 std::string Exception::getFullDescription() const
-{ return getExtendedDescription() + std::string("  ") + mLocation + std::string("\n") + mStackTrace; }
+{
+   return getExtendedDescription() + std::string("  ") + mLocation +
+             std::string("\n") + mStackTrace;
+}
 
 PluginException::PluginException(const std::string& msg,
-                                 const std::string& location) throw()
+                                 const std::string& location) throw ()
    : Exception(msg, location)
 {
    /* Do nothing. */ ;
 }
 
-PluginException::~PluginException() throw()
+PluginException::~PluginException() throw ()
 {
    /* Do nothign. */ ;
 }
 
 PluginLoadException::PluginLoadException(const std::string& msg,
-                                         const std::string& location) throw()
+                                         const std::string& location) throw ()
    : PluginException(msg, location)
 {
    /* Do nothing. */ ;
 }
 
-PluginLoadException::~PluginLoadException() throw()
+PluginLoadException::~PluginLoadException() throw ()
 {
    /* Do nothing. */ ;
 }
 
 NoSuchPluginException::NoSuchPluginException(const std::string& msg,
                                              const std::string& location)
-   throw()
+   throw ()
    : PluginException(msg, location)
 {
    /* Do nothing. */ ;
 }
 
-NoSuchPluginException::~NoSuchPluginException() throw()
+NoSuchPluginException::~NoSuchPluginException() throw ()
 {
    /* Do nothing. */ ;
 }
 
 PluginInterfaceException::PluginInterfaceException(const std::string& msg,
                                                    const std::string& location)
-   throw()
+   throw ()
    : PluginException(msg, location)
 {
    /* Do nothing. */ ;
 }
 
-PluginInterfaceException::~PluginInterfaceException() throw()
+PluginInterfaceException::~PluginInterfaceException() throw ()
 {
    /* Do nothing. */ ;
 }

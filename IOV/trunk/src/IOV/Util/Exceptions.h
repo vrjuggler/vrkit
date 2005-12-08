@@ -30,10 +30,11 @@ namespace inf
 class IOV_CLASS_API Exception : public std::runtime_error
 {
 public:
-   Exception(std::string desc, std::string location) throw();
-   virtual ~Exception() throw();
+   Exception(std::string desc, std::string location) throw ();
 
-   virtual const char* what() const throw();
+   virtual ~Exception() throw ();
+
+   virtual const char* what() const throw ();
 
    virtual std::string getExceptionName() const;
 
@@ -59,12 +60,14 @@ class IOV_CLASS_API PluginException : public Exception
 {
 public:
    PluginException(const std::string& msg, const std::string& location = "")
-      throw();
+      throw ();
 
-   virtual ~PluginException() throw();
+   virtual ~PluginException() throw ();
 
    std::string getExceptionName()
-   { return "inf::PluginException"; }
+   {
+      return "inf::PluginException";
+   }
 };
 
 /** Exception when loading a plugin. */
@@ -72,12 +75,14 @@ class PluginLoadException : public PluginException
 {
 public:
    PluginLoadException(const std::string& msg,
-                       const std::string& location = "") throw();
+                       const std::string& location = "") throw ();
 
-   virtual ~PluginLoadException() throw();
+   virtual ~PluginLoadException() throw ();
 
    std::string getExceptionName()
-   { return "inf::PluginLoadException"; }
+   {
+      return "inf::PluginLoadException";
+   }
 };
 
 /** Exception when we can't find a plugin. */
@@ -85,24 +90,28 @@ class NoSuchPluginException : public PluginException
 {
 public:
    NoSuchPluginException(const std::string& msg,
-                         const std::string& location = "") throw();
+                         const std::string& location = "") throw ();
 
-   virtual ~NoSuchPluginException() throw();
+   virtual ~NoSuchPluginException() throw ();
 
    std::string getExceptionName()
-   { return "inf::NoSuchPluginException"; }
+   {
+      return "inf::NoSuchPluginException";
+   }
 };
 
 class PluginInterfaceException : public PluginException
 {
 public:
    PluginInterfaceException(const std::string& msg,
-                            const std::string& location) throw();
+                            const std::string& location) throw ();
 
-   virtual ~PluginInterfaceException() throw();
+   virtual ~PluginInterfaceException() throw ();
 
    std::string getExceptionName()
-   { return "infi::PluginInterfaceException";  }
+   {
+      return "infi::PluginInterfaceException";
+   }
 };
 
 }
