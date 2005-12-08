@@ -24,7 +24,7 @@ const char* Exception::what() const throw()
 }
 
 std::string Exception::getExceptionName() const
-{  return std::string("infi::Exception"); }
+{  return std::string("inf::Exception"); }
 
 std::string Exception::getDescription() const
 { return mDescription; }
