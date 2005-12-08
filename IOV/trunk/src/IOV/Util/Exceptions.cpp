@@ -8,7 +8,8 @@
 namespace inf
 {
 
-Exception::Exception(std::string desc, std::string location) throw ()
+Exception::Exception(const std::string& desc, const std::string& location)
+   throw ()
    : std::runtime_error(desc)
    , mDescription(desc)
    , mLocation(location)
@@ -37,7 +38,7 @@ std::string Exception::getDescription() const
    return mDescription;
 }
 
-void Exception::setDescription(std::string desc)
+void Exception::setDescription(const std::string& desc)
 {
    mDescription = desc;
 }

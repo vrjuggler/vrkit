@@ -30,7 +30,7 @@ namespace inf
 class IOV_CLASS_API Exception : public std::runtime_error
 {
 public:
-   Exception(std::string desc, std::string location) throw ();
+   Exception(const std::string& desc, const std::string& location) throw ();
 
    virtual ~Exception() throw ();
 
@@ -39,7 +39,7 @@ public:
    virtual std::string getExceptionName() const;
 
    std::string getDescription() const;
-   void setDescription(std::string desc);
+   void setDescription(const std::string& desc);
 
    /** Slightly longer description */
    virtual std::string getExtendedDescription() const;
