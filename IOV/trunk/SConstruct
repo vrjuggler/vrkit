@@ -56,7 +56,7 @@ def BuildDarwinEnvironment():
 
    CXX = WhereIs('g++')
    CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions', '-Wunused',
-               '-Wno-conversion', '-Ddarwin', '-Wno-long-double']
+               '-Wno-conversion', '-Wno-long-double']
    LINKFLAGS = []
 
    # Enable profiling?
