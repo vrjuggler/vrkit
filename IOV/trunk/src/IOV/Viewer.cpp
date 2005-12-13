@@ -12,7 +12,6 @@
 #include <vpr/vpr.h>
 #include <vpr/System.h>
 #include <vpr/Util/FileUtils.h>
-#include <vpr/IO/Socket/InetAddr.h>
 #include <jccl/Config/Configuration.h>
 
 #include <IOV/User.h>
