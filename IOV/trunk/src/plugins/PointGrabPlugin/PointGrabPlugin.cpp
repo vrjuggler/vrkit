@@ -64,8 +64,7 @@ namespace inf
 
 void PointGrabPlugin::init(ViewerPtr viewer)
 {
-   mGrabData =
-      viewer->getSceneObj()->getSceneData<GrabData>(GrabData::type_guid);
+   mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
 
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
@@ -462,7 +461,7 @@ void PointGrabPlugin::focusChanged(inf::ViewerPtr viewer)
    {
       inf::ScenePtr scene = viewer->getSceneObj();
       StatusPanelPluginDataPtr status_panel_data =
-         scene->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
+         scene->getSceneData<StatusPanelPluginData>();
 
       if ( status_panel_data->mStatusPanelPlugin )
       {
@@ -485,7 +484,7 @@ void PointGrabPlugin::focusChanged(inf::ViewerPtr viewer)
    {
       inf::ScenePtr scene = viewer->getSceneObj();
       StatusPanelPluginDataPtr status_panel_data =
-         scene->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
+         scene->getSceneData<StatusPanelPluginData>();
 
       if ( status_panel_data->mStatusPanelPlugin )
       {

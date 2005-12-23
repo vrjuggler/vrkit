@@ -254,7 +254,7 @@ void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
    IOV_STATUS << "Switching to mode: " << mModeNames[modeNum] << std::endl;
 
    StatusPanelPluginDataPtr status_panel_data =
-      viewer->getSceneObj()->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
+      viewer->getSceneObj()->getSceneData<StatusPanelPluginData>();
    if(status_panel_data->mStatusPanelPlugin)
    {
       inf::StatusPanel& panel = status_panel_data->mStatusPanelPlugin->getPanel();

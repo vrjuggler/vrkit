@@ -174,8 +174,7 @@ void OpenSgViewer::init()
       scene_transform_root.node()->addChild(light_node);
    osg::endEditCP(scene_transform_root.node());
 
-   inf::GrabDataPtr grab_data =
-      scene->getSceneData<inf::GrabData>(inf::GrabData::type_guid);
+   inf::GrabDataPtr grab_data = scene->getSceneData<inf::GrabData>();
    grab_data->addObject(model_xform);
 }
 

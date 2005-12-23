@@ -139,7 +139,7 @@ void StatusPanelPlugin::init(inf::ViewerPtr viewer)
 
    // Register with scene data
    StatusPanelPluginDataPtr status_panel_data =
-      scene_obj->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
+      scene_obj->getSceneData<StatusPanelPluginData>();
    status_panel_data->mStatusPanelPlugin = shared_from_this();
 }
 

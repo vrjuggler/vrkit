@@ -178,7 +178,7 @@ void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
 {
    inf::ScenePtr scene = viewer->getSceneObj();
    StatusPanelPluginDataPtr status_panel_data =
-      scene->getSceneData<StatusPanelPluginData>(StatusPanelPluginData::type_guid);
+      scene->getSceneData<StatusPanelPluginData>();
 
    // We can only navigate when we have focus.
    mCanNavigate = isFocused();

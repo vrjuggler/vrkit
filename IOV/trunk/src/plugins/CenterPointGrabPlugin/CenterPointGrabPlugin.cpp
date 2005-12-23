@@ -50,8 +50,7 @@ const OSG::TransformNodePtr CenterPointGrabPlugin::sEmptyCoredXformNode;
 
 void CenterPointGrabPlugin::init(ViewerPtr viewer)
 {
-   mGrabData =
-      viewer->getSceneObj()->getSceneData<GrabData>(GrabData::type_guid);
+   mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
 
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
