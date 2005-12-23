@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2005-12-23 patrickh Added an overload of daa::Scene::getSceneData<T>() that
+                    takes no argument and instead requires the availability of
+                    T::type_guid.
+                    -- VERSION -- 0.14.1
 2005-12-03 allenb   Extended WandInterface to support analog values.
                     -- VERSION -- 0.14.0
 2005-12-01 patrickh Split the IOV cluster configuration into a separate

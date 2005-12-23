@@ -148,6 +148,32 @@ public:
    }
 
    /**
+    * Returns the value in the collection of scene data associated with the
+    * given key.  If no value is associated with the given key, then a value
+    * is creaetd using \c T::create() (which means that \c T must have a
+    * static method \c create() that returns \c boost::shared_ptr<T>).
+    * Furthermore, \c T must have a static data member \c type_guid that
+    * provides the key (index) of the value to be returned.
+    *
+    * @post If no value is already associated with \c T::type_guid, then a
+    *       value of type \c boost::shared_ptr<T> is created and stored in the
+    *       collection of scene data.
+    *
+    * @returns A shared pointer of type \c boost::shared_ptr<T> is returned to
+    *          the caller that is guaranteed to be valid.  If the collection
+    *          of scene data has a value associated with \c T::type_guid, then
+    *          that value is returned.  Otherwise, a new object is created and
+    *          returned.
+    *
+    * @since 0.14.1
+    */
+   template<typename T>
+   boost::shared_ptr<T> getSceneData()
+   {
+      return getSceneData<T>(T::type_guid);
+   }
+
+   /**
     * Removes the value in the container of scene data associated with the
     * given key.  The removed value is returned to the caller.  If there is
     * no value associated with the given key, then this method has no effect.
