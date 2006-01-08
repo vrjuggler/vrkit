@@ -1,4 +1,4 @@
-// Copyright (C) Infiscape Corporation 2005
+// Copyright (C) Infiscape Corporation 2005-2006
 
 #ifndef _INF_VIEWPOINTS_PLUGIN_H_
 #define _INF_VIEWPOINTS_PLUGIN_H_

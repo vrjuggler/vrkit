@@ -1,4 +1,4 @@
-// Copyright (C) Infiscape Corporation 2005
+// Copyright (C) Infiscape Corporation 2005-2006
 
 #ifndef INF_CONFIGURATION_H
 #define INF_CONFIGURATION_H

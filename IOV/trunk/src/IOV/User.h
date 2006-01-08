@@ -1,4 +1,4 @@
-// Copyright (C) Infiscape Corporation 2005
+// Copyright (C) Infiscape Corporation 2005-2006
 
 #ifndef USER_H
 #define USER_H

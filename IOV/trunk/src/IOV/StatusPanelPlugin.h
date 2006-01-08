@@ -1,4 +1,4 @@
-// Copyright (C) Infiscape Corporation 2005
+// Copyright (C) Infiscape Corporation 2005-2006
 
 #ifndef _STATUS_PANEL_PLUGIN_H_
 #define _STATUS_PANEL_PLUGIN_H_

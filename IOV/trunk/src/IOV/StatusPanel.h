@@ -1,4 +1,4 @@
-// Copyright (C) Infiscape Corporation 2005
+// Copyright (C) Infiscape Corporation 2005-2006
 
 #ifndef _IOV_STATUS_PANEL_H_
 #define _IOV_STATUS_PANEL_H_

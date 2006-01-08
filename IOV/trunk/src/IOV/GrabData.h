@@ -1,4 +1,4 @@
-// Copyright (C) Infiscape Corporation 2005
+// Copyright (C) Infiscape Corporation 2005-2006
 
 #ifndef _INF_GRAB_DATA_H_
 #define _INF_GRAB_DATA_H_

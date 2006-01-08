@@ -1,4 +1,4 @@
-// Copyright (C) Infiscape Corporation 2005
+// Copyright (C) Infiscape Corporation 2005-2006
 
 #ifndef PLUGIN_PTR_H_
 #define PLUGIN_PTR_H_

@@ -1,4 +1,4 @@
-// Copyright (C) Infiscape Corporation 2005
+// Copyright (C) Infiscape Corporation 2005-2006
 
 #ifndef _INTERFACE_TRADER_H
 #define _INTERFACE_TRADER_H

@@ -1,4 +1,4 @@
-// Copyright (C) Infiscape Corporation 2005
+// Copyright (C) Infiscape Corporation 2005-2006
 
 #ifndef IOV_UI_BUILDER_H_
 #define IOV_UI_BUILDER_H_
