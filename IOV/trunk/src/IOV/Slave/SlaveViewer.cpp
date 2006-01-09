@@ -304,7 +304,8 @@ void SlaveViewer::latePreFrame()
 
       if ( mConnection->wait() )
       {
-         //std::cout << "-------- Recv data: " << iter_num++ << " --------" << std::endl;
+         //std::cout << "-------- Recv data: " << iter_num++ << " --------"
+         //          << std::endl;
          mAspect->receiveSync(*mConnection);
          OSG::Thread::getCurrentChangeList()->clearAll();
          mConnection->getValue(finish);
@@ -347,12 +348,18 @@ void SlaveViewer::latePreFrame()
 
    /*
    std::string file_name;
-   if((iter_num%3)==0)
-   { file_name = std::string("slave_scene.out0.osb"); }
-   else if((iter_num%3) == 1)
-   { file_name = std::string("slave_scene.out1.osb"); }
-   else if((iter_num%3) == 2)
-   { file_name = std::string("slave_scene.out2.osb"); }
+   if ( iter_num % 3 == 0 )
+   {
+      file_name = std::string("slave_scene.out0.osb");
+   }
+   else if ( iter_num % 3 == 1 )
+   {
+      file_name = std::string("slave_scene.out1.osb");
+   }
+   else if ( iter_num % 3 == 2 )
+   {
+      file_name = std::string("slave_scene.out2.osb");
+   }
 
    OSG::SceneFileHandler::the().write(getScene(), file_name.c_str());
    */
