@@ -297,7 +297,7 @@ void SlaveViewer::contextInit()
 
 void SlaveViewer::latePreFrame()
 {
-   static int iter_num(0);
+//   static int iter_num(0);
    try
    {
       OSG::UInt8 finish(false);
