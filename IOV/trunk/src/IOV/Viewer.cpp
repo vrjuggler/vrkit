@@ -261,9 +261,9 @@ void Viewer::deallocate()
       }
    }
 
-   std::cout << "Viewer::deallocate:\n"
-             << "                                  num_types: " << num_types << std::endl
-             << "   Total OpenSG objects allocated (w/types): " << pFCStore->size()
+   std::cout << "Viewer::deallocate():\n"
+             << "                                    num_types: " << num_types << std::endl
+             << "    Total OpenSG objects allocated (w/ types): " << pFCStore->size()
              << std::endl;
 
    unsigned int non_null_count(0);
@@ -277,7 +277,7 @@ void Viewer::deallocate()
       }
    }
 
-   std::cout << "     Rem non-null OpenSG objects (wo/types): "
+   std::cout << "Remaining non-null OpenSG objects (w/o types): "
              << (non_null_count-num_types) << std::endl;
 
 // Enable this section when you want to see the names and types of the objects
