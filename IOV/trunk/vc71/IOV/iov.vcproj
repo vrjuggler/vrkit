@@ -244,6 +244,9 @@
 				RelativePath="..\..\src\Iov\PluginPtr.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\resource.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\ResourceMgr.h">
 			</File>
 			<File
@@ -301,6 +304,9 @@
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+			<File
+				RelativePath="..\..\src\Iov\iov.rc">
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
