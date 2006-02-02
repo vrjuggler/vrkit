@@ -262,6 +262,8 @@ def installLibs(srcRoot, destdir,
             installDir(srcdir, destdir, extensions)
 
 def installIOV(prefix, platform):
+   installProgs(prefix, platform)
+
    destdir = os.path.join(prefix, 'include', 'IOV')
    srcdir  = os.path.join(gProjectDir, 'src', 'IOV')
    installDir(srcdir, destdir, ['.h'])
@@ -281,6 +283,16 @@ def installIOV(prefix, platform):
    jdef_destdir = destdir
 
    installPlugins(prefix, platform, share_root, jdef_destdir)
+
+def installProgs(prefix, platform):
+   destdir = os.path.join(prefix, 'bin')
+
+   prog_build_dirs = glob.glob(os.path.join(gProjectDir, 'vc71', '*',
+                                            platform, '*'))
+
+   for d in prog_build_dirs:
+      for f in glob.glob(os.path.join(d, '*.exe')):
+         shutil.copy2(f, destdir)
 
 def installPlugins(prefix, platform, shareRoot, jdefDir):
    destdir = os.path.join(prefix, 'lib', 'IOV', 'plugins')
