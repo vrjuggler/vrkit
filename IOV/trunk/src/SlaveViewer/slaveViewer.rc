@@ -51,7 +51,7 @@ END
 //
 // Icon
 // The first icon in the resource file is the default icon in Explorer
-aaaaa ICON "../../data/infiscape.ico"
+aaaaa ICON "../../data/infiscape_viewer.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
