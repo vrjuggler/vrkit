@@ -152,6 +152,9 @@
 			<File
 				RelativePath="..\..\src\Viewer\infi_app.cpp">
 			</File>
+			<File
+				RelativePath="..\..\src\Viewer\infi_app.rc">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

@@ -152,6 +152,9 @@
 			<File
 				RelativePath="..\..\src\SlaveViewer\slave_app.cpp">
 			</File>
+			<File
+				RelativePath="..\..\src\SlaveViewer\slaveViewer.rc">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
