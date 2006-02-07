@@ -16,15 +16,17 @@
 namespace inf
 {
 
-/** Simple stupid interface for a wand.
- *
- * Just uses VJWand and VJButton0..4 and VJAnalog0...4
+/**
+ * Simple interface for a wand. This depends on VJWand, VJButton[0..5], and
+ * VJAnalog[0..3] being defined in the VR Juggler configuration.
  */
 class IOV_CLASS_API WandInterface : public DeviceInterface
 {
 public:
    WandInterface()
-   { init(); }
+   {
+      init();
+   }
 
    void init();
 
