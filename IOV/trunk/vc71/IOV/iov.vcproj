@@ -138,6 +138,9 @@
 				RelativePath="..\..\src\Iov\Configuration.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Util\DigitalCommand.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Util\Exceptions.cpp">
 			</File>
 			<File
@@ -203,6 +206,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\DeviceInterface.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Util\DigitalCommand.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Util\Exceptions.h">
