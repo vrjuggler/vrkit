@@ -16,6 +16,7 @@
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
 #include <IOV/GeometryHighlightTraverser.h>
+#include <IOV/Util/DigitalCommand.h>
 
 
 namespace inf
@@ -73,20 +74,6 @@ protected:
    void focusChanged(inf::ViewerPtr viewer);
 
 private:
-   struct DigitalHolder
-   {
-      bool test(const gadget::Digital::State testState);
-
-      bool operator()(bool state, int btn);
-
-      WandInterfacePtr       mWandIf;
-      gadget::Digital::State mButtonState;
-      std::vector<int>       mButtonVec;
-   };
-
-   void configButtons(jccl::ConfigElementPtr elt, const std::string& propName,
-                      DigitalHolder& holder);
-
    static std::string getElementType()
    {
       return std::string("point_grab_plugin");
@@ -107,7 +94,8 @@ private:
 
    WandInterfacePtr mWandInterface;
 
-   DigitalHolder mGrabBtn;  /**< Button for grabbing and releasing objects. */
+   /** Button for grabbing and releasing objects. */
+   inf::DigitalCommand mGrabBtn;
    std::string mGrabText;
 
    bool mIntersecting;

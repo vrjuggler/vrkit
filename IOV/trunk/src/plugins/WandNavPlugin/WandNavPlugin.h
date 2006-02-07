@@ -10,6 +10,7 @@
 #include <vpr/Util/Interval.h>
 
 #include <IOV/WandInterfacePtr.h>
+#include <IOV/Util/DigitalCommand.h>
 #include <IOV/Plugin/NavPlugin.h>
 
 
@@ -83,17 +84,6 @@ protected:
       FLY  = 1      /**< Fly mode */
    };
 
-   struct DigitalHolder
-   {
-      bool test(const gadget::Digital::State testState);
-
-      bool operator()(bool state, int btn);
-
-      WandInterfacePtr       mWandIf;
-      gadget::Digital::State mButtonState;
-      std::vector<int>       mButtonVec;
-   };
-
    WandNavPlugin();
 
    virtual void focusChanged(inf::ViewerPtr viewer);
@@ -101,9 +91,6 @@ protected:
    virtual void updateNavState(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
    virtual void runNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
-
-   void configButtons(jccl::ConfigElementPtr elt, const std::string& propName,
-                      DigitalHolder& holder);
 
    std::vector<int> transformButtonVec(const std::vector<int>& btns);
 
@@ -125,11 +112,11 @@ protected:
    float mRotationSensitivity;      /**< Scalar on rotation delta.  Used to adjust sensitivity. */
    NavMode mNavMode;
 
-   DigitalHolder mForwardBtn;  /**< Button for forward motion. */
-   DigitalHolder mReverseBtn;  /**< Button for reverse. */
-   DigitalHolder mRotateBtn;   /**< Button for rotate. */
-   DigitalHolder mModeBtn;     /**< Button for swapping mode. */
-   DigitalHolder mResetBtn;    /**< Button for resetting location. */
+   inf::DigitalCommand mForwardBtn;     /**< Button for forward motion. */
+   inf::DigitalCommand mReverseBtn;     /**< Button for reverse. */
+   inf::DigitalCommand mRotateBtn;      /**< Button for rotate. */
+   inf::DigitalCommand mModeBtn;        /**< Button for swapping mode. */
+   inf::DigitalCommand mResetBtn;       /**< Button for resetting location. */
 
    std::string mForwardText;
    std::string mReverseText;

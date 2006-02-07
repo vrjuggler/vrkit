@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-02-07 patrickh Added inf::DigitalCommand, which was factored from code
+                    formerly in PointGrabPlugin and WandNavPlugin.
+                    -- VERSION -- 0.15.0
 2005-12-23 patrickh Added an overload of inf::Scene::getSceneData<T>() that
                     takes no argument and instead requires the availability of
                     T::type_guid.

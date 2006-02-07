@@ -1,9 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
 #include <string.h>
-#include <numeric>
 #include <algorithm>
-#include <boost/algorithm/string.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/exception.hpp>
 
@@ -246,7 +244,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
    // If we are intersecting an object but not grabbing it and the grab
    // button has just been pressed, grab the intersected object.
    if ( mIntersecting && ! mGrabbing &&
-        mGrabBtn.test(gadget::Digital::TOGGLE_ON) )
+        mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
    {
       mGrabSound.trigger();
       mGrabbing = true;
@@ -275,7 +273,8 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
    }
    // If we are grabbing an object and the grab button has just been pressed
    // again, release the grabbed object.
-   else if ( mGrabbing && mGrabBtn.test(gadget::Digital::TOGGLE_ON) )
+   else if ( mGrabbing &&
+             mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
    {
       mGrabbing = false;
 
@@ -350,7 +349,7 @@ bool PointGrabPlugin::config(jccl::ConfigElementPtr elt)
    const std::string grab_scale_prop("grab_shader_scale");
    const std::string grab_exp_prop("grab_shader_exponent");
 
-   configButtons(elt, grab_btn_prop, mGrabBtn);
+   mGrabBtn.configButtons(elt->getProperty<std::string>(grab_btn_prop));
 
    float isect_color[3];
    float grab_color[3];
@@ -457,7 +456,7 @@ void PointGrabPlugin::focusChanged(inf::ViewerPtr viewer)
 {
    // If we have focus and our grab/release button is configured, we
    // will update the status panel to include our command.
-   if ( isFocused() && mGrabBtn.mButtonVec[0] != -1 )
+   if ( isFocused() && mGrabBtn.isConfigured() )
    {
       inf::ScenePtr scene = viewer->getSceneObj();
       StatusPanelPluginDataPtr status_panel_data =
@@ -467,14 +466,14 @@ void PointGrabPlugin::focusChanged(inf::ViewerPtr viewer)
       {
          inf::StatusPanel& panel =
             status_panel_data->mStatusPanelPlugin->getPanel();
-         if ( ! panel.hasControlText(mGrabBtn.mButtonVec, mGrabText) )
+         if ( ! panel.hasControlText(mGrabBtn.getButtons(), mGrabText) )
          {
-            // The button numbers in mGrabBtn.mButtonVec are zero-based, but
-            // we would like them to be one-based in the status panel display.
-            std::vector<int> btns(mGrabBtn.mButtonVec.size());
+            // The button numbers in mGrabBtn are zero-based, but we would like
+            // them to be one-based in the status panel display.
+            std::vector<int> btns(mGrabBtn.getButtons().size());
             IncValue inc;
-            std::transform(mGrabBtn.mButtonVec.begin(),
-                           mGrabBtn.mButtonVec.end(), btns.begin(), inc);
+            std::transform(mGrabBtn.getButtons().begin(),
+                           mGrabBtn.getButtons().end(), btns.begin(), inc);
 
             panel.addControlText(btns, mGrabText);
          }
@@ -491,59 +490,16 @@ void PointGrabPlugin::focusChanged(inf::ViewerPtr viewer)
          inf::StatusPanel& panel =
             status_panel_data->mStatusPanelPlugin->getPanel();
 
-         // The button numbers in mGrabBtn.mButtonVec are zero-based, but
-         // we would like them to be one-based in the status panel display.
-         std::vector<int> btns(mGrabBtn.mButtonVec.size());
+         // The button numbers in mGrabBtn are zero-based, but we would like
+         // them to be one-based in the status panel display.
+         std::vector<int> btns(mGrabBtn.getButtons().size());
          IncValue inc;
-         std::transform(mGrabBtn.mButtonVec.begin(),
-                        mGrabBtn.mButtonVec.end(), btns.begin(), inc);
+         std::transform(mGrabBtn.getButtons().begin(),
+                        mGrabBtn.getButtons().end(), btns.begin(), inc);
 
          panel.removeControlText(btns, mGrabText);
       }
    }
-}
-
-struct StringToInt
-{
-   int operator()(const std::string& input)
-   {
-      return atoi(input.c_str());
-   }
-};
-
-void PointGrabPlugin::configButtons(jccl::ConfigElementPtr elt,
-                                    const std::string& propName,
-                                    PointGrabPlugin::DigitalHolder& holder)
-{
-   holder.mWandIf = mWandInterface;
-
-   std::string btn_str = elt->getProperty<std::string>(propName);
-
-   std::vector<std::string> btn_strings;
-   boost::trim(btn_str);
-   boost::split(btn_strings, btn_str, boost::is_any_of(", "));
-   holder.mButtonVec.resize(btn_strings.size());
-   std::transform(btn_strings.begin(), btn_strings.end(),
-                  holder.mButtonVec.begin(), StringToInt());
-}
-
-bool PointGrabPlugin::DigitalHolder::test(const gadget::Digital::State testState)
-{
-   if ( mButtonVec.empty() )
-   {
-      return false;
-   }
-   else
-   {
-      mButtonState = testState;
-      return std::accumulate(mButtonVec.begin(), mButtonVec.end(), true,
-                             *this);
-   }
-}
-
-bool PointGrabPlugin::DigitalHolder::operator()(bool state, int btn)
-{
-   return state && mWandIf->getButton(btn)->getData() == mButtonState;
 }
 
 }
