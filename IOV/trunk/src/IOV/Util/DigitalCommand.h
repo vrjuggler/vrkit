@@ -3,6 +3,8 @@
 #ifndef _INF_DIGITAL_COMMAND_H_
 #define _INF_DIGITAL_COMMAND_H_
 
+#include <IOV/Config.h>
+
 #include <string>
 #include <vector>
 
@@ -23,7 +25,7 @@ namespace inf
  *
  * @see inf::WandInterface
  */
-class DigitalCommand
+class IOV_CLASS_API DigitalCommand
 {
 public:
    /**
