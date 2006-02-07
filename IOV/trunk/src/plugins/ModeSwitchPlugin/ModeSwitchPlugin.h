@@ -14,6 +14,7 @@
 
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
+#include <IOV/Util/DigitalCommand.h>
 
 
 namespace inf
@@ -77,8 +78,7 @@ protected:
    }
 
    ModeSwitchPlugin()
-      : mSwitchButton(-1)
-      , mCurrentMode(0)
+      : mCurrentMode(0)
    {
       /* Do nothing. */ ;
    }
@@ -96,8 +96,8 @@ protected:
       std::vector<unsigned>  mActiveModes;  /**< Indexes of modes where plugin is active. */
    };
 
-   WandInterfacePtr  mWandInterface;
-   int               mSwitchButton;
+   WandInterfacePtr    mWandInterface;
+   inf::DigitalCommand mSwitchButton;
 
    std::vector<std::string>     mModeNames;       /**< The names of the plugin modes. */
    unsigned                     mCurrentMode;     /**< Current active plugin. */

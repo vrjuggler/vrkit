@@ -140,8 +140,8 @@
             </viewpoints_vp>
          </viewpoints>
       </viewpoints_plugin>
-      <mode_switch_plugin name="InfiscapeModeSwitchPlug-In0" version="1">
-         <swap_button_num>3</swap_button_num>
+      <mode_switch_plugin name="InfiscapeModeSwitchPlug-In0" version="2">
+         <swap_button_nums>3</swap_button_nums>
          <plugins>
             <mode_plugin_def name="Nav Plugin" version="1">
                <plugin>WandNavPlugin</plugin>

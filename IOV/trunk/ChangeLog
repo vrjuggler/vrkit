@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-02-07 patrickh Extended ModeSwitchPlugin to allow multiple buttons to be
+                    used for activating mode swapping.
+                    -- VERSION -- 0.15.1
 2006-02-07 patrickh Added inf::DigitalCommand, which was factored from code
                     formerly in PointGrabPlugin and WandNavPlugin.
                     -- VERSION -- 0.15.0

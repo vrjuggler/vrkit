@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <sstream>
-
+#include <algorithm>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 
@@ -55,7 +55,17 @@ IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
 
 namespace
 {
-   const vpr::GUID mode_switch_status_id("8c0034da-b613-4bd0-9c30-f8c35f48ba1a");
+
+const vpr::GUID mode_switch_status_id("8c0034da-b613-4bd0-9c30-f8c35f48ba1a");
+
+struct IncValue
+{
+   int operator()(int v)
+   {
+      return v + 1;
+   }
+};
+
 }
 
 namespace inf
@@ -78,12 +88,12 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
    const std::string plugin_path_prop("plugin_path");
    const std::string plugins_prop("plugins");
    const std::string mode_names_prop("mode_names");
-   const std::string swap_button_prop("swap_button_num");
+   const std::string swap_button_prop("swap_button_nums");
    const std::string mode_plugin_type("mode_plugin_def");
    const std::string active_modes_prop("active_modes");
    const std::string plugin_prop("plugin");
 
-   const unsigned int req_cfg_version(1);
+   const unsigned int req_cfg_version(2);
 
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
@@ -129,7 +139,7 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
    }
 
    // Get the button for swapping
-   mSwitchButton = elt->getProperty<int>(swap_button_prop);
+   mSwitchButton.configButtons(elt->getProperty<std::string>(swap_button_prop));
 
    // Get mode names
    const unsigned int num_mode_names(elt->getNum(mode_names_prop));
@@ -208,10 +218,7 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
 
 void ModeSwitchPlugin::updateState(inf::ViewerPtr viewer)
 {
-   gadget::DigitalInterface& switch_button =
-      mWandInterface->getButton(mSwitchButton);
-
-   if ( switch_button->getData() == gadget::Digital::TOGGLE_ON )
+   if ( mSwitchButton.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
    {
       unsigned int new_mode(0);
       if ( mMaxMode != 0 )
@@ -239,7 +246,6 @@ void ModeSwitchPlugin::run(inf::ViewerPtr viewer)
    }
 }
 
-
 void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
                                     inf::ViewerPtr viewer)
 {
@@ -264,9 +270,14 @@ void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
       stream << mModeNames[modeNum];
       panel.setHeaderText(stream.str());
 
-      // The button number mSwitchButton is zero-based, but we would like it
-      // to be one-based in the status panel display.
-      panel.setControlText(mSwitchButton + 1, "Switch Mode");
+      // The button numbers in mSwitchButton are zero-based, but we would like
+      // them to be one-based in the status panel display.
+      std::vector<int> btns(mSwitchButton.getButtons().size());
+      std::transform(mSwitchButton.getButtons().begin(),
+                     mSwitchButton.getButtons().end(), btns.begin(),
+                     IncValue());
+
+      panel.addControlText(btns, "Switch Mode");
    }
 
    for ( unsigned int i = 0; i < mPlugins.size(); ++i )
