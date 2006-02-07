@@ -59,8 +59,8 @@ aaaaa ICON "../../data/infiscape_viewer.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,14,1,0
- PRODUCTVERSION 0,14,1,0
+ FILEVERSION 0,15,0,0
+ PRODUCTVERSION 0,15,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -78,12 +78,12 @@ BEGIN
             VALUE "Comments", "http://www.infiscape.com/"
             VALUE "CompanyName", "Infiscape Corporation"
             VALUE "FileDescription", "IOV Viewer"
-            VALUE "FileVersion", "0.14.1"
+            VALUE "FileVersion", "0.15.0"
             VALUE "InternalName", "IOV Viewer"
             VALUE "LegalCopyright", "Copyright © 2005–2006"
             VALUE "OriginalFilename", "infi_app.exe"
             VALUE "ProductName", "IOV Viewer"
-            VALUE "ProductVersion", "0.14.1"
+            VALUE "ProductVersion", "0.15.0"
         END
     END
     BLOCK "VarFileInfo"
