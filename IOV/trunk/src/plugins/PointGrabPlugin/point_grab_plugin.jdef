@@ -44,7 +44,7 @@
       <parent />
       <category>/Infiscape/</category>
       <property valuetype="string" variable="false" name="grab_button_nums">
-         <help />
+         <help>Select the number(s) of the button that should activate grabbing. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
          <value label="Grab/Release Button Number(s)" defaultvalue="-1" />
       </property>
       <property valuetype="float" variable="false" name="intersect_color">
@@ -107,7 +107,7 @@
       <parent />
       <category>/Infiscape/</category>
       <property valuetype="string" variable="false" name="grab_button_nums">
-         <help />
+         <help>Select the number(s) of the button that should activate grabbing. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
          <value label="Grab/Release Button Number(s)" defaultvalue="-1" />
       </property>
       <property valuetype="float" variable="false" name="intersect_color">

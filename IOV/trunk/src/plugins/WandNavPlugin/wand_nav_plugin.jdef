@@ -60,23 +60,23 @@
          <value label="Rotation Sensitivity" defaultvalue="0.5" />
       </property>
       <property valuetype="string" variable="false" name="forward_button_nums">
-         <help>Select the number(s) of the button that should activate forward (positive) navigation. The button number must be in the range [0,3]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <help>Select the number(s) of the button that should activate forward (positive) navigation. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
          <value label="Forward Button" defaultvalue="-1" />
       </property>
       <property valuetype="string" variable="false" name="reverse_button_nums">
-         <help>Select the number(s) of the button that should activate reverse (negative) navigation. The button number must be in the range [0,3]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <help>Select the number(s) of the button that should activate reverse (negative) navigation. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
          <value label="Reverse Button" defaultvalue="-1" />
       </property>
       <property valuetype="string" variable="false" name="rotate_button_nums">
-         <help>Select the number(s) of the button that should activate rotation. The button number must be in the range [0,3]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <help>Select the number(s) of the button that should activate rotation. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
          <value label="Rotate Button Number(s)" defaultvalue="-1" />
       </property>
       <property valuetype="string" variable="false" name="nav_mode_button_nums">
-         <help>Select the number(s) of the button that should toggle the navigation mode between walk and fly. The button number must be in the range [0,3]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <help>Select the number(s) of the button that should toggle the navigation mode between walk and fly. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
          <value label="Mode Toggle Button Number(s)" defaultvalue="-1" />
       </property>
       <property valuetype="string" variable="false" name="reset_button_nums">
-         <help>Select the number(s) of the button that should reset the navigation back to the origin. The button number must be in the range [0,3]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <help>Select the number(s) of the button that should reset the navigation back to the origin. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
          <value label="Reset Button Number(s)" defaultvalue="-1" />
       </property>
       <property valuetype="integer" variable="false" name="initial_mode">
