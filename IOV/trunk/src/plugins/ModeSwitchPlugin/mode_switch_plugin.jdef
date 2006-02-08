@@ -32,7 +32,7 @@
          <help>Each value adds to the path where dynamically loadable plulg-ins can be found. The path may make use of environment variables. For example: &lt;tt&gt;${HOME}/inf-plugins&lt;/tt&gt;. If no values are set for this property, the default search path will be &lt;tt&gt;${VJ_BASE_DIR}/lib{,32,64}/infiscape/viewer/plugins&lt;/tt&gt; depending on the compile-time application binary interface (ABI).</help>
          <value label="Plug-In Path" defaultvalue="" />
       </property>
-      <property valuetype="integer" variable="false" name="swap_button_nums">
+      <property valuetype="string" variable="false" name="swap_button_nums">
          <help>Select the number(s) of the button that should activate mode swapping. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
          <value label="Mode Swap Button(s)" defaultvalue="-1" />
       </property>
