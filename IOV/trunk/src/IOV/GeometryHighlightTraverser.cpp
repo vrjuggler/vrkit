@@ -12,7 +12,6 @@
 #include <OpenSG/OSGMultiPassMaterial.h>
 #include <OpenSG/OSGSimpleGeometry.h>
 #include <OpenSG/OSGSimpleMaterial.h>
-#include <OpenSG/OSGBlendChunk.h>
 #include <OpenSG/OSGSHLChunk.h>
 #include <OpenSG/OSGPolygonChunk.h>
 
