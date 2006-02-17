@@ -96,9 +96,10 @@ opts = SConsAddons.Options.Options(files = [options_cache_filename, 'options.cus
                                    args= ARGUMENTS);
 boost_options = SConsAddons.Options.Boost.Boost("boost", "1.32.0",
                                                 required = False)
-vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("vrjuggler", "1.1.169", required=True);
+vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("vrjuggler", "1.1.169", 
+                                                    required=True, useCppPath=True);
 opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.6.0",
-                                                   required = True)
+                                                   required = True, useCppPath=True)
 
 Export('boost_options','opensg_options')
 
