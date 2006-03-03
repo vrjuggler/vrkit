@@ -3,6 +3,7 @@
 
 # Import the stuff we need
 
+import distutils.util
 import sys, os, re, string, glob
 pj = os.path.join
 
@@ -91,7 +92,7 @@ elif GetPlatform() == 'mac':
 Export('GetPlatform')
 
 # ---------- Options ------------ #
-options_cache_filename = 'options.cache.' + GetPlatform()
+options_cache_filename = 'options.cache.' + distutils.util.get_platform()
 opts = SConsAddons.Options.Options(files = [options_cache_filename, 'options.custom'],
                                    args= ARGUMENTS);
 boost_options = SConsAddons.Options.Boost.Boost("boost", "1.32.0",
@@ -108,7 +109,7 @@ opts.AddOption( vrj_options )
 opts.AddOption( opensg_options )
 
 # Setup build dir and prefix settings
-build_dir = "build." + GetPlatform()
+build_dir = "build." + distutils.util.get_platform()
 def_prefix = pj( Dir('.').get_abspath(), build_dir, 'instlinks')
 unspecified_prefix = "use-instlinks"
 opts.Add('prefix', 'Installation prefix: def:' + unspecified_prefix, unspecified_prefix)
