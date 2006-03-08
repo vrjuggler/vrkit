@@ -78,7 +78,8 @@ def BuildDarwinEnvironment():
       LINKFLAGS   = LINKFLAGS
    )
 
-optimize = ARGUMENTS.get('optimize', 'no')
+optimize_default = 'no'
+optimize = ARGUMENTS.get('optimize', optimize_default)
 Export('optimize')
 
 # --- Main Build --- #
@@ -113,6 +114,7 @@ build_dir = "build." + distutils.util.get_platform()
 def_prefix = pj( Dir('.').get_abspath(), build_dir, 'instlinks')
 unspecified_prefix = "use-instlinks"
 opts.Add('prefix', 'Installation prefix: def:' + unspecified_prefix, unspecified_prefix)
+opts.Add('optimize', 'Enable optimization', optimize_default)
 
 help_text += opts.GenerateHelpText(baseEnv)
 
