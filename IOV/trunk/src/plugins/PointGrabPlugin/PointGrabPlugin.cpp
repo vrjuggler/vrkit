@@ -182,15 +182,15 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       {
          OSG::Matrix world_xform;
          (*o).node()->getParent()->getToWorld(world_xform);
-         gmtl::Matrix44f sg_M_vp;
-         gmtl::set(sg_M_vp, world_xform);
-         gmtl::invert(sg_M_vp);
+         gmtl::Matrix44f obj_M_vp;
+         gmtl::set(obj_M_vp, world_xform);
+         gmtl::invert(obj_M_vp);
 
          // Get the wand transformation in virtual world coordinates,
          // including any transformations in the scene graph below the
          // transformation root.
-         const gmtl::Matrix44f sg_M_wand = sg_M_vp * vp_M_wand;
-         const gmtl::Vec3f wand_pos_vw(gmtl::makeTrans<gmtl::Vec3f>(sg_M_wand));
+         const gmtl::Matrix44f obj_M_wand = obj_M_vp * vp_M_wand;
+         const gmtl::Vec3f wand_pos_vw(gmtl::makeTrans<gmtl::Vec3f>(obj_M_wand));
          const OSG::Pnt3f wand_point(wand_pos_vw[0], wand_pos_vw[1],
                                      wand_pos_vw[2]);
 
@@ -254,22 +254,22 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
       mGeomTraverser.swapHighlightMaterial(lit_node, mIsectHighlightID,
                                            mGrabHighlightID);
 
-      // m_wand_M_obj is the offset between the wand and the grabbed object's
+      // m_wand_M_obj_xform is the offset between the wand and the grabbed object's
       // center point:
       //
-      //    m_wand_M_obj = wand_M_vp * vp_M_vw * vw_M_obj
+      //    m_wand_M_obj_xform = wand_M_vp * vp_M_obj * obj_xform
       gmtl::Matrix44f wand_M_vp;
-      gmtl::Matrix44f vw_M_obj;
+      gmtl::Matrix44f obj_xform;
 
       OSG::Matrix world_xform;
       mIntersectedObj.node()->getParent()->getToWorld(world_xform);
-      gmtl::Matrix44f vp_M_vw;
-      gmtl::set(vp_M_vw, world_xform);
+      gmtl::Matrix44f vp_M_obj;
+      gmtl::set(vp_M_obj, world_xform);
 
       gmtl::invert(wand_M_vp, vp_M_wand);
-      gmtl::set(vw_M_obj, mIntersectedObj->getMatrix());
+      gmtl::set(obj_xform, mIntersectedObj->getMatrix());
 
-      m_wand_M_obj = wand_M_vp * vp_M_vw * vw_M_obj;
+      m_wand_M_obj_xform = wand_M_vp * vp_M_obj * obj_xform;
    }
    // If we are grabbing an object and the grab button has just been pressed
    // again, release the grabbed object.
@@ -287,7 +287,7 @@ void PointGrabPlugin::updateState(ViewerPtr viewer)
          OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
          mGeomTraverser.swapHighlightMaterial(lit_node, mGrabHighlightID,
                                               mIsectHighlightID);
-         gmtl::identity(m_wand_M_obj);
+         gmtl::identity(m_wand_M_obj_xform);
       }
    }
 }
@@ -299,21 +299,20 @@ void PointGrabPlugin::run(inf::ViewerPtr viewer)
    {
       //const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
 
-      // vw_M_vp is the current position of the view platform in the virtual
-      // world.
+      // obj_M_vp is the inverse of the object in view platform space.
       OSG::Matrix world_xform;
       mIntersectedObj.node()->getParent()->getToWorld(world_xform);
-      gmtl::Matrix44f vw_M_vp;
-      gmtl::set(vw_M_vp, world_xform);
-      gmtl::invert(vw_M_vp);
+      gmtl::Matrix44f obj_M_vp;
+      gmtl::set(obj_M_vp, world_xform);
+      gmtl::invert(obj_M_vp);
 
       // Get the wand transformation in virtual world coordinates.
       const gmtl::Matrix44f vp_M_wand(
          mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
       );
-      const gmtl::Matrix44f vw_M_wand = vw_M_vp * vp_M_wand;
+      const gmtl::Matrix44f obj_M_wand = obj_M_vp * vp_M_wand;
 
-      gmtl::Matrix44f new_obj_mat = vw_M_wand * m_wand_M_obj;
+      gmtl::Matrix44f new_obj_mat = obj_M_wand * m_wand_M_obj_xform;
 
       osg::Matrix obj_mat_osg;
       gmtl::set(obj_mat_osg, new_obj_mat);

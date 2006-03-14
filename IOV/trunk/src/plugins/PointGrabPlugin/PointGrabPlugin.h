@@ -108,7 +108,7 @@ private:
    OSG::Color3f mIntersectColor;
    OSG::Color3f mGrabColor;
 
-   gmtl::Matrix44f m_wand_M_obj;
+   gmtl::Matrix44f m_wand_M_obj_xform;
 
    snx::SoundHandle mIntersectSound;
    snx::SoundHandle mGrabSound;
