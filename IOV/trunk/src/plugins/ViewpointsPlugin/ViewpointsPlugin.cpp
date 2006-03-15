@@ -39,8 +39,9 @@ namespace
 }
 
 
-static inf::PluginCreator sViewpointsPluginCreator(&inf::ViewpointsPlugin::create,
-                                                   "Viewpoints Plugin");
+static inf::PluginCreator<inf::Plugin> sViewpointsPluginCreator(
+   &inf::ViewpointsPlugin::create, "Viewpoints Plugin"
+);
 
 extern "C"
 {
@@ -54,7 +55,7 @@ IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
+IOV_PLUGIN_API(inf::PluginCreator<inf::Plugin>*) getCreator()
 {
    return &sViewpointsPluginCreator;
 }

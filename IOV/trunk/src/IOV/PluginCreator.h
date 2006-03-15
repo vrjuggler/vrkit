@@ -5,28 +5,45 @@
 
 #include <IOV/Config.h>
 
+#include <sstream>
 #include <string>
 #include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
 #include <vpr/vpr.h>
-
-#include <IOV/PluginPtr.h>
 
 
 namespace inf
 {
 
-class IOV_CLASS_API PluginCreator
+template<typename PLUGIN_TYPE>
+class PluginCreator
 {
 public:
-   PluginCreator(boost::function<inf::PluginPtr ()> creator,
-                 const std::string& pluginName,
+   typedef boost::shared_ptr<PLUGIN_TYPE> plugin_ptr_t;
+   typedef boost::function<plugin_ptr_t ()> creator_t;
+
+   PluginCreator(creator_t creator, const std::string& pluginName,
                  const vpr::Uint32 pluginMajorVer = 1,
                  const vpr::Uint32 pluginMinorVer = 0,
-                 const vpr::Uint32 pluginPatchVer = 0);
+                 const vpr::Uint32 pluginPatchVer = 0)
+      : mCreator(creator)
+      , mPluginName(pluginName)
+      , mPluginMajorVer(pluginMajorVer)
+      , mPluginMinorVer(pluginMinorVer)
+      , mPluginPatchVer(pluginPatchVer)
+   {
+      std::ostringstream str_stream;
+      str_stream << mPluginMajorVer << "." << mPluginMinorVer << "."
+                 << mPluginPatchVer;
+      mPluginVersionStr = str_stream.str();
+   }
 
-   ~PluginCreator();
+   ~PluginCreator()
+   {
+      /* Do nothing. */ ;
+   }
 
-   inf::PluginPtr createPlugin() const
+   plugin_ptr_t createPlugin() const
    {
       return mCreator();
    }
@@ -57,7 +74,7 @@ public:
    }
 
 private:
-   boost::function<inf::PluginPtr ()> mCreator;
+   creator_t mCreator;
 
    std::string mPluginName;
 

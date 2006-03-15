@@ -34,9 +34,8 @@ Viewer::Viewer()
    , mAspect(NULL)
    , mConnection(NULL)
 {
-   mPluginFactory = PluginFactory::create();
+   mPluginFactory = plugin_factory_t::create();
 }
-
 
 Viewer::~Viewer()
 {
@@ -68,8 +67,8 @@ void Viewer::init()
 
    // Load plugins embedded in library
    getPluginFactory()->registerCreator(
-      new inf::PluginCreator(&inf::StatusPanelPlugin::create,
-                             "StatusPanelPlugin"),
+      new inf::PluginCreator<inf::Plugin>(&inf::StatusPanelPlugin::create,
+                                          "StatusPanelPlugin"),
       "StatusPanelPlugin"
    );
 
@@ -439,7 +438,7 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
       try
       {
          std::cout << "   Loading plugin: " << plugin_name << " .... ";
-         inf::PluginCreator* creator =
+         plugin_factory_t::plugin_creator_t* creator =
             mPluginFactory->getPluginCreator(plugin_name);
 
          if ( NULL != creator )

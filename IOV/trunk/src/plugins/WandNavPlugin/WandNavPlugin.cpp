@@ -33,8 +33,9 @@
 #include "WandNavPlugin.h"
 
 
-static inf::PluginCreator sPluginCreator(&inf::WandNavPlugin::create,
-                                         "Wand Navigator Plug-in");
+static inf::PluginCreator<inf::Plugin> sPluginCreator(
+   &inf::WandNavPlugin::create, "Wand Navigator Plug-in"
+);
 
 extern "C"
 {
@@ -48,7 +49,7 @@ IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
+IOV_PLUGIN_API(inf::PluginCreator<inf::Plugin>*) getCreator()
 {
    return &sPluginCreator;
 }

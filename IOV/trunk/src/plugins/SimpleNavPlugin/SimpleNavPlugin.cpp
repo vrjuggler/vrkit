@@ -30,21 +30,23 @@
 #include "SimpleNavPlugin.h"
 
 
-static inf::PluginCreator sPluginCreator(&inf::SimpleNavPlugin::create,
-                                         "Simple Navigator Plug-in");
+static inf::PluginCreator<inf::Plugin> sPluginCreator(
+   &inf::SimpleNavPlugin::create, "Simple Navigator Plug-in"
+);
 
 extern "C"
 {
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer, vpr::Uint32& minorVer)
+IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                               vpr::Uint32& minorVer)
 {
    majorVer = INF_PLUGIN_API_MAJOR;
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
+IOV_PLUGIN_API(inf::PluginCreator<inf::Plugin>*) getCreator()
 {
    return &sPluginCreator;
 }

@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include <vpr/DynLoad/Library.h>
+
 #include <IOV/ViewerPtr.h>
 #include <IOV/PluginPtr.h>
 
@@ -23,6 +25,32 @@ namespace inf
 class IOV_CLASS_API Plugin
 {
 public:
+   /**
+    * Returns the name of the entry point function used for retrieving the
+    * creator of instances of this plug-in type.
+    */
+   static std::string getCreatorFuncName()
+   {
+      return "getCreator";
+   }
+
+   /**
+    * Validates that the given dynamic code entity has the query interface
+    * needed to get an instance of inf::Plugin.
+    *
+    * @pre \p pluginLib must have been loaded successfully.
+    *
+    * @param pluginLib The code entity (shared library, DLL, executable) to
+    *                  validate.
+    *
+    * @return This method always returns true. If the plug-in is not valid,
+    *         an exception is thrown.
+    *
+    * @throw inf::PluginInterfaceException is thrown if \p pluginLib is not a
+    *        valid dynamic code entity for an inf::Plugin instance.
+    */
+   static bool validatePluginLib(vpr::LibraryPtr pluginLib);
+
    virtual ~Plugin();
 
    /**

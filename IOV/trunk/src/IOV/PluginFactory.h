@@ -5,37 +5,46 @@
 
 #include <IOV/Config.h>
 
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <map>
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 
 #include <vpr/vpr.h>
 #include <vpr/DynLoad/Library.h>
 
 #include <IOV/Util/Exceptions.h>
-#include <IOV/PluginFactoryPtr.h>
+#include <IOV/PluginFactoryBase.h>
+#include <IOV/PluginCreator.h>
 
 
 namespace inf
 {
 
-class PluginCreator;
-
 /** Central factory for IOV plugins.
  * Takes care of scanning, finding, and returning plugin libraries.
  */
-class IOV_CLASS_API PluginFactory
-   : public boost::enable_shared_from_this<PluginFactory>
+template<typename PLUGIN_TYPE>
+class PluginFactory
+   : public inf::PluginFactoryBase
+   , public boost::enable_shared_from_this<PluginFactory<PLUGIN_TYPE> >
 {
 public:
-   static PluginFactoryPtr create()
+   typedef boost::shared_ptr< PluginFactory<PLUGIN_TYPE> > ptr_t;
+   typedef inf::PluginCreator<PLUGIN_TYPE> plugin_creator_t;
+   typedef boost::shared_ptr<PLUGIN_TYPE> plugin_ptr_t;
+
+   static ptr_t create()
    {
-      return PluginFactoryPtr(new PluginFactory());
+      return ptr_t(new PluginFactory<PLUGIN_TYPE>());
    }
 
-   ~PluginFactory()
+   virtual ~PluginFactory()
    {
+      /* Do nothing. */ ;
    }
 
    /**
@@ -44,39 +53,21 @@ public:
     * libraries that are discovered are registered with this class using
     * the platform-agnostic name of the plug-in as the registration key.
     *
-    * @see getPluginLibrary
-    * @see getPluginCreator
-    */
-   void init(const std::vector<std::string>& scanPath);
-
-   /**
-    * Extends the current list of plugin libraries by
-    * searching the given path looking for additional plug-in libraries
-    * using platform- and build-specific naming conventions.
+    * @param scanPath A list of directories to scan for plug-ins.
     *
     * @see getPluginLibrary
     * @see getPluginCreator
     */
-   void addScanPath(const std::vector<std::string>& scanPath);
+   void init(const std::vector<std::string>& scanPath)
+   {
+      addScanPath(scanPath);
+   }
 
    /**
-    * Returns the plug-in library associated with the given platform-agnostic
-    * plug-in name.
-    *
-    * @param name       The platform-agnostic name of the desired plug-in.
-    *
-    * @throw NoSuchPluginException
-    *           Thrown if the given plug-in name does not match any of the
-    *           plug-ins discovered when this object was initialized.
-    */
-   vpr::LibraryPtr getPluginLibrary(const std::string& name) const
-      throw(inf::NoSuchPluginException);
-
-   /**
-    * Returns the inf::PluginCreator instance retrieved from the plug-in
-    * library associated with the given platform-agnostic plug-in name.  If
-    * the creator instance has not already been looked up, the lookup will
-    * occur as a result of calling this method.
+    * Returns the plugin_creator_t instance retrieved from the plug-in library
+    * associated with the given platform-agnostic plug-in name. If the creator
+    * instance has not already been looked up, the lookup will occur as a
+    * result of calling this method.
     *
     * @param name       The platform-agnostic name of the desired plug-in.
     *
@@ -92,63 +83,119 @@ public:
     *           plug-in API version against which the plug-in was compiled
     *           does not match the run-time plug-in API version.
     */
-   inf::PluginCreator* getPluginCreator(const std::string& name)
-      throw(inf::NoSuchPluginException, inf::PluginLoadException,
-            inf::PluginInterfaceException);
+   plugin_creator_t* getPluginCreator(const std::string& name)
+      throw (inf::NoSuchPluginException, inf::PluginLoadException,
+             inf::PluginInterfaceException)
+   {
+      typename plugin_creator_map_t::iterator i = mPluginCreators.find(name);
 
+      if ( mPluginCreators.end() == i )
+      {
+         this->registerCreatorFromName(name);
 
-   /** Manually register a creator with the system.
+         i = mPluginCreators.find(name);
+         if ( mPluginCreators.end() == i )
+         {
+            std::ostringstream msg_stream;
+            msg_stream << "Plug-in '" << name << "' failed to load";
+            throw PluginLoadException(msg_stream.str(), IOV_LOCATION);
+         }
+      }
+
+      return (*i).second;
+   }
+
+   /**
+    * Manually register a creator with the plug-in factory.
     *
-    * This method can be used to add creators that are not
-    * able to be found in a dynamic library but are still available.
-    * This is sometimes the case with custom plugins compiled directly into
-    * an application.
+    * This method can be used to add creators that are not able to be found in
+    * a dynamic library but are still available. This is sometimes the case
+    * with custom plugins compiled directly into an application.
     *
     * @param creator    A valid creator
     * @param name       The name of the plugin type that is created by creator.
     */
-   void registerCreator(inf::PluginCreator* creator, const std::string& name);
+   void registerCreator(plugin_creator_t* creator, const std::string& name)
+   {
+      if ( mPluginCreators.find(name) != mPluginCreators.end() )
+      {
+         std::cerr << "WARNING: Tried to re-register a creator for plug-in "
+                   << "type '" << name << "'!\n"
+                   << "This registration will be ignored." << std::endl;
+         return;
+      }
+
+      std::cout << "IOV: [PluginFactory::registerCreator()] "
+                << "Registering creator for '" << name << "'" << std::endl;
+
+      mPluginCreators[name] = creator;
+   }
 
 protected:
    PluginFactory()
+      : PluginFactoryBase()
+      , mGetCreatorFuncName(PLUGIN_TYPE::getCreatorFuncName())
+      , mValidator(PLUGIN_TYPE::validatePluginLib)
    {
+      /* Do nothing. */ ;
    }
 
-private:
    /**
-    * Registers an instance of inf::PluginCreator retrieved from the given
+    * Registers an instance of plugin_creator_t retrieved from the given
     * plug-in library using the given platform-agnostic plug-in name as the
     * registration key.
     *
     * @pre The plug-in library has been loaded.
     * @post If no exception is thrown, an entry will be added to
     *       mPluginCreators associating \c name with an instance of
-    *       inf::PluginCreator.
+    *       plugin_creator_t.
     *
     * @param pluginLib  The plug-in library that will be examined to get the
-    *                   inf::PluginCreator instance to reigster.
+    *                   inf::PluginCreator<inf::Plugin> instance to reigster.
     * @param name       The platform-agnostic name of the plug-in that will
     *                   be used as the key for registering the
-    *                   inf::PluginCreator instance.
+    *                   plugin_creator_t instance.
     *
     * @throw inf::PluginInterfaceException
     *           Thrown if the given plug-in library does not contain an
     *           entry point function for acquiring the plug-in's creator
     *           instance.
     */
-   void registerCreator(vpr::LibraryPtr pluginLib, const std::string& name)
-      throw(inf::PluginInterfaceException);
+   void registerCreatorFromLib(vpr::LibraryPtr pluginLib,
+                               const std::string& name)
+      throw (inf::PluginInterfaceException)
+   {
+      vprASSERT(pluginLib->isLoaded() && "Plug-in library is not loaded");
 
-   /**
-    * @pre The plug-in library has been loaded.
-    */
-   void validatePluginInterface(vpr::LibraryPtr pluginLib)
-      throw(inf::PluginInterfaceException);
+      if ( mValidator(pluginLib) )
+      {
+         void* creator_symbol = pluginLib->findSymbol(mGetCreatorFuncName);
 
-   typedef std::map<std::string, vpr::LibraryPtr> plugin_libs_map_t;
-   typedef std::map<std::string, inf::PluginCreator*> plugin_creator_map_t;
+         if ( creator_symbol != NULL )
+         {
+            plugin_creator_t* (*creator_func)();
+            creator_func = (plugin_creator_t* (*)()) creator_symbol;
+            plugin_creator_t* new_creator = (*creator_func)();
+            registerCreator(new_creator, name);
+         }
+         else
+         {
+            std::ostringstream msg_stream;
+            msg_stream << "Plug-in '" << pluginLib->getName()
+                       << "' has no entry point function named "
+                       << mGetCreatorFuncName;
+            throw inf::PluginInterfaceException(msg_stream.str(),
+                                                IOV_LOCATION);
+         }
+      }
+   }
 
-   plugin_libs_map_t    mPluginLibs;      /**< Map of plugin libs we know about. */
+private:
+   const std::string mGetCreatorFuncName;
+   boost::function<bool (vpr::LibraryPtr)> mValidator;
+
+   typedef std::map<std::string, plugin_creator_t*> plugin_creator_map_t;
+
    plugin_creator_map_t mPluginCreators;  /**< Map of plugin creators that have been registered. */
 };
 
