@@ -10,6 +10,7 @@
          <value label="Module Name" defaultvalue="" />
          <enumeration editable="true">
             <enum label="CenterPointGrabPlugin" value="CenterPointGrabPlugin" />
+            <enum label="LogoPlugin" value="LogoPlugin" />
             <enum label="PointGrabPlugin" value="PointGrabPlugin" />
             <enum label="SimpleNavPlugin" value="SimpleNavPlugin" />
             <enum label="ViewpointsPlugin" value="ViewpointsPlugin" />
