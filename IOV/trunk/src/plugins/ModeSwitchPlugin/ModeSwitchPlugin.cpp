@@ -164,9 +164,11 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
       jccl::ConfigElementPtr plg_elt =
          elt->getProperty<jccl::ConfigElementPtr>(plugins_prop, i);
       plugin_data.mName = plg_elt->getProperty<std::string>(plugin_prop);
+
       try
       {
-         std::cout << "   Loading plugin: " << plugin_data.mName << " .... ";
+         std::cout << "   Loading plugin: " << plugin_data.mName << " .... "
+                   << std::flush;
 
          inf::PluginCreator* creator =
             plugin_factory->getPluginCreator(plugin_data.mName);
