@@ -53,8 +53,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,15,1,0
- PRODUCTVERSION 0,15,1,0
+ FILEVERSION 0,16,0,0
+ PRODUCTVERSION 0,16,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -72,12 +72,12 @@ BEGIN
             VALUE "Comments", "http://www.infiscape.com/"
             VALUE "CompanyName", "Infiscape Corporation"
             VALUE "FileDescription", "IOV"
-            VALUE "FileVersion", "0.15.1"
+            VALUE "FileVersion", "0.16.0"
             VALUE "InternalName", "IOV"
             VALUE "LegalCopyright", "Copyright © 2005–2006"
             VALUE "OriginalFilename", "iov.dll"
             VALUE "ProductName", "IOV"
-            VALUE "ProductVersion", "0.15.1"
+            VALUE "ProductVersion", "0.16.0"
         END
     END
     BLOCK "VarFileInfo"

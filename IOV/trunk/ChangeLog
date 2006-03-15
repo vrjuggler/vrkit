@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-03-15 patrickh IOV 0.15 branch created.
+                    -- VERSION -- 0.16.0
 2006-02-07 patrickh Extended ModeSwitchPlugin to allow multiple buttons to be
                     used for activating mode swapping.
                     -- VERSION -- 0.15.1
