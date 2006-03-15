@@ -150,7 +150,7 @@ inf::PluginCreator* PluginFactory::getPluginCreator(const std::string& name)
          catch (vpr::IOException& ex)
          {
             std::ostringstream msg_stream;
-            msg_stream << "Plug-in '" << name << "' failed to load: "
+            msg_stream << "Plug-in '" << name << "' failed to load:\n"
                        << ex.getExtendedDescription();
             throw PluginLoadException(msg_stream.str(), IOV_LOCATION);
          }
