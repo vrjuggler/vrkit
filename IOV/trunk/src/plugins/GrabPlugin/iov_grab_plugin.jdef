@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="iov_grab_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="IOV Grab Plug-In (Infiscape)">
+      <abstract>false</abstract>
+      <help />
+      <parent />
+      <category>/Infiscape/</category>
+      <property valuetype="string" variable="false" name="grab_button_nums">
+         <help>Select the number(s) of the button that should activate grabbing. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <value label="Grab/Release Button Number(s)" defaultvalue="-1" />
+      </property>
+      <property valuetype="float" variable="false" name="intersect_color">
+         <help>Red/green/blue color for the object intersection highlight.</help>
+         <value label="Red" defaultvalue="1.0" />
+         <value label="Green" defaultvalue="1.0" />
+         <value label="Blue" defaultvalue="0.0" />
+      </property>
+      <property valuetype="float" variable="false" name="grab_color">
+         <help>Red/green/blue color for the object grabbing highlight.</help>
+         <value label="Red" defaultvalue="1.0" />
+         <value label="Green" defaultvalue="0.0" />
+         <value label="Blue" defaultvalue="1.0" />
+      </property>
+      <property valuetype="string" variable="true" name="shader_search_path">
+         <help>A list of zero or more directories to search for vertex and fragment shaders. The use of environment variables is allowed. Environment variables are referenced using the form &lt;tt&gt;${ENV_VAR}&lt;/tt&gt; or &lt;tt&gt;$(ENV_VAR)&lt;/tt&gt;. Regardless of the value(s) set for this property, the path &lt;tt&gt;${IOV_BASE_DIR}/share/IOV/data/shaders&lt;/tt&gt; will always be searched for shader program files that are not identified by an absolute path.</help>
+         <value label="Diredctory" defaultvalue="" />
+      </property>
+      <property valuetype="boolean" variable="false" name="enable_highlight_shaders">
+         <help>Indicates whether to use GLSL shaders to highlight the selected object (intersection and grabbing).</help>
+         <value label="Use GLSL Intersection Highlighter?" defaultvalue="true" />
+      </property>
+      <property valuetype="string" variable="false" name="intersect_shader">
+         <help>The vertex and fragment shaders to use for highlighting the currently intersected object.</help>
+         <value label="Vertex Shader" defaultvalue="${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.vs" />
+         <value label="Fragment Shader" defaultvalue="${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.fs" />
+      </property>
+      <property valuetype="float" variable="false" name="intersect_shader_scale">
+         <help>The 32-bit real number value used as the &lt;tt&gt;scale&lt;/tt&gt; uniform for the intersect shader. This controls the size of the halo that surrounds the geometry.</help>
+         <value label="Intersect Shader Scale Uniform" defaultvalue="1.0" />
+      </property>
+      <property valuetype="float" variable="false" name="intersect_shader_exponent">
+         <help>The 32-bit real number value used as the &lt;tt&gt;exponent&lt;/tt&gt; uniform for the intersect shader. This controls the alpha value for the halo as it surrounds the geometry. A value of 1.0 keeps the same alpha value as is set in the shader source. A higher value gives thinner strips at the sides (more alpha in the middle, less at the sides).</help>
+         <value label="Intersect Shader Exponent Uniform" defaultvalue="1.0" />
+      </property>
+      <property valuetype="string" variable="false" name="grab_shader">
+         <help>The vertex and fragment shaders to use for highlighting the currently grabbed object.</help>
+         <value label="Vertex Shader" defaultvalue="${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.vs" />
+         <value label="Fragment Shader" defaultvalue="${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.fs" />
+      </property>
+      <property valuetype="float" variable="false" name="grab_shader_scale">
+         <help>The 32-bit real number value used as the &lt;tt&gt;scale&lt;/tt&gt; uniform for the grab shader. This controls the size of the halo that surrounds the geometry.</help>
+         <value label="Grab Shader Scale Uniform" defaultvalue="1.0" />
+      </property>
+      <property valuetype="float" variable="false" name="grab_shader_exponent">
+         <help>The 32-bit real number value used as the &lt;tt&gt;exponent&lt;/tt&gt; uniform for the grab shader. This controls the alpha value for the halo as it surrounds the geometry. A value of 1.0 keeps the same alpha value as is set in the shader source. A higher value gives thinner strips at the sides (more alpha in the middle, less at the sides).</help>
+         <value label="Grab Shader Exponent Uniform" defaultvalue="1.0" />
+      </property>
+      <property valuetype="string" variable="true" name="strategy_plugin_path">
+         <help>Each value adds to the path where dynamically loadable intersection and move strategy plug-ins can be found.  The path may make use of environment variables.  For example: &lt;tt&gt;${HOME}/inf-plugins&lt;/tt&gt;.  If no values are set for this property, the default search path will be &lt;tt&gt;${VJ_BASE_DIR}/lib{,32,64}/infiscape/viewer/plugins/grab&lt;/tt&gt; depending on the compile-time application binary interface (ABI).</help>
+         <value label="Strategy Plug-In Path" defaultvalue=""/>
+      </property>
+      <property valuetype="string" variable="false" name="isect_strategy">
+         <help></help>
+         <value label="Intersection Strategy" defaultvalue="PointIntersection" />
+         <enumeration editable="true">
+            <enum label="Point Intersection" value="PointIntersection"/>
+            <enum label="Ray Intersection" value="RayIntersection"/>
+         </enumeration>
+      </property>
+      <property valuetype="string" variable="false" name="move_strategy">
+         <help></help>
+         <value label="Move Strategy" defaultvalue="Basic Move" />
+         <enumeration editable="true">
+            <enum label="Basic Move" value="BasicMove"/>
+         </enumeration>
+      </property>
+      <upgrade_transform>
+      </upgrade_transform>
+   </definition_version>
+</definition>
+
