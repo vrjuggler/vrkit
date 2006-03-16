@@ -68,11 +68,12 @@
             <enum label="Ray Intersection" value="RayIntersection"/>
          </enumeration>
       </property>
-      <property valuetype="string" variable="false" name="move_strategy">
+      <property valuetype="string" variable="true" name="move_strategy">
          <help></help>
          <value label="Move Strategy" defaultvalue="Basic Move" />
          <enumeration editable="true">
             <enum label="Basic Move" value="BasicMove"/>
+            <enum label="Slide Move" value="SlideMove"/>
          </enumeration>
       </property>
       <upgrade_transform>

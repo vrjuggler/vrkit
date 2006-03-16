@@ -7,6 +7,9 @@
 
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
+#include <IOV/User.h>
+#include <IOV/Viewer.h>
+#include <IOV/WandInterface.h>
 
 #include "BasicMoveStrategy.h"
 
@@ -46,11 +49,11 @@ void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
                                       OSG::TransformNodePtr obj,
                                       const gmtl::Matrix44f& vp_M_wand)
 {
-   // m_xform_wand_M_obj_xform is the offset between the wand and the grabbed
+   // m_wand_M_obj is the offset between the wand and the grabbed
    // object's center point:
    //
-   //    m_xform_wand_M_obj_xform = xform_wand_M_vp * vp_M_obj * obj_xform
-   gmtl::Matrix44f xform_wand_M_vp;
+   //    m_wand_M_obj = wand_M_vp * vp_M_obj * obj_xform
+   gmtl::Matrix44f wand_M_vp;
    gmtl::Matrix44f obj_xform;
 
    OSG::Matrix world_xform;
@@ -58,16 +61,16 @@ void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
    gmtl::Matrix44f vp_M_obj;
    gmtl::set(vp_M_obj, world_xform);
 
-   gmtl::invert(xform_wand_M_vp, vp_M_wand);
+   gmtl::invert(wand_M_vp, vp_M_wand);
    gmtl::set(obj_xform, obj->getMatrix());
 
-   m_xform_wand_M_obj_xform = xform_wand_M_vp * vp_M_obj * obj_xform;
+   m_wand_M_obj = wand_M_vp * vp_M_obj * obj_xform;
 }
 
 void BasicMoveStrategy::objectReleased(inf::ViewerPtr viewer,
                                        OSG::TransformNodePtr obj)
 {
-   gmtl::identity(m_xform_wand_M_obj_xform);
+   gmtl::identity(m_wand_M_obj);
 }
 
 gmtl::Matrix44f
@@ -75,19 +78,16 @@ BasicMoveStrategy::computeMove(inf::ViewerPtr viewer,
                                OSG::TransformNodePtr obj,
                                const gmtl::Matrix44f& vp_M_wand)
 {
-   // obj_M_vp is the inverse of the object in view platform space.
+   // pobj_M_vp is the inverse of the object in view platform space.
    OSG::Matrix world_xform;
    obj.node()->getParent()->getToWorld(world_xform);
-   gmtl::Matrix44f obj_M_vp;
-   gmtl::set(obj_M_vp, world_xform);
-   gmtl::invert(obj_M_vp);
+   gmtl::Matrix44f pobj_M_vp;
+   gmtl::set(pobj_M_vp, world_xform);
+   gmtl::invert(pobj_M_vp);
 
-   // XXX: Move strategy
-   const gmtl::Matrix44f obj_M_wand_xform = obj_M_vp * vp_M_wand;
+   const gmtl::Matrix44f pobj_M_wand = pobj_M_vp * vp_M_wand;
 
-   return obj_M_wand_xform * m_xform_wand_M_obj_xform;
-   //gmtl::Matrix44f new_obj_xform = vp_M_wand_xform;
-   //gmtl::Matrix44f new_obj_mat = new_obj_xform * m_obj_M_xform;
+   return pobj_M_wand * m_wand_M_obj;
 }
 
 }

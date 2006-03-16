@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef _INF_BASIC_MOVE_STRATEGY_H_
-#define _INF_BASIC_MOVE_STRATEGY_H_
+#ifndef _INF_SLIDE_MOVE_STRATEGY_H_
+#define _INF_SLIDE_MOVE_STRATEGY_H_
 
 #include <boost/enable_shared_from_this.hpp>
 
@@ -11,22 +11,22 @@
 namespace inf
 {
 
-class BasicMoveStrategy
+class SlideMoveStrategy
    : public inf::MoveStrategy
-   , public boost::enable_shared_from_this<BasicMoveStrategy>
+   , public boost::enable_shared_from_this<SlideMoveStrategy>
 {
 public:
    static std::string getId()
    {
-      return "BasicMove";
+      return "SlideMove";
    }
 
    static inf::MoveStrategyPtr create()
    {
-      return inf::MoveStrategyPtr(new BasicMoveStrategy());
+      return inf::MoveStrategyPtr(new SlideMoveStrategy());
    }
 
-   virtual ~BasicMoveStrategy()
+   virtual ~SlideMoveStrategy()
    {
       /* Do nothing. */ ;
    }
@@ -45,12 +45,13 @@ public:
                                        const gmtl::Matrix44f& vp_M_wand);
 
 protected:
-   BasicMoveStrategy()
-      : inf::MoveStrategy()
+   SlideMoveStrategy()
+      : inf::MoveStrategy(), mTransValue(0.0f)
    {
       /* Do nothing. */ ;
    }
 
+   float mTransValue;
    gmtl::Matrix44f m_wand_M_obj;
 };
 

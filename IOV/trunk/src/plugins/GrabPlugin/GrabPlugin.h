@@ -131,8 +131,8 @@ private:
    /** @name Move Strategy */
    //@{
    std::map< std::string, boost::function<MoveStrategyPtr ()> > mMoveStrategyMap;
-   MoveStrategyPtr mMoveStrategy;
-   std::string mMoveStrategyName;
+   std::vector<MoveStrategyPtr> mMoveStrategies;
+   std::vector<std::string> mMoveStrategyNames;
    //@}
 };
 

@@ -61,10 +61,6 @@ namespace inf
 
 void GrabPlugin::init(ViewerPtr viewer)
 {
-   // Static strategy registration.
-//   mISectStrategyMap[PointIntersectionStrategy::getId()] = PointIntersectionStrategy::create;
-//   mMoveStrategyMap[BasicMoveStrategy::getId()] = BasicMoveStrategy::create;
-
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
 
@@ -121,30 +117,35 @@ void GrabPlugin::init(ViewerPtr viewer)
                  << mIsectStrategyName << ":\n" << ex.what() << std::endl;
    }
 
-   // Build the MoveStrategy
-   try
+   // Build the MoveStrategies
+   for (std::vector<std::string>::iterator itr = mMoveStrategyNames.begin();
+        itr != mMoveStrategyNames.end(); ++itr)
    {
-      IOV_STATUS << "   Loading move strategy plug-in '"
-                 << mMoveStrategyName << "' ..." << std::flush;
-      inf::PluginCreator<inf::MoveStrategy>* creator =
-         mPluginFactory->getPluginCreator<inf::MoveStrategy>(mMoveStrategyName);
+      try
+      {
+         IOV_STATUS << "   Loading move strategy plug-in '"
+                    << *itr << "' ..." << std::flush;
+         inf::PluginCreator<inf::MoveStrategy>* creator =
+            mPluginFactory->getPluginCreator<inf::MoveStrategy>(*itr);
 
-      if ( NULL != creator )
-      {
-         mMoveStrategy = creator->createPlugin();
-         mMoveStrategy->init(viewer);
-         IOV_STATUS << "[OK]" << std::endl;
+         if ( NULL != creator )
+         {
+            MoveStrategyPtr move_strategy = creator->createPlugin();
+            move_strategy->init(viewer);
+            mMoveStrategies.push_back(move_strategy);
+            IOV_STATUS << "[OK]" << std::endl;
+         }
+         else
+         {
+            IOV_STATUS << "[ERROR]\nWARNING: No creator for strategy plug-in "
+                       << *itr << std::endl;
+         }
       }
-      else
+      catch (std::runtime_error& ex)
       {
-         IOV_STATUS << "[ERROR]\nWARNING: No creator for strategy plug-in "
-                    << mMoveStrategyName << std::endl;
+         IOV_STATUS << "[ERROR]\nWARNING: Failed to load strategy plug-in "
+                    << *itr << ":\n" << ex.what() << std::endl;
       }
-   }
-   catch (std::runtime_error& ex)
-   {
-      IOV_STATUS << "[ERROR]\nWARNING: Failed to load strategy plug-in "
-                 << mMoveStrategyName << ":\n" << ex.what() << std::endl;
    }
 
    bool use_scribe(false);
@@ -297,10 +298,14 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       mGeomTraverser.swapHighlightMaterial(lit_node, mIsectHighlightID,
                                            mGrabHighlightID);
 
-      if ( mMoveStrategy )
+      if ( !mMoveStrategies.empty() )
       {
-         mMoveStrategy->objectGrabbed(viewer, mIntersectedObj,
-                                      vp_M_wand_xform);
+         for (std::vector<MoveStrategyPtr>::iterator itr = mMoveStrategies.begin();
+              itr != mMoveStrategies.end(); ++itr)
+         {
+            (*itr)->objectGrabbed(viewer, mIntersectedObj,
+                                  vp_M_wand_xform);
+         }
       }
 
       // XXX: Send grab event.
@@ -322,9 +327,13 @@ void GrabPlugin::updateState(ViewerPtr viewer)
          mGeomTraverser.swapHighlightMaterial(lit_node, mGrabHighlightID,
                                               mIsectHighlightID);
 
-         if ( mMoveStrategy )
+         if ( !mMoveStrategies.empty() )
          {
-            mMoveStrategy->objectReleased(viewer, mIntersectedObj);
+            for (std::vector<MoveStrategyPtr>::iterator itr = mMoveStrategies.begin();
+                 itr != mMoveStrategies.end(); ++itr)
+            {
+               (*itr)->objectReleased(viewer, mIntersectedObj);
+            }
          }
 
          // XXX: Send release event
@@ -337,16 +346,20 @@ void GrabPlugin::run(inf::ViewerPtr viewer)
    // Move the grabbed object.
    if ( mGrabbing )
    {
-      if ( mMoveStrategy )
+      if ( !mMoveStrategies.empty() )
       {
          // Get the wand transformation in virtual world coordinates.
          const gmtl::Matrix44f vp_M_wand_xform(
             mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
          );
 
-         const gmtl::Matrix44f new_obj_mat(
-            mMoveStrategy->computeMove(viewer, mIntersectedObj, vp_M_wand_xform)
-         );
+         gmtl::Matrix44f new_obj_mat;
+
+         for (std::vector<MoveStrategyPtr>::iterator itr = mMoveStrategies.begin();
+              itr != mMoveStrategies.end(); ++itr)
+         {
+            gmtl::preMult(new_obj_mat, (*itr)->computeMove(viewer, mIntersectedObj, vp_M_wand_xform));
+         }
 
          // XXX: Send a move event.
          OSG::Matrix obj_mat_osg;
@@ -493,7 +506,13 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
    }
 
    mIsectStrategyName = elt->getProperty<std::string>(isect_strategy_prop);
-   mMoveStrategyName = elt->getProperty<std::string>(move_strategy_prop);
+
+   const unsigned int num_move_strategy_names(elt->getNum(move_strategy_prop));
+   for ( unsigned int i = 0; i < num_move_strategy_names; ++i)
+   {
+      std::string move_strategy_name = elt->getProperty<std::string>(move_strategy_prop, i);
+      mMoveStrategyNames.push_back(move_strategy_name);
+   }
 
 
    return true;
