@@ -50,7 +50,7 @@ IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreator<inf::Plugin>*) getCreator()
+IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }

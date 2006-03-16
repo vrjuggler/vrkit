@@ -2,21 +2,20 @@
 
 #include <iostream>
 #include <sstream>
-#include <stdexcept>
 
 #include <boost/filesystem/path.hpp>
 
 #include <vpr/vpr.h>
 #include <vpr/vprParam.h>
+#include <vpr/DynLoad/LibraryFinder.h>
+#include <vpr/Util/Assert.h>
 
 #if __VPR_version >= 1001005
 #  include <vpr/IO/IOException.h>
 #endif
 
-#include <vpr/DynLoad/LibraryFinder.h>
-#include <vpr/Util/Assert.h>
-
-#include <IOV/PluginFactoryBase.h>
+#include <IOV/Plugin.h>
+#include <IOV/PluginFactory.h>
 
 
 namespace fs = boost::filesystem;
@@ -24,7 +23,12 @@ namespace fs = boost::filesystem;
 namespace inf
 {
 
-void PluginFactoryBase::addScanPath(const std::vector<std::string>& scanPath)
+void PluginFactory::init(const std::vector<std::string>& scanPath)
+{
+   addScanPath(scanPath);
+}
+
+void PluginFactory::addScanPath(const std::vector<std::string>& scanPath)
 {
    // Determine the platform-specific file extension used for dynamically
    // loadable code.
@@ -75,14 +79,11 @@ void PluginFactoryBase::addScanPath(const std::vector<std::string>& scanPath)
                if(mPluginLibs.find(plugin_name) == mPluginLibs.end())
                {
                   mPluginLibs[plugin_name] = libs[j];
-                  std::cout << "IOV: Found plug-in [" << plugin_name << "]"
-                            << std::endl;
+                  std::cout << "IOV: Found plugin: [" << plugin_name << "]" << std::endl;
                }
                else
                {
-                  std::cout << "WARNING: IOV found a plug-in that was "
-                            << "already registered: " << plugin_name
-                            << std::endl;
+                  std::cout << "WARNING: IOV found a plugin that was already registered: " << plugin_name << std::endl;
                }
             }
             else
@@ -100,11 +101,11 @@ void PluginFactoryBase::addScanPath(const std::vector<std::string>& scanPath)
    }
 }
 
-vpr::LibraryPtr PluginFactoryBase::getPluginLibrary(const std::string& name)
-   const
-   throw (inf::NoSuchPluginException)
+vpr::LibraryPtr PluginFactory::getPluginLibrary(const std::string& name) const
+   throw(inf::NoSuchPluginException)
 {
-   plugin_libs_map_t::const_iterator lib = mPluginLibs.find(name);
+   std::map<std::string, vpr::LibraryPtr>::const_iterator lib =
+      mPluginLibs.find(name);
 
    if ( lib != mPluginLibs.end() )
    {
@@ -112,23 +113,43 @@ vpr::LibraryPtr PluginFactoryBase::getPluginLibrary(const std::string& name)
    }
    else
    {
-      std::ostringstream msg_stream;
+      std::stringstream msg_stream;
       msg_stream << "No plug-in named '" << name << "' exists";
       throw NoSuchPluginException(msg_stream.str(), IOV_LOCATION);
    }
 }
 
-void PluginFactoryBase::registerCreatorFromName(const std::string& name)
+void PluginFactory::registerCreator(inf::PluginCreatorBase* creator,
+                                    const std::string& name)
+{
+   plugin_creator_map_t::iterator i = mPluginCreators.find(name);
+   if(i != mPluginCreators.end())
+   {
+      std::cerr << "WARNING: Tried to re-register a creator for plugin type: " << name
+                << ".  This registration will be ignored." << std::endl;
+      return;
+   }
+
+   std::cout << "IOV: PluginFactory: Registering creator for: " << name << std::endl;
+
+   mPluginCreators[name] = creator;
+}
+
+void PluginFactory::
+registerCreatorFromName(const std::string& name,
+                        const std::string& getCreatorFuncName,
+                        boost::function<bool (vpr::LibraryPtr)> validator)
    throw (inf::PluginLoadException)
 {
    // Get the vpr::LibraryPtr for the named plug-in.  This will throw an
    // exception if name is not a valid plug-in name.
    vpr::LibraryPtr plugin_lib = getPluginLibrary(name);
 
-   // At this point, we know that the given name must be a valid plug-in name.
+   // At this point, we know that the given name must be a valid plug-in
+   // name.
    if ( plugin_lib->isLoaded() )
    {
-      registerCreatorFromLib(plugin_lib, name);
+      registerCreatorFromLib(plugin_lib, name, getCreatorFuncName, validator);
    }
    else
    {
@@ -136,7 +157,8 @@ void PluginFactoryBase::registerCreatorFromName(const std::string& name)
       try
       {
          plugin_lib->load();
-         registerCreatorFromLib(plugin_lib, name);
+         registerCreatorFromLib(plugin_lib, name, getCreatorFuncName,
+                                validator);
       }
       catch (vpr::IOException& ex)
       {
@@ -148,7 +170,8 @@ void PluginFactoryBase::registerCreatorFromName(const std::string& name)
 #else
       if ( plugin_lib->load().success() )
       {
-         registerCreatorFromLib(plugin_lib, name);
+         registerCreatorFromLib(plugin_lib, name, getCreatorFuncName,
+                                validator);
       }
       else
       {
@@ -157,6 +180,37 @@ void PluginFactoryBase::registerCreatorFromName(const std::string& name)
          throw PluginLoadException(msg_stream.str(), IOV_LOCATION);
       }
 #endif
+   }
+}
+
+void PluginFactory::
+registerCreatorFromLib(vpr::LibraryPtr pluginLib, const std::string& name,
+                       const std::string& getCreatorFuncName,
+                       boost::function<bool (vpr::LibraryPtr)> validator)
+   throw (inf::PluginInterfaceException)
+{
+   vprASSERT(pluginLib->isLoaded() && "Plug-in library is not loaded");
+
+   if ( validator(pluginLib) )
+   {
+      void* creator_symbol = pluginLib->findSymbol(getCreatorFuncName);
+
+      if ( creator_symbol != NULL )
+      {
+         inf::PluginCreatorBase* (*creator_func)();
+         creator_func = (inf::PluginCreatorBase* (*)()) creator_symbol;
+         inf::PluginCreatorBase* new_creator = (*creator_func)();
+         registerCreator(new_creator, name);
+      }
+      else
+      {
+         std::ostringstream msg_stream;
+         msg_stream << "Plug-in '" << pluginLib->getName()
+                    << "' has no entry point function named "
+                    << getCreatorFuncName;
+         throw inf::PluginInterfaceException(msg_stream.str(),
+                                             IOV_LOCATION);
+      }
    }
 }
 

@@ -34,8 +34,9 @@ Viewer::Viewer()
    , mAspect(NULL)
    , mConnection(NULL)
 {
-   mPluginFactory = plugin_factory_t::create();
+   mPluginFactory = PluginFactory::create();
 }
+
 
 Viewer::~Viewer()
 {
@@ -438,8 +439,8 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
       try
       {
          std::cout << "   Loading plugin: " << plugin_name << " .... ";
-         plugin_factory_t::plugin_creator_t* creator =
-            mPluginFactory->getPluginCreator(plugin_name);
+         inf::PluginCreator<inf::Plugin>* creator =
+            mPluginFactory->getPluginCreator<inf::Plugin>(plugin_name);
 
          if ( NULL != creator )
          {

@@ -16,10 +16,10 @@
 
 #include <IOV/ViewerPtr.h>
 
+#include <IOV/PluginPtr.h>
 #include <IOV/UserPtr.h>
 #include <IOV/ScenePtr.h>
-#include <IOV/Plugin.h>
-#include <IOV/PluginFactory.h>
+#include <IOV/PluginFactoryPtr.h>
 
 #include <IOV/Scene.h>
 #include <IOV/Configuration.h>
@@ -51,9 +51,6 @@ class IOV_CLASS_API Viewer
    , public boost::enable_shared_from_this<Viewer>
 {
 public:
-   typedef inf::PluginFactory<inf::Plugin> plugin_factory_t;
-   typedef plugin_factory_t::ptr_t         plugin_factory_ptr_t;
-
    static ViewerPtr create()
    {
       ViewerPtr new_viewer(new Viewer);
@@ -124,7 +121,7 @@ public:
    }
 
    /** Return the plugin factory being used by the system. */
-   plugin_factory_ptr_t getPluginFactory()
+   inf::PluginFactoryPtr getPluginFactory()
    {
       return mPluginFactory;
    }
@@ -206,13 +203,13 @@ private:
    //@}
 
    /**< Plugin factory for the entire system. */
-   plugin_factory_ptr_t mPluginFactory;
+   inf::PluginFactoryPtr mPluginFactory;
 
    /** List of plugins managed by the viewer.
    * @link association
    * @supplierCardinality 0..**/
    /*# Plugin lnkPlugin; */
-   std::vector<plugin_factory_t::plugin_ptr_t> mPlugins;
+   std::vector<PluginPtr> mPlugins;
 
    /** The configuration for the system (and the viewer). */
    inf::Configuration  mConfiguration;

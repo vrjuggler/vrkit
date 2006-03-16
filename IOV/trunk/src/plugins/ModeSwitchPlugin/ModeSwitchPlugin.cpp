@@ -46,7 +46,7 @@ IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
    minorVer = INF_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreator<inf::Plugin>*) getCreator()
+IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }
@@ -133,8 +133,7 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
       search_path.push_back(new_path);
    }
 
-   inf::Viewer::plugin_factory_ptr_t plugin_factory =
-      viewer->getPluginFactory();
+   inf::PluginFactoryPtr plugin_factory = viewer->getPluginFactory();
    if(!search_path.empty())
    {
       plugin_factory->addScanPath(search_path);
@@ -172,8 +171,8 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
          std::cout << "   Loading plugin: " << plugin_data.mName << " .... "
                    << std::flush;
 
-         inf::Viewer::plugin_factory_t::plugin_creator_t* creator =
-            plugin_factory->getPluginCreator(plugin_data.mName);
+         inf::PluginCreator<inf::Plugin>* creator =
+            plugin_factory->getPluginCreator<inf::Plugin>(plugin_data.mName);
 
          if ( NULL != creator )
          {
