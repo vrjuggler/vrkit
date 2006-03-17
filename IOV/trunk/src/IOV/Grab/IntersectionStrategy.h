@@ -20,6 +20,9 @@
 namespace inf
 {
 
+/**
+ * A pluggable strategy for detecting intersection with a scene object.
+ */
 class IOV_CLASS_API IntersectionStrategy : public boost::noncopyable
 {
 public:
@@ -50,18 +53,65 @@ public:
     */
    static bool validatePluginLib(vpr::LibraryPtr pluginLib);
 
+   /**
+    * Destructor. This does nothing.
+    */
    virtual ~IntersectionStrategy();
 
+   /**
+    * Initializes this intersection strategy.
+    *
+    * @post This intersection strategy is initialized and ready to be used.
+    *
+    * @param viewer The VR Juggler application object.
+    */
    virtual void init(ViewerPtr viewer) = 0;
 
+   /**
+    * Updates this intersection strategy. This method is invoked once per
+    * frame to give the intersection strategy an opportunity to update its
+    * state. For exmaple, an intersection strategy may be rendering something
+    * in the scene to assist with the intersection operation, and overriding
+    * this method is the place to perform updates to that rendered
+    * information.
+    *
+    * @pre This intersection strategy has been initialized.
+    *
+    * @param viewer The VR Juggler application object.
+    */
    virtual void update(ViewerPtr)
-   {;}
+   {
+      /* Do nothing. */ ;
+   }
 
-   virtual OSG::TransformNodePtr findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint) = 0;
+   /**
+    * Attempts to find an intersection with a scene object. This is where the
+    * real work is done. If a point of intersection is found, the intersected
+    * scene object is returned as is the point of intersection.
+    *
+    * @pre This intersection strategy has been initialized.
+    *
+    * @param viewer         The VR Juggler application object.
+    * @param intersectPoint Storage for the point of intersection if an
+    *                       intersection is detected.
+    *
+    * @return The intersected scene object is returned or \c OSG::NullFC if no
+    *         intersection was found.
+    *
+    * @note The value of \p intersectPoint is undefined except when the
+    *       return value of this method is not \c OSG::NullFC.
+    */
+   virtual OSG::TransformNodePtr
+      findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint) = 0;
 
 protected:
+   /**
+    * Constructor. This does nothing.
+    */
    IntersectionStrategy();
 };
 
 }
+
+
 #endif /*_INF_INTERSECTION_STRATEGY_H_*/
