@@ -59,8 +59,8 @@ aaaaa ICON "../../data/infiscape_vrjuggler.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,16,1,0
- PRODUCTVERSION 0,16,1,0
+ FILEVERSION 0,16,2,0
+ PRODUCTVERSION 0,16,2,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -78,12 +78,12 @@ BEGIN
             VALUE "Comments", "http://www.infiscape.com/"
             VALUE "CompanyName", "Infiscape Corporation"
             VALUE "FileDescription", "IOV slaveViewer"
-            VALUE "FileVersion", "0.16.1"
+            VALUE "FileVersion", "0.16.2"
             VALUE "InternalName", "IOV slaveViewer"
             VALUE "LegalCopyright", "Copyright © 2005–2006"
             VALUE "OriginalFilename", "slaveViewer.exe"
             VALUE "ProductName", "IOV slaveViewer"
-            VALUE "ProductVersion", "0.16.1"
+            VALUE "ProductVersion", "0.16.2"
         END
     END
     BLOCK "VarFileInfo"

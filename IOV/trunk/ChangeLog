@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-03-17 patrickh The functionality of the Point Grab Plug-in has been
+                    superceded by the Grab Plug-in and its Basic Move Strategy
+                    plug-in.
+                    -- VERSION -- 0.16.2
 2006-03-17 patrickh Replaced the Center Point Grab Plug-in with a move strategy
                     used by the Grab Plug-in.
                     -- VERSION -- 0.16.1
