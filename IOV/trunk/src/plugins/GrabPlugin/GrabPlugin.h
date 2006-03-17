@@ -130,6 +130,7 @@ private:
 
    /** @name Move Strategy */
    //@{
+   gmtl::Matrix44f mGrabbed_pobj_M_obj;
    std::map< std::string, boost::function<MoveStrategyPtr ()> > mMoveStrategyMap;
    std::vector<MoveStrategyPtr> mMoveStrategies;
    std::vector<std::string> mMoveStrategyNames;

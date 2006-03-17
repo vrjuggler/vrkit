@@ -60,7 +60,8 @@ public:
 
    virtual gmtl::Matrix44f computeMove(inf::ViewerPtr viewer,
                                        OSG::TransformNodePtr obj,
-                                       const gmtl::Matrix44f& vp_M_wand) = 0;
+                                       const gmtl::Matrix44f& vp_M_wand,
+                                       gmtl::Matrix44f& curObjPos) = 0;
 
 protected:
    MoveStrategy();

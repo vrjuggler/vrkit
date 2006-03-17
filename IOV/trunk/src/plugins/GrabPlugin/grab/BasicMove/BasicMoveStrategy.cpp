@@ -49,34 +49,33 @@ void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
                                       OSG::TransformNodePtr obj,
                                       const gmtl::Matrix44f& vp_M_wand)
 {
-   // m_wand_M_obj is the offset between the wand and the grabbed
+   // m_wand_M_pobj is the offset between the wand and the grabbed
    // object's center point:
    //
-   //    m_wand_M_obj = wand_M_vp * vp_M_obj * obj_xform
+   //    m_wand_M_pobj = wand_M_vp * vp_M_pobj
    gmtl::Matrix44f wand_M_vp;
-   gmtl::Matrix44f obj_xform;
 
    OSG::Matrix world_xform;
    obj.node()->getParent()->getToWorld(world_xform);
-   gmtl::Matrix44f vp_M_obj;
-   gmtl::set(vp_M_obj, world_xform);
+   gmtl::Matrix44f vp_M_pobj;
+   gmtl::set(vp_M_pobj, world_xform);
 
    gmtl::invert(wand_M_vp, vp_M_wand);
-   gmtl::set(obj_xform, obj->getMatrix());
 
-   m_wand_M_obj = wand_M_vp * vp_M_obj * obj_xform;
+   m_wand_M_pobj = wand_M_vp * vp_M_pobj;
 }
 
 void BasicMoveStrategy::objectReleased(inf::ViewerPtr viewer,
                                        OSG::TransformNodePtr obj)
 {
-   gmtl::identity(m_wand_M_obj);
+   gmtl::identity(m_wand_M_pobj);
 }
 
 gmtl::Matrix44f
 BasicMoveStrategy::computeMove(inf::ViewerPtr viewer,
                                OSG::TransformNodePtr obj,
-                               const gmtl::Matrix44f& vp_M_wand)
+                               const gmtl::Matrix44f& vp_M_wand,
+                               gmtl::Matrix44f& curObjMat)
 {
    // pobj_M_vp is the inverse of the object in view platform space.
    OSG::Matrix world_xform;
@@ -87,7 +86,7 @@ BasicMoveStrategy::computeMove(inf::ViewerPtr viewer,
 
    const gmtl::Matrix44f pobj_M_wand = pobj_M_vp * vp_M_wand;
 
-   return pobj_M_wand * m_wand_M_obj;
+   return pobj_M_wand * m_wand_M_pobj * curObjMat;
 }
 
 }

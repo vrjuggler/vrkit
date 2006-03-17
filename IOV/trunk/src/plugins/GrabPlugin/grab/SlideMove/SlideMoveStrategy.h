@@ -40,9 +40,11 @@ public:
    virtual void objectReleased(inf::ViewerPtr viewer,
                                OSG::TransformNodePtr obj);
 
+   // Note: Use the curObjPos instead of obj->getMatrix()
    virtual gmtl::Matrix44f computeMove(inf::ViewerPtr viewer,
                                        OSG::TransformNodePtr obj,
-                                       const gmtl::Matrix44f& vp_M_wand);
+                                       const gmtl::Matrix44f& vp_M_wand,
+                                       gmtl::Matrix44f& curObjPos);
 
 protected:
    SlideMoveStrategy()

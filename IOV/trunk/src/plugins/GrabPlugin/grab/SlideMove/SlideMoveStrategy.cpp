@@ -61,7 +61,8 @@ void SlideMoveStrategy::objectReleased(inf::ViewerPtr viewer,
 gmtl::Matrix44f
 SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
                                OSG::TransformNodePtr obj,
-                               const gmtl::Matrix44f& vp_M_wand)
+                               const gmtl::Matrix44f& vp_M_wand,
+                               gmtl::Matrix44f& curObjPos)
 {
    int mInOutAnalogNum = 0;
 
@@ -101,16 +102,12 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
    gmtl::set(pobj_M_vp, world_xform);
    gmtl::invert(pobj_M_vp);
 
-   // XXX: Move strategy
    const gmtl::Matrix44f pobj_M_wand = pobj_M_vp * vp_M_wand;
    gmtl::Matrix44f wand_M_pobj;
    gmtl::invert(wand_M_pobj, pobj_M_wand);
 
 /////
-   gmtl::Matrix44f pobj_M_obj;
-   gmtl::set(pobj_M_obj, obj->getMatrix());
-
-   gmtl::Matrix44f wand_M_obj = wand_M_pobj * pobj_M_obj;
+   gmtl::Matrix44f wand_M_obj = wand_M_pobj * curObjPos;
    gmtl::Vec3f obj_dir = gmtl::makeTrans<gmtl::Vec3f>(wand_M_obj);
 
    std::cout << "Obj Dir: " << obj_dir << std::endl;
@@ -127,7 +124,7 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
       gmtl::makeTrans<gmtl::Matrix44f>(obj_dir*mTransValue);
    gmtl::Matrix44f pobj_trans_mat = pobj_M_wand * delta_trans_mat;
 
-   return pobj_M_wand * delta_trans_mat * wand_M_pobj;
+   return pobj_M_wand * delta_trans_mat * wand_M_pobj * curObjPos;
 }
 
 }
