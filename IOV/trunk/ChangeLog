@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-03-16 arnob    Added a new grab plug-in whose intersection and object
+                    movement behaviors are defined by strategies that are
+                    plugged in at run time.
 2006-03-16 patrickh Made inf::PluginCreator and inf::PluginFactory templated
            aronb    types to allow them to be used for plug-in types beyond
                     those deriving from inf::Plugin.
