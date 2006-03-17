@@ -22,6 +22,8 @@ namespace inf
 
 /**
  * A pluggable strategy for detecting intersection with a scene object.
+ *
+ * @since 0.16.0
  */
 class IOV_CLASS_API IntersectionStrategy : public boost::noncopyable
 {

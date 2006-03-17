@@ -22,6 +22,8 @@ namespace inf
 
 /**
  * A pluggable strategy for moving a grabbed scene object.
+ *
+ * @since 0.16.0
  */
 class IOV_CLASS_API MoveStrategy : public boost::noncopyable
 {
