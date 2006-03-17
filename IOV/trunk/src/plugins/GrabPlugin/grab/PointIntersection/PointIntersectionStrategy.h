@@ -5,6 +5,7 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <OpenSG/OSGTransform.h>
+#include <gmtl/Point.h>
 #include <IOV/ViewerPtr.h>
 #include <IOV/GrabDataPtr.h>
 #include "../../IntersectionStrategy.h"
@@ -37,7 +38,7 @@ public:
    }
    virtual void init(ViewerPtr viewer);
 
-   virtual OSG::TransformNodePtr findIntersection(ViewerPtr viewer);
+   virtual OSG::TransformNodePtr findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint);
 
 private:
    inf::GrabDataPtr mGrabData;

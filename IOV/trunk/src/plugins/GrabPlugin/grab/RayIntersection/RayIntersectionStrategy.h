@@ -9,6 +9,8 @@
 #include <IOV/GrabDataPtr.h>
 #include "../../IntersectionStrategy.h"
 
+#include <gmtl/Point.h>
+
 #include <OpenSG/OSGLine.h>
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGSwitch.h>
@@ -47,7 +49,7 @@ public:
 
    virtual void update(ViewerPtr viewer);
 
-   virtual OSG::TransformNodePtr findIntersection(ViewerPtr viewer);
+   virtual OSG::TransformNodePtr findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint);
 
    void setVisible(bool visible);
    void initGeom();

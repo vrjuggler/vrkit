@@ -47,9 +47,11 @@ void SlideMoveStrategy::init(inf::ViewerPtr)
 }
 
 void SlideMoveStrategy::objectGrabbed(inf::ViewerPtr,
-                                      OSG::TransformNodePtr,
-                                      const gmtl::Matrix44f&)
+                                      OSG::TransformNodePtr obj,
+                                      gmtl::Point3f& intersectPoint,
+                                      const gmtl::Matrix44f& vp_M_wand)
 {
+   mIntersectPoint = intersectPoint;
 }
 
 void SlideMoveStrategy::objectReleased(inf::ViewerPtr viewer,
@@ -91,9 +93,12 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
    float trans_val = -in_out_val*in_out_scale;
    mTransValue += trans_val;
 
-   //std::cout << "trans val: " << trans_val << std::endl;
-   //std::cout << "mTransValue: " << mTransValue << std::endl;
-
+   // If the object is at the wand then don't allow it to
+   // move any further back.
+   if (mTransValue >= 1.0)
+   {
+      mTransValue = 1.0;
+   }
 
    // pobj_M_vp is the inverse of the object in view platform space.
    OSG::Matrix world_xform;
@@ -106,23 +111,24 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
    gmtl::Matrix44f wand_M_pobj;
    gmtl::invert(wand_M_pobj, pobj_M_wand);
 
-/////
    gmtl::Matrix44f wand_M_obj = wand_M_pobj * curObjPos;
+
    gmtl::Vec3f obj_dir = gmtl::makeTrans<gmtl::Vec3f>(wand_M_obj);
+  
+   // XXX: Make it configurable if we want to slide the intersection
+   //      point or the center of the object closer to us.
+   obj_dir += mIntersectPoint;
 
-   std::cout << "Obj Dir: " << obj_dir << std::endl;
+   // XXX: This was removed to allow objects further away to get
+   //      closer faster. If this is normalized again then we will
+   //      need to change the mTransVal >= check to take the length
+   //      of obj_dir into account.
+   //gmtl::normalize(obj_dir);
 
-   if (gmtl::length(obj_dir) <= 0.0f)
-   {
-      return gmtl::MAT_IDENTITY44F;
-   }
-   gmtl::normalize(obj_dir);
-
-/////
    // Accumulate translation matrix.
    gmtl::Matrix44f delta_trans_mat =
-      gmtl::makeTrans<gmtl::Matrix44f>(obj_dir*mTransValue);
-   gmtl::Matrix44f pobj_trans_mat = pobj_M_wand * delta_trans_mat;
+      gmtl::makeTrans<gmtl::Matrix44f>(obj_dir*-mTransValue);
+
 
    return pobj_M_wand * delta_trans_mat * wand_M_pobj * curObjPos;
 }

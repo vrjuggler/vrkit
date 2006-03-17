@@ -4,6 +4,8 @@
 #include <vpr/vpr.h>
 #include <vpr/Util/Assert.h>
 
+#include <gmtl/Point.h>
+
 #include <IOV/Util/Exceptions.h>
 
 #include "MoveStrategy.h"

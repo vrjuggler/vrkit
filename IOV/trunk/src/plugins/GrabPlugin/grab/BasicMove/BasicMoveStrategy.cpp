@@ -47,6 +47,7 @@ void BasicMoveStrategy::init(inf::ViewerPtr viewer)
 
 void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
                                       OSG::TransformNodePtr obj,
+                                      gmtl::Point3f& intersectPoint,
                                       const gmtl::Matrix44f& vp_M_wand)
 {
    // m_wand_M_pobj is the offset between the wand and the grabbed

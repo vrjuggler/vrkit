@@ -240,7 +240,8 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       OSG::TransformNodePtr intersect_obj;
       if (NULL != mIsectStrategy.get())
       {
-         intersect_obj = mIsectStrategy->findIntersection(viewer);
+         mIntersectPoint = gmtl::Point3f();
+         intersect_obj = mIsectStrategy->findIntersection(viewer, mIntersectPoint);
       }
 
       // If the intersected object is different than the one with which the
@@ -305,7 +306,7 @@ void GrabPlugin::updateState(ViewerPtr viewer)
          for (std::vector<MoveStrategyPtr>::iterator itr = mMoveStrategies.begin();
               itr != mMoveStrategies.end(); ++itr)
          {
-            (*itr)->objectGrabbed(viewer, mIntersectedObj,
+            (*itr)->objectGrabbed(viewer, mIntersectedObj, mIntersectPoint,
                                   vp_M_wand_xform);
          }
       }

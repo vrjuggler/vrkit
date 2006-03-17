@@ -161,7 +161,7 @@ void RayIntersectionStrategy::initGeom()
    OSG::endEditCP(mSwitchNode);
 }
 
-OSG::TransformNodePtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer)
+OSG::TransformNodePtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint)
 {
    WandInterfacePtr wand = viewer->getUser()->getInterfaceTrader().getWandInterface();
    const gmtl::Matrix44f vp_M_wand(
@@ -173,6 +173,7 @@ OSG::TransformNodePtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer
    float min_dist = 999999999.9f;   // Set to a max
    const GrabData::object_list_t& objects = mGrabData->getObjects();
    OSG::Line osg_pick_ray;
+   OSG::Pnt3f osg_intersect_point;
 
    GrabData::object_list_t::const_iterator o;
    for ( o = objects.begin(); o != objects.end(); ++o)
@@ -200,11 +201,13 @@ OSG::TransformNodePtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer
          {
             intersect_obj = *o;
             min_dist = enter_val;
+            osg_intersect_point = osg_pick_ray.getPosition() + (min_dist * osg_pick_ray.getDirection());
          }
       }
 
    }
 
+   intersectPoint.set(osg_intersect_point.getValues());
    return intersect_obj;
 }
 

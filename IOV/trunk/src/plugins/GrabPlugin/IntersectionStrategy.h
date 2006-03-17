@@ -6,6 +6,7 @@
 #include <boost/noncopyable.hpp>
 #include <OpenSG/OSGTransform.h>
 #include <vpr/DynLoad/Library.h>
+#include <gmtl/Point.h>
 #include <IOV/ViewerPtr.h>
 
 #include "IntersectionStrategyPtr.h"
@@ -54,7 +55,7 @@ public:
    virtual void update(ViewerPtr)
    {;}
 
-   virtual OSG::TransformNodePtr findIntersection(ViewerPtr viewer) = 0;
+   virtual OSG::TransformNodePtr findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint) = 0;
 
 protected:
    IntersectionStrategy();

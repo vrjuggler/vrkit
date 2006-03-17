@@ -43,8 +43,10 @@ void PointIntersectionStrategy::init(ViewerPtr viewer)
    mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
 }
 
-OSG::TransformNodePtr PointIntersectionStrategy::findIntersection(ViewerPtr viewer)
+OSG::TransformNodePtr PointIntersectionStrategy::findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint)
 {
+   intersectPoint.set(0.0f, 0.0f, 0.0f);
+
    WandInterfacePtr wand = viewer->getUser()->getInterfaceTrader().getWandInterface();
    const gmtl::Matrix44f vp_M_wand_xform(
       wand->getWandPos()->getData(viewer->getDrawScaleFactor())
@@ -77,6 +79,7 @@ OSG::TransformNodePtr PointIntersectionStrategy::findIntersection(ViewerPtr view
       if ( bbox.intersect(wand_point) )
       {
          intersect_obj = *o;
+         intersectPoint.set(wand_point.getValues());
          break;
       }
    }

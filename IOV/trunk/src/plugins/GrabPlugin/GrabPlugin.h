@@ -126,6 +126,7 @@ private:
    std::map< std::string, boost::function<IntersectionStrategyPtr ()> > mIsectStrategyMap;
    IntersectionStrategyPtr mIsectStrategy;
    std::string mIsectStrategyName;
+   gmtl::Point3f mIntersectPoint;
    //@}
 
    /** @name Move Strategy */
