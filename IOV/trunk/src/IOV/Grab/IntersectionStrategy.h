@@ -3,13 +3,15 @@
 #ifndef _INF_INTERSECTION_STRATEGY_H_
 #define _INF_INTERSECTION_STRATEGY_H_
 
+#include <IOV/Config.h>
+
 #include <boost/noncopyable.hpp>
 #include <OpenSG/OSGTransform.h>
 #include <vpr/DynLoad/Library.h>
 #include <gmtl/Point.h>
 #include <IOV/ViewerPtr.h>
 
-#include "IntersectionStrategyPtr.h"
+#include <IOV/Grab/IntersectionStrategyPtr.h>
 
 #define INF_ISECT_STRATEGY_PLUGIN_API_MAJOR 1
 #define INF_ISECT_STRATEGY_PLUGIN_API_MINOR 0
@@ -18,7 +20,7 @@
 namespace inf
 {
 
-class IntersectionStrategy : public boost::noncopyable
+class IOV_CLASS_API IntersectionStrategy : public boost::noncopyable
 {
 public:
    /**

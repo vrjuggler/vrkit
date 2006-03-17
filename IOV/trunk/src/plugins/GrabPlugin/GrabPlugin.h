@@ -20,11 +20,8 @@
 #include <IOV/GeometryHighlightTraverser.h>
 #include <IOV/PluginFactory.h>
 #include <IOV/Util/DigitalCommand.h>
-
-#include "IntersectionStrategyPtr.h"
-#include "MoveStrategyPtr.h"
-#include "IntersectionStrategy.h"
-#include "MoveStrategy.h"
+#include <IOV/Grab/IntersectionStrategy.h>
+#include <IOV/Grab/MoveStrategy.h>
 
 
 namespace inf

@@ -5,7 +5,7 @@
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include "../../MoveStrategy.h"
+#include <IOV/Grab/MoveStrategy.h>
 
 
 namespace inf

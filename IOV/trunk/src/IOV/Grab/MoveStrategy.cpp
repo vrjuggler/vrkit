@@ -4,15 +4,17 @@
 #include <vpr/vpr.h>
 #include <vpr/Util/Assert.h>
 
+#include <gmtl/Point.h>
+
 #include <IOV/Util/Exceptions.h>
 
-#include "IntersectionStrategy.h"
+#include <IOV/Grab/MoveStrategy.h>
 
 
 namespace inf
 {
 
-bool IntersectionStrategy::validatePluginLib(vpr::LibraryPtr pluginLib)
+bool MoveStrategy::validatePluginLib(vpr::LibraryPtr pluginLib)
 {
    vprASSERT(pluginLib->isLoaded() && "Plug-in library is not loaded");
 
@@ -37,13 +39,13 @@ bool IntersectionStrategy::validatePluginLib(vpr::LibraryPtr pluginLib)
       vpr::Uint32 minor_ver;
       (*version_func)(major_ver, minor_ver);
 
-      if ( major_ver != INF_ISECT_STRATEGY_PLUGIN_API_MAJOR )
+      if ( major_ver != INF_MOVE_STRATEGY_PLUGIN_API_MAJOR )
       {
          std::ostringstream msg_stream;
          msg_stream << "Interface version mismatch: run-time does not match "
                     << "compile-time plug-in setting ("
-                    << INF_ISECT_STRATEGY_PLUGIN_API_MAJOR << "."
-                    << INF_ISECT_STRATEGY_PLUGIN_API_MINOR
+                    << INF_MOVE_STRATEGY_PLUGIN_API_MAJOR << "."
+                    << INF_MOVE_STRATEGY_PLUGIN_API_MINOR
                     << " != " << major_ver << "." << minor_ver << ")";
          throw inf::PluginInterfaceException(msg_stream.str(),
                                              IOV_LOCATION);
@@ -53,12 +55,12 @@ bool IntersectionStrategy::validatePluginLib(vpr::LibraryPtr pluginLib)
    return true;
 }
 
-IntersectionStrategy::~IntersectionStrategy()
+MoveStrategy::~MoveStrategy()
 {
    /* Do nothing. */ ;
 }
 
-IntersectionStrategy::IntersectionStrategy()
+MoveStrategy::MoveStrategy()
 {
    /* Do nothing. */ ;
 }

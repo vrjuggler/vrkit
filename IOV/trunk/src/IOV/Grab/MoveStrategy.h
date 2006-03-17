@@ -3,13 +3,15 @@
 #ifndef _INF_MOVE_STRATEGY_H_
 #define _INF_MOVE_STRATEGY_H_
 
+#include <IOV/Config.h>
+
 #include <boost/noncopyable.hpp>
 #include <OpenSG/OSGTransform.h>
 #include <gmtl/Matrix.h>
 #include <vpr/DynLoad/Library.h>
 #include <IOV/ViewerPtr.h>
 
-#include "MoveStrategyPtr.h"
+#include <IOV/Grab/MoveStrategyPtr.h>
 
 #define INF_MOVE_STRATEGY_PLUGIN_API_MAJOR 1
 #define INF_MOVE_STRATEGY_PLUGIN_API_MINOR 0
@@ -18,7 +20,7 @@
 namespace inf
 {
 
-class MoveStrategy : public boost::noncopyable
+class IOV_CLASS_API MoveStrategy : public boost::noncopyable
 {
 public:
    /**

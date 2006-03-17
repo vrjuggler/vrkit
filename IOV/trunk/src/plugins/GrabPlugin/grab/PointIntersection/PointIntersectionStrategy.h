@@ -3,13 +3,13 @@
 #ifndef _INF_POINT_INTERSECTION_STRATEGY_H_
 #define _INF_POINT_INTERSECTION_STRATEGY_H_
 
+#include <string>
 #include <boost/enable_shared_from_this.hpp>
 #include <OpenSG/OSGTransform.h>
 #include <gmtl/Point.h>
 #include <IOV/ViewerPtr.h>
 #include <IOV/GrabDataPtr.h>
-#include "../../IntersectionStrategy.h"
-#include <string>
+#include <IOV/Grab/IntersectionStrategy.h>
 
 namespace inf
 {

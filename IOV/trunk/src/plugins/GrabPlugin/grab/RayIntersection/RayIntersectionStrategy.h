@@ -3,21 +3,21 @@
 #ifndef _INF_RAY_INTERSECTION_STRATEGY_H_
 #define _INF_RAY_INTERSECTION_STRATEGY_H_
 
+#include <string>
+
 #include <boost/enable_shared_from_this.hpp>
 #include <OpenSG/OSGTransform.h>
-#include <IOV/ViewerPtr.h>
-#include <IOV/GrabDataPtr.h>
-#include "../../IntersectionStrategy.h"
-
-#include <gmtl/Point.h>
-
 #include <OpenSG/OSGLine.h>
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGSwitch.h>
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGNode.h>
 
-#include <string>
+#include <gmtl/Point.h>
+#include <IOV/ViewerPtr.h>
+#include <IOV/GrabDataPtr.h>
+#include <IOV/Grab/IntersectionStrategy.h>
+
 
 namespace inf
 {
