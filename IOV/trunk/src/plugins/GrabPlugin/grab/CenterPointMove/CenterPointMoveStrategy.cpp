@@ -45,7 +45,7 @@ void CenterPointMoveStrategy::init(inf::ViewerPtr)
 
 void CenterPointMoveStrategy::objectGrabbed(inf::ViewerPtr,
                                             OSG::TransformNodePtr,
-                                            gmtl::Point3f&,
+                                            const gmtl::Point3f&,
                                             const gmtl::Matrix44f&)
 {
    /* Do nothing. */ ;

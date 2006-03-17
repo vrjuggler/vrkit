@@ -80,7 +80,7 @@ public:
     */
    virtual void objectGrabbed(inf::ViewerPtr viewer,
                               OSG::TransformNodePtr obj,
-                              gmtl::Point3f& intersectPoint,
+                              const gmtl::Point3f& intersectPoint,
                               const gmtl::Matrix44f& vp_M_wand) = 0;
 
    /**

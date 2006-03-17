@@ -48,7 +48,7 @@ void SlideMoveStrategy::init(inf::ViewerPtr)
 
 void SlideMoveStrategy::objectGrabbed(inf::ViewerPtr,
                                       OSG::TransformNodePtr obj,
-                                      gmtl::Point3f& intersectPoint,
+                                      const gmtl::Point3f& intersectPoint,
                                       const gmtl::Matrix44f& vp_M_wand)
 {
    mIntersectPoint = intersectPoint;
