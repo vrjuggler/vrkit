@@ -27,7 +27,8 @@ namespace inf
 /** Central factory for IOV plugins.
  * Takes care of scanning, finding, and returning plugin libraries.
  */
-class PluginFactory : public boost::enable_shared_from_this<PluginFactory>
+class IOV_CLASS_API PluginFactory
+   : public boost::enable_shared_from_this<PluginFactory>
 {
 public:
    static PluginFactoryPtr create()

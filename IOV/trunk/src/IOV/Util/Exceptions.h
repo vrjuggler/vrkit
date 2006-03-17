@@ -71,7 +71,7 @@ public:
 };
 
 /** Exception when loading a plugin. */
-class PluginLoadException : public PluginException
+class IOV_CLASS_API PluginLoadException : public PluginException
 {
 public:
    PluginLoadException(const std::string& msg,
@@ -86,7 +86,7 @@ public:
 };
 
 /** Exception when we can't find a plugin. */
-class NoSuchPluginException : public PluginException
+class IOV_CLASS_API NoSuchPluginException : public PluginException
 {
 public:
    NoSuchPluginException(const std::string& msg,
@@ -100,7 +100,7 @@ public:
    }
 };
 
-class PluginInterfaceException : public PluginException
+class IOV_CLASS_API PluginInterfaceException : public PluginException
 {
 public:
    PluginInterfaceException(const std::string& msg,
