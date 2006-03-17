@@ -9,7 +9,6 @@
          <help>The name of a plug-in to be loaded and used by the Infiscape OpenSG Viewer application.</help>
          <value label="Module Name" defaultvalue="" />
          <enumeration editable="true">
-            <enum label="CenterPointGrabPlugin" value="CenterPointGrabPlugin" />
             <enum label="GrabPlugin" value="GrabPlugin" />
             <enum label="LogoPlugin" value="LogoPlugin" />
             <enum label="PointGrabPlugin" value="PointGrabPlugin" />

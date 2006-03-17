@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-03-17 patrickh Replaced the Center Point Grab Plug-in with a move strategy
+                    used by the Grab Plug-in.
+                    -- VERSION -- 0.16.1
 2006-03-16 arnob    Added a new grab plug-in whose intersection and object
                     movement behaviors are defined by strategies that are
                     plugged in at run time.
