@@ -4,6 +4,7 @@
 
 #include <gmtl/MatrixOps.h>
 #include <gmtl/External/OpenSGConvert.h>
+#include <gmtl/Output.h>
 
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
@@ -105,9 +106,25 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
    gmtl::Matrix44f wand_M_pobj;
    gmtl::invert(wand_M_pobj, pobj_M_wand);
 
+/////
+   gmtl::Matrix44f pobj_M_obj;
+   gmtl::set(pobj_M_obj, obj->getMatrix());
+
+   gmtl::Matrix44f wand_M_obj = wand_M_pobj * pobj_M_obj;
+   gmtl::Vec3f obj_dir = gmtl::makeTrans<gmtl::Vec3f>(wand_M_obj);
+
+   std::cout << "Obj Dir: " << obj_dir << std::endl;
+
+   if (gmtl::length(obj_dir) <= 0.0f)
+   {
+      return gmtl::MAT_IDENTITY44F;
+   }
+   gmtl::normalize(obj_dir);
+
+/////
    // Accumulate translation matrix.
    gmtl::Matrix44f delta_trans_mat =
-      gmtl::makeTrans<gmtl::Matrix44f>(gmtl::Vec3f(0,0,mTransValue));
+      gmtl::makeTrans<gmtl::Matrix44f>(obj_dir*mTransValue);
    gmtl::Matrix44f pobj_trans_mat = pobj_M_wand * delta_trans_mat;
 
    return pobj_M_wand * delta_trans_mat * wand_M_pobj;

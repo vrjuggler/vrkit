@@ -359,14 +359,14 @@ void GrabPlugin::run(inf::ViewerPtr viewer)
               itr != mMoveStrategies.end(); ++itr)
          {
             gmtl::preMult(new_obj_mat, (*itr)->computeMove(viewer, mIntersectedObj, vp_M_wand_xform));
-         }
 
-         // XXX: Send a move event.
-         OSG::Matrix obj_mat_osg;
-         gmtl::set(obj_mat_osg, new_obj_mat);
-         OSG::beginEditCP(mIntersectedObj, OSG::Transform::MatrixFieldMask);
-            mIntersectedObj->setMatrix(obj_mat_osg);
-         OSG::endEditCP(mIntersectedObj, OSG::Transform::MatrixFieldMask);
+            // XXX: Send a move event.
+            OSG::Matrix obj_mat_osg;
+            gmtl::set(obj_mat_osg, new_obj_mat);
+            OSG::beginEditCP(mIntersectedObj, OSG::Transform::MatrixFieldMask);
+               mIntersectedObj->setMatrix(obj_mat_osg);
+            OSG::endEditCP(mIntersectedObj, OSG::Transform::MatrixFieldMask);
+         }
       }
    }
 }
