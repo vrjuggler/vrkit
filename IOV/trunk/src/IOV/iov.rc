@@ -1,6 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include "../version.rc"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -53,8 +54,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,16,2,0
- PRODUCTVERSION 0,16,2,0
+ FILEVERSION VERSION_NUM
+ PRODUCTVERSION VERSION_NUM
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -72,12 +73,12 @@ BEGIN
             VALUE "Comments", "http://www.infiscape.com/"
             VALUE "CompanyName", "Infiscape Corporation"
             VALUE "FileDescription", "IOV"
-            VALUE "FileVersion", "0.16.2"
+            VALUE "FileVersion", VERSION_STR
             VALUE "InternalName", "IOV"
-            VALUE "LegalCopyright", "Copyright © 2005–2006"
+            VALUE "LegalCopyright", COPYRIGHT_STR
             VALUE "OriginalFilename", "iov.dll"
             VALUE "ProductName", "IOV"
-            VALUE "ProductVersion", "0.16.2"
+            VALUE "ProductVersion", VERSION_STR
         END
     END
     BLOCK "VarFileInfo"
