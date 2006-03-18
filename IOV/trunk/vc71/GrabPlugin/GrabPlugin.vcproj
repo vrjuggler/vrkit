@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="Point Grab Plug-in"
-	ProjectGUID="{609FF498-5686-4CF6-A9E6-EC801A07C8B1}"
+	Name="Grab Plug-in"
+	ProjectGUID="{A0218102-78F5-48BB-A6C6-F81B3759ED60}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -36,13 +36,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iov_d.lib vrj_d.lib vrj_ogl_d.lib gadget_d.lib sonix_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
-				OutputFile="$(OutDir)/PointGrabPlugin_d.dll"
+				OutputFile="$(OutDir)/GrabPlugin_d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/PointGrabPlugin_d.pdb"
+				ProgramDatabaseFile="$(OutDir)/GrabPlugin_d.pdb"
 				SubSystem="1"
-				ImportLibrary="$(OutDir)/PointGrabPlugin_d.lib"
+				ImportLibrary="$(OutDir)/GrabPlugin_d.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -75,7 +75,6 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="..\..\src;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0400;_WIN32_WINDOWS=0x0410;_WIN32_WINNT=0x0400;_OSG_HAVE_CONFIGURED_H_;OSG_BUILD_DLL;OSG_WITH_GLUT;OSG_WITH_GIF;OSG_WITH_TIF;OSG_WITH_JPG;_CONSOLE;_USRDLL;_IOV_PLUGIN_BUILD_;WININC"
 				StringPooling="TRUE"
@@ -94,14 +93,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iov.lib vrj.lib vrj_ogl.lib gadget.lib sonix.lib jccl.lib vpr.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
-				OutputFile="$(OutDir)/PointGrabPlugin.dll"
+				OutputFile="$(OutDir)/GrabPlugin.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				GenerateDebugInformation="FALSE"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/PointGrabPlugin.lib"
+				ImportLibrary="$(OutDir)/GrabPlugin.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -132,14 +131,14 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
-				RelativePath="..\..\src\plugins\PointGrabPlugin\PointGrabPlugin.cpp">
+				RelativePath="..\..\src\plugins\GrabPlugin\GrabPlugin.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
 			<File
-				RelativePath="..\..\src\plugins\PointGrabPlugin\PointGrabPlugin.h">
+				RelativePath="..\..\src\plugins\GrabPlugin\GrabPlugin.h">
 			</File>
 		</Filter>
 		<Filter

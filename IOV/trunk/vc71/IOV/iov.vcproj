@@ -150,10 +150,16 @@
 				RelativePath="..\..\src\Iov\GrabData.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Grab\IntersectionStrategy.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Grab\MoveStrategy.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Plugin.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\Iov\PluginCreator.cpp">
+				RelativePath="..\..\src\Iov\PluginCreatorBase.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\PluginFactory.cpp">
@@ -229,6 +235,18 @@
 				RelativePath="..\..\src\Iov\InterfaceTrader.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Grab\IntersectionStrategy.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Grab\IntersectionStrategyPtr.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Grab\MoveStrategy.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Grab\MoveStrategyPtr.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Plugin\NavPlugin.h">
 			</File>
 			<File
@@ -239,6 +257,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\PluginCreator.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\PluginCreatorBase.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\PluginFactory.h">
@@ -312,6 +333,9 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 			<File
 				RelativePath="..\..\src\Iov\iov.rc">
+			</File>
+			<File
+				RelativePath="..\..\src\version.rc">
 			</File>
 		</Filter>
 	</Files>

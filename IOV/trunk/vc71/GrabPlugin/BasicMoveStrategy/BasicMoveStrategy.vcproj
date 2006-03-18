@@ -2,9 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="Center Point Grab Plug-in"
-	ProjectGUID="{84D25702-83BA-4AB0-8BAB-C9ACD7C425C5}"
-	RootNamespace="Center Point Grab Plug-in"
+	Name="Basic Move Strategy Plug-in"
+	ProjectGUID="{B6EDEE2D-5973-41CF-A75F-7D5F1DCC97C7}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -13,14 +12,14 @@
 	<Configurations>
 		<Configuration
 			Name="DebugDLL|Win32"
-			OutputDirectory="..\$(PlatformName)\plugins"
+			OutputDirectory="..\..\$(PlatformName)\plugins\grab"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\src;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\src;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;WINVER=0x0400;_WIN32_WINDOWS=0x0410;_WIN32_WINNT=0x0400;_OSG_HAVE_CONFIGURED_H_;OSG_BUILD_DLL;_DEBUG;OSG_DEBUG;OSG_WITH_GLUT;OSG_WITH_GIF;OSG_WITH_TIF;OSG_WITH_JPG;_CONSOLE;_USRDLL;_IOV_PLUGIN_BUILD_;WININC"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -36,14 +35,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iov_d.lib vrj_d.lib vrj_ogl_d.lib gadget_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
-				OutputFile="$(OutDir)/CenterPointGrabPlugin_d.dll"
+				AdditionalDependencies="iov_d.lib vrj_d.lib vrj_ogl_d.lib gadget_d.lib sonix_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
+				OutputFile="$(OutDir)/BasicMove_d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/CenterPointGrabPlugin_d.pdb"
+				ProgramDatabaseFile="$(OutDir)/BasicMove_d.pdb"
 				SubSystem="1"
-				ImportLibrary="$(OutDir)/CenterPointGrabPlugin_d.lib"
+				ImportLibrary="$(OutDir)/BasicMove_d.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -68,7 +67,7 @@
 		</Configuration>
 		<Configuration
 			Name="ReleaseDLL|Win32"
-			OutputDirectory="..\$(PlatformName)\plugins"
+			OutputDirectory="..\..\$(PlatformName)\plugins\grab"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
@@ -76,8 +75,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="..\..\src;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
+				AdditionalIncludeDirectories="..\..\..\src;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0400;_WIN32_WINDOWS=0x0410;_WIN32_WINNT=0x0400;_OSG_HAVE_CONFIGURED_H_;OSG_BUILD_DLL;OSG_WITH_GLUT;OSG_WITH_GIF;OSG_WITH_TIF;OSG_WITH_JPG;_CONSOLE;_USRDLL;_IOV_PLUGIN_BUILD_;WININC"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
@@ -94,15 +92,15 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iov.lib vrj.lib vrj_ogl.lib gadget.lib jccl.lib vpr.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
-				OutputFile="$(OutDir)/CenterPointGrabPlugin.dll"
+				AdditionalDependencies="iov.lib vrj.lib vrj_ogl.lib gadget.lib sonix.lib jccl.lib vpr.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
+				OutputFile="$(OutDir)/BasicMove.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				GenerateDebugInformation="FALSE"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/CenterPointGrabPlugin.lib"
+				ImportLibrary="$(OutDir)/BasicMove.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -133,14 +131,14 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
-				RelativePath="..\..\src\plugins\CenterPointGrabPlugin\CenterPointGrabPlugin.cpp">
+				RelativePath="..\..\..\src\plugins\GrabPlugin\grab\BasicMove\BasicMoveStrategy.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
 			<File
-				RelativePath="..\..\src\plugins\CenterPointGrabPlugin\CenterPointGrabPlugin.h">
+				RelativePath="..\..\..\src\plugins\GrabPlugin\grab\BasicMove\BasicMoveStrategy.h">
 			</File>
 		</Filter>
 		<Filter
