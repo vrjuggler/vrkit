@@ -47,7 +47,7 @@ void ObjectSpaceMoveStrategy::init(inf::ViewerPtr viewer)
 
 void ObjectSpaceMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
                                       OSG::TransformNodePtr obj,
-                                      gmtl::Point3f& intersectPoint,
+                                      const gmtl::Point3f& intersectPoint,
                                       const gmtl::Matrix44f& vp_M_wand)
 {
    gmtl::invert(m_wand_M_vp, vp_M_wand);
