@@ -3,8 +3,14 @@
 #ifndef _INF_SLIDE_MOVE_STRATEGY_H_
 #define _INF_SLIDE_MOVE_STRATEGY_H_
 
+#include <string>
 #include <boost/enable_shared_from_this.hpp>
 
+#include <OpenSG/OSGColor.h>
+
+#include <jccl/Config/ConfigElementPtr.h>
+
+#include <IOV/Util/Exceptions.h>
 #include <IOV/Grab/MoveStrategy.h>
 
 
@@ -48,14 +54,31 @@ public:
                                        gmtl::Matrix44f& curObjPos);
 
 protected:
-   SlideMoveStrategy()
-      : inf::MoveStrategy(), mTransValue(0.0f)
+   SlideMoveStrategy();
+
+private:
+   static std::string getElementType()
    {
-      /* Do nothing. */ ;
+      return "slide_move_strategy";
    }
+
+   void configure(jccl::ConfigElementPtr cfgElt) throw (inf::Exception);
 
    float mTransValue;
    gmtl::Point3f mIntersectPoint;
+
+   /** @name Slide Behavior Properties */
+   //@{
+   enum SlideTarget
+   {
+      ISECT_POINT = 0,
+      WAND_CENTER
+   };
+
+   SlideTarget  mSlideTarget;   /**< */
+   int          mAnalogNum;     /**< The wand interface analog index */
+   float        mForwardValue;  /**< Value for foroward sliing (0 or 1) */
+   //@}
 };
 
 }

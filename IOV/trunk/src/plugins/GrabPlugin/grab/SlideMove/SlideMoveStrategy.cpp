@@ -8,6 +8,7 @@
 
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
+#include <IOV/Status.h>
 #include <IOV/User.h>
 #include <IOV/Viewer.h>
 #include <IOV/WandInterface.h>
@@ -42,8 +43,25 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getMoveStrategyCreator()
 namespace inf
 {
 
-void SlideMoveStrategy::init(inf::ViewerPtr)
+void SlideMoveStrategy::init(inf::ViewerPtr viewer)
 {
+   jccl::ConfigElementPtr cfg_elt =
+      viewer->getConfiguration().getConfigElement(getElementType());
+
+   if ( cfg_elt )
+   {
+      try
+      {
+         configure(cfg_elt);
+      }
+      catch (inf::Exception& ex)
+      {
+         std::cerr << ex.what() << std::endl;
+      }
+   }
+
+   vprASSERT(mForwardValue == 0.0f || mForwardValue == 1.0f &&
+             "Invalid setting for mForwardValue");
 }
 
 void SlideMoveStrategy::objectGrabbed(inf::ViewerPtr,
@@ -66,36 +84,43 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
                                const gmtl::Matrix44f& vp_M_wand,
                                gmtl::Matrix44f& curObjPos)
 {
-   int mInOutAnalogNum = 0;
-
    WandInterfacePtr wand_if =
       viewer->getUser()->getInterfaceTrader().getWandInterface();
-   gadget::AnalogInterface& analog_dev = wand_if->getAnalog(mInOutAnalogNum);
+   gadget::AnalogInterface& analog_dev = wand_if->getAnalog(mAnalogNum);
 
    if ( ! analog_dev->isStupefied() )
    {
-      float analog_value = wand_if->getAnalog(mInOutAnalogNum)->getData();
+      const float to_meters(viewer->getDrawScaleFactor());
+      const float analog_value(analog_dev->getData());
       //std::cout << "Analog Value: " << analog_value << std::endl;
 
       // Rescale [0,1] to [-1,1]
-      float in_out_val = (analog_value*2.0)-1.0f;
+      float in_out_val = analog_value * 2.0 - 1.0f;
 
-      //std::cout << "Analog values: " << analog0_val << ", " << analog1_val
-      //          << std::endl;
-      const float eps_limit(0.1);
+      const float eps_limit(0.1 * to_meters);
 
-      if(fabs(in_out_val) < eps_limit)
-      { in_out_val = 0.0f; }
+      if ( gmtl::Math::abs(in_out_val) < eps_limit )
+      {
+         in_out_val = 0.0f;
+      }
 
-      // If we don't have an analog configured, then set in-out to 0
-      if(-1 == mInOutAnalogNum)
-      { in_out_val = 0.0f; }
+      // The above code treats the forward value as 1.0. If the forward value
+      // is 0.0, then swap the sliding direction.
+      if ( mForwardValue == 0.0f )
+      {
+         in_out_val = -in_out_val;
+      }
+
+      // If we don't have an analog configured, then set in-out to 0.
+      if ( -1 == mAnalogNum )
+      {
+         in_out_val = 0.0f;
+      }
 
       //std::cout << "In out: " << in_out_val << std::endl;
 
-      gmtl::Matrix44f new_obj_pos;
-      const float in_out_scale = 0.20f;
-      float trans_val = -in_out_val*in_out_scale;
+      const float in_out_scale(0.20f);
+      const float trans_val(-in_out_val * in_out_scale);
       mTransValue += trans_val;
 
       // If the object is at the wand then don't allow it to
@@ -116,13 +141,14 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
       gmtl::Matrix44f wand_M_pobj;
       gmtl::invert(wand_M_pobj, pobj_M_wand);
 
-      gmtl::Matrix44f wand_M_obj = wand_M_pobj * curObjPos;
+      const gmtl::Matrix44f wand_M_obj(wand_M_pobj * curObjPos);
 
       gmtl::Vec3f obj_dir = gmtl::makeTrans<gmtl::Vec3f>(wand_M_obj);
-     
-      // XXX: Make it configurable if we want to slide the intersection
-      //      point or the center of the object closer to us.
-      obj_dir += mIntersectPoint;
+
+      if ( mSlideTarget == ISECT_POINT )
+      {
+         obj_dir += mIntersectPoint;
+      }
 
       // XXX: This was removed to allow objects further away to get
       //      closer faster. If this is normalized again then we will
@@ -134,8 +160,78 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
       gmtl::Matrix44f delta_trans_mat =
          gmtl::makeTrans<gmtl::Matrix44f>(obj_dir*-mTransValue);
 
-
       return pobj_M_wand * delta_trans_mat * wand_M_pobj * curObjPos;
+   }
+}
+
+SlideMoveStrategy::SlideMoveStrategy()
+   : inf::MoveStrategy()
+   , mTransValue(0.0f)
+   , mAnalogNum(0)
+   , mForwardValue(1.0f)
+{
+   /* Do nothing. */ ;
+}
+
+void SlideMoveStrategy::configure(jccl::ConfigElementPtr cfgElt)
+   throw (inf::Exception)
+{
+   vprASSERT(cfgElt->getID() == getElementType());
+
+   const unsigned int req_cfg_version(1);
+
+   if ( cfgElt->getVersion() < req_cfg_version )
+   {
+      std::stringstream msg;
+      msg << "Configuration of SlideMoveStrategy failed.  Required config "
+          << "element version is " << req_cfg_version << ", but element '"
+          << cfgElt->getName() << "' is version " << cfgElt->getVersion();
+      throw inf::PluginException(msg.str(), IOV_LOCATION);
+   }
+
+   const std::string slide_target_prop("slide_target");
+   const std::string analog_input_prop("analog_input");
+   const std::string forward_value_prop("forward_slide_value");
+
+   const unsigned int slide_target =
+      cfgElt->getProperty<unsigned int>(slide_target_prop);
+
+   if ( slide_target == 0 || slide_target == 1 )
+   {
+      mSlideTarget = static_cast<SlideTarget>(slide_target);
+   }
+   else
+   {
+      IOV_STATUS << "ERROR: Invalid slide target identifier " << slide_target
+                 << std::endl;
+   }
+
+   const int analog_num = cfgElt->getProperty<int>(analog_input_prop);
+
+   // -1 disables sliding. Otherwise, the analog number must be in the range
+   // 0 <= analog_num < 4.
+   if ( analog_num == -1 || 0 <= analog_num && analog_num < 4 )
+   {
+      mAnalogNum = analog_num;
+   }
+   else
+   {
+      IOV_STATUS << "ERROR: Analog input index (" << analog_num << ") given!\n"
+                 << "This must be -1 (to disable) or in the range [0, 4)."
+                 << std::endl;
+   }
+
+   const float fwd_val = cfgElt->getProperty<float>(forward_value_prop);
+
+   if ( fwd_val == 0.0f || fwd_val == 1.0f )
+   {
+      mForwardValue = fwd_val;
+   }
+   else
+   {
+      IOV_STATUS << "ERROR: Invalid forward sliding value (" << fwd_val
+                 << ") given!\n"
+                 << "This must be either 0.0 or 1.0" << std::endl;
    }
 }
 
