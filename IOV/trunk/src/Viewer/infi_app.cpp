@@ -27,6 +27,7 @@
 #include <IOV/User.h>
 #include <IOV/Scene.h>
 #include <IOV/GrabData.h>
+#include <IOV/WandInterface.h>
 
 #include <IOV/Status.h>
 
@@ -85,7 +86,15 @@ void OpenSgViewer::preFrame()
 {
    // Call up to get navigation and plugin updates.
    inf::Viewer::preFrame();
-   // Do nothing
+
+   inf::WandInterfacePtr wand_if = getUser()->getInterfaceTrader().getWandInterface();
+   gadget::DigitalInterface& save_btn(wand_if->getButton(5));
+
+   if ( save_btn->getData() == gadget::Digital::TOGGLE_ON )
+   {
+      OSG::GroupNodePtr root = getSceneObj()->getSceneRoot();
+      OSG::SceneFileHandler::the().write(root, "scene.osb");
+   }
 }
 
 
