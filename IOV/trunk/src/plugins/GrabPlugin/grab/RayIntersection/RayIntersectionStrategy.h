@@ -6,6 +6,8 @@
 #include <string>
 
 #include <boost/enable_shared_from_this.hpp>
+
+#include <OpenSG/OSGColor.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGLine.h>
 #include <OpenSG/OSGGeometry.h>
@@ -14,8 +16,12 @@
 #include <OpenSG/OSGNode.h>
 
 #include <gmtl/Point.h>
+
+#include <jccl/Config/ConfigElementPtr.h>
+
 #include <IOV/ViewerPtr.h>
 #include <IOV/GrabDataPtr.h>
+#include <IOV/Util/Exceptions.h>
 #include <IOV/Grab/IntersectionStrategy.h>
 
 
@@ -27,9 +33,7 @@ class RayIntersectionStrategy
    , public boost::enable_shared_from_this<RayIntersectionStrategy>
 {
 protected:
-   RayIntersectionStrategy()
-      : inf::IntersectionStrategy()
-   {;}
+   RayIntersectionStrategy();
 
 public:
    virtual ~RayIntersectionStrategy()
@@ -49,11 +53,21 @@ public:
 
    virtual void update(ViewerPtr viewer);
 
-   virtual OSG::TransformNodePtr findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint);
+   virtual OSG::TransformNodePtr
+      findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint);
 
    void setVisible(bool visible);
+
    void initGeom();
+
 private:
+   static std::string getElementType()
+   {
+      return "ray_intersection_strategy";
+   }
+
+   void configure(jccl::ConfigElementPtr cfgElt) throw (inf::Exception);
+
    inf::GrabDataPtr mGrabData;
 
    OSG::Line            mSelectionRay;    /**< The ray used for selection. */
@@ -65,7 +79,13 @@ private:
    OSG::GeometryNodePtr mGeomNode;
    OSG::SwitchNodePtr   mSwitchNode;
 
-   float                mRayLength;
+   /** @name Ray Properties */
+   //@{
+   float        mRayLength;     /**< The length of the rendered "ray" */
+   OSG::Color4f mRayDiffuse;
+   OSG::Color4f mRayAmbient;
+   OSG::Real32  mRayWidth;
+   //@}
 };
 
 }

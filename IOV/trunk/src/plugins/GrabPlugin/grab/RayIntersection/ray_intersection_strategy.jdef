@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="ray_intersection_strategy" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="Ray Intersection Strategy (Infiscape)">
+      <abstract>false</abstract>
+      <help />
+      <category>/Infiscape/</category>
+      <property valuetype="float" variable="false" name="ray_length">
+         <help>The length of the rendered ray in feet. The ray itself is infinite; this property simply defines how much of the ray is rendered in the scene.</help>
+         <value label="Ray Length (Feet)" defaultvalue="5.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="ray_width">
+         <help>The width of the rendered ray in pixels. The rendered width of the ray has no bearing on intersection detection; this is used entirely for visibility purposes.</help>
+         <value label="Ray Width (Pixels)" defaultvalue="5.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="ray_diffuse_color">
+         <help>The diffuse (RGBA) color for the rendered ray. Property values must be in the range [0.0,1.0].</help>
+         <value label="Ray Diffuse Red" defaultvalue="1.0"/>
+         <value label="Ray Diffuse Green" defaultvalue="0.0"/>
+         <value label="Ray Diffuse Blue" defaultvalue="0.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="ray_ambient_color">
+         <help>The ambient (RGBA) color for the rendered ray. Property values must be in the range [0.0,1.0].</help>
+         <value label="Ray Ambient Red" defaultvalue="1.0"/>
+         <value label="Ray Ambient Green" defaultvalue="0.0"/>
+         <value label="Ray Ambient Blue" defaultvalue="0.0"/>
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>
+

@@ -1,8 +1,14 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#include "RayIntersectionStrategy.h"
+#include <OpenSG/OSGChunkMaterial.h>
+#include <OpenSG/OSGMaterialChunk.h>
+#include <OpenSG/OSGLineChunk.h>
+
 #include <gmtl/Matrix.h>
 #include <gmtl/External/OpenSGConvert.h>
+
+#include <jccl/Config/ConfigElement.h>
+
 #include <IOV/GrabData.h>
 #include <IOV/InterfaceTrader.h>
 #include <IOV/Plugin/PluginConfig.h>
@@ -11,9 +17,8 @@
 #include <IOV/Viewer.h>
 #include <IOV/WandInterface.h>
 
-#include <OpenSG/OSGChunkMaterial.h>
-#include <OpenSG/OSGMaterialChunk.h>
-#include <OpenSG/OSGLineChunk.h>
+#include "RayIntersectionStrategy.h"
+
 
 static inf::PluginCreator<inf::IntersectionStrategy> sPluginCreator(
    &inf::RayIntersectionStrategy::create, "Ray Intersection Strategy Plug-in"
@@ -42,12 +47,39 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getIntersectionStrategyCreator()
 namespace inf
 {
 
+RayIntersectionStrategy::RayIntersectionStrategy()
+   : inf::IntersectionStrategy()
+   , mRayLength(20.0f)
+   , mRayDiffuse(1.0f, 0.0f, 0.0f, 1.0f)
+   , mRayAmbient(1.0f, 0.0f, 0.0f, 1.0f)
+   , mRayWidth(5.0f)
+{
+   /* Do nothing. */ ;
+}
+
 void RayIntersectionStrategy::init(ViewerPtr viewer)
 {
    mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
 
+   jccl::ConfigElementPtr cfg_elt =
+      viewer->getConfiguration().getConfigElement(getElementType());
+
+   if ( cfg_elt )
+   {
+      try
+      {
+         configure(cfg_elt);
+      }
+      catch (inf::Exception& ex)
+      {
+         std::cerr << ex.what() << std::endl;
+      }
+   }
+
+   // Scale the ray length (measured in feet) into application units.
+   mRayLength *= 0.3048f * viewer->getDrawScaleFactor();
+
    initGeom();
-   mRayLength = 20.0f;
 
    OSG::GroupNodePtr decorator_root = viewer->getSceneObj()->getDecoratorRoot();
    OSG::beginEditCP(decorator_root.node());
@@ -71,7 +103,7 @@ void RayIntersectionStrategy::update(ViewerPtr viewer)
 
    OSG::Pnt3f start_pt, end_pt;
    start_pt = mSelectionRay.getPosition();
-   end_pt = start_pt+(mSelectionRay.getDirection()*mRayLength);
+   end_pt = start_pt + mSelectionRay.getDirection() * mRayLength;
 
    OSG::beginEditCP(mGeomPts);
       mGeomPts->setValue(start_pt,0);
@@ -106,9 +138,9 @@ void RayIntersectionStrategy::initGeom()
    OSG::CPEditor mce(mat_chunk);
    OSG::CPEditor lce(line_chunk);
    mat_chunk->setLit(true);
-   mat_chunk->setDiffuse(OSG::Color4f(1,0,0,1));
-   mat_chunk->setAmbient(OSG::Color4f(1,0,0,1));
-   line_chunk->setWidth(5);
+   mat_chunk->setDiffuse(mRayDiffuse);
+   mat_chunk->setAmbient(mRayAmbient);
+   line_chunk->setWidth(mRayWidth);
    chunk_mat->addChunk(mat_chunk);
    chunk_mat->addChunk(line_chunk);
 
@@ -209,6 +241,85 @@ OSG::TransformNodePtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer
 
    intersectPoint.set(osg_intersect_point.getValues());
    return intersect_obj;
+}
+
+void RayIntersectionStrategy::configure(jccl::ConfigElementPtr cfgElt)
+   throw (inf::Exception)
+{
+   vprASSERT(cfgElt->getID() == getElementType());
+
+   const unsigned int req_cfg_version(1);
+
+   if ( cfgElt->getVersion() < req_cfg_version )
+   {
+      std::stringstream msg;
+      msg << "Configuration of RayIntersectionStrategy failed.  Required "
+          << "config element version is " << req_cfg_version
+          << ", but element '" << cfgElt->getName() << "' is version "
+          << cfgElt->getVersion();
+      throw inf::PluginException(msg.str(), IOV_LOCATION);
+   }
+
+   const std::string ray_length_prop("ray_length");
+   const std::string ray_width_prop("ray_width");
+   const std::string ray_diffuse_prop("ray_diffuse_color");
+   const std::string ray_ambient_prop("ray_ambient_color");
+
+   const float ray_len = cfgElt->getProperty<float>(ray_length_prop);
+
+   if ( ray_len > 0.0f )
+   {
+      mRayLength = ray_len;
+   }
+
+   const OSG::Real32 ray_width(
+      cfgElt->getProperty<OSG::Real32>(ray_width_prop)
+   );
+
+   if ( ray_width > 0.0f )
+   {
+      mRayWidth = ray_width;
+   }
+
+   OSG::Real32 red, green, blue;
+
+   red   = cfgElt->getProperty<OSG::Real32>(ray_diffuse_prop, 0);
+   green = cfgElt->getProperty<OSG::Real32>(ray_diffuse_prop, 1);
+   blue  = cfgElt->getProperty<OSG::Real32>(ray_diffuse_prop, 2);
+
+   if ( 0.0f <= red && red <= 1.0f )
+   {
+      mRayDiffuse[0] = red;
+   }
+
+   if ( 0.0f <= green && green <= 1.0f )
+   {
+      mRayDiffuse[1] = green;
+   }
+
+   if ( 0.0f <= blue && blue <= 1.0f )
+   {
+      mRayDiffuse[2] = blue;
+   }
+
+   red   = cfgElt->getProperty<float>(ray_ambient_prop, 0);
+   green = cfgElt->getProperty<float>(ray_ambient_prop, 1);
+   blue  = cfgElt->getProperty<float>(ray_ambient_prop, 2);
+
+   if ( 0.0f <= red && red <= 1.0f )
+   {
+      mRayAmbient[0] = red;
+   }
+
+   if ( 0.0f <= green && green <= 1.0f )
+   {
+      mRayAmbient[1] = green;
+   }
+
+   if ( 0.0f <= blue && blue <= 1.0f )
+   {
+      mRayAmbient[2] = blue;
+   }
 }
 
 }
