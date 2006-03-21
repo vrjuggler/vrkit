@@ -1,6 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
-2006-03-17 aronb    Use Boost.Signals to handle event generation by the Grab
+2006-03-21 patrickh Added the Grid Plug-in.
+                    -- VERSION -- 0.17.1
+2006-03-21 aronb    Use Boost.Signals to handle event generation by the Grab
                     Plug-in.
                     -- VERSION -- 0.17.0
 2006-03-17 patrickh The functionality of the Point Grab Plug-in has been
