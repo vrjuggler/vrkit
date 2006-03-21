@@ -96,7 +96,7 @@ Export('GetPlatform')
 options_cache_filename = 'options.cache.' + distutils.util.get_platform()
 opts = SConsAddons.Options.Options(files = [options_cache_filename, 'options.custom'],
                                    args= ARGUMENTS);
-boost_options = SConsAddons.Options.Boost.Boost("boost", "1.32.0",
+boost_options = SConsAddons.Options.Boost.Boost("boost", "1.32.0",libs=['signals'],
                                                 required = False)
 vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("vrjuggler", "1.1.169", 
                                                     required=True, useCppPath=True);
@@ -162,6 +162,8 @@ if not SConsAddons.Util.hasHelpFlag():
    # the output returned by 'vrjuggler-config --cxxflags'.
    if boost_options.isAvailable():
       boost_options.updateEnv(baseEnv)
+   else:
+      print "WARNING: Cannot build IOV without Boost.Signals"
 
    if SCons.Util.WhereIs('distcc'):
       baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")
