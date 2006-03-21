@@ -118,7 +118,7 @@
          <value label="Module Name" defaultvalue=""/>
          <enumeration editable="true">
             <enum label="GrabPlugin" value="GrabPlugin"/>
-            <enum lidel="GridPlugin" value="GridPlugin"/>
+            <enum label="GridPlugin" value="GridPlugin"/>
             <enum label="LogoPlugin" value="LogoPlugin"/>
             <enum label="ModeSwitchPlugin" value="ModeSwitchPlugin"/>
             <enum label="SimpleNavPlugin" value="SimpleNavPlugin"/>
