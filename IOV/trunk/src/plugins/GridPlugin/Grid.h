@@ -143,8 +143,8 @@ private:
     */
    void initGeometry(const OSG::Real32 width, const OSG::Real32 height,
                      const OSG::Real32 granularity, const Corner corner,
-                     const gmtl::Point3f& cornerPos,
-                     const gmtl::EulerAngleXYZf& rot,
+                     const OSG::Vec3f& cornerPos,
+                     const OSG::Quaternion& rot,
                      const OSG::Color3f& color);
 
    std::string           mName;

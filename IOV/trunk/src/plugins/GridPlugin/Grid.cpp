@@ -6,9 +6,7 @@
 #include <OpenSG/OSGSimpleGeometry.h>
 #include <OpenSG/OSGSimpleMaterial.h>
 
-#include <gmtl/Generate.h>
 #include <gmtl/Math.h>
-#include <gmtl/Output.h>
 #include <gmtl/External/OpenSGConvert.h>
 
 #include <vpr/Util/Assert.h>
@@ -109,16 +107,15 @@ void Grid::init(jccl::ConfigElementPtr cfgElt)
       throw inf::PluginException(msg_stream.str(), IOV_LOCATION);
    }
 
-   const gmtl::Point3f corner_pos(
+   const OSG::Vec3f corner_pos(
       cfgElt->getProperty<float>(corner_pos_prop, 0),
       cfgElt->getProperty<float>(corner_pos_prop, 1),
       cfgElt->getProperty<float>(corner_pos_prop, 2)
    );
-   const gmtl::EulerAngleXYZf rot(
-      gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 0)),
-      gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 1)),
-      gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 2))
-   );
+   OSG::Quaternion rot;
+   rot.setValue(gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 0)),
+                gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 1)),
+                gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 2)));
 
    initGeometry(width, height, granularity, corner, corner_pos, rot,
                 OSG::Color3f(red, green, blue));
@@ -175,8 +172,8 @@ OSG::Matrix Grid::getCurrentXform()
 void Grid::initGeometry(const OSG::Real32 width, const OSG::Real32 height,
                         const OSG::Real32 granularity,
                         const Grid::Corner corner,
-                        const gmtl::Point3f& cornerPos,
-                        const gmtl::EulerAngleXYZf& rot,
+                        const OSG::Vec3f& cornerPos,
+                        const OSG::Quaternion& rot,
                         const OSG::Color3f& color)
 {
    OSG::SimpleMaterialPtr plane_mat = OSG::SimpleMaterial::create();
@@ -192,6 +189,12 @@ void Grid::initGeometry(const OSG::Real32 width, const OSG::Real32 height,
       plane_mat->setTransparency(0.90f);
    OSG::endEditCP(plane_mat, mat_mask);
 
+   OSG::SimpleMaterialPtr line_mat = OSG::SimpleMaterialPtr::dcast(OSG::deepClone(plane_mat));
+
+   OSG::beginEditCP(line_mat, OSG::SimpleMaterial::TransparencyFieldMask);
+      line_mat->setTransparency(0.0f);
+   OSG::endEditCP(line_mat, OSG::SimpleMaterial::TransparencyFieldMask);
+
    mPlaneNode = OSG::makePlaneGeo(width, height, 1, 1);
    OSG::beginEditCP(mPlaneNode, OSG::Geometry::MaterialFieldMask);
       mPlaneNode->setMaterial(plane_mat);
@@ -201,7 +204,7 @@ void Grid::initGeometry(const OSG::Real32 width, const OSG::Real32 height,
    const float half_height(height / 2.0f);
 
    std::cout << "Corner = " << cornerPos << std::endl;
-   gmtl::Point3f center_pt;
+   OSG::Vec3f center_pt;
 
    switch ( corner )
    {
@@ -230,14 +233,11 @@ void Grid::initGeometry(const OSG::Real32 width, const OSG::Real32 height,
    std::cout << "Center = " << center_pt << std::endl;
 
    mRoot = OSG::Transform::create();
-//   gmtl::Matrix44f xform;
-//   gmtl::setRot(xform, rot);
-//   gmtl::setTrans(xform, center_pt);
-//   move(xform);
-   move(gmtl::makeTrans<gmtl::Matrix44f>(center_pt) *
-           gmtl::makeRot<gmtl::Matrix44f>(rot));
-//   move(gmtl::makeRot<gmtl::Matrix44f>(rot) *
-//           gmtl::makeTrans<gmtl::Matrix44f>(center_pt));
+
+   OSG::Matrix xform;
+   xform.setTransform(center_pt, rot, OSG::Vec3f(1.0f, 1.0f, 1.0f), OSG::Quaternion(), cornerPos - center_pt);
+
+   move(xform);
 
    OSG::GeoPTypesPtr type = OSG::GeoPTypesUI8::create();
    OSG::beginEditCP(type, OSG::GeoPTypesUI8::GeoPropDataFieldMask);
@@ -289,7 +289,7 @@ void Grid::initGeometry(const OSG::Real32 width, const OSG::Real32 height,
       mGridNode->setLengths(length);
       mGridNode->setPositions(pos);
       mGridNode->setNormals(norms);
-      mGridNode->setMaterial(plane_mat);
+      mGridNode->setMaterial(line_mat);
    OSG::endEditCP(mGridNode, geom_mask);
 
    OSG::beginEditCP(mRoot.node(), OSG::Node::ChildrenFieldMask);
