@@ -23,7 +23,7 @@ gadget::DigitalInterface& WandInterface::getButton(int buttonNum)
 
 gadget::AnalogInterface& WandInterface::getAnalog(int analogNum)
 {
-   if( (analogNum >0) &&
+   if( (analogNum >= 0) &&
        (analogNum < int(mAnalogInterfaces.size())))
    {
       return mAnalogInterfaces[analogNum];
