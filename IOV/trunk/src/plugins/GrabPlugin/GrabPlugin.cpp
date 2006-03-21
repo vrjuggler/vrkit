@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <algorithm>
+#include <boost/bind.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/exception.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -16,6 +17,7 @@
 #include <vpr/System.h>
 #include <vpr/Util/FileUtils.h>
 
+#include <IOV/EventData.h>
 #include <IOV/Viewer.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/PluginPtr.h>
@@ -61,6 +63,10 @@ namespace inf
 
 void GrabPlugin::init(ViewerPtr viewer)
 {
+   mEventData = viewer->getSceneObj()->getSceneData<EventData>();
+
+   mEventData->mObjectMovedSignal.connect(boost::bind(&GrabPlugin::defaultObjectMovedSlot, this, _1, _2));
+
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
 
@@ -367,14 +373,19 @@ void GrabPlugin::run(inf::ViewerPtr viewer)
             new_obj_mat = (*itr)->computeMove(viewer, mIntersectedObj, vp_M_wand_xform, new_obj_mat);
          }
 
-         // XXX: Send a move event.
-         OSG::Matrix obj_mat_osg;
-         gmtl::set(obj_mat_osg, new_obj_mat);
-         OSG::beginEditCP(mIntersectedObj, OSG::Transform::MatrixFieldMask);
-            mIntersectedObj->setMatrix(obj_mat_osg);
-         OSG::endEditCP(mIntersectedObj, OSG::Transform::MatrixFieldMask);
+         // Send a move event.
+         mEventData->mObjectMovedSignal(mIntersectedObj, new_obj_mat);
       }
    }
+}
+
+void GrabPlugin::defaultObjectMovedSlot(OSG::TransformNodePtr obj, const gmtl::Matrix44f& newObjMat)
+{
+   OSG::Matrix obj_mat_osg;
+   gmtl::set(obj_mat_osg, newObjMat);
+   OSG::beginEditCP(obj, OSG::Transform::MatrixFieldMask);
+      obj->setMatrix(obj_mat_osg);
+   OSG::endEditCP(obj, OSG::Transform::MatrixFieldMask);
 }
 
 bool GrabPlugin::config(jccl::ConfigElementPtr elt)
