@@ -7,6 +7,8 @@
 
 #include <IOV/Grab/MoveStrategy.h>
 
+#include <gmtl/Quat.h>
+#include <gmtl/QuatOps.h>
 
 namespace inf
 {
@@ -34,15 +36,15 @@ public:
    virtual void init(inf::ViewerPtr viewer);
 
    virtual void objectGrabbed(inf::ViewerPtr viewer,
-                              OSG::TransformNodePtr obj,
+                              SceneObjectPtr obj,
                               const gmtl::Point3f& intersectPoint,
                               const gmtl::Matrix44f& vp_M_wand);
 
    virtual void objectReleased(inf::ViewerPtr viewer,
-                               OSG::TransformNodePtr obj);
+                               SceneObjectPtr obj);
 
    virtual gmtl::Matrix44f computeMove(inf::ViewerPtr viewer,
-                                       OSG::TransformNodePtr obj,
+                                       SceneObjectPtr obj,
                                        const gmtl::Matrix44f& vp_M_wand,
                                        gmtl::Matrix44f& curObjPos);
 
@@ -53,7 +55,11 @@ protected:
       /* Do nothing. */ ;
    }
 
+   gmtl::Quatf     mRotation;
    gmtl::Matrix44f m_wand_M_vp;
+   gmtl::Matrix44f m_wand_M_pobj;
+   gmtl::Matrix44f m_pobj_M_obj;
+   gmtl::Matrix44f m_obj_M_pobj;
 };
 
 }

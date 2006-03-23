@@ -10,6 +10,7 @@
 #include <IOV/User.h>
 #include <IOV/Viewer.h>
 #include <IOV/WandInterface.h>
+#include <IOV/SceneObject.h>
 
 #include "BasicMoveStrategy.h"
 
@@ -46,7 +47,7 @@ void BasicMoveStrategy::init(inf::ViewerPtr viewer)
 }
 
 void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
-                                      OSG::TransformNodePtr obj,
+                                      SceneObjectPtr obj,
                                       const gmtl::Point3f& intersectPoint,
                                       const gmtl::Matrix44f& vp_M_wand)
 {
@@ -57,7 +58,15 @@ void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
    gmtl::Matrix44f wand_M_vp;
 
    OSG::Matrix world_xform;
-   obj.node()->getParent()->getToWorld(world_xform);
+
+   vprASSERT(obj->getRoot() != OSG::NullFC);
+
+   // If we have no parent then we want to use the identity.
+   if (obj->getRoot()->getParent() != OSG::NullFC)
+   {
+      obj->getRoot()->getParent()->getToWorld(world_xform);
+   }
+
    gmtl::Matrix44f vp_M_pobj;
    gmtl::set(vp_M_pobj, world_xform);
 
@@ -67,20 +76,27 @@ void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
 }
 
 void BasicMoveStrategy::objectReleased(inf::ViewerPtr viewer,
-                                       OSG::TransformNodePtr obj)
+                                       SceneObjectPtr obj)
 {
    gmtl::identity(m_wand_M_pobj);
 }
 
 gmtl::Matrix44f
 BasicMoveStrategy::computeMove(inf::ViewerPtr viewer,
-                               OSG::TransformNodePtr obj,
+                               SceneObjectPtr obj,
                                const gmtl::Matrix44f& vp_M_wand,
                                gmtl::Matrix44f& curObjMat)
 {
    // pobj_M_vp is the inverse of the object in view platform space.
    OSG::Matrix world_xform;
-   obj.node()->getParent()->getToWorld(world_xform);
+   vprASSERT(obj->getRoot() != OSG::NullFC);
+
+   // If we have no parent then we want to use the identity.
+   if (obj->getRoot()->getParent() != OSG::NullFC)
+   {
+      obj->getRoot()->getParent()->getToWorld(world_xform);
+   }
+
    gmtl::Matrix44f pobj_M_vp;
    gmtl::set(pobj_M_vp, world_xform);
    gmtl::invert(pobj_M_vp);

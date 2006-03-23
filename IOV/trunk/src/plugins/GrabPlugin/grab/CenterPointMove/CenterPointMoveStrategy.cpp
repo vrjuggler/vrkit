@@ -2,14 +2,15 @@
 
 #include <IOV/Config.h>
 
+#include <vpr/Util/Assert.h>
 #include <gmtl/MatrixOps.h>
 #include <gmtl/External/OpenSGConvert.h>
 
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
+#include <IOV/SceneObject.h>
 
 #include "CenterPointMoveStrategy.h"
-
 
 static inf::PluginCreator<inf::MoveStrategy> sPluginCreator(
    &inf::CenterPointMoveStrategy::create, "Center Point Move Strategy Plug-in"
@@ -44,7 +45,7 @@ void CenterPointMoveStrategy::init(inf::ViewerPtr)
 }
 
 void CenterPointMoveStrategy::objectGrabbed(inf::ViewerPtr,
-                                            OSG::TransformNodePtr,
+                                            SceneObjectPtr,
                                             const gmtl::Point3f&,
                                             const gmtl::Matrix44f&)
 {
@@ -52,20 +53,28 @@ void CenterPointMoveStrategy::objectGrabbed(inf::ViewerPtr,
 }
 
 void CenterPointMoveStrategy::objectReleased(inf::ViewerPtr,
-                                             OSG::TransformNodePtr)
+                                             SceneObjectPtr)
 {
    /* Do nothing. */ ;
 }
 
 gmtl::Matrix44f
 CenterPointMoveStrategy::computeMove(inf::ViewerPtr,
-                                     OSG::TransformNodePtr obj,
+                                     SceneObjectPtr obj,
                                      const gmtl::Matrix44f& vp_M_wand,
                                      gmtl::Matrix44f&)
 {
    // pobj_M_vp is the inverse of the object in view platform space.
    OSG::Matrix world_xform;
-   obj.node()->getParent()->getToWorld(world_xform);
+
+   vprASSERT(obj->getRoot() != OSG::NullFC);
+
+   // If we have no parent then we want to use the identity.
+   if (obj->getRoot()->getParent() != OSG::NullFC)
+   {
+      obj->getRoot()->getParent()->getToWorld(world_xform);
+   }
+
    gmtl::Matrix44f pobj_M_vp;
    gmtl::set(pobj_M_vp, world_xform);
    gmtl::invert(pobj_M_vp);

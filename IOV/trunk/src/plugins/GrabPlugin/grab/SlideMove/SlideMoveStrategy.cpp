@@ -8,6 +8,7 @@
 
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
+#include <IOV/SceneObject.h>
 #include <IOV/Status.h>
 #include <IOV/User.h>
 #include <IOV/Viewer.h>
@@ -65,7 +66,7 @@ void SlideMoveStrategy::init(inf::ViewerPtr viewer)
 }
 
 void SlideMoveStrategy::objectGrabbed(inf::ViewerPtr,
-                                      OSG::TransformNodePtr obj,
+                                      SceneObjectPtr obj,
                                       const gmtl::Point3f& intersectPoint,
                                       const gmtl::Matrix44f& vp_M_wand)
 {
@@ -73,14 +74,14 @@ void SlideMoveStrategy::objectGrabbed(inf::ViewerPtr,
 }
 
 void SlideMoveStrategy::objectReleased(inf::ViewerPtr viewer,
-                                       OSG::TransformNodePtr obj)
+                                       SceneObjectPtr obj)
 {
    mTransValue = 0.0f;
 }
 
 gmtl::Matrix44f
 SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
-                               OSG::TransformNodePtr obj,
+                               SceneObjectPtr obj,
                                const gmtl::Matrix44f& vp_M_wand,
                                gmtl::Matrix44f& curObjPos)
 {
@@ -132,7 +133,15 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
 
       // pobj_M_vp is the inverse of the object in view platform space.
       OSG::Matrix world_xform;
-      obj.node()->getParent()->getToWorld(world_xform);
+
+      vprASSERT(obj->getRoot() != OSG::NullFC);
+
+      // If we have no parent then we want to use the identity.
+      if (obj->getRoot()->getParent() != OSG::NullFC)
+      {
+         obj->getRoot()->getParent()->getToWorld(world_xform);
+      }
+
       gmtl::Matrix44f pobj_M_vp;
       gmtl::set(pobj_M_vp, world_xform);
       gmtl::invert(pobj_M_vp);
@@ -162,6 +171,7 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
 
       return pobj_M_wand * delta_trans_mat * wand_M_pobj * curObjPos;
    }
+   return curObjPos;
 }
 
 SlideMoveStrategy::SlideMoveStrategy()

@@ -6,9 +6,9 @@
 #include <IOV/Config.h>
 
 #include <boost/noncopyable.hpp>
-#include <OpenSG/OSGTransform.h>
 #include <gmtl/Matrix.h>
 #include <vpr/DynLoad/Library.h>
+#include <IOV/SceneObjectPtr.h>
 #include <IOV/ViewerPtr.h>
 
 #include <IOV/Grab/MoveStrategyPtr.h>
@@ -81,7 +81,7 @@ public:
     *                       coordiantes.
     */
    virtual void objectGrabbed(inf::ViewerPtr viewer,
-                              OSG::TransformNodePtr obj,
+                              SceneObjectPtr obj,
                               const gmtl::Point3f& intersectPoint,
                               const gmtl::Matrix44f& vp_M_wand) = 0;
 
@@ -95,7 +95,7 @@ public:
     * @param obj    The grabbed node in the scene graph that is now released.
     */
    virtual void objectReleased(inf::ViewerPtr viewer,
-                               OSG::TransformNodePtr obj) = 0;
+                               SceneObjectPtr obj) = 0;
 
    /**
     * Computes the new transformation for \p obj based on the behavior of this
@@ -121,7 +121,7 @@ public:
     *       of this method. Use \p curObjPos instead.
     */
    virtual gmtl::Matrix44f computeMove(inf::ViewerPtr viewer,
-                                       OSG::TransformNodePtr obj,
+                                       SceneObjectPtr obj,
                                        const gmtl::Matrix44f& vp_M_wand,
                                        gmtl::Matrix44f& curObjPos) = 0;
 

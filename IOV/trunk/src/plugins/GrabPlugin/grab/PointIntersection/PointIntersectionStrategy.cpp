@@ -9,6 +9,7 @@
 #include <IOV/User.h>
 #include <IOV/Viewer.h>
 #include <IOV/WandInterface.h>
+#include <IOV/SceneObject.h>
 
 static inf::PluginCreator<inf::IntersectionStrategy> sPluginCreator(
    &inf::PointIntersectionStrategy::create, "Point Intersection Strategy Plug-in"
@@ -40,8 +41,8 @@ namespace inf
 void PointIntersectionStrategy::init(ViewerPtr viewer)
 {;}
 
-OSG::TransformNodePtr PointIntersectionStrategy::findIntersection(ViewerPtr viewer,
-   const std::vector<OSG::TransformNodePtr>& objs, gmtl::Point3f& intersectPoint)
+SceneObjectPtr PointIntersectionStrategy::findIntersection(ViewerPtr viewer,
+   const std::vector<SceneObjectPtr>& objs, gmtl::Point3f& intersectPoint)
 {
    intersectPoint.set(0.0f, 0.0f, 0.0f);
 
@@ -50,14 +51,22 @@ OSG::TransformNodePtr PointIntersectionStrategy::findIntersection(ViewerPtr view
       wand->getWandPos()->getData(viewer->getDrawScaleFactor())
    );
 
-   OSG::TransformNodePtr intersect_obj;
+   SceneObjectPtr intersect_obj;
 
    // Find the first object in objs with which the wand intersects.
-   std::vector<OSG::TransformNodePtr>::const_iterator o;
+   std::vector<SceneObjectPtr>::const_iterator o;
    for ( o = objs.begin(); o != objs.end(); ++o )
    {
       OSG::Matrix world_xform;
-      (*o).node()->getParent()->getToWorld(world_xform);
+
+      vprASSERT((*o)->getRoot() != OSG::NullFC);
+
+      // If we have no parent then we want to use the identity.
+      if ((*o)->getRoot()->getParent() != OSG::NullFC)
+      {
+         (*o)->getRoot()->getParent()->getToWorld(world_xform);
+      }
+
       gmtl::Matrix44f obj_M_vp;
       gmtl::set(obj_M_vp, world_xform);
       gmtl::invert(obj_M_vp);
@@ -70,7 +79,7 @@ OSG::TransformNodePtr PointIntersectionStrategy::findIntersection(ViewerPtr view
       const OSG::Pnt3f wand_point(wand_pos_vw[0], wand_pos_vw[1],
                                   wand_pos_vw[2]);
 
-      const OSG::DynamicVolume& bbox = (*o).node()->getVolume();
+      const OSG::DynamicVolume& bbox = (*o)->getRoot()->getVolume();
 
       if ( bbox.intersect(wand_point) )
       {

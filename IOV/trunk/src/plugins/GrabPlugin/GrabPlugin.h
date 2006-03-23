@@ -24,6 +24,7 @@
 #include <IOV/Util/DigitalCommand.h>
 #include <IOV/Grab/IntersectionStrategy.h>
 #include <IOV/Grab/MoveStrategy.h>
+#include <IOV/SceneObjectPtr.h>
 
 namespace inf
 {
@@ -79,7 +80,7 @@ protected:
 
    void focusChanged(inf::ViewerPtr viewer);
 
-   int defaultObjectMovedSlot(const OSG::TransformNodePtr obj, const gmtl::Matrix44f& newObjMat);
+   int defaultObjectMovedSlot(SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat);
 
 private:
    static std::string getElementType()
@@ -106,7 +107,7 @@ private:
 
    bool mIntersecting;
    bool mGrabbing;
-   OSG::TransformNodePtr mIntersectedObj;
+   SceneObjectPtr mIntersectedObj;
 
    GeometryHighlightTraverser mGeomTraverser;
    unsigned int mIsectHighlightID;

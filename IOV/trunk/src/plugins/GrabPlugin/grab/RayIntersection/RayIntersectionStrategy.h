@@ -8,7 +8,6 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include <OpenSG/OSGColor.h>
-#include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGLine.h>
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGSwitch.h>
@@ -52,8 +51,8 @@ public:
 
    virtual void update(ViewerPtr viewer);
 
-   virtual OSG::TransformNodePtr
-      findIntersection(ViewerPtr viewer, const std::vector<OSG::TransformNodePtr>& objs, gmtl::Point3f& intersectPoint);
+   virtual SceneObjectPtr
+      findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs, gmtl::Point3f& intersectPoint);
 
    void setVisible(bool visible);
 

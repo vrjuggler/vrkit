@@ -10,10 +10,9 @@
 
 #include <IOV/SceneData.h>
 #include <IOV/EventDataPtr.h>
+#include <IOV/SceneObjectPtr.h>
 
 #include <boost/signal.hpp>
-
-#include <OpenSG/OSGTransform.h>
 
 #include <gmtl/Matrix.h>
 
@@ -59,7 +58,7 @@ public:
    virtual ~EventData();
 
 public:
-   boost::signal< int (OSG::TransformNodePtr, gmtl::Matrix44f), EventResult > mObjectMovedSignal;
+   boost::signal< int (SceneObjectPtr, gmtl::Matrix44f), EventResult > mObjectMovedSignal;
 
 protected:
    EventData();

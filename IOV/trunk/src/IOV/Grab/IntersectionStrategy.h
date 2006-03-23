@@ -9,6 +9,8 @@
 #include <OpenSG/OSGTransform.h>
 #include <vpr/DynLoad/Library.h>
 #include <gmtl/Point.h>
+
+#include <IOV/SceneObjectPtr.h>
 #include <IOV/ViewerPtr.h>
 
 #include <IOV/Grab/IntersectionStrategyPtr.h>
@@ -105,8 +107,8 @@ public:
     * @note The value of \p intersectPoint is undefined except when the
     *       return value of this method is not \c OSG::NullFC.
     */
-   virtual OSG::TransformNodePtr
-      findIntersection(ViewerPtr viewer, const std::vector<OSG::TransformNodePtr>& objs,
+   virtual SceneObjectPtr
+      findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
                        gmtl::Point3f& intersectPoint) = 0;
 
 protected:

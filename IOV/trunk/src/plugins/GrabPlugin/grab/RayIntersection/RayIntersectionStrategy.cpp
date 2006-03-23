@@ -15,6 +15,7 @@
 #include <IOV/User.h>
 #include <IOV/Viewer.h>
 #include <IOV/WandInterface.h>
+#include <IOV/SceneObject.h>
 
 #include "RayIntersectionStrategy.h"
 
@@ -190,25 +191,33 @@ void RayIntersectionStrategy::initGeom()
    OSG::endEditCP(mSwitchNode);
 }
 
-OSG::TransformNodePtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer,
-   const std::vector<OSG::TransformNodePtr>& objs, gmtl::Point3f& intersectPoint)
+SceneObjectPtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer,
+   const std::vector<SceneObjectPtr>& objs, gmtl::Point3f& intersectPoint)
 {
    WandInterfacePtr wand = viewer->getUser()->getInterfaceTrader().getWandInterface();
    const gmtl::Matrix44f vp_M_wand(
       wand->getWandPos()->getData(viewer->getDrawScaleFactor())
    );
 
-   OSG::TransformNodePtr intersect_obj;
+   SceneObjectPtr intersect_obj;
 
    float min_dist = 999999999.9f;   // Set to a max
    OSG::Line osg_pick_ray;
    OSG::Pnt3f osg_intersect_point;
 
-   std::vector<OSG::TransformNodePtr>::const_iterator o;
+   std::vector<SceneObjectPtr>::const_iterator o;
    for ( o = objs.begin(); o != objs.end(); ++o)
    {
       OSG::Matrix world_xform;
-      (*o).node()->getParent()->getToWorld(world_xform);
+
+      vprASSERT((*o)->getRoot() != OSG::NullFC);
+
+      // If we have no parent then we want to use the identity.
+      if ((*o)->getRoot()->getParent() != OSG::NullFC)
+      {
+         (*o)->getRoot()->getParent()->getToWorld(world_xform);
+      }
+
       gmtl::Matrix44f obj_M_vp;
       gmtl::set(obj_M_vp, world_xform);
       gmtl::invert(obj_M_vp);
@@ -223,8 +232,7 @@ OSG::TransformNodePtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer
                             OSG::Vec3f(pick_ray.mDir.getData()));
        
       float enter_val, exit_val;
-      if(((*o).node() != OSG::NullFC) &&
-         ((*o).node()->getVolume().intersect(osg_pick_ray, enter_val, exit_val)) )
+      if ((*o)->getRoot()->getVolume().intersect(osg_pick_ray, enter_val, exit_val))
       {
          if (enter_val < min_dist)
          {

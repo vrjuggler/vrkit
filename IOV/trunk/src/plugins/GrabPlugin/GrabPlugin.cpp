@@ -26,6 +26,7 @@
 #include <IOV/InterfaceTrader.h>
 #include <IOV/WandInterface.h>
 #include <IOV/ViewPlatform.h>
+#include <IOV/SceneObject.h>
 #include <IOV/Status.h>
 #include <IOV/StatusPanel.h>
 #include <IOV/StatusPanelPlugin.h>
@@ -245,7 +246,7 @@ void GrabPlugin::updateState(ViewerPtr viewer)
    if ( ! mGrabbing )
    {
       // Get the intersected object.
-      OSG::TransformNodePtr intersect_obj;
+      SceneObjectPtr intersect_obj;
       if (NULL != mIsectStrategy.get())
       {
          mIntersectPoint = gmtl::Point3f();
@@ -255,13 +256,12 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       // If the intersected object is different than the one with which the
       // wand intersected during the last frame, we need to make updates to
       // the application and scene state.
-      if ( intersect_obj.node() != mIntersectedObj.node() )
+      if ( intersect_obj != mIntersectedObj )
       {
-         if ( mIntersectedObj.node() != OSG::NullFC )
+         if ( mIntersectedObj != NULL && mIntersectedObj->getRoot() != OSG::NullFC )
          {
-            // XXX: Is there any cleaner way to do this?
-            OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
-            mGeomTraverser.removeHighlightMaterial(lit_node,
+            OSG::NodeRefPtr lit_node = mIntersectedObj->getRoot();
+            mGeomTraverser.removeHighlightMaterial(lit_node.get(),
                                                    mIsectHighlightID);
 
             // XXX: Send de-select event
@@ -273,16 +273,15 @@ void GrabPlugin::updateState(ViewerPtr viewer)
          // If the new node of mIntersectedObj is non-NULL, then we are
          // intersecting a new object since the last frame.  Set up the
          // highlight node for this new object.
-         if ( mIntersectedObj.node() != OSG::NullFC )
+         if ( mIntersectedObj != NULL && mIntersectedObj->getRoot() != OSG::NullFC)
          {
             mIntersectSound.trigger();
             mIntersecting = true;
 
-            // XXX: Is there any cleaner way to do this?
-            OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
+            OSG::NodeRefPtr lit_node = mIntersectedObj->getRoot();
 
             // Apply mIsectHighlightMaterial.
-            mGeomTraverser.addHighlightMaterial(lit_node, mIsectHighlightID);
+            mGeomTraverser.addHighlightMaterial(lit_node.get(), mIsectHighlightID);
 
             // XXX: Send select event.
          }
@@ -303,11 +302,11 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       mGrabbing = true;
 
       // XXX: Is there any cleaner way to do this?
-      OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
-      mGeomTraverser.swapHighlightMaterial(lit_node, mIsectHighlightID,
+      OSG::NodeRefPtr lit_node = mIntersectedObj->getRoot();
+      mGeomTraverser.swapHighlightMaterial(lit_node.get(), mIsectHighlightID,
                                            mGrabHighlightID);
 
-      gmtl::set(mGrabbed_pobj_M_obj, mIntersectedObj->getMatrix());
+      gmtl::set(mGrabbed_pobj_M_obj, mIntersectedObj->getPos());
    
       if ( !mMoveStrategies.empty() )
       {
@@ -331,11 +330,10 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       // We have just released the grabbed object, but we are still
       // intersecting it.  Set the bounding box state back to the
       // intersecting state and clear mIntersectedObj.
-      if ( mIntersectedObj.node() != OSG::NullFC )
+      if ( mIntersectedObj != NULL && mIntersectedObj->getRoot() != OSG::NullFC )
       {
-         // XXX: Is there any cleaner way to do this?
-         OSG::NodePtr lit_node = mIntersectedObj.node()->getChild(0);
-         mGeomTraverser.swapHighlightMaterial(lit_node, mGrabHighlightID,
+         OSG::NodeRefPtr lit_node = mIntersectedObj->getRoot();
+         mGeomTraverser.swapHighlightMaterial(lit_node.get(), mGrabHighlightID,
                                               mIsectHighlightID);
 
          gmtl::identity(mGrabbed_pobj_M_obj);
@@ -381,14 +379,13 @@ void GrabPlugin::run(inf::ViewerPtr viewer)
    }
 }
 
-int GrabPlugin::defaultObjectMovedSlot(OSG::TransformNodePtr obj, const gmtl::Matrix44f& newObjMat)
+int GrabPlugin::defaultObjectMovedSlot(SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat)
 {
+
    OSG::Matrix obj_mat_osg;
    gmtl::set(obj_mat_osg, newObjMat);
-   OSG::beginEditCP(obj, OSG::Transform::MatrixFieldMask);
-      obj->setMatrix(obj_mat_osg);
-   OSG::endEditCP(obj, OSG::Transform::MatrixFieldMask);
-
+   obj->moveTo(obj_mat_osg);
+   
    return EventResult::CONTINUE;
 }
 

@@ -5,26 +5,22 @@
 
 #include <IOV/Config.h>
 
-#include <OpenSG/OSGCoredNodePtr.h>
-#include <OpenSG/OSGNode.h>
-#include <OpenSG/OSGTransform.h>
-
 #include <vpr/vpr.h>
 #include <vpr/Util/GUID.h>
 
 #include <IOV/SceneData.h>
 #include <IOV/GrabDataPtr.h>
+#include <IOV/SceneObjectPtr.h>
 
+#include <vector>
 
 namespace inf
 {
 
-typedef OSG::TransformNodePtr CoredTransformPtr;
-
 class IOV_CLASS_API GrabData : public inf::SceneData
 {
 public:
-   typedef std::vector<OSG::TransformNodePtr> object_list_t;
+   typedef std::vector<SceneObjectPtr> object_list_t;
 
    /**
     * The unique type identifier for scene data used by plug-ins that manage
@@ -39,10 +35,12 @@ public:
 
    virtual ~GrabData();
 
-   void addObject(OSG::TransformNodePtr obj)
-   {
-      mObjects.push_back(obj);
-   }
+   void addObject(SceneObjectPtr obj);
+
+   /**
+    * Remove given object from grabbable list.
+    */
+   void removeObject(SceneObjectPtr obj);
 
    const object_list_t& getObjects() const
    {

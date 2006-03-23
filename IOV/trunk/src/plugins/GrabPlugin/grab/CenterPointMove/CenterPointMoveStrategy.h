@@ -34,15 +34,15 @@ public:
    virtual void init(inf::ViewerPtr viewer);
 
    virtual void objectGrabbed(inf::ViewerPtr viewer,
-                              OSG::TransformNodePtr obj,
+                              SceneObjectPtr obj,
                               const gmtl::Point3f& intersectPoint,
                               const gmtl::Matrix44f& vp_M_wand);
 
    virtual void objectReleased(inf::ViewerPtr viewer,
-                               OSG::TransformNodePtr obj);
+                               SceneObjectPtr obj);
 
    virtual gmtl::Matrix44f computeMove(inf::ViewerPtr viewer,
-                                       OSG::TransformNodePtr obj,
+                                       SceneObjectPtr obj,
                                        const gmtl::Matrix44f& vp_M_wand,
                                        gmtl::Matrix44f& curObjMat);
 
