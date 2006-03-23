@@ -9,7 +9,6 @@
 
 #include <jccl/Config/ConfigElement.h>
 
-#include <IOV/GrabData.h>
 #include <IOV/InterfaceTrader.h>
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
@@ -59,8 +58,6 @@ RayIntersectionStrategy::RayIntersectionStrategy()
 
 void RayIntersectionStrategy::init(ViewerPtr viewer)
 {
-   mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
-
    jccl::ConfigElementPtr cfg_elt =
       viewer->getConfiguration().getConfigElement(getElementType());
 
@@ -193,7 +190,8 @@ void RayIntersectionStrategy::initGeom()
    OSG::endEditCP(mSwitchNode);
 }
 
-OSG::TransformNodePtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint)
+OSG::TransformNodePtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer,
+   const std::vector<OSG::TransformNodePtr>& objs, gmtl::Point3f& intersectPoint)
 {
    WandInterfacePtr wand = viewer->getUser()->getInterfaceTrader().getWandInterface();
    const gmtl::Matrix44f vp_M_wand(
@@ -203,12 +201,11 @@ OSG::TransformNodePtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer
    OSG::TransformNodePtr intersect_obj;
 
    float min_dist = 999999999.9f;   // Set to a max
-   const GrabData::object_list_t& objects = mGrabData->getObjects();
    OSG::Line osg_pick_ray;
    OSG::Pnt3f osg_intersect_point;
 
-   GrabData::object_list_t::const_iterator o;
-   for ( o = objects.begin(); o != objects.end(); ++o)
+   std::vector<OSG::TransformNodePtr>::const_iterator o;
+   for ( o = objs.begin(); o != objs.end(); ++o)
    {
       OSG::Matrix world_xform;
       (*o).node()->getParent()->getToWorld(world_xform);

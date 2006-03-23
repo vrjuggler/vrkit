@@ -3,7 +3,6 @@
 #include "PointIntersectionStrategy.h"
 #include <gmtl/Matrix.h>
 #include <gmtl/External/OpenSGConvert.h>
-#include <IOV/GrabData.h>
 #include <IOV/InterfaceTrader.h>
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
@@ -39,11 +38,10 @@ namespace inf
 {
 
 void PointIntersectionStrategy::init(ViewerPtr viewer)
-{
-   mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
-}
+{;}
 
-OSG::TransformNodePtr PointIntersectionStrategy::findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint)
+OSG::TransformNodePtr PointIntersectionStrategy::findIntersection(ViewerPtr viewer,
+   const std::vector<OSG::TransformNodePtr>& objs, gmtl::Point3f& intersectPoint)
 {
    intersectPoint.set(0.0f, 0.0f, 0.0f);
 
@@ -54,11 +52,9 @@ OSG::TransformNodePtr PointIntersectionStrategy::findIntersection(ViewerPtr view
 
    OSG::TransformNodePtr intersect_obj;
 
-   const GrabData::object_list_t& objects = mGrabData->getObjects();
-
-   // Find the first object in objects with which the wand intersects.
-   GrabData::object_list_t::const_iterator o;
-   for ( o = objects.begin(); o != objects.end(); ++o )
+   // Find the first object in objs with which the wand intersects.
+   std::vector<OSG::TransformNodePtr>::const_iterator o;
+   for ( o = objs.begin(); o != objs.end(); ++o )
    {
       OSG::Matrix world_xform;
       (*o).node()->getParent()->getToWorld(world_xform);

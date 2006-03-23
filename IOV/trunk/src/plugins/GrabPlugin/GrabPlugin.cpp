@@ -18,6 +18,7 @@
 #include <vpr/Util/FileUtils.h>
 
 #include <IOV/EventData.h>
+#include <IOV/GrabData.h>
 #include <IOV/Viewer.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/PluginPtr.h>
@@ -64,8 +65,9 @@ namespace inf
 void GrabPlugin::init(ViewerPtr viewer)
 {
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
+   mEventData->mObjectMovedSignal.connect(100, boost::bind(&GrabPlugin::defaultObjectMovedSlot, this, _1, _2));
 
-   mEventData->mObjectMovedSignal.connect(boost::bind(&GrabPlugin::defaultObjectMovedSlot, this, _1, _2));
+   mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
 
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
@@ -247,7 +249,7 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       if (NULL != mIsectStrategy.get())
       {
          mIntersectPoint = gmtl::Point3f();
-         intersect_obj = mIsectStrategy->findIntersection(viewer, mIntersectPoint);
+         intersect_obj = mIsectStrategy->findIntersection(viewer, mGrabData->getObjects(), mIntersectPoint);
       }
 
       // If the intersected object is different than the one with which the
@@ -379,13 +381,15 @@ void GrabPlugin::run(inf::ViewerPtr viewer)
    }
 }
 
-void GrabPlugin::defaultObjectMovedSlot(OSG::TransformNodePtr obj, const gmtl::Matrix44f& newObjMat)
+int GrabPlugin::defaultObjectMovedSlot(OSG::TransformNodePtr obj, const gmtl::Matrix44f& newObjMat)
 {
    OSG::Matrix obj_mat_osg;
    gmtl::set(obj_mat_osg, newObjMat);
    OSG::beginEditCP(obj, OSG::Transform::MatrixFieldMask);
       obj->setMatrix(obj_mat_osg);
    OSG::endEditCP(obj, OSG::Transform::MatrixFieldMask);
+
+   return EventResult::CONTINUE;
 }
 
 bool GrabPlugin::config(jccl::ConfigElementPtr elt)

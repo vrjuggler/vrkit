@@ -13,6 +13,8 @@
 
 #include <IOV/Grab/IntersectionStrategyPtr.h>
 
+#include <vector>
+
 #define INF_ISECT_STRATEGY_PLUGIN_API_MAJOR 1
 #define INF_ISECT_STRATEGY_PLUGIN_API_MINOR 0
 
@@ -104,7 +106,8 @@ public:
     *       return value of this method is not \c OSG::NullFC.
     */
    virtual OSG::TransformNodePtr
-      findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint) = 0;
+      findIntersection(ViewerPtr viewer, const std::vector<OSG::TransformNodePtr>& objs,
+                       gmtl::Point3f& intersectPoint) = 0;
 
 protected:
    /**

@@ -16,6 +16,7 @@
 #include <snx/SoundHandle.h>
 
 #include <IOV/EventDataPtr.h>
+#include <IOV/GrabDataPtr.h>
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
 #include <IOV/GeometryHighlightTraverser.h>
@@ -78,7 +79,7 @@ protected:
 
    void focusChanged(inf::ViewerPtr viewer);
 
-   void defaultObjectMovedSlot(const OSG::TransformNodePtr obj, const gmtl::Matrix44f& newObjMat);
+   int defaultObjectMovedSlot(const OSG::TransformNodePtr obj, const gmtl::Matrix44f& newObjMat);
 
 private:
    static std::string getElementType()
@@ -136,6 +137,7 @@ private:
    std::vector<std::string> mMoveStrategyNames;
    //@}
 
+   GrabDataPtr  mGrabData;
    EventDataPtr mEventData;
 };
 

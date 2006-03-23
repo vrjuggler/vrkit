@@ -8,7 +8,6 @@
 #include <OpenSG/OSGTransform.h>
 #include <gmtl/Point.h>
 #include <IOV/ViewerPtr.h>
-#include <IOV/GrabDataPtr.h>
 #include <IOV/Grab/IntersectionStrategy.h>
 
 namespace inf
@@ -38,10 +37,10 @@ public:
    }
    virtual void init(ViewerPtr viewer);
 
-   virtual OSG::TransformNodePtr findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint);
+   virtual OSG::TransformNodePtr findIntersection(ViewerPtr viewer,
+      const std::vector<OSG::TransformNodePtr>& objs, gmtl::Point3f& intersectPoint);
 
 private:
-   inf::GrabDataPtr mGrabData;
 };
 
 }

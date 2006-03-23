@@ -20,7 +20,6 @@
 #include <jccl/Config/ConfigElementPtr.h>
 
 #include <IOV/ViewerPtr.h>
-#include <IOV/GrabDataPtr.h>
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Grab/IntersectionStrategy.h>
 
@@ -54,7 +53,7 @@ public:
    virtual void update(ViewerPtr viewer);
 
    virtual OSG::TransformNodePtr
-      findIntersection(ViewerPtr viewer, gmtl::Point3f& intersectPoint);
+      findIntersection(ViewerPtr viewer, const std::vector<OSG::TransformNodePtr>& objs, gmtl::Point3f& intersectPoint);
 
    void setVisible(bool visible);
 
@@ -67,8 +66,6 @@ private:
    }
 
    void configure(jccl::ConfigElementPtr cfgElt) throw (inf::Exception);
-
-   inf::GrabDataPtr mGrabData;
 
    OSG::Line            mSelectionRay;    /**< The ray used for selection. */
 
