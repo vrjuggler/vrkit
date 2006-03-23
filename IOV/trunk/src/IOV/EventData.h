@@ -20,6 +20,28 @@
 namespace inf
 {
 
+struct EventResult
+{
+   typedef int result_type;
+   static const result_type DONE = 0;
+   static const result_type CONTINUE = 1;
+
+   template<typename InputIterator>
+   result_type operator()(InputIterator first, InputIterator last) const
+   {
+      while (first != last)
+      {
+         //result_type result = *first;
+         if (DONE == *first)
+         {
+            return DONE;
+         }
+         ++first;
+      }
+      return DONE;
+   }
+};
+
 class IOV_CLASS_API EventData : public inf::SceneData
 {
 public:
@@ -37,7 +59,7 @@ public:
    virtual ~EventData();
 
 public:
-   boost::signal<void (OSG::TransformNodePtr, gmtl::Matrix44f)> mObjectMovedSignal;
+   boost::signal< int (OSG::TransformNodePtr, gmtl::Matrix44f), EventResult > mObjectMovedSignal;
 
 protected:
    EventData();
