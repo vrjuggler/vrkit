@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-03-22 aronb    Refactored the Grab Plug-in to operate in terms of the new
+                    type inf::SceneObject instead of dealing with the scene
+                    graph directly.
+                    -- VERSION -- 0.18.0
 2006-03-21 patrickh Added the Grid Plug-in.
                     -- VERSION -- 0.17.1
 2006-03-21 aronb    Use Boost.Signals to handle event generation by the Grab
