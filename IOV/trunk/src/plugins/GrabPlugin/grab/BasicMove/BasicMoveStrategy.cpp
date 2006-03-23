@@ -42,13 +42,12 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getMoveStrategyCreator()
 namespace inf
 {
 
-void BasicMoveStrategy::init(inf::ViewerPtr viewer)
+void BasicMoveStrategy::init(inf::ViewerPtr)
 {
 }
 
 void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
-                                      SceneObjectPtr obj,
-                                      const gmtl::Point3f& intersectPoint,
+                                      SceneObjectPtr obj, const gmtl::Point3f&,
                                       const gmtl::Matrix44f& vp_M_wand)
 {
    // m_wand_M_pobj is the offset between the wand and the grabbed
@@ -75,15 +74,13 @@ void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
    m_wand_M_pobj = wand_M_vp * vp_M_pobj;
 }
 
-void BasicMoveStrategy::objectReleased(inf::ViewerPtr viewer,
-                                       SceneObjectPtr obj)
+void BasicMoveStrategy::objectReleased(inf::ViewerPtr, SceneObjectPtr)
 {
    gmtl::identity(m_wand_M_pobj);
 }
 
 gmtl::Matrix44f
-BasicMoveStrategy::computeMove(inf::ViewerPtr viewer,
-                               SceneObjectPtr obj,
+BasicMoveStrategy::computeMove(inf::ViewerPtr, SceneObjectPtr obj,
                                const gmtl::Matrix44f& vp_M_wand,
                                gmtl::Matrix44f& curObjMat)
 {
