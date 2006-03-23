@@ -15,14 +15,18 @@
 namespace inf
 {
 
-/** @interface */
+/**
+ * A scene object whose children and parent are determined statically through
+ * construction of a tree of scene objects. This construction is performed
+ * using the addChild() method.
+ *
+ * @since 0.18.0
+ */
 class IOV_CLASS_API StaticSceneObject
    : public SceneObject
 {
 protected:
    StaticSceneObject();
-
-
 
 public:
    virtual ~StaticSceneObject();

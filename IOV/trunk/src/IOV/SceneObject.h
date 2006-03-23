@@ -16,7 +16,21 @@
 namespace inf
 {
 
-/** @interface */
+/**
+ * Base type for objects in the scene. Such objects correspond to a subtree
+ * in the scene graph but exist as a higher level concept. Exactly what defines
+ * an object in the scene is up to the application programmer. One use of this
+ * type is in handling grabbable objects.
+ *
+ * This type uses the Composite Pattern to allow for easy management of
+ * parent/child relationships of scene objects. Code in IOV operatins in terms
+ * of this abstract base type. Application classes can derive from this base
+ * type to define custom scene objects.
+ *
+ * @see inf::GrabData
+ *
+ * @since 0.18.0
+ */
 class IOV_CLASS_API SceneObject
    : public boost::enable_shared_from_this<SceneObject>
 {

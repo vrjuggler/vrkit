@@ -15,7 +15,12 @@
 namespace inf
 {
 
-/** @interface */
+/**
+ * A scene object whose children and parent are determined on the fly when
+ * they are requested.
+ *
+ * @since 0.18.0
+ */
 class IOV_CLASS_API DynamicSceneObject
    : public SceneObject
 {
