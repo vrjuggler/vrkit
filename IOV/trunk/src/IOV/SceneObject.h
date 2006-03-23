@@ -53,7 +53,7 @@ public:
    /**
     * Get the position of the scene object.
     */
-   OSG::Matrix getPos();
+   virtual OSG::Matrix getPos();
 
    /**
     * Return the root OpenSG node for this object.
