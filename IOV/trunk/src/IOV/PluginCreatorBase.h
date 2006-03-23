@@ -20,7 +20,7 @@ namespace inf
  *
  * @since 0.16.0
  */
-class IOV_CLASS_API PluginCreatorBase : public boost::noncopyable
+class IOV_CLASS_API PluginCreatorBase : boost::noncopyable
 {
 public:
    virtual ~PluginCreatorBase();

@@ -25,7 +25,7 @@ namespace inf
  *
  * @since 0.16.0
  */
-class IOV_CLASS_API MoveStrategy : public boost::noncopyable
+class IOV_CLASS_API MoveStrategy : boost::noncopyable
 {
 public:
    /**

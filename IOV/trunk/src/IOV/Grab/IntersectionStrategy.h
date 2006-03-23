@@ -29,7 +29,7 @@ namespace inf
  *
  * @since 0.16.0
  */
-class IOV_CLASS_API IntersectionStrategy : public boost::noncopyable
+class IOV_CLASS_API IntersectionStrategy : boost::noncopyable
 {
 public:
    /**
