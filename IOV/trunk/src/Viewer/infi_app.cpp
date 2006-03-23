@@ -27,6 +27,7 @@
 #include <IOV/User.h>
 #include <IOV/Scene.h>
 #include <IOV/GrabData.h>
+#include <IOV/StaticSceneObject.h>
 #include <IOV/WandInterface.h>
 
 #include <IOV/Status.h>
@@ -184,7 +185,9 @@ void OpenSgViewer::init()
    osg::endEditCP(scene_transform_root.node());
 
    inf::GrabDataPtr grab_data = scene->getSceneData<inf::GrabData>();
-   grab_data->addObject(model_xform);
+   inf::StaticSceneObjectPtr model_obj = inf::StaticSceneObject::create();
+   model_obj->init(model_xform);
+   grab_data->addObject(model_obj);
 }
 
 void OpenSgViewer::initGl()
