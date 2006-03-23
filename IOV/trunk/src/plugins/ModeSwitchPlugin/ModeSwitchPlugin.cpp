@@ -280,7 +280,7 @@ void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
                      mSwitchButton.getButtons().end(), btns.begin(),
                      IncValue());
 
-      panel.addControlText(btns, "Switch Mode");
+      panel.setControlText(btns, "Switch Mode");
    }
 
    for ( unsigned int i = 0; i < mPlugins.size(); ++i )
