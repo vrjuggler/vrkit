@@ -15,6 +15,7 @@
             <enum label="SimpleNavPlugin" value="SimpleNavPlugin" />
             <enum label="ViewpointsPlugin" value="ViewpointsPlugin" />
             <enum label="WandNavPlugin" value="WandNavPlugin" />
+            <enum label="WidgetPlugin" value="WidgetPlugin" />
          </enumeration>
       </property>
       <property valuetype="integer" variable="true" name="active_modes">
