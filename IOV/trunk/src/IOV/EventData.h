@@ -11,6 +11,7 @@
 #include <IOV/SceneData.h>
 #include <IOV/EventDataPtr.h>
 #include <IOV/SceneObjectPtr.h>
+#include <IOV/Widget/Event.h>
 
 #include <boost/signal.hpp>
 
@@ -18,28 +19,6 @@
 
 namespace inf
 {
-
-struct EventResult
-{
-   typedef int result_type;
-   static const result_type DONE = 0;
-   static const result_type CONTINUE = 1;
-
-   template<typename InputIterator>
-   result_type operator()(InputIterator first, InputIterator last) const
-   {
-      while (first != last)
-      {
-         //result_type result = *first;
-         if (DONE == *first)
-         {
-            return DONE;
-         }
-         ++first;
-      }
-      return DONE;
-   }
-};
 
 class IOV_CLASS_API EventData : public inf::SceneData
 {
@@ -58,7 +37,9 @@ public:
    virtual ~EventData();
 
 public:
-   boost::signal< int (SceneObjectPtr, gmtl::Matrix44f), EventResult > mObjectMovedSignal;
+   boost::signal< Event::ResultType (SceneObjectPtr, gmtl::Matrix44f), Event::ResultOperator > mObjectMovedSignal;
+   boost::signal< Event::ResultType (SceneObjectPtr), Event::ResultOperator > mObjectSelectedSignal;
+   boost::signal< Event::ResultType (SceneObjectPtr), Event::ResultOperator > mObjectDeselectedSignal;
 
 protected:
    EventData();
