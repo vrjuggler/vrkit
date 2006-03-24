@@ -69,7 +69,7 @@ public:
     *
     * @return false is always returned by this implementation.
     */
-   virtual bool hasParent() const;
+   virtual bool hasParent();
 
    /**
     * Returns the parent of this composite object. This implementation always
@@ -92,7 +92,7 @@ public:
     *
     * @return false is always returned by this implementation.
     */
-   virtual bool hasChildren() const;
+   virtual bool hasChildren();
 
    /**
     * Returns the number of children of this composite object. This
@@ -100,7 +100,7 @@ public:
     *
     * @return 0 is always returned by this implementation.
     */
-   virtual unsigned int getChildCount() const;
+   virtual unsigned int getChildCount();
 
    /**
     * Adds the given child to this composite object's collection of children.

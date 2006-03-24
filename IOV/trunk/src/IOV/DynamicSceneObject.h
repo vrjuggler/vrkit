@@ -7,7 +7,9 @@
 #include <IOV/DynamicSceneObjectPtr.h>
 #include <IOV/SceneObject.h>
 
+#include <OpenSG/OSGAction.h>
 #include <OpenSG/OSGDynamicVolume.h>
+#include <OpenSG/OSGTransform.h>
 
 #include <boost/enable_shared_from_this.hpp>
 #include <vector>
@@ -30,10 +32,27 @@ protected:
 public:
    virtual ~DynamicSceneObject();
 
+   static DynamicSceneObjectPtr create()
+   {
+      return DynamicSceneObjectPtr(new DynamicSceneObject());
+   }
+
+   void init(OSG::TransformNodePtr node);
+
    /**
     * Return the dynamic volume that bounds the object.
     */
    virtual OSG::DynamicVolume& getVolume(const bool update = false);
+
+   /**
+    * Move to the specified location.
+    */
+   virtual void moveTo(const OSG::Matrix& matrix);
+
+   /**
+    * Get the position of the scene object.
+    */
+   OSG::Matrix getPos();
 
    /**
     * Return the root OpenSG node for this object.
@@ -48,7 +67,7 @@ public:
     *
     * @return false is always returned by this implementation.
     */
-   virtual bool hasParent() const;
+   virtual bool hasParent();
 
    /**
     * Returns the parent of this composite object. This implementation always
@@ -71,7 +90,7 @@ public:
     *
     * @return false is always returned by this implementation.
     */
-   virtual bool hasChildren() const;
+   virtual bool hasChildren();
 
    /**
     * Returns the number of children of this composite object. This
@@ -79,7 +98,7 @@ public:
     *
     * @return 0 is always returned by this implementation.
     */
-   virtual unsigned int getChildCount() const;
+   virtual unsigned int getChildCount();
 
    /**
     * Adds the given child to this composite object's collection of children.
@@ -138,7 +157,12 @@ public:
    //@}
 
 protected:
+   OSG::Action::ResultE enter(OSG::NodePtr& node);
+
+protected:
+   OSG::TransformNodePtr        mTransformNode;
    OSG::DynamicVolume           mEmptyVolume;
+   std::vector<SceneObjectPtr>  mChildren;
 };
 
 }
