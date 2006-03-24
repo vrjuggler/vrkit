@@ -123,7 +123,7 @@ void removeHighlight(CorePtr core, OSG::MaterialRefPtr oldMaterial)
             OSG::beginEditCP(core,
                              CorePtr::StoredObjectType::MaterialFieldMask);
                core->setMaterial(orig_mat);
-            OSG::endEditCP(core, CorePtr::StoredObjectTYpe::MaterialFieldMask);
+            OSG::endEditCP(core, CorePtr::StoredObjectType::MaterialFieldMask);
          }
       }
    }
@@ -362,9 +362,18 @@ void GeometryHighlightTraverser::removeHighlightMaterial(OSG::NodePtr node,
 
    traverse(node);
 
-   std::vector<OSG::GeometryRefPtr>::iterator c;
-   for ( c = mGeomCores.begin(); c != mGeomCores.end(); ++c )
+   OSG::MaterialRefPtr old_mat(mMaterials[id]);
+
+   std::vector<OSG::GeometryRefPtr>::iterator gc;
+   for ( gc = mGeomCores.begin(); gc != mGeomCores.end(); ++gc )
    {
+      removeHighlight(*gc, old_mat);
+   }
+
+   std::vector<OSG::MaterialGroupRefPtr>::iterator mgc;
+   for ( mgc = mMatGroupCores.begin(); mgc != mMatGroupCores.end(); ++mgc )
+   {
+      removeHighlight(*mgc, old_mat);
    }
 }
 
