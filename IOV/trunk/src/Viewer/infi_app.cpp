@@ -3,11 +3,15 @@
 #include <stdlib.h>
 #include <boost/program_options.hpp>
 
+#include <boost/bind.hpp>
+
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGTransform.h>
 
 #include <OpenSG/OSGMatrix.h>
+#include <OpenSG/OSGMaterialPool.h>
 #include <OpenSG/OSGSimpleGeometry.h>
+#include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGDirectionalLight.h>
 #include <OpenSG/OSGSceneFileHandler.h>
 
@@ -24,11 +28,15 @@
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
 
 #include <IOV/Viewer.h>
+#include <IOV/EventData.h>
 #include <IOV/User.h>
 #include <IOV/Scene.h>
 #include <IOV/GrabData.h>
 #include <IOV/StaticSceneObject.h>
 #include <IOV/WandInterface.h>
+
+#include <IOV/Widget/MaterialChooser.h>
+#include <IOV/Widget/WidgetData.h>
 
 #include <IOV/Status.h>
 
@@ -50,6 +58,8 @@ public:
    {;}
 
    // Callback methods
+
+   int objectMovedSlot(inf::SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat);
 
    virtual void init();
    virtual void contextInit();
@@ -73,7 +83,9 @@ protected:
    {;}
 
 protected:
-   std::string    mFileName;
+   std::string              mFileName;
+   inf::MaterialChooserPtr  mMaterialChooser; /**< The status panel we are using. */
+   OSG::MaterialPoolPtr     mMaterialPool;
 };
 
 
@@ -88,6 +100,8 @@ void OpenSgViewer::preFrame()
    // Call up to get navigation and plugin updates.
    inf::Viewer::preFrame();
 
+   mMaterialChooser->update();
+
    inf::WandInterfacePtr wand_if = getUser()->getInterfaceTrader().getWandInterface();
    gadget::DigitalInterface& save_btn(wand_if->getButton(5));
 
@@ -98,12 +112,34 @@ void OpenSgViewer::preFrame()
    }
 }
 
+int OpenSgViewer::objectMovedSlot(inf::SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat)
+{
+   //std::cout << "MOVED" << std::endl;
+   //return inf::EventResult::DONE;
+   return inf::Event::CONTINUE;
+}
 
 void OpenSgViewer::init()
 {
    inf::Viewer::init();
 
+   inf::EventDataPtr event_data = getSceneObj()->getSceneData<inf::EventData>();
+   event_data->mObjectMovedSignal.connect(0, boost::bind(&OpenSgViewer::objectMovedSlot, this, _1, _2));
+
    vprASSERT(getSceneObj().get() != NULL);      // We should have valid scene
+
+   inf::ScenePtr scene = getSceneObj();
+
+   mMaterialChooser = inf::MaterialChooser::create();
+
+   // Initialize panel
+   const float feet_to_app_units(0.3048f * getDrawScaleFactor());
+   mMaterialChooser->init(getDrawScaleFactor());
+   mMaterialChooser->setWidthHeight(10.0f * feet_to_app_units, 15.0f * feet_to_app_units);
+
+   // Add widget to scene.
+   inf::WidgetDataPtr widget_data = scene->getSceneData<inf::WidgetData>();
+   widget_data->addWidget(mMaterialChooser);
 
    OSG::RefPtr<OSG::NodePtr> model_root;
 
@@ -119,6 +155,10 @@ void OpenSgViewer::init()
       model_root =
          osg::SceneFileHandler::the().read((osg::Char8*)(mFileName.c_str()));
    }
+
+   mMaterialPool = OSG::MaterialPool::create();
+   mMaterialPool->add(model_root);
+   mMaterialChooser->setMaterialPool(mMaterialPool);
 
    OSG::TransformPtr model_xform_core = OSG::Transform::create();
    OSG::beginEditCP(model_xform_core, OSG::Transform::MatrixFieldMask);
@@ -176,7 +216,6 @@ void OpenSgViewer::init()
    OSG::endEditCP(light_node);
 
    // create the root part of the scene
-   inf::ScenePtr scene = getSceneObj();
    OSG::TransformNodePtr scene_transform_root = scene->getTransformRoot();
 
    // Set up the root node
