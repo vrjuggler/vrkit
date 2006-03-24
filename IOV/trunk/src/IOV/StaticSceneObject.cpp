@@ -45,7 +45,7 @@ OSG::DynamicVolume& StaticSceneObject::getVolume(const bool update)
 }
 
 
-bool StaticSceneObject::hasParent() const
+bool StaticSceneObject::hasParent()
 {
    return mParent.lock().get() != NULL;
 }
@@ -60,12 +60,12 @@ void StaticSceneObject::setParent(SceneObjectPtr parent)
    mParent = parent;
 }
 
-bool StaticSceneObject::hasChildren() const
+bool StaticSceneObject::hasChildren()
 {
    return ! mChildren.empty();
 }
 
-unsigned int StaticSceneObject::getChildCount() const
+unsigned int StaticSceneObject::getChildCount()
 {
    return mChildren.size();
 }

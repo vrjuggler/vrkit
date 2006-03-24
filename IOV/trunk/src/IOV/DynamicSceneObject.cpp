@@ -1,6 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
 #include <IOV/DynamicSceneObject.h>
+#include <OpenSG/OSGSimpleAttachments.h>
 
 namespace inf
 {
@@ -15,24 +16,66 @@ DynamicSceneObject::DynamicSceneObject()
    mEmptyVolume.setEmpty();
 }
 
+void DynamicSceneObject::init(OSG::TransformNodePtr node)
+{
+   mTransformNode = node;
+}
 
 OSG::DynamicVolume& DynamicSceneObject::getVolume(const bool update)
 {
-   return mEmptyVolume;
+   return getRoot()->getVolume(update);
+}
+
+bool isTransform(OSG::NodePtr node)
+{
+   if (OSG::NullFC == node || OSG::NullFC == node->getCore())
+   {
+      return false;
+   }
+
+   if (node->getCore()->getType().isDerivedFrom(OSG::Transform::getClassType()))
+   {
+      return true;
+   }
+   return false;
+}
+
+void DynamicSceneObject::moveTo(const OSG::Matrix& matrix)
+{
+   OSG::beginEditCP(mTransformNode.core(), OSG::Transform::MatrixFieldMask);
+      mTransformNode->setMatrix(matrix);
+   OSG::endEditCP(mTransformNode.core(), OSG::Transform::MatrixFieldMask);
+}
+
+OSG::Matrix DynamicSceneObject::getPos()
+{
+   return mTransformNode->getMatrix();
 }
 
 OSG::NodeRefPtr DynamicSceneObject::getRoot()
 {
-   return OSG::NodeRefPtr();
+   return OSG::NodeRefPtr(mTransformNode.node());
 }
 
-bool DynamicSceneObject::hasParent() const
+bool DynamicSceneObject::hasParent()
 {
-   return false;
+   return (getParent().get() != NULL);
 }
 
 SceneObjectPtr DynamicSceneObject::getParent()
 {
+   OSG::NodePtr parent = getRoot()->getParent();
+   while (OSG::NullFC != parent)
+   {
+      if (isTransform(parent))
+      {
+         OSG::TransformNodePtr parent_node(parent);
+         DynamicSceneObjectPtr parent_obj = DynamicSceneObject::create();
+         parent_obj->init(parent_node);
+         return parent_obj;
+      }
+      parent = parent->getParent();
+   }
    return DynamicSceneObjectPtr();
 }
 
@@ -41,14 +84,14 @@ void DynamicSceneObject::setParent(SceneObjectPtr parent)
    // Do nothing
 }
 
-bool DynamicSceneObject::hasChildren() const
+bool DynamicSceneObject::hasChildren()
 {
-   return false;
+   return (!getChildren().empty());
 }
 
-unsigned int DynamicSceneObject::getChildCount() const
+unsigned int DynamicSceneObject::getChildCount()
 {
-   return 0;
+   return (getChildren().size());
 }
 
 void DynamicSceneObject::addChild(SceneObjectPtr child)
@@ -68,12 +111,47 @@ void DynamicSceneObject::removeChild(const unsigned int childIndex)
 
 SceneObjectPtr DynamicSceneObject::getChild(const unsigned int childIndex)
 {
-   // Do nothing
+   return (getChildren()[childIndex]);
+}
+
+OSG::Action::ResultE DynamicSceneObject::enter(OSG::NodePtr& node)
+{   
+   if(node->getCore()->getType().isDerivedFrom(OSG::Transform::getClassType()))
+   {
+      OSG::TransformNodePtr parent_node(node);
+      DynamicSceneObjectPtr parent_obj = DynamicSceneObject::create();
+      parent_obj->init(parent_node);
+      mChildren.push_back(parent_obj);
+      /*
+      std::string node_str("<NULL>");
+      const char* node_name = OSG::getName(node);
+      if (NULL != node_name)
+      {
+         node_str = node_name;
+      }
+      std::cout << "Adding node: " << node_str << std::endl;
+      */
+      return OSG::Action::Skip;
+   }   
+   return OSG::Action::Continue; 
 }
 
 std::vector<SceneObjectPtr> DynamicSceneObject::getChildren()
 {
-   return std::vector<SceneObjectPtr>();
+   //std::cout << "DynamicSceneObject::getChildren()" << std::endl;
+   //if (mChildren.empty())
+   {
+   mChildren.clear();
+
+   // Traverse over all children.
+   OSG::traverse(getRoot()->getMFChildren()->getValues(), 
+                 OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<OSG::Action::ResultE,
+                                                          DynamicSceneObject,
+                                                          OSG::NodePtr>(
+                                                          this, 
+                                                          &DynamicSceneObject::enter));
+   }
+   return mChildren;
 }
 
 }

@@ -15,6 +15,31 @@ SceneObject::SceneObject()
    mEmptyVolume.setEmpty();
 }
 
+void SceneObject::wandEntered()
+{
+   /* Do nothing */;
+}
+
+void SceneObject::wandExited()
+{
+   /* Do nothing */;
+}
+
+void SceneObject::wandPressed()
+{
+   /* Do nothing */;
+}
+
+void SceneObject::wandReleased()
+{
+   /* Do nothing */;
+}
+
+void SceneObject::wandMoved()
+{
+   /* Do nothing */;
+}
+
 OSG::DynamicVolume& SceneObject::getVolume(const bool update)
 {
    return mEmptyVolume;
@@ -30,12 +55,7 @@ OSG::Matrix SceneObject::getPos()
    return OSG::Matrix::identity();
 }
 
-OSG::NodeRefPtr SceneObject::getRoot()
-{
-   return OSG::NodeRefPtr();
-}
-
-bool SceneObject::hasParent() const
+bool SceneObject::hasParent()
 {
    return false;
 }
@@ -50,12 +70,12 @@ void SceneObject::setParent(SceneObjectPtr parent)
    // Do nothing
 }
 
-bool SceneObject::hasChildren() const
+bool SceneObject::hasChildren()
 {
    return false;
 }
 
-unsigned int SceneObject::getChildCount() const
+unsigned int SceneObject::getChildCount()
 {
    return 0;
 }
