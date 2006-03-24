@@ -4,6 +4,8 @@
 
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGGeometry.h>
+#include <OpenSG/OSGGeoFunctions.h>
+#include <OpenSG/OSGSimpleGeometry.h>
 #include <OpenSG/OSGSimpleMaterial.h>
 #include <OpenSG/OSGDepthChunk.h>
 #include <OpenSG/OSGTextureChunk.h>
@@ -49,6 +51,25 @@ OSG::GeometryPtr UiBuilder::createGeomGeo()
    OSG::GeoColors4fPtr colors = OSG::GeoColors4f::create();
    OSG::GeoNormals3fPtr norms = OSG::GeoNormals3f::create();
 
+   OSG::beginEditCP(geo_core);
+   {
+       geo_core->setTypes(type);
+       geo_core->setLengths(lens);
+       geo_core->setPositions(pnts);
+       geo_core->setColors(colors);
+       geo_core->setNormals(norms);
+
+       // assign a material to the geometry to make it visible. The details
+       // of materials are defined later.
+       geo_core->setMaterial(createDefaultMaterial());
+   }
+   OSG::endEditCP(geo_core);
+
+   return geo_core;
+}
+
+OSG::MaterialPtr UiBuilder::createDefaultMaterial()
+{
    OSG::ChunkMaterialPtr mat = OSG::ChunkMaterial::create();
    OSG::MaterialChunkPtr mat_chunk = OSG::MaterialChunk::create();
    OSG::BlendChunkPtr blend_chunk = OSG::BlendChunk::create();
@@ -73,21 +94,7 @@ OSG::GeometryPtr UiBuilder::createGeomGeo()
 
    // XXX: Handle transparency
 
-   OSG::beginEditCP(geo_core);
-   {
-       geo_core->setTypes(type);
-       geo_core->setLengths(lens);
-       geo_core->setPositions(pnts);
-       geo_core->setColors(colors);
-       geo_core->setNormals(norms);
-
-       // assign a material to the geometry to make it visible. The details
-       // of materials are defined later.
-       geo_core->setMaterial(mat);
-   }
-   OSG::endEditCP(geo_core);
-
-   return geo_core;
+   return mat;
 }
 
 void UiBuilder::resetGeomGeo(OSG::GeometryPtr geom)
@@ -111,6 +118,43 @@ void UiBuilder::resetGeomGeo(OSG::GeometryPtr geom)
    OSG::endEditCP(geom);
 }
 
+OSG::GeometryPtr UiBuilder::buildSphere(const OSG::UInt16 depth, const OSG::Real32 radius, 
+                                        const OSG::Color3f& color, const float alpha)
+{
+   // Geometry fields returned are:
+   // GeoPTypesPtr
+   // GeoPLengthsPtr
+   // GeoPositions3fPtr
+   // GeoColors4fPtr     - Missing
+   // GeoNormals3fPtr
+   // GeoTexCoords2fPtr  - Extra
+   // GeoIndicesUI32Ptr  - Extra
+   OSG::GeometryPtr geom = OSG::makeSphereGeo(depth, radius);
+   OSG::createSingleIndex(geom);
+   OSG::Color4f used_color(color.red(), color.green(), color.blue(), alpha);
+   
+   OSG::GeoPositions3fPtr verts = OSG::GeoPositions3fPtr::dcast(geom->getPositions());
+   OSG::GeoColors4fPtr colors = OSG::GeoColors4f::create();
+   OSG::GeoColors4f::StoredFieldType* mfc = colors->getFieldPtr();
+   assert(NULL != mfc);
+
+   OSG::beginEditCP(colors);
+   for (OSG::UInt32 i = 0 ; i < verts->size() ; i++)
+   {
+      mfc->push_back(used_color);
+   }
+   OSG::endEditCP(colors);
+
+   OSG::beginEditCP(geom);
+   {
+      geom->setColors(colors);
+      geom->setMaterial(createDefaultMaterial());
+   }
+   OSG::endEditCP(geom);
+
+   return geom;
+}
+
 void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom,
                                       const OSG::Color3f& color,
                                       const OSG::Pnt2f& minPt,
@@ -129,7 +173,8 @@ void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom,
    assert(OSG::NullFC != colors);
    assert(OSG::NullFC != norms);
 
-   OSG::MFColor4f* mfc = colors->getFieldPtr();
+   //OSG::MFColor4f* mfc = colors->getFieldPtr();
+   OSG::GeoColors4f::StoredFieldType* mfc = colors->getFieldPtr();
    assert(NULL != mfc);
 
    OSG::CPEditor types_ed(types);

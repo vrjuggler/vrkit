@@ -5,6 +5,7 @@
 
 #include <IOV/Config.h>
 #include <OpenSG/OSGGeometry.h>
+#include <OpenSG/OSGMaterial.h>
 #include <OpenSG/OSGTextFace.h>
 #include <OpenSG/OSGTextTXFFace.h>
 #include <OpenSG/OSGTextTXFGlyph.h>
@@ -36,12 +37,20 @@ public:
     */
    OSG::GeometryPtr createGeomGeo();
 
+   OSG::MaterialPtr createDefaultMaterial();
+
    /**
     * Resets the attributes of the given geometry core.
     *
     * @param geom The core that will have its attributes reset.
     */
    void resetGeomGeo(OSG::GeometryPtr geom);
+
+   /** Build a sphere.
+    * 
+    */
+   OSG::GeometryPtr buildSphere(const OSG::UInt16 depth, const OSG::Real32 radius, 
+                                const OSG::Color3f& color, const float alpha);
 
    /** Build a rectangle.
     * @PARAM geom    The geometry to add to.
