@@ -1,6 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
 #include <algorithm>
+#include <boost/bind.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 
@@ -235,6 +236,9 @@ void Viewer::deallocate()
       delete mConnection;
    }
 
+   std::for_each(mPlugins.begin(), mPlugins.end(),
+                 boost::bind((void (inf::PluginPtr::*)()) &inf::PluginPtr::reset, _1));
+
    mUser.reset();
    mScene.reset();
    mPlugins.clear();
@@ -445,9 +449,9 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
          if ( NULL != creator )
          {
             inf::PluginPtr plugin = creator->createPlugin();
-            plugin->setFocused(shared_from_this(), true);
             // Initialize the plugin, and configure it.
             plugin->init(shared_from_this());
+            plugin->setFocused(shared_from_this(), true);
             mPlugins.push_back(plugin);
             std::cout << "[OK]" << std::endl;
          }
