@@ -20,6 +20,117 @@
 
 namespace fs = boost::filesystem;
 
+namespace
+{
+
+template<typename CorePtr>
+void addHighlight(CorePtr core, OSG::MaterialRefPtr newMat)
+{
+   OSG::MultiPassMaterialPtr mpass_mat;
+
+   // Save the core's current material so that we can restore it later
+   // in removeHighlightMaterial().
+   OSG::MaterialPtr mat = core->getMaterial();
+
+   // If the geometry node has no material at all or its material is not a
+   // multi-pass material, then we need to create a new mulit-pass material
+   // and make the geometry's current material the first material of
+   // mpass_mat.
+   if ( OSG::NullFC == mat ||
+        ! mat->getType().isDerivedFrom(OSG::MultiPassMaterial::getClassType()) )
+   {
+      // If the geometry node has no material at all, we have to inject a
+      // dummy material to ensure that the geometry is rendered before the
+      // highlighting is rendered.
+      if ( OSG::NullFC == mat )
+      {
+         mat = OSG::getDefaultMaterial();
+      }
+
+      mpass_mat = OSG::MultiPassMaterial::create();
+      OSG::beginEditCP(mpass_mat,
+                       OSG::MultiPassMaterial::MaterialsFieldMask);
+         mpass_mat->addMaterial(mat);
+      OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+
+      // Replace the material for the geometry core with the new
+      // multi-pass material.
+      OSG::beginEditCP(core, CorePtr::StoredObjectType::MaterialFieldMask);
+         core->setMaterial(mpass_mat);
+      OSG::endEditCP(core, CorePtr::StoredObjectType::MaterialFieldMask);
+   }
+   // If we already have a multi-pass material, we will use it for
+   // mpass_mat.
+   else
+   {
+      mpass_mat = OSG::MultiPassMaterialPtr::dcast(mat);
+   }
+
+//   std::cout << "Ading material " << newMat << std::endl;
+   // Now, we add the highlight material.
+   OSG::beginEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+      mpass_mat->addMaterial(newMat);
+   OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+}
+
+template<typename CorePtr>
+void swapHighlight(CorePtr core, OSG::MaterialRefPtr oldMat,
+                   OSG::MaterialRefPtr newMat)
+{
+   OSG::MaterialPtr mat = core->getMaterial();
+   OSG::MultiPassMaterialPtr mpass_mat = OSG::MultiPassMaterialPtr::dcast(mat);
+
+   if ( mpass_mat->hasMaterial(oldMat) )
+   {
+      OSG::beginEditCP(mpass_mat,
+                       OSG::MultiPassMaterial::MaterialsFieldMask);
+         mpass_mat->subMaterial(oldMat);
+         mpass_mat->addMaterial(newMat);
+      OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+   }
+}
+
+template<typename CorePtr>
+void removeHighlight(CorePtr core, OSG::MaterialRefPtr oldMaterial)
+{
+   OSG::MaterialPtr mat = core->getMaterial();
+
+   if ( OSG::NullFC != mat )
+   {
+      OSG::MultiPassMaterialPtr mpass_mat =
+         OSG::MultiPassMaterialPtr::dcast(mat);
+
+      // Ensure that mpass_mat has the given material to be removed and
+      // then remove it.
+      if ( OSG::NullFC != mpass_mat && mpass_mat->hasMaterial(oldMaterial) )
+      {
+//         std::cout << "Removing material " << oldMaterial << std::endl;
+         OSG::beginEditCP(mpass_mat,
+                          OSG::MultiPassMaterial::MaterialsFieldMask);
+            mpass_mat->subMaterial(oldMaterial);
+         OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+
+         // If the number of materials remaining in mpass_mat is 1, then we
+         // have reached the point where we need to restore the original
+         // material.
+         OSG::MFMaterialPtr& materials(mpass_mat->getMaterials());
+         if ( materials.getSize() == 1 )
+         {
+            OSG::MaterialRefPtr orig_mat(mpass_mat->getMaterials(0));
+//            std::cout << "Restoring original material " << orig_mat.get()
+//                      << std::endl;
+            // Restore the material back to whatever it was originally.
+            OSG::beginEditCP(core,
+                             CorePtr::StoredObjectType::MaterialFieldMask);
+               core->setMaterial(orig_mat);
+            OSG::endEditCP(core, CorePtr::StoredObjectTYpe::MaterialFieldMask);
+         }
+      }
+   }
+}
+
+}
+
 namespace inf
 {
 
@@ -202,54 +313,18 @@ void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
 
    traverse(node);
 
-   std::vector<OSG::GeometryRefPtr>::iterator c;
-   for ( c = mGeomCores.begin(); c != mGeomCores.end(); ++c )
+   OSG::MaterialRefPtr material(mMaterials[id]);
+
+   std::vector<OSG::GeometryRefPtr>::iterator gc;
+   for ( gc = mGeomCores.begin(); gc != mGeomCores.end(); ++gc )
    {
-      OSG::MultiPassMaterialPtr mpass_mat;
+      addHighlight((*gc).get(), material);
+   }
 
-      // Save the core's current material so that we can restore it later
-      // in removeHighlightMaterial().
-      OSG::MaterialPtr mat = (*c)->getMaterial();
-
-      // If the geometry node has no material at all or its material is not a
-      // multi-pass material, then we need to create a new mulit-pass material
-      // and make the geometry's current material the first material of
-      // mpass_mat.
-      if ( OSG::NullFC == mat ||
-           ! mat->getType().isDerivedFrom(OSG::MultiPassMaterial::getClassType()) )
-      {
-         // If the geometry node has no material at all, we have to inject a
-         // dummy material to ensure that the geometry is rendered before the
-         // highlighting is rendered.
-         if ( OSG::NullFC == mat )
-         {
-            mat = OSG::getDefaultMaterial();
-         }
-
-         mpass_mat = OSG::MultiPassMaterial::create();
-         OSG::beginEditCP(mpass_mat,
-                          OSG::MultiPassMaterial::MaterialsFieldMask);
-            mpass_mat->addMaterial(mat);
-         OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
-
-         // Replace the material for the geometry core with the new
-         // multi-pass material.
-         OSG::beginEditCP(*c, OSG::Geometry::MaterialFieldMask);
-            (*c)->setMaterial(mpass_mat);
-         OSG::endEditCP(*c, OSG::Geometry::MaterialFieldMask);
-      }
-      // If we already have a multi-pass material, we will use it for
-      // mpass_mat.
-      else
-      {
-         mpass_mat = OSG::MultiPassMaterialPtr::dcast(mat);
-      }
-
-//      std::cout << "Ading material " << mMaterials[id] << std::endl;
-      // Now, we add the highlight material.
-      OSG::beginEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
-         mpass_mat->addMaterial(mMaterials[id]);
-      OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+   std::vector<OSG::MaterialGroupRefPtr>::iterator mgc;
+   for ( mgc = mMatGroupCores.begin(); mgc != mMatGroupCores.end(); ++mgc )
+   {
+      addHighlight((*mgc).get(), material);
    }
 }
 
@@ -263,20 +338,19 @@ void GeometryHighlightTraverser::swapHighlightMaterial(OSG::NodePtr node,
 
    traverse(node);
 
-   std::vector<OSG::GeometryRefPtr>::iterator c;
-   for ( c = mGeomCores.begin(); c != mGeomCores.end(); ++c )
+   OSG::MaterialRefPtr old_mat(mMaterials[oldID]);
+   OSG::MaterialRefPtr new_mat(mMaterials[newID]);
+
+   std::vector<OSG::GeometryRefPtr>::iterator gc;
+   for ( gc = mGeomCores.begin(); gc != mGeomCores.end(); ++gc )
    {
-      OSG::MaterialPtr mat = (*c)->getMaterial();
-      OSG::MultiPassMaterialPtr mpass_mat =
-         OSG::MultiPassMaterialPtr::dcast(mat);
-      if ( mpass_mat->hasMaterial(mMaterials[oldID]) )
-      {
-         OSG::beginEditCP(mpass_mat,
-                          OSG::MultiPassMaterial::MaterialsFieldMask);
-            mpass_mat->subMaterial(mMaterials[oldID]);
-            mpass_mat->addMaterial(mMaterials[newID]);
-         OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
-      }
+      swapHighlight(*gc, old_mat, new_mat);
+   }
+
+   std::vector<OSG::MaterialGroupRefPtr>::iterator mgc;
+   for ( mgc = mMatGroupCores.begin(); mgc != mMatGroupCores.end(); ++mgc )
+   {
+      swapHighlight(*mgc, new_mat, new_mat);
    }
 }
 
@@ -291,41 +365,6 @@ void GeometryHighlightTraverser::removeHighlightMaterial(OSG::NodePtr node,
    std::vector<OSG::GeometryRefPtr>::iterator c;
    for ( c = mGeomCores.begin(); c != mGeomCores.end(); ++c )
    {
-      OSG::MaterialPtr mat = (*c)->getMaterial();
-
-      if ( OSG::NullFC != mat )
-      {
-         OSG::MultiPassMaterialPtr mpass_mat =
-            OSG::MultiPassMaterialPtr::dcast(mat);
-
-         // Ensure that mpass_mat has the given material to be removed and
-         // then remove it.
-         if ( OSG::NullFC != mpass_mat &&
-              mpass_mat->hasMaterial(mMaterials[id]) )
-         {
-//            std::cout << "Removing material " << mMaterials[id] << std::endl;
-            OSG::beginEditCP(mpass_mat,
-                             OSG::MultiPassMaterial::MaterialsFieldMask);
-               mpass_mat->subMaterial(mMaterials[id]);
-            OSG::endEditCP(mpass_mat,
-                           OSG::MultiPassMaterial::MaterialsFieldMask);
-
-            // If the number of materials remaining in mpass_mat is 1, then we
-            // have reached the point where we need to restore the original
-            // material.
-            OSG::MFMaterialPtr& materials(mpass_mat->getMaterials());
-            if ( materials.getSize() == 1 )
-            {
-               OSG::MaterialRefPtr orig_mat(mpass_mat->getMaterials(0));
-//               std::cout << "Restoring original material "
-//                         << orig_mat.get() << std::endl;
-               // Restore the material back to whatever it was originally.
-               OSG::beginEditCP(*c, OSG::Geometry::MaterialFieldMask);
-                  (*c)->setMaterial(orig_mat);
-               OSG::endEditCP(*c, OSG::Geometry::MaterialFieldMask);
-            }
-         }
-      }
    }
 }
 
@@ -389,10 +428,18 @@ void GeometryHighlightTraverser::traverse(OSG::NodePtr node)
 
 OSG::Action::ResultE GeometryHighlightTraverser::enter(OSG::NodePtr& node)
 {
-   if ( node->getCore()->getType().isDerivedFrom(OSG::Geometry::getClassType()) )
+   OSG::NodeCorePtr core = node->getCore();
+   OSG::FieldContainerType& core_fct = core->getType();
+
+   if ( core_fct.isDerivedFrom(OSG::Geometry::getClassType()) )
    {
-      OSG::GeometryPtr geom = OSG::GeometryPtr::dcast(node->getCore());
+      OSG::GeometryPtr geom = OSG::GeometryPtr::dcast(core);
       mGeomCores.push_back(OSG::GeometryRefPtr(geom));
+   }
+   else if ( core_fct.isDerivedFrom(OSG::MaterialGroup::getClassType()) )
+   {
+      OSG::MaterialGroupPtr mat_grp = OSG::MaterialGroupPtr::dcast(core);
+      mMatGroupCores.push_back(OSG::MaterialGroupRefPtr(mat_grp));
    }
 
    return OSG::Action::Continue;
