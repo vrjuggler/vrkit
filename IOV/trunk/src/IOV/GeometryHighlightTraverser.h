@@ -17,6 +17,7 @@
 #include <OpenSG/OSGMaterial.h>
 #include <OpenSG/OSGChunkMaterial.h>
 #include <OpenSG/OSGSHLChunk.h>
+#include <OpenSG/OSGMaterialGroup.h>
 
 #include <IOV/Util/Exceptions.h>
 
@@ -271,6 +272,7 @@ private:
       const char*         mName;
    };
 
+   std::vector<OSG::MaterialGroupRefPtr> mMatGroupCores;
    std::vector<OSG::GeometryRefPtr> mGeomCores;
 
    std::vector<boost::filesystem::path> mShaderSearchPath;
