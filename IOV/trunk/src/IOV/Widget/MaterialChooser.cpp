@@ -1,5 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
+#include <OpenSG/OSGSimpleAttachments.h>
+
 #include <IOV/Widget/MaterialChooser.h>
 #include <IOV/Widget/SphereButton.h>
 #include <IOV/Widget/ScrollBar.h>
