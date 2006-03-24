@@ -229,6 +229,20 @@ void GrabPlugin::init(ViewerPtr viewer)
 void GrabPlugin::updateState(ViewerPtr viewer)
 {
    //const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
+   /*
+   if ( mIntersectedObj )
+   {
+      const std::vector<SceneObjectPtr>& objs = mGrabData->getObjects();
+      // If mIntersectedObj is not in objs, then our scene object was stolen
+      // out from under us and is no longer valid.
+      if ( std::find(objs.begin(), objs.end(), mIntersectedObj) == objs.end() )
+      {
+         mIntersectedObj = inf::SceneObjectPtr();
+         mIntersecting   = false;
+         mGrabbing       = false;
+      }
+   }
+   */
 
    // Get the wand transformation in virtual platform coordinates.
    const gmtl::Matrix44f vp_M_wand_xform(
@@ -249,8 +263,27 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       SceneObjectPtr intersect_obj;
       if (NULL != mIsectStrategy.get())
       {
-         mIntersectPoint = gmtl::Point3f();
-         intersect_obj = mIsectStrategy->findIntersection(viewer, mGrabData->getObjects(), mIntersectPoint);
+         gmtl::Point3f cur_ip;
+         std::vector<SceneObjectPtr> objs = mGrabData->getObjects();
+         SceneObjectPtr cur_obj = mIsectStrategy->findIntersection(viewer, objs, cur_ip);
+
+         // Save results from calling intersect on grabbable objects.
+         intersect_obj = cur_obj;
+         mIntersectPoint = cur_ip;
+
+         while (NULL != cur_obj && intersect_obj->hasChildren())
+         {
+            objs = cur_obj->getChildren();
+            cur_ip.set(0.0f, 0.0f, 0.0f);
+            cur_obj = mIsectStrategy->findIntersection(viewer, objs, cur_ip);
+
+            // If we intersected a child, save results
+            if (NULL != cur_obj)
+            {
+               intersect_obj = cur_obj;
+               mIntersectPoint = cur_ip;
+            }
+         }
       }
 
       // If the intersected object is different than the one with which the
@@ -301,7 +334,6 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       mGrabSound.trigger();
       mGrabbing = true;
 
-      // XXX: Is there any cleaner way to do this?
       OSG::NodeRefPtr lit_node = mIntersectedObj->getRoot();
       mGeomTraverser.swapHighlightMaterial(lit_node.get(), mIsectHighlightID,
                                            mGrabHighlightID);
@@ -317,8 +349,8 @@ void GrabPlugin::updateState(ViewerPtr viewer)
                                   vp_M_wand_xform);
          }
       }
-
-      // XXX: Send grab event.
+      // Send a select event.
+      mEventData->mObjectSelectedSignal(mIntersectedObj);
    }
    // If we are grabbing an object and the grab button has just been pressed
    // again, release the grabbed object.
@@ -346,8 +378,8 @@ void GrabPlugin::updateState(ViewerPtr viewer)
                (*itr)->objectReleased(viewer, mIntersectedObj);
             }
          }
-
-         // XXX: Send release event
+         // Send a select event.
+         mEventData->mObjectDeselectedSignal(mIntersectedObj);
       }
    }
 }
@@ -386,7 +418,7 @@ int GrabPlugin::defaultObjectMovedSlot(SceneObjectPtr obj, const gmtl::Matrix44f
    gmtl::set(obj_mat_osg, newObjMat);
    obj->moveTo(obj_mat_osg);
    
-   return EventResult::CONTINUE;
+   return Event::CONTINUE;
 }
 
 bool GrabPlugin::config(jccl::ConfigElementPtr elt)
