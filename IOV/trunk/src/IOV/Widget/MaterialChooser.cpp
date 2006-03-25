@@ -139,7 +139,8 @@ void MaterialChooser::materialsChanged()
 void MaterialChooser::setWidthHeight(const float w, const float h, const float borderWidth)
 {
    Frame::setWidthHeight(w, h, borderWidth);
-
+   
+   mSpacing = mWidth * 0.025;
    float hdiam = (mWidth - mSpacing*(mHNum+1))/mHNum;
    float vdiam = (mHeight - mSpacing*(mVNum+1))/mVNum;
 
@@ -173,7 +174,7 @@ void MaterialChooser::setWidthHeight(const float w, const float h, const float b
          sb->update();
       }
    }
-   mScrollBar->move(OSG::Pnt3f(mWidth + mBorderWidth-0.5, 0.0f, 0.0f));
+   mScrollBar->move(OSG::Pnt3f(mWidth, 0.0f, 0.0f));
    mScrollBar->setWidthHeight(mBorderWidth, mHeight, 0.0f);
    mScrollBar->update();
 }
