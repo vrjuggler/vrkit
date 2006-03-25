@@ -83,13 +83,16 @@ Event::ResultType MaterialChooser::onButtonClicked(unsigned int index)
    
    std::string mat_str("<NULL>");
    
-   if (index >= mMaterialPool->getCount())
+   int current_row = mScrollBar->value();
+   int mat_index = (current_row*3) + index;
+
+   if (mat_index >= mMaterialPool->getCount())
    {
       selected_material = OSG::NullFC;
    }
    else
    {
-      selected_material = mMaterialPool->get(index);
+      selected_material = mMaterialPool->get(mat_index);
       const char* mat_name = OSG::getName(selected_material);
       if (NULL != mat_name)
       {
