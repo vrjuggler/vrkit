@@ -257,7 +257,7 @@ inf::Event::ResultType WidgetPlugin::objectSelected(inf::SceneObjectPtr obj, boo
    {
       mSelectedObject = inf::SceneObjectPtr();
    }
-   inf::Event::CONTINUE;
+   return inf::Event::CONTINUE;
 }
 
 inf::Event::ResultType WidgetPlugin::objectMovedSlot(inf::SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat)
