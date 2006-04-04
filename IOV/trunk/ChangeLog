@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-04-03 patrick  Added an overload of inf::Widget::move() that takes an
+                    OSG::Matrix reference so that widgets can be positioned
+                    using a full transformation matrix.
+                    -- VERSION -- 0.19.2
 2006-04-03 patrick  Extended the Ray Intersection Strategy plug-in to use
                     (configurable) triangle-level intersection testing.
                     -- VERSION -- 0.19.1

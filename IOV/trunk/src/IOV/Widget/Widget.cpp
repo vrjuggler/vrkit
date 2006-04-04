@@ -79,7 +79,8 @@ void Widget::update()
    }
 }
 
-void Widget::setWidthHeight(const float w, const float h, const float borderWidth)
+void Widget::setWidthHeight(const float w, const float h,
+                            const float borderWidth)
 {
    mWidth = w;
    mHeight = h;
@@ -89,9 +90,16 @@ void Widget::setWidthHeight(const float w, const float h, const float borderWidt
 
 void Widget::move(const OSG::Pnt3f& pnt)
 {
-   OSG::beginEditCP(mRootWidgetNode.core());
+   OSG::beginEditCP(mRootWidgetNode.core(), OSG::Transform::MatrixFieldMask);
       mRootWidgetNode.core()->getMatrix().setTranslate(pnt);
-   OSG::endEditCP(mRootWidgetNode.core());
+   OSG::endEditCP(mRootWidgetNode.core(), OSG::Transform::MatrixFieldMask);
+}
+
+void Widget::move(const OSG::Matrix& xform)
+{
+   OSG::beginEditCP(mRootWidgetNode.core(), OSG::Transform::MatrixFieldMask);
+      mRootWidgetNode.core()->setMatrix(xform);
+   OSG::endEditCP(mRootWidgetNode.core(), OSG::Transform::MatrixFieldMask);
 }
 
 void Widget::updatePanelScene()
