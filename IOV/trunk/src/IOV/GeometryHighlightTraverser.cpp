@@ -360,10 +360,18 @@ void GeometryHighlightTraverser::swapHighlightMaterial(OSG::NodePtr node,
    validateMaterialID(oldID);
    validateMaterialID(newID);
 
-   traverse(node);
-
    OSG::MaterialRefPtr old_mat(mMaterials[oldID]);
    OSG::MaterialRefPtr new_mat(mMaterials[newID]);
+
+   if ( old_mat == new_mat )
+   {
+      IOV_STATUS << "WARNING: Trying to replace material with itself!"
+                 << std::endl;
+      return;
+   }
+
+   // Traverse node to populate mGeomCores and mMatGroupCores.
+   traverse(node);
 
    std::vector<OSG::GeometryRefPtr>::iterator gc;
    for ( gc = mGeomCores.begin(); gc != mGeomCores.end(); ++gc )
