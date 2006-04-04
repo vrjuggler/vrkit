@@ -52,7 +52,9 @@ public:
    virtual void update(ViewerPtr viewer);
 
    virtual SceneObjectPtr
-      findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs, gmtl::Point3f& intersectPoint);
+      findIntersection(ViewerPtr viewer,
+                       const std::vector<SceneObjectPtr>& objs,
+                       gmtl::Point3f& intersectPoint);
 
    void setVisible(bool visible);
 
@@ -82,6 +84,8 @@ private:
    OSG::Color4f mRayAmbient;
    OSG::Real32  mRayWidth;
    //@}
+
+   bool mTriangleIsect;
 };
 
 }

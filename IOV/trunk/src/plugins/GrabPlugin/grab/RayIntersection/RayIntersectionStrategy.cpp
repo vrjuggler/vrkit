@@ -1,8 +1,12 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
+#include <boost/cast.hpp>
+
 #include <OpenSG/OSGChunkMaterial.h>
 #include <OpenSG/OSGMaterialChunk.h>
 #include <OpenSG/OSGLineChunk.h>
+#include <OpenSG/OSGIntersectAction.h>
+#include <OpenSG/OSGTriangleIterator.h>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/External/OpenSGConvert.h>
@@ -44,6 +48,36 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getIntersectionStrategyCreator()
 
 }
 
+namespace
+{
+
+OSG::Action::ResultE geometryEnter(OSG::CNodePtr& node, OSG::Action* action)
+{
+   OSG::IntersectAction* ia =
+      boost::polymorphic_downcast<OSG::IntersectAction*>(action);
+   OSG::NodePtr n(node);
+   OSG::Geometry* core =
+      boost::polymorphic_downcast<OSG::Geometry*>(n->getCore().getCPtr());
+
+   OSG::TriangleIterator it;
+    
+   for ( it = core->beginTriangles(); it != core->endTriangles(); ++it )
+   {
+      OSG::Real32 t;
+      OSG::Vec3f norm;
+
+      if ( ia->getLine().intersect(it.getPosition(0), it.getPosition(1),
+                                   it.getPosition(2), t, &norm) )
+      {
+         ia->setHit(t, n, it.getIndex(), norm);
+      }
+   }
+    
+   return OSG::Action::Continue; 
+}
+
+}
+
 namespace inf
 {
 
@@ -53,6 +87,7 @@ RayIntersectionStrategy::RayIntersectionStrategy()
    , mRayDiffuse(1.0f, 0.0f, 0.0f, 1.0f)
    , mRayAmbient(1.0f, 0.0f, 0.0f, 1.0f)
    , mRayWidth(5.0f)
+   , mTriangleIsect(false)
 {
    /* Do nothing. */ ;
 }
@@ -72,6 +107,18 @@ void RayIntersectionStrategy::init(ViewerPtr viewer)
       {
          std::cerr << ex.what() << std::endl;
       }
+   }
+
+   // If we are going to do triangle-level intersections, then register our
+   // geometry core callback with OSG::IntersectAction.
+   if ( mTriangleIsect )
+   {
+      OSG::IntersectAction::registerEnterDefault(
+         OSG::Geometry::getClassType(),
+         OSG::osgTypedFunctionFunctor2CPtrRef<
+            OSG::Action::ResultE, OSG::CNodePtr, OSG::Action*
+         >(geometryEnter)
+      );
    }
 
    // Scale the ray length (measured in feet) into application units.
@@ -191,10 +238,12 @@ void RayIntersectionStrategy::initGeom()
    OSG::endEditCP(mSwitchNode);
 }
 
-SceneObjectPtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer,
-   const std::vector<SceneObjectPtr>& objs, gmtl::Point3f& intersectPoint)
+SceneObjectPtr RayIntersectionStrategy::
+findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
+                 gmtl::Point3f& intersectPoint)
 {
-   WandInterfacePtr wand = viewer->getUser()->getInterfaceTrader().getWandInterface();
+   WandInterfacePtr wand =
+      viewer->getUser()->getInterfaceTrader().getWandInterface();
    const gmtl::Matrix44f vp_M_wand(
       wand->getWandPos()->getData(viewer->getDrawScaleFactor())
    );
@@ -232,19 +281,52 @@ SceneObjectPtr RayIntersectionStrategy::findIntersection(ViewerPtr viewer,
                             OSG::Vec3f(pick_ray.mDir.getData()));
        
       float enter_val, exit_val;
-      if ((*o)->getRoot()->getVolume().intersect(osg_pick_ray, enter_val, exit_val))
+      OSG::NodeRefPtr root = (*o)->getRoot();
+
+      if ( root->getVolume().intersect(osg_pick_ray, enter_val, exit_val) )
       {
-         if (enter_val < min_dist)
+         // If enter_val is less than min_dist, then our ray has intersected
+         // an object that is closer than the last intersected object.
+         if ( enter_val < min_dist )
          {
-            intersect_obj = *o;
-            min_dist = enter_val;
-            osg_intersect_point = osg_pick_ray.getPosition() + (min_dist * osg_pick_ray.getDirection());
+            // If we are doing triangle-level intersection, then we create an
+            // intersect action and apply it to the intersected object.
+            // Earlier, a callback was registered for handling geometry cores
+            // to perform the triangle intersection test.
+            if ( mTriangleIsect )
+            {
+               OSG::IntersectAction* action(OSG::IntersectAction::create());
+
+               action->setLine(osg_pick_ray);
+               action->apply(root);
+
+               // If we got a hit, then we update the state of our
+               // intersection test.
+               if ( action->didHit() )
+               {
+                  intersect_obj = *o;
+                  min_dist = enter_val;
+                  osg_intersect_point = action->getHitPoint();
+               }
+
+               delete action;
+            }
+            // If we are not doing triangle-level intersection, then
+            // intersecting with the bounding volume is sufficient to have
+            // an object intersection.
+            else
+            {
+               intersect_obj = *o;
+               min_dist = enter_val;
+               osg_intersect_point = osg_pick_ray.getPosition() +
+                                        min_dist * osg_pick_ray.getDirection();
+            }
          }
       }
-
    }
 
    intersectPoint.set(osg_intersect_point.getValues());
+
    return intersect_obj;
 }
 
@@ -253,7 +335,7 @@ void RayIntersectionStrategy::configure(jccl::ConfigElementPtr cfgElt)
 {
    vprASSERT(cfgElt->getID() == getElementType());
 
-   const unsigned int req_cfg_version(1);
+   const unsigned int req_cfg_version(2);
 
    if ( cfgElt->getVersion() < req_cfg_version )
    {
@@ -269,6 +351,7 @@ void RayIntersectionStrategy::configure(jccl::ConfigElementPtr cfgElt)
    const std::string ray_width_prop("ray_width");
    const std::string ray_diffuse_prop("ray_diffuse_color");
    const std::string ray_ambient_prop("ray_ambient_color");
+   const std::string tri_isect_prop("triangle_intersect");
 
    const float ray_len = cfgElt->getProperty<float>(ray_length_prop);
 
@@ -325,6 +408,8 @@ void RayIntersectionStrategy::configure(jccl::ConfigElementPtr cfgElt)
    {
       mRayAmbient[2] = blue;
    }
+
+   mTriangleIsect = cfgElt->getProperty<bool>(tri_isect_prop);
 }
 
 }

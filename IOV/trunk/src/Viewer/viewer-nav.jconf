@@ -159,7 +159,7 @@
          <slide_target>Intersection Point</slide_target>
          <forward_slide_value>1.0</forward_slide_value>
       </slide_move_strategy>
-      <ray_intersection_strategy name="Ray Intersection Strategy" version="1">
+      <ray_intersection_strategy name="Ray Intersection Strategy" version="2">
          <ray_length>10.0</ray_length>
          <ray_width>2.0</ray_width>
          <ray_diffuse_color>1.0</ray_diffuse_color>
@@ -168,6 +168,7 @@
          <ray_ambient_color>1.0</ray_ambient_color>
          <ray_ambient_color>0.0</ray_ambient_color>
          <ray_ambient_color>0.0</ray_ambient_color>
+         <triangle_intersect>false</triangle_intersect>
       </ray_intersection_strategy>
       <basic_highlighter name="Basic Highlighter" version="1">
          <enable_highlight_shaders>true</enable_highlight_shaders>

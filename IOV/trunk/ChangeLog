@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-04-03 patrick  Extended the Ray Intersection Strategy plug-in to use
+                    (configurable) triangle-level intersection testing.
+                    -- VERSION -- 0.19.1
 2006-04-03 patrick  Moved the use of inf::GeometryHighlightTraverser out of the
                     Grab Plug-in and into the new class inf::BasicHighlighter.
                     User code must now choose to use (or not to use)
