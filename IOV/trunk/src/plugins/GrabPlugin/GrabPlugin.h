@@ -9,7 +9,6 @@
 #include <map>
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/function.hpp>
 #include <gmtl/Matrix.h>
 
@@ -19,12 +18,12 @@
 #include <IOV/GrabDataPtr.h>
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
-#include <IOV/GeometryHighlightTraverser.h>
 #include <IOV/PluginFactory.h>
 #include <IOV/Util/DigitalCommand.h>
 #include <IOV/Grab/IntersectionStrategy.h>
 #include <IOV/Grab/MoveStrategy.h>
 #include <IOV/SceneObjectPtr.h>
+
 
 namespace inf
 {
@@ -88,17 +87,6 @@ private:
       return std::string("iov_grab_plugin");
    }
 
-   std::vector<boost::filesystem::path> mShaderSearchPath;
-   bool mEnableShaders;
-   std::string mIsectVertexShaderFile;
-   std::string mIsectFragmentShaderFile;
-   float       mIsectUniformScale;
-   float       mIsectUniformExponent;
-   std::string mGrabVertexShaderFile;
-   std::string mGrabFragmentShaderFile;
-   float       mGrabUniformScale;
-   float       mGrabUniformExponent;
-
    WandInterfacePtr mWandInterface;
 
    /** Button for grabbing and releasing objects. */
@@ -108,12 +96,6 @@ private:
    bool mIntersecting;
    bool mGrabbing;
    SceneObjectPtr mIntersectedObj;
-
-   GeometryHighlightTraverser mGeomTraverser;
-   unsigned int mIsectHighlightID;
-   unsigned int mGrabHighlightID;
-   OSG::Color3f mIntersectColor;
-   OSG::Color3f mGrabColor;
 
    snx::SoundHandle mIntersectSound;
    snx::SoundHandle mGrabSound;

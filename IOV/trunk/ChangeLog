@@ -1,5 +1,11 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-04-03 patrick  Moved the use of inf::GeometryHighlightTraverser out of the
+                    Grab Plug-in and into the new class inf::BasicHighlighter.
+                    User code must now choose to use (or not to use)
+                    inf::BasicHighlighter or some other object highlight
+                    mechanism.
+                    -- VERSION -- 0.19.0
 2006-03-22 aronb    Refactored the Grab Plug-in to operate in terms of the new
                     type inf::SceneObject instead of dealing with the scene
                     graph directly.

@@ -4,10 +4,7 @@
 #include <algorithm>
 #include <boost/bind.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/filesystem/exception.hpp>
 #include <boost/filesystem/operations.hpp>
-
-#include <OpenSG/OSGSimpleMaterial.h>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
@@ -75,15 +72,6 @@ void GrabPlugin::init(ViewerPtr viewer)
 
    mIntersectSound.init("intersect");
    mGrabSound.init("grab");
-
-   std::string iov_base_dir;
-   vpr::System::getenv("IOV_BASE_DIR", iov_base_dir);
-   if ( ! iov_base_dir.empty() )
-   {
-      fs::path iov_base_dir_path(iov_base_dir, fs::native);
-      fs::path shader_subdir_path("share/IOV/data/shaders");
-      mShaderSearchPath.push_back(iov_base_dir_path / shader_subdir_path);
-   }
 
    // Configure
    std::string elt_type_name = getElementType();
@@ -156,74 +144,6 @@ void GrabPlugin::init(ViewerPtr viewer)
                     << *itr << ":\n" << ex.what() << std::endl;
       }
    }
-
-   bool use_scribe(false);
-
-   if ( mEnableShaders )
-   {
-      try
-      {
-         mGeomTraverser.extendShaderSearchPath(mShaderSearchPath);
-
-         std::vector<OSG::StateChunkRefPtr> chunks;
-
-         OSG::RefPtr<OSG::BlendChunkPtr> blend_chunk;
-         blend_chunk = OSG::BlendChunk::create();
-         OSG::beginEditCP(blend_chunk);
-            blend_chunk->setSrcFactor(GL_SRC_ALPHA);
-            blend_chunk->setDestFactor(GL_ONE);
-         OSG::endEditCP(blend_chunk);
-
-         chunks.push_back(OSG::StateChunkRefPtr(blend_chunk.get()));
-
-         OSG::Vec3f isect_color_vec(mIntersectColor[0], mIntersectColor[1],
-                                    mIntersectColor[2]);
-         inf::GeometryHighlightTraverser::uniform_map_t isect_uniform_params;
-         isect_uniform_params["color"]    = isect_color_vec;
-         isect_uniform_params["scale"]    = mIsectUniformScale;
-         isect_uniform_params["exponent"] = mIsectUniformExponent;
-         mIsectHighlightID =
-            mGeomTraverser.createSHLMaterial(mIsectVertexShaderFile,
-                                             mIsectFragmentShaderFile,
-                                             chunks, isect_uniform_params);
-
-         OSG::Vec3f grab_color_vec(mGrabColor[0], mGrabColor[1],
-                                   mGrabColor[2]);
-         inf::GeometryHighlightTraverser::uniform_map_t grab_uniform_params;
-         grab_uniform_params["color"]    = grab_color_vec;
-         grab_uniform_params["scale"]    = mGrabUniformScale;
-         grab_uniform_params["exponent"] = mGrabUniformExponent;
-         mGrabHighlightID =
-            mGeomTraverser.createSHLMaterial(mGrabVertexShaderFile,
-                                             mGrabFragmentShaderFile,
-                                             chunks, grab_uniform_params);
-      }
-      catch (inf::Exception& ex)
-      {
-         std::cerr << ex.what() << std::endl;
-         std::cout << "Falling back on highlighting through scribing."
-                   << std::endl;
-         use_scribe = true;
-      }
-   }
-   else
-   {
-      use_scribe = true;
-   }
-
-   if ( use_scribe )
-   {
-      mIsectHighlightID = mGeomTraverser.createScribeMaterial(false, GL_LINE,
-                                                              true, false,
-                                                              false, 0.05f,
-                                                              1.0f,
-                                                              mIntersectColor);
-      mGrabHighlightID  = mGeomTraverser.createScribeMaterial(false, GL_LINE,
-                                                              true, false,
-                                                              false, 0.05f,
-                                                              1.0f,
-                                                              mGrabColor);
-   }
 }
 
 void GrabPlugin::updateState(ViewerPtr viewer)
@@ -291,32 +211,27 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       // the application and scene state.
       if ( intersect_obj != mIntersectedObj )
       {
-         if ( mIntersectedObj != NULL && mIntersectedObj->getRoot() != OSG::NullFC )
+         // If we were intersecting a different object, then emit a
+         // de-intersection signal for mIntersectedObj.
+         if ( mIntersectedObj != NULL &&
+              mIntersectedObj->getRoot() != OSG::NullFC )
          {
-            OSG::NodeRefPtr lit_node = mIntersectedObj->getRoot();
-            mGeomTraverser.removeHighlightMaterial(lit_node.get(),
-                                                   mIsectHighlightID);
-
-            // XXX: Send de-select event
+            mEventData->mObjectDeintersectedSignal(mIntersectedObj);
          }
 
          // Change the intersected object to the one we found above.
          mIntersectedObj = intersect_obj;
 
          // If the new node of mIntersectedObj is non-NULL, then we are
-         // intersecting a new object since the last frame.  Set up the
-         // highlight node for this new object.
-         if ( mIntersectedObj != NULL && mIntersectedObj->getRoot() != OSG::NullFC)
+         // intersecting a new object since the last frame. Emit an
+         // intersection signal for this new object.
+         if ( mIntersectedObj != NULL &&
+              mIntersectedObj->getRoot() != OSG::NullFC)
          {
             mIntersectSound.trigger();
             mIntersecting = true;
 
-            OSG::NodeRefPtr lit_node = mIntersectedObj->getRoot();
-
-            // Apply mIsectHighlightMaterial.
-            mGeomTraverser.addHighlightMaterial(lit_node.get(), mIsectHighlightID);
-
-            // XXX: Send select event.
+            mEventData->mObjectIntersectedSignal(mIntersectedObj);
          }
          // Otherwise, we are intersecting nothing.
          else
@@ -334,13 +249,9 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       mGrabSound.trigger();
       mGrabbing = true;
 
-      OSG::NodeRefPtr lit_node = mIntersectedObj->getRoot();
-      mGeomTraverser.swapHighlightMaterial(lit_node.get(), mIsectHighlightID,
-                                           mGrabHighlightID);
-
       gmtl::set(mGrabbed_pobj_M_obj, mIntersectedObj->getPos());
    
-      if ( !mMoveStrategies.empty() )
+      if ( ! mMoveStrategies.empty() )
       {
          for (std::vector<MoveStrategyPtr>::iterator itr = mMoveStrategies.begin();
               itr != mMoveStrategies.end(); ++itr)
@@ -349,6 +260,7 @@ void GrabPlugin::updateState(ViewerPtr viewer)
                                   vp_M_wand_xform);
          }
       }
+
       // Send a select event.
       mEventData->mObjectSelectedSignal(mIntersectedObj);
    }
@@ -364,10 +276,6 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       // intersecting state and clear mIntersectedObj.
       if ( mIntersectedObj != NULL && mIntersectedObj->getRoot() != OSG::NullFC )
       {
-         OSG::NodeRefPtr lit_node = mIntersectedObj->getRoot();
-         mGeomTraverser.swapHighlightMaterial(lit_node.get(), mGrabHighlightID,
-                                              mIsectHighlightID);
-
          gmtl::identity(mGrabbed_pobj_M_obj);
 
          if ( !mMoveStrategies.empty() )
@@ -425,7 +333,7 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
 {
    vprASSERT(elt->getID() == getElementType());
 
-   const unsigned int req_cfg_version(1);
+   const unsigned int req_cfg_version(2);
 
    // Check for correct version of plugin configuration.
    if ( elt->getVersion() < req_cfg_version )
@@ -438,88 +346,11 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
    }
 
    const std::string grab_btn_prop("grab_button_nums");
-   const std::string isect_prop("intersect_color");
-   const std::string grab_prop("grab_color");
-   const std::string isect_shader_prop("intersect_shader");
-   const std::string isect_scale_prop("intersect_shader_scale");
-   const std::string isect_exp_prop("intersect_shader_exponent");
-   const std::string grab_shader_prop("grab_shader");
-   const std::string grab_scale_prop("grab_shader_scale");
-   const std::string grab_exp_prop("grab_shader_exponent");
    const std::string strategy_plugin_path_prop("strategy_plugin_path");
    const std::string isect_strategy_prop("isect_strategy");
    const std::string move_strategy_prop("move_strategy");
 
    mGrabBtn.configButtons(elt->getProperty<std::string>(grab_btn_prop));
-
-   float isect_color[3];
-   float grab_color[3];
-
-   isect_color[0] = elt->getProperty<float>(isect_prop, 0);
-   isect_color[1] = elt->getProperty<float>(isect_prop, 1);
-   isect_color[2] = elt->getProperty<float>(isect_prop, 2);
-
-   if ( isect_color[0] >= 0.0f && isect_color[0] <= 1.0f &&
-        isect_color[1] >= 0.0f && isect_color[1] <= 1.0f &&
-        isect_color[2] >= 0.0f && isect_color[2] <= 1.0f )
-   {
-      mIntersectColor.setValuesRGB(isect_color[0], isect_color[1],
-                                   isect_color[2]);
-   }
-   else
-   {
-      std::cerr << "WARNING: Ignoring invalid inersection highlight color <"
-                << isect_color[0] << "," << isect_color[1] << ","
-                << isect_color[2] << ">" << std::endl;
-   }
-
-   grab_color[0] = elt->getProperty<float>(grab_prop, 0);
-   grab_color[1] = elt->getProperty<float>(grab_prop, 1);
-   grab_color[2] = elt->getProperty<float>(grab_prop, 2);
-
-   if ( grab_color[0] >= 0.0f && grab_color[0] <= 1.0f &&
-        grab_color[1] >= 0.0f && grab_color[1] <= 1.0f &&
-        grab_color[2] >= 0.0f && grab_color[2] <= 1.0f )
-   {
-      mGrabColor.setValuesRGB(grab_color[0], grab_color[1], grab_color[2]);
-   }
-   else
-   {
-      std::cerr << "WARNING: Ignoring invalid grab highlight color <"
-                << grab_color[0] << "," << grab_color[1] << ","
-                << grab_color[2] << ">" << std::endl;
-   }
-
-   const unsigned int num_paths = elt->getNum("shader_search_path");
-   for ( unsigned int i = 0; i < num_paths; ++i )
-   {
-      std::string path =
-         vpr::replaceEnvVars(elt->getProperty<std::string>("shader_search_path", i));
-
-      try
-      {
-         mShaderSearchPath.push_back(fs::path(path, fs::native));
-      }
-      catch (fs::filesystem_error& ex)
-      {
-         std::cerr << ex.what() << std::endl;
-      }
-   }
-
-   mEnableShaders = elt->getProperty<bool>("enable_highlight_shaders");
-   mIsectVertexShaderFile =
-      vpr::replaceEnvVars(elt->getProperty<std::string>(isect_shader_prop, 0));
-   mIsectFragmentShaderFile =
-      vpr::replaceEnvVars(elt->getProperty<std::string>(isect_shader_prop, 1));
-   mIsectUniformScale    = elt->getProperty<float>(isect_scale_prop, 0);
-   mIsectUniformExponent = elt->getProperty<float>(isect_exp_prop, 0);
-
-   mGrabVertexShaderFile =
-      vpr::replaceEnvVars(elt->getProperty<std::string>(grab_shader_prop, 0));
-   mGrabFragmentShaderFile =
-      vpr::replaceEnvVars(elt->getProperty<std::string>(grab_shader_prop, 1));
-   mGrabUniformScale    = elt->getProperty<float>(grab_scale_prop, 0);
-   mGrabUniformExponent = elt->getProperty<float>(grab_exp_prop, 0);
 
    // Set up two default search paths:
    //    1. Relative path to './plugins/grab'
@@ -564,27 +395,13 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
       mMoveStrategyNames.push_back(move_strategy_name);
    }
 
-
    return true;
 }
 
 GrabPlugin::GrabPlugin()
-   : mEnableShaders(true)
-   , mIsectVertexShaderFile("highlight.vs")
-   , mIsectFragmentShaderFile("highlight.fs")
-   , mIsectUniformScale(1.0f)
-   , mIsectUniformExponent(1.0f)
-   , mGrabVertexShaderFile("highlight.vs")
-   , mGrabFragmentShaderFile("highlight.fs")
-   , mGrabUniformScale(1.0f)
-   , mGrabUniformExponent(1.0f)
-   , mGrabText("Grab/Release Toggle")
+   : mGrabText("Grab/Release Toggle")
    , mIntersecting(false)
    , mGrabbing(false)
-   , mIsectHighlightID(GeometryHighlightTraverser::HIGHLIGHT0)
-   , mGrabHighlightID(GeometryHighlightTraverser::HIGHLIGHT1)
-   , mIntersectColor(1.0f, 1.0f, 0.0f)
-   , mGrabColor(1.0f, 0.0f, 1.0f)
 {
    ;
 }

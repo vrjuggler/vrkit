@@ -34,6 +34,7 @@
 #include <IOV/GrabData.h>
 #include <IOV/StaticSceneObject.h>
 #include <IOV/WandInterface.h>
+#include <IOV/Util/BasicHighlighter.h>
 
 #include <IOV/Widget/MaterialChooser.h>
 #include <IOV/Widget/WidgetData.h>
@@ -64,9 +65,8 @@ public:
    virtual void init();
    virtual void contextInit();
    virtual void preFrame();
-   virtual void postFrame()
-   {;}
 
+   virtual void deallocate();
 
    // Configuration settings
 
@@ -86,6 +86,7 @@ protected:
    std::string              mFileName;
    inf::MaterialChooserPtr  mMaterialChooser; /**< The status panel we are using. */
    OSG::MaterialPoolPtr     mMaterialPool;
+   inf::BasicHighlighterPtr mHighlighter;
 };
 
 
@@ -112,6 +113,15 @@ void OpenSgViewer::preFrame()
    }
 }
 
+void OpenSgViewer::deallocate()
+{
+   inf::Viewer::deallocate();
+
+   mMaterialChooser = inf::MaterialChooserPtr();
+   mMaterialPool    = OSG::NullFC;
+   mHighlighter     = inf::BasicHighlighterPtr();
+}
+
 int OpenSgViewer::objectMovedSlot(inf::SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat)
 {
    //std::cout << "MOVED" << std::endl;
@@ -122,6 +132,9 @@ int OpenSgViewer::objectMovedSlot(inf::SceneObjectPtr obj, const gmtl::Matrix44f
 void OpenSgViewer::init()
 {
    inf::Viewer::init();
+
+   mHighlighter = inf::BasicHighlighter::create();
+   mHighlighter->init(shared_from_this());
 
    inf::EventDataPtr event_data = getSceneObj()->getSceneData<inf::EventData>();
    event_data->mObjectMovedSignal.connect(0, boost::bind(&OpenSgViewer::objectMovedSlot, this, _1, _2));

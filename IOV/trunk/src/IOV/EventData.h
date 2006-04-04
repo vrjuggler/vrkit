@@ -37,9 +37,37 @@ public:
    virtual ~EventData();
 
 public:
+   /**
+    * The type for signals whose slots take a single argument of type
+    * inf::SceneObjectPtr.
+    */
+   typedef boost::signal<Event::ResultType (SceneObjectPtr),
+                         Event::ResultOperator> basic_action_t;
+
+   /** @name Signals */
+   //@{
    boost::signal< Event::ResultType (SceneObjectPtr, gmtl::Matrix44f), Event::ResultOperator > mObjectMovedSignal;
-   boost::signal< Event::ResultType (SceneObjectPtr), Event::ResultOperator > mObjectSelectedSignal;
-   boost::signal< Event::ResultType (SceneObjectPtr), Event::ResultOperator > mObjectDeselectedSignal;
+
+   /**
+    * Signal emitted when an object is intersected. This is similar to a
+    * mouse-over or mouse-enter event in traditional 2D windowing systems.
+    *
+    * @since 0.19.0
+    */
+   basic_action_t mObjectIntersectedSignal;
+
+   /**
+    * Signal emitted when an object changes from being intersected to not being
+    * intersected. This is similar to a mouse-exit event in traditional 2D
+    * windowing systems.
+    *
+    * @since 0.19.0
+    */
+   basic_action_t mObjectDeintersectedSignal;
+
+   basic_action_t mObjectSelectedSignal;
+   basic_action_t mObjectDeselectedSignal;
+   //@}
 
 protected:
    EventData();
