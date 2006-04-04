@@ -178,8 +178,6 @@ BasicHighlighter::objectSelected(inf::SceneObjectPtr obj, const bool selected)
    // Switch from the intersection highlight to the grab highlight.
    if ( selected )
    {
-      std::cout << "Swapping isect (" << mIsectHighlightID << ") for grab ("
-                << mGrabHighlightID << ")" << std::endl;
       mGeomTraverser.swapHighlightMaterial(obj->getRoot().get(),
                                            mIsectHighlightID,
                                            mGrabHighlightID);
@@ -187,8 +185,6 @@ BasicHighlighter::objectSelected(inf::SceneObjectPtr obj, const bool selected)
    // Switch from the grab highlight to the intersection highlight.
    else
    {
-      std::cout << "Swapping grab (" << mGrabHighlightID << ") for isect ("
-                << mIsectHighlightID << ")" << std::endl;
       mGeomTraverser.swapHighlightMaterial(obj->getRoot().get(),
                                            mGrabHighlightID,
                                            mIsectHighlightID);
