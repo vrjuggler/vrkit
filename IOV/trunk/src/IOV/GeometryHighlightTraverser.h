@@ -221,57 +221,6 @@ private:
 
    void validateMaterialID(const unsigned int id) throw(inf::Exception);
 
-private:
-   class UniformVisitor : public boost::static_visitor<>
-   {
-   public:
-      UniformVisitor(OSG::SHLChunkRefPtr shlChunk, const char* name)
-         : mSHLChunk(shlChunk)
-         , mName(name)
-      {
-         /* Do nothing. */ ;
-      }
-
-      ~UniformVisitor()
-      {
-         /* Do nothing. */ ;
-      }
-
-      void operator()(bool& b) const
-      {
-         mSHLChunk->setUniformParameter(mName, b);
-      }
-
-      void operator()(OSG::Int32& i) const
-      {
-         mSHLChunk->setUniformParameter(mName, i);
-      }
-
-      void operator()(OSG::Real32& r) const
-      {
-         mSHLChunk->setUniformParameter(mName, r);
-      }
-
-      void operator()(OSG::Vec2f& v) const
-      {
-         mSHLChunk->setUniformParameter(mName, v);
-      }
-
-      void operator()(OSG::Vec3f& v) const
-      {
-         mSHLChunk->setUniformParameter(mName, v);
-      }
-
-      void operator()(OSG::Vec4f& v) const
-      {
-         mSHLChunk->setUniformParameter(mName, v);
-      }
-
-   private:
-      OSG::SHLChunkRefPtr mSHLChunk;
-      const char*         mName;
-   };
-
    std::vector<OSG::MaterialGroupRefPtr> mMatGroupCores;
    std::vector<OSG::GeometryRefPtr> mGeomCores;
 
