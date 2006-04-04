@@ -15,6 +15,8 @@
 #include <OpenSG/OSGSHLChunk.h>
 #include <OpenSG/OSGPolygonChunk.h>
 
+#include <IOV/Status.h>
+
 #include <IOV/GeometryHighlightTraverser.h>
 
 
@@ -78,7 +80,29 @@ void swapHighlight(CorePtr core, OSG::MaterialRefPtr oldMat,
                    OSG::MaterialRefPtr newMat)
 {
    OSG::MaterialPtr mat = core->getMaterial();
+
+   // Verify that core actually has a material set. If it does not, then
+   // there is nothing we can do.
+   if ( OSG::NullFC == mat )
+   {
+      std::ostringstream msg_stream;
+      msg_stream << "Node core " << core << " is supposed to have a material";
+      throw inf::Exception(msg_stream.str(), IOV_LOCATION);
+   }
+
    OSG::MultiPassMaterialPtr mpass_mat = OSG::MultiPassMaterialPtr::dcast(mat);
+
+   // mat is supposed to be a multi-pass material. If it is not, then
+   // something has gone wrong. In this case, either someone is mis-using
+   // inf::GeometryHighlightTraverser, or that class has a bug in it.
+   if ( OSG::NullFC == mpass_mat )
+   {
+      std::ostringstream msg_stream;
+      msg_stream << "Node core " << core
+                 << " is supposed to have an OSG::MultiPassMaterial, but its"
+                 << "material is of type " << mat->getType().getCName();
+      throw inf::Exception(msg_stream.str(), IOV_LOCATION);
+   }
 
    if ( mpass_mat->hasMaterial(oldMat) )
    {
@@ -344,13 +368,31 @@ void GeometryHighlightTraverser::swapHighlightMaterial(OSG::NodePtr node,
    std::vector<OSG::GeometryRefPtr>::iterator gc;
    for ( gc = mGeomCores.begin(); gc != mGeomCores.end(); ++gc )
    {
-      swapHighlight(*gc, old_mat, new_mat);
+      try
+      {
+         swapHighlight(*gc, old_mat, new_mat);
+      }
+      catch (inf::Exception& ex)
+      {
+         IOV_STATUS
+            << "[inf::GeometryHighlightTraverser::swapHighlightMaterial()] "
+            << "WARNING:\n" << ex.what() << std::endl;
+      }
    }
 
    std::vector<OSG::MaterialGroupRefPtr>::iterator mgc;
    for ( mgc = mMatGroupCores.begin(); mgc != mMatGroupCores.end(); ++mgc )
    {
-      swapHighlight(*mgc, new_mat, new_mat);
+      try
+      {
+         swapHighlight(*mgc, new_mat, new_mat);
+      }
+      catch (inf::Exception& ex)
+      {
+         IOV_STATUS
+            << "[inf::GeometryHighlightTraverser::swapHighlightMaterial()] "
+            << "WARNING:\n" << ex.what() << std::endl;
+      }
    }
 }
 
