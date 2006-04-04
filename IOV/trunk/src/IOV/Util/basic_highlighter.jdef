@@ -12,7 +12,7 @@
       </property>
       <property valuetype="boolean" variable="false" name="enable_highlight_shaders">
          <help>Indicates whether to use GLSL shaders to highlight the selected object (intersection and grabbing).</help>
-         <value label="Use GLSL Intersection Highlighter?" defaultvalue="true" />
+         <value label="Use GLSL Highlighters?" defaultvalue="true" />
       </property>
       <property valuetype="float" variable="false" name="intersect_color">
          <help>Red/green/blue color for the object intersection highlight.</help>
