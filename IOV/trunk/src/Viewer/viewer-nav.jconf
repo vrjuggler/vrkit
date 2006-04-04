@@ -149,23 +149,8 @@
          <initial_rot>0.0</initial_rot>
          <initial_rot>0.0</initial_rot>
       </status_panel_plugin>
-      <iov_grab_plugin name="Grab Plug-in" version="1">
+      <iov_grab_plugin name="Grab Plug-in" version="2">
          <grab_button_nums>0</grab_button_nums>
-         <intersect_color>1.0</intersect_color>
-         <intersect_color>1.0</intersect_color>
-         <intersect_color>0.0</intersect_color>
-         <grab_color>1.0</grab_color>
-         <grab_color>0.0</grab_color>
-         <grab_color>1.0</grab_color>
-         <enable_highlight_shaders>true</enable_highlight_shaders>
-         <intersect_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.vs</intersect_shader>
-         <intersect_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.fs</intersect_shader>
-         <intersect_shader_scale>1.0</intersect_shader_scale>
-         <intersect_shader_exponent>1.0</intersect_shader_exponent>
-         <grab_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.vs</grab_shader>
-         <grab_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.fs</grab_shader>
-         <grab_shader_scale>1.0</grab_shader_scale>
-         <grab_shader_exponent>1.0</grab_shader_exponent>
          <isect_strategy>PointIntersection</isect_strategy>
          <move_strategy>Basic Move</move_strategy>
       </iov_grab_plugin>
@@ -184,6 +169,23 @@
          <ray_ambient_color>0.0</ray_ambient_color>
          <ray_ambient_color>0.0</ray_ambient_color>
       </ray_intersection_strategy>
+      <basic_highlighter name="Basic Highlighter" version="1">
+         <enable_highlight_shaders>true</enable_highlight_shaders>
+         <intersect_color>1.0</intersect_color>
+         <intersect_color>1.0</intersect_color>
+         <intersect_color>0.0</intersect_color>
+         <intersect_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.vs</intersect_shader>
+         <intersect_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.fs</intersect_shader>
+         <intersect_shader_scale>1.0</intersect_shader_scale>
+         <intersect_shader_exponent>1.0</intersect_shader_exponent>
+         <grab_color>1.0</grab_color>
+         <grab_color>0.0</grab_color>
+         <grab_color>1.0</grab_color>
+         <grab_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.vs</grab_shader>
+         <grab_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.fs</grab_shader>
+         <grab_shader_scale>1.0</grab_shader_scale>
+         <grab_shader_exponent>1.0</grab_shader_exponent>
+      </basic_highlighter>
    </elements>
 </configuration>
 
