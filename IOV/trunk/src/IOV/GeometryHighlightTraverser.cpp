@@ -385,7 +385,7 @@ void GeometryHighlightTraverser::swapHighlightMaterial(OSG::NodePtr node,
    {
       try
       {
-         swapHighlight(*mgc, new_mat, new_mat);
+         swapHighlight(*mgc, old_mat, new_mat);
       }
       catch (inf::Exception& ex)
       {
@@ -465,6 +465,7 @@ void GeometryHighlightTraverser::createDefaultMaterials()
 void GeometryHighlightTraverser::reset()
 {
    mGeomCores.clear();
+   mMatGroupCores.clear();
 }
 
 void GeometryHighlightTraverser::traverse(OSG::NodePtr node)
