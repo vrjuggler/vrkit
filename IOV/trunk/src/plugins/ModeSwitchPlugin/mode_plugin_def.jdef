@@ -12,6 +12,7 @@
             <enum label="GrabPlugin" value="GrabPlugin" />
             <enum label="GridPlugin" value="GridPlugin" />
             <enum label="LogoPlugin" value="LogoPlugin" />
+            <enum label="PickPlugin" value="PickPlugin" />
             <enum label="SimpleNavPlugin" value="SimpleNavPlugin" />
             <enum label="ViewpointsPlugin" value="ViewpointsPlugin" />
             <enum label="WandNavPlugin" value="WandNavPlugin" />
