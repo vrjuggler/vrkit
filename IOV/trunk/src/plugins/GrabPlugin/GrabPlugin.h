@@ -40,7 +40,8 @@ public:
 
    virtual ~GrabPlugin()
    {
-      /* Do nothing. */ ;
+      mIsectConnection.disconnect();
+      mDeIsectConnection.disconnect();
    }
 
    virtual std::string getDescription()
@@ -87,30 +88,56 @@ private:
       return std::string("iov_grab_plugin");
    }
 
+   /**
+    * Responds to object intersection signals. If \p obj is newly intersected,
+    * then our intersection highlight is applied to it.
+    *
+    * @post Our intersection highlight is applied to \p obj.
+    *
+    * @param obj         The object associated with the intersection signal.
+    * @param pnt         The intersection point.
+    */
+   inf::Event::ResultType objectIntersected(inf::SceneObjectPtr obj,
+                                            inf::SceneObjectPtr parentObj,
+                                            gmtl::Point3f pnt);
+
+   /**
+    * Responds to object de-intersection signals. Our intersection highlight
+    * is removed from \p obj.
+    *
+    * @post Our intersection highlight is removed from \p obj.
+    *
+    * @param obj         The object associated with the intersection signal.
+    */
+   inf::Event::ResultType objectDeintersected(inf::SceneObjectPtr obj);
+
    WandInterfacePtr mWandInterface;
 
    /** Button for grabbing and releasing objects. */
    inf::DigitalCommand mGrabBtn;
    std::string mGrabText;
 
+   /** @name Intersection Strategy */
+   //@{
    bool mIntersecting;
-   bool mGrabbing;
+   SceneObjectPtr mGrabbedObj;
    SceneObjectPtr mIntersectedObj;
-
+   gmtl::Point3f mIntersectPoint;
    snx::SoundHandle mIntersectSound;
+   boost::signals::connection mIsectConnection;
+   boost::signals::connection mDeIsectConnection;
+   //@}
+
+   /** @name Grabbing data */
+   //@{
+   bool mGrabbing;
    snx::SoundHandle mGrabSound;
+   GrabDataPtr  mGrabData;
+   //@}
 
    std::vector<std::string> mStrategyPluginPath;
 
    inf::PluginFactoryPtr mPluginFactory;
-
-   /** @name Intersection Strategy */
-   //@{
-   std::map< std::string, boost::function<IntersectionStrategyPtr ()> > mIsectStrategyMap;
-   IntersectionStrategyPtr mIsectStrategy;
-   std::string mIsectStrategyName;
-   gmtl::Point3f mIntersectPoint;
-   //@}
 
    /** @name Move Strategy */
    //@{
@@ -120,7 +147,6 @@ private:
    std::vector<std::string> mMoveStrategyNames;
    //@}
 
-   GrabDataPtr  mGrabData;
    EventDataPtr mEventData;
 };
 

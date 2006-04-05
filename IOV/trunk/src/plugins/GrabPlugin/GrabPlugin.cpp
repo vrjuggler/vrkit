@@ -65,6 +65,12 @@ void GrabPlugin::init(ViewerPtr viewer)
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
    mEventData->mObjectMovedSignal.connect(100, boost::bind(&GrabPlugin::defaultObjectMovedSlot, this, _1, _2));
 
+   // Connect the intersection signal to our slot.
+   mIsectConnection = mEventData->mObjectIntersectedSignal.connect(0, boost::bind(&GrabPlugin::objectIntersected, this, _1, _2, _3));
+
+   // Connect the de-intersection signal to our slot.
+   mDeIsectConnection = mEventData->mObjectDeintersectedSignal.connect(0, boost::bind(&GrabPlugin::objectDeintersected, this, _1));
+
    mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
 
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
@@ -87,32 +93,6 @@ void GrabPlugin::init(ViewerPtr viewer)
    // Initialize the plug-in factories for our strategy plug-in types.
    mPluginFactory = viewer->getPluginFactory();
    mPluginFactory->addScanPath(mStrategyPluginPath);
-
-   // Build the IntersectionStrategy instance.
-   try
-   {
-      IOV_STATUS << "   Loading intersection strategy plug-in '"
-                 << mIsectStrategyName << "' ..." << std::flush;
-      inf::PluginCreator<inf::IntersectionStrategy>* creator =
-         mPluginFactory->getPluginCreator<inf::IntersectionStrategy>(mIsectStrategyName);
-
-      if ( NULL != creator )
-      {
-         mIsectStrategy = creator->createPlugin();
-         mIsectStrategy->init(viewer);
-         IOV_STATUS << "[OK]" << std::endl;
-      }
-      else
-      {
-         IOV_STATUS << "[ERROR]\nWARNING: No creator for strategy plug-in "
-                    << mIsectStrategyName << std::endl;
-      }
-   }
-   catch (std::runtime_error& ex)
-   {
-      IOV_STATUS << "[ERROR]\nWARNING: Failed to load strategy plug-in "
-                 << mIsectStrategyName << ":\n" << ex.what() << std::endl;
-   }
 
    // Build the MoveStrategies
    for (std::vector<std::string>::iterator itr = mMoveStrategyNames.begin();
@@ -146,100 +126,53 @@ void GrabPlugin::init(ViewerPtr viewer)
    }
 }
 
-void GrabPlugin::updateState(ViewerPtr viewer)
+inf::Event::ResultType
+GrabPlugin::objectIntersected(inf::SceneObjectPtr obj,
+                              inf::SceneObjectPtr parentObj,
+                              gmtl::Point3f pnt)
 {
-   //const ViewPlatform& view_platform = viewer->getUser()->getViewPlatform();
-   /*
-   if ( mIntersectedObj )
+   if (!mGrabbing)
    {
       const std::vector<SceneObjectPtr>& objs = mGrabData->getObjects();
-      // If mIntersectedObj is not in objs, then our scene object was stolen
-      // out from under us and is no longer valid.
-      if ( std::find(objs.begin(), objs.end(), mIntersectedObj) == objs.end() )
+
+      // If we intersected a grabbable object.
+      if ( std::find(objs.begin(), objs.end(), parentObj) != objs.end() )
       {
-         mIntersectedObj = inf::SceneObjectPtr();
-         mIntersecting   = false;
-         mGrabbing       = false;
+         mIntersectedObj = obj;
+         mIntersectPoint = pnt;
+         mIntersectSound.trigger();
+         mIntersecting = true;
       }
    }
-   */
+   else
+   {
+      return inf::Event::DONE;
+   }
+   
+   return inf::Event::CONTINUE;
+}
 
+inf::Event::ResultType
+GrabPlugin::objectDeintersected(inf::SceneObjectPtr obj)
+{
+   if (mGrabbing)
+   {
+      return inf::Event::DONE;
+   }
+
+   mIntersecting = false;
+   mIntersectedObj = SceneObjectPtr();
+
+   return inf::Event::CONTINUE;
+}
+
+
+void GrabPlugin::updateState(ViewerPtr viewer)
+{
    // Get the wand transformation in virtual platform coordinates.
    const gmtl::Matrix44f vp_M_wand_xform(
       mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
    );
-
-   // Perform intersection tests with all the grabbable objects if and only
-   // if we are not already grabbing an object.
-
-   // XXX: Strategy for intersection
-   if (NULL != mIsectStrategy.get())
-   {
-      mIsectStrategy->update(viewer);
-   }
-   if ( ! mGrabbing )
-   {
-      // Get the intersected object.
-      SceneObjectPtr intersect_obj;
-      if (NULL != mIsectStrategy.get())
-      {
-         gmtl::Point3f cur_ip;
-         std::vector<SceneObjectPtr> objs = mGrabData->getObjects();
-         SceneObjectPtr cur_obj = mIsectStrategy->findIntersection(viewer, objs, cur_ip);
-
-         // Save results from calling intersect on grabbable objects.
-         intersect_obj = cur_obj;
-         mIntersectPoint = cur_ip;
-
-         while (NULL != cur_obj && intersect_obj->hasChildren())
-         {
-            objs = cur_obj->getChildren();
-            cur_ip.set(0.0f, 0.0f, 0.0f);
-            cur_obj = mIsectStrategy->findIntersection(viewer, objs, cur_ip);
-
-            // If we intersected a child, save results
-            if (NULL != cur_obj)
-            {
-               intersect_obj = cur_obj;
-               mIntersectPoint = cur_ip;
-            }
-         }
-      }
-
-      // If the intersected object is different than the one with which the
-      // wand intersected during the last frame, we need to make updates to
-      // the application and scene state.
-      if ( intersect_obj != mIntersectedObj )
-      {
-         // If we were intersecting a different object, then emit a
-         // de-intersection signal for mIntersectedObj.
-         if ( mIntersectedObj != NULL &&
-              mIntersectedObj->getRoot() != OSG::NullFC )
-         {
-            mEventData->mObjectDeintersectedSignal(mIntersectedObj);
-         }
-
-         // Change the intersected object to the one we found above.
-         mIntersectedObj = intersect_obj;
-
-         // If the new node of mIntersectedObj is non-NULL, then we are
-         // intersecting a new object since the last frame. Emit an
-         // intersection signal for this new object.
-         if ( mIntersectedObj != NULL &&
-              mIntersectedObj->getRoot() != OSG::NullFC)
-         {
-            mIntersectSound.trigger();
-            mIntersecting = true;
-
-            mEventData->mObjectIntersectedSignal(mIntersectedObj);
-         }
-         // Otherwise, we are intersecting nothing.
-         else
-         {
-            mIntersecting = false;
-         }
-      }
-   }
 
    // If we are intersecting an object but not grabbing it and the grab
    // button has just been pressed, grab the intersected object.
@@ -248,33 +181,32 @@ void GrabPlugin::updateState(ViewerPtr viewer)
    {
       mGrabSound.trigger();
       mGrabbing = true;
+      mGrabbedObj = mIntersectedObj;
 
-      gmtl::set(mGrabbed_pobj_M_obj, mIntersectedObj->getPos());
+      gmtl::set(mGrabbed_pobj_M_obj, mGrabbedObj->getPos());
    
       if ( ! mMoveStrategies.empty() )
       {
          for (std::vector<MoveStrategyPtr>::iterator itr = mMoveStrategies.begin();
               itr != mMoveStrategies.end(); ++itr)
          {
-            (*itr)->objectGrabbed(viewer, mIntersectedObj, mIntersectPoint,
+            (*itr)->objectGrabbed(viewer, mGrabbedObj, mIntersectPoint,
                                   vp_M_wand_xform);
          }
       }
 
       // Send a select event.
-      mEventData->mObjectSelectedSignal(mIntersectedObj);
+      mEventData->mObjectSelectedSignal(mGrabbedObj);
    }
    // If we are grabbing an object and the grab button has just been pressed
    // again, release the grabbed object.
    else if ( mGrabbing &&
              mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
    {
-      mGrabbing = false;
-
       // We have just released the grabbed object, but we are still
       // intersecting it.  Set the bounding box state back to the
-      // intersecting state and clear mIntersectedObj.
-      if ( mIntersectedObj != NULL && mIntersectedObj->getRoot() != OSG::NullFC )
+      // intersecting state and clear mGrabbedObj.
+      if ( mGrabbedObj != NULL && mGrabbedObj->getRoot() != OSG::NullFC )
       {
          gmtl::identity(mGrabbed_pobj_M_obj);
 
@@ -283,12 +215,15 @@ void GrabPlugin::updateState(ViewerPtr viewer)
             for (std::vector<MoveStrategyPtr>::iterator itr = mMoveStrategies.begin();
                  itr != mMoveStrategies.end(); ++itr)
             {
-               (*itr)->objectReleased(viewer, mIntersectedObj);
+               (*itr)->objectReleased(viewer, mGrabbedObj);
             }
          }
          // Send a select event.
-         mEventData->mObjectDeselectedSignal(mIntersectedObj);
+         mEventData->mObjectDeselectedSignal(mGrabbedObj);
       }
+
+      mGrabbing = false;
+      mGrabbedObj = SceneObjectPtr();
    }
 }
 
@@ -297,6 +232,7 @@ void GrabPlugin::run(inf::ViewerPtr viewer)
    // Move the grabbed object.
    if ( mGrabbing )
    {
+      vprASSERT(NULL != mGrabbedObj && "GrabbedObj can not be NULL if we are grabbing an object.");
       if ( !mMoveStrategies.empty() )
       {
          // Get the wand transformation in virtual world coordinates.
@@ -310,11 +246,11 @@ void GrabPlugin::run(inf::ViewerPtr viewer)
               itr != mMoveStrategies.end(); ++itr)
          {
             // new_obj_mat is gaurenteed to place the object into pobj space
-            new_obj_mat = (*itr)->computeMove(viewer, mIntersectedObj, vp_M_wand_xform, new_obj_mat);
+            new_obj_mat = (*itr)->computeMove(viewer, mGrabbedObj, vp_M_wand_xform, new_obj_mat);
          }
 
          // Send a move event.
-         mEventData->mObjectMovedSignal(mIntersectedObj, new_obj_mat);
+         mEventData->mObjectMovedSignal(mGrabbedObj, new_obj_mat);
       }
    }
 }
@@ -333,7 +269,7 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
 {
    vprASSERT(elt->getID() == getElementType());
 
-   const unsigned int req_cfg_version(2);
+   const unsigned int req_cfg_version(3);
 
    // Check for correct version of plugin configuration.
    if ( elt->getVersion() < req_cfg_version )
@@ -347,7 +283,6 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
 
    const std::string grab_btn_prop("grab_button_nums");
    const std::string strategy_plugin_path_prop("strategy_plugin_path");
-   const std::string isect_strategy_prop("isect_strategy");
    const std::string move_strategy_prop("move_strategy");
 
    mGrabBtn.configButtons(elt->getProperty<std::string>(grab_btn_prop));
@@ -385,8 +320,6 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
       std::string dir = elt->getProperty<std::string>(strategy_plugin_path_prop, i);
       mStrategyPluginPath.push_back(vpr::replaceEnvVars(dir));
    }
-
-   mIsectStrategyName = elt->getProperty<std::string>(isect_strategy_prop);
 
    const unsigned int num_move_strategy_names(elt->getNum(move_strategy_prop));
    for ( unsigned int i = 0; i < num_move_strategy_names; ++i)
