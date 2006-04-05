@@ -131,6 +131,7 @@ OSG::GeometryPtr UiBuilder::buildSphere(const OSG::UInt16 depth, const OSG::Real
    // GeoIndicesUI32Ptr  - Extra
    OSG::GeometryPtr geom = OSG::makeSphereGeo(depth, radius);
    OSG::createSingleIndex(geom);
+   OSG::calcVertexTangents(geom);
    OSG::Color4f used_color(color.red(), color.green(), color.blue(), alpha);
    
    OSG::GeoPositions3fPtr verts = OSG::GeoPositions3fPtr::dcast(geom->getPositions());
