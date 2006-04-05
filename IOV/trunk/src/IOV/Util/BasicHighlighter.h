@@ -102,6 +102,9 @@ public:
    inf::Event::ResultType objectSelected(inf::SceneObjectPtr obj,
                                          const bool selected);
 
+   inf::Event::ResultType objectPicked(inf::SceneObjectPtr obj,
+                                       const bool picked);
+
 protected:
    BasicHighlighter();
 

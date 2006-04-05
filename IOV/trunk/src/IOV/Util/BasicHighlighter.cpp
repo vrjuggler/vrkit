@@ -150,6 +150,14 @@ void BasicHighlighter::init(inf::ViewerPtr viewer)
    // Connect the de-selection signal to our slot.
    mDeselectConnection = event_data->mObjectDeselectedSignal.connect(100,
       boost::bind(&BasicHighlighter::objectSelected, this, _1, false));
+
+   // Connect the selection signal to our slot.
+   mSelectConnection = event_data->mObjectPickedSignal.connect(100,
+      boost::bind(&BasicHighlighter::objectPicked, this, _1, true));
+
+   // Connect the de-selection signal to our slot.
+   mDeselectConnection = event_data->mObjectUnpickedSignal.connect(100,
+      boost::bind(&BasicHighlighter::objectPicked, this, _1, false));
 }
 
 inf::Event::ResultType
@@ -190,6 +198,26 @@ BasicHighlighter::objectSelected(inf::SceneObjectPtr obj, const bool selected)
       mGeomTraverser.swapHighlightMaterial(obj->getRoot().get(),
                                            mGrabHighlightID,
                                            mIsectHighlightID);
+   }
+
+   return inf::Event::CONTINUE;
+}
+
+inf::Event::ResultType
+BasicHighlighter::objectPicked(inf::SceneObjectPtr obj, const bool picked)
+{
+   // Switch from the intersection highlight to the grab highlight.
+   if ( picked )
+   {
+      mGeomTraverser.swapHighlightMaterial(obj->getRoot().get(),
+                                           mIsectHighlightID,
+                                           mGrabHighlightID);
+   }
+   // Switch from the grab highlight to the intersection highlight.
+   else
+   {
+      mGeomTraverser.removeHighlightMaterial(obj->getRoot().get(),
+                                             mGrabHighlightID);
    }
 
    return inf::Event::CONTINUE;
