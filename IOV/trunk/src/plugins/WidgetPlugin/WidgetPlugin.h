@@ -112,6 +112,29 @@ private:
    }
 
    /**
+    * Responds to object intersection signals. If \p obj is newly intersected,
+    * then our intersection highlight is applied to it.
+    *
+    * @post Our intersection highlight is applied to \p obj.
+    *
+    * @param obj         The object associated with the intersection signal.
+    * @param pnt         The intersection point.
+    */
+   inf::Event::ResultType objectIntersected(inf::SceneObjectPtr obj,
+                                            inf::SceneObjectPtr parentObj,
+                                            gmtl::Point3f pnt);
+
+   /**
+    * Responds to object de-intersection signals. Our intersection highlight
+    * is removed from \p obj.
+    *
+    * @post Our intersection highlight is removed from \p obj.
+    *
+    * @param obj         The object associated with the intersection signal.
+    */
+   inf::Event::ResultType objectDeintersected(inf::SceneObjectPtr obj);
+
+   /**
     * Configures this plug-in.
     *
     * @pre The type of \p elt matches the value returned by getElementType().
@@ -156,10 +179,13 @@ private:
 
    /** @name Intersection Strategy */
    //@{
-   std::map< std::string, boost::function<IntersectionStrategyPtr ()> > mIsectStrategyMap;
-   IntersectionStrategyPtr mIsectStrategy;
-   std::string mIsectStrategyName;
    gmtl::Point3f mIntersectPoint;
+   //@}
+
+   /** @name Intersection Strategy */
+   //@{
+   boost::signals::connection mIsectConnection;
+   boost::signals::connection mDeIsectConnection;
    //@}
    
    WidgetDataPtr mWidgetData;

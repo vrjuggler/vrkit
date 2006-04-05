@@ -60,6 +60,13 @@ void WidgetPlugin::init(inf::ViewerPtr viewer)
    mMovedConnection = event_data->mObjectMovedSignal.connect(0, boost::bind(&WidgetPlugin::objectMovedSlot, this, _1, _2));
    mMovedConnection.block();
 
+   // Connect the intersection signal to our slot.
+   mIsectConnection = event_data->mObjectIntersectedSignal.connect(0, boost::bind(&WidgetPlugin::objectIntersected, this, _1, _2, _3));
+
+   // Connect the de-intersection signal to our slot.
+   mDeIsectConnection = event_data->mObjectDeintersectedSignal.connect(0, boost::bind(&WidgetPlugin::objectDeintersected, this, _1));
+
+
    event_data->mObjectSelectedSignal.connect(0, boost::bind(&WidgetPlugin::objectSelected, this, _1, true));
    event_data->mObjectDeselectedSignal.connect(0, boost::bind(&WidgetPlugin::objectSelected, this, _1, false));
 
@@ -77,100 +84,60 @@ void WidgetPlugin::init(inf::ViewerPtr viewer)
    }
 
    mWidgetData = scene->getSceneData<WidgetData>();
+}
 
+inf::Event::ResultType
+WidgetPlugin::objectIntersected(inf::SceneObjectPtr obj,
+                              inf::SceneObjectPtr parentObj,
+                              gmtl::Point3f pnt)
+{
+   const std::vector<SceneObjectPtr>& objs = mWidgetData->getWidgets();
 
-   // Initialize the plug-in factories for our strategy plug-in types.
-   mPluginFactory = viewer->getPluginFactory();
-   //mPluginFactory->addScanPath(mStrategyPluginPath);
-
-   mIsectStrategyName = "RayIntersection";
-   // Build the IntersectionStrategy instance.
-   try
+   // If we intersected a grabbable object.
+   if ( std::find(objs.begin(), objs.end(), parentObj) != objs.end() )
    {
-      IOV_STATUS << "   Loading intersection strategy plug-in '"
-                 << mIsectStrategyName << "' ..." << std::flush;
-      inf::PluginCreator<inf::IntersectionStrategy>* creator =
-         mPluginFactory->getPluginCreator<inf::IntersectionStrategy>(mIsectStrategyName);
+      if (isFocused())
+      {
+         mIntersectedObj = obj;
+         mIntersectPoint = pnt;
+         //mIntersectSound.trigger();
+         mIntersecting = true;
+         mIntersectedObj->wandEntered();
+      }
+      // Don't allow anyone else to process this event since it is only
+      // for widgets. (ex. BasicHighlighter)
+      return inf::Event::DONE;
+   }
 
-      if ( NULL != creator )
-      {
-         mIsectStrategy = creator->createPlugin();
-         mIsectStrategy->init(viewer);
-         IOV_STATUS << "[OK]" << std::endl;
-      }
-      else
-      {
-         IOV_STATUS << "[ERROR]\nWARNING: No creator for strategy plug-in "
-                    << mIsectStrategyName << std::endl;
-      }
-   }
-   catch (std::runtime_error& ex)
+   return inf::Event::CONTINUE;
+}
+
+inf::Event::ResultType
+WidgetPlugin::objectDeintersected(inf::SceneObjectPtr obj)
+{
+   if ( mIntersectedObj != NULL &&
+        mIntersectedObj == obj &&
+        mIntersectedObj->getRoot() != OSG::NullFC )
    {
-      IOV_STATUS << "[ERROR]\nWARNING: Failed to load strategy plug-in "
-                 << mIsectStrategyName << ":\n" << ex.what() << std::endl;
+      if (isFocused())
+      {
+         mIntersectedObj->wandExited();
+         mIntersecting = false;
+         mIntersectedObj = SceneObjectPtr();
+      }
+
+      // Don't allow anyone else to process this event since it is only
+      // for widgets. (ex. BasicHighlighter)
+      return inf::Event::DONE;
    }
+
+   return inf::Event::CONTINUE;
 }
 
 void WidgetPlugin::updateState(inf::ViewerPtr viewer)
 {
-   gmtl::Point3f last_isect_point = mIntersectPoint;
-
-   // Get the intersected object.
-   SceneObjectPtr intersect_obj;
-   if (NULL != mIsectStrategy.get())
-   {
-      gmtl::Point3f cur_ip;
-      std::vector<SceneObjectPtr> objs = mWidgetData->getWidgets();
-      SceneObjectPtr cur_obj = mIsectStrategy->findIntersection(viewer, objs, cur_ip);
-
-      // Save results from calling intersect on grabbable objects.
-      intersect_obj = cur_obj;
-      mIntersectPoint = cur_ip;
-
-      while (NULL != cur_obj && intersect_obj->hasChildren())
-      {
-         objs = cur_obj->getChildren();
-         cur_ip.set(0.0f, 0.0f, 0.0f);
-         cur_obj = mIsectStrategy->findIntersection(viewer, objs, cur_ip);
-
-         // If we intersected a child, save results
-         if (NULL != cur_obj)
-         {
-            intersect_obj = cur_obj;
-            mIntersectPoint = cur_ip;
-         }
-      }
-   }
-
-   // If the intersected object is different than the one with which the
-   // wand intersected during the last frame, we need to make updates to
-   // the application and scene state.
-   if ( intersect_obj != mIntersectedObj )
-   {
-      if ( mIntersectedObj != NULL && mIntersectedObj->getRoot() != OSG::NullFC )
-      {
-         mIntersectedObj->wandExited();
-      }
-
-      // Change the intersected object to the one we found above.
-      mIntersectedObj = intersect_obj;
-
-      // If the new node of mIntersectedObj is non-NULL, then we are
-      // intersecting a new object since the last frame.  Set up the
-      // highlight node for this new object.
-      if ( mIntersectedObj != NULL && mIntersectedObj->getRoot() != OSG::NullFC)
-      {
-         //mIntersectSound.trigger();
-         mIntersecting = true;
-
-         mIntersectedObj->wandEntered();
-      }
-      // Otherwise, we are intersecting nothing.
-      else
-      {
-         mIntersecting = false;
-      }
-   }
+   // XXX: Mouse move is not currently implemented.
+   //gmtl::Point3f last_isect_point = mIntersectPoint;
 
    // If we are intersecting an object but not grabbing it and the grab
    // button has just been pressed, grab the intersected object.
@@ -197,20 +164,16 @@ void WidgetPlugin::updateState(inf::ViewerPtr viewer)
       }
    }
 
-   // Move the grabbed object.
+   // XXX: Mouse move is not currently implemented.
+   /*
    if ( mIntersecting  &&  last_isect_point != mIntersectPoint)
    {
-      // Get the wand transformation in virtual world coordinates.
-      /*
-      const gmtl::Matrix44f vp_M_wand_xform(
-         mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
-      );
-      */
       static int i = 0;
       i++;
 
       mIntersectedObj->wandMoved();
    }
+   */
 }
 
 void WidgetPlugin::run(inf::ViewerPtr viewer)
@@ -273,11 +236,19 @@ void WidgetPlugin::focusChanged(inf::ViewerPtr viewer)
 
    if (isFocused())
    {
+      /*
+      mIsectConnection.unblock();
+      mDeIsectConnection.unblock();
       mMovedConnection.unblock();
+      */
    }
    else
    {
+      /*
+      mIsectConnection.block();
+      mDeIsectConnection.block();
       mMovedConnection.block();
+      */
    }
 /*
    if ( ! isFocused() )
