@@ -63,18 +63,26 @@ public:
 
    /**
     * Responds to object intersection signals. If \p obj is newly intersected,
-    * then our intersection highlight is applied to it. Otherwise, our
-    * intersection highlight is removed.
+    * then our intersection highlight is applied to it.
     *
-    * @post If \p intersected is true, then our intersection highlight is
-    *       applied to \p obj. Otherwise, \p obj has no highlights from us.
+    * @post Our intersection highlight is applied to \p obj.
     *
     * @param obj         The object associated with the intersection signal.
-    * @param intersected Indicates whether \p obj is newly intersected or was
-    *                    intersected and is no longer.
+    * @param pnt         The intersection point.
     */
    inf::Event::ResultType objectIntersected(inf::SceneObjectPtr obj,
-                                            const bool intersected);
+                                            inf::SceneObjectPtr parentObj,
+                                            gmtl::Point3f pnt);
+
+   /**
+    * Responds to object de-intersection signals. Our intersection highlight
+    * is removed from \p obj.
+    *
+    * @post Our intersection highlight is removed from \p obj.
+    *
+    * @param obj         The object associated with the intersection signal.
+    */
+   inf::Event::ResultType objectDeintersected(inf::SceneObjectPtr obj);
 
    /**
     * Responds to object selection signals. If \p obj is newly selected, then

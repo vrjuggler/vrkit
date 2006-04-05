@@ -135,42 +135,44 @@ void BasicHighlighter::init(inf::ViewerPtr viewer)
    inf::EventDataPtr event_data =
       viewer->getSceneObj()->getSceneData<inf::EventData>();
 
-   boost::function<inf::Event::ResultType (inf::SceneObjectPtr)> f;
-
    // Connect the intersection signal to our slot.
-   f = boost::bind(&BasicHighlighter::objectIntersected, this, _1, true);
-   mIsectConnection = event_data->mObjectIntersectedSignal.connect(0, f);
+   mIsectConnection = event_data->mObjectIntersectedSignal.connect(100,
+      boost::bind(&BasicHighlighter::objectIntersected, this, _1, _2, _3));
 
    // Connect the de-intersection signal to our slot.
-   f = boost::bind(&BasicHighlighter::objectIntersected, this, _1, false);
-   mDeIsectConnection = event_data->mObjectDeintersectedSignal.connect(0, f);
+   mDeIsectConnection = event_data->mObjectDeintersectedSignal.connect(100,
+      boost::bind(&BasicHighlighter::objectDeintersected, this, _1));
 
    // Connect the selection signal to our slot.
-   f = boost::bind(&BasicHighlighter::objectSelected, this, _1, true);
-   mSelectConnection = event_data->mObjectSelectedSignal.connect(0, f);
+   mSelectConnection = event_data->mObjectSelectedSignal.connect(100,
+      boost::bind(&BasicHighlighter::objectSelected, this, _1, true));
 
    // Connect the de-selection signal to our slot.
-   f = boost::bind(&BasicHighlighter::objectSelected, this, _1, false);
-   mDeselectConnection = event_data->mObjectDeselectedSignal.connect(0, f);
+   mDeselectConnection = event_data->mObjectDeselectedSignal.connect(100,
+      boost::bind(&BasicHighlighter::objectSelected, this, _1, false));
 }
 
 inf::Event::ResultType
 BasicHighlighter::objectIntersected(inf::SceneObjectPtr obj,
-                                    const bool intersected)
+                                    inf::SceneObjectPtr,
+                                    gmtl::Point3f)
 {
-   if ( intersected )
-   {
-      mGeomTraverser.addHighlightMaterial(obj->getRoot().get(),
-                                          mIsectHighlightID);
-   }
-   else
-   {
-      mGeomTraverser.removeHighlightMaterial(obj->getRoot().get(),
-                                             mIsectHighlightID);
-   }
+   mGeomTraverser.addHighlightMaterial(obj->getRoot().get(),
+                                       mIsectHighlightID);
 
    return inf::Event::CONTINUE;
 }
+
+inf::Event::ResultType
+BasicHighlighter::objectDeintersected(inf::SceneObjectPtr obj)
+{
+   mGeomTraverser.removeHighlightMaterial(obj->getRoot().get(),
+                                          mIsectHighlightID);
+
+   return inf::Event::CONTINUE;
+}
+
+
 
 inf::Event::ResultType
 BasicHighlighter::objectSelected(inf::SceneObjectPtr obj, const bool selected)
