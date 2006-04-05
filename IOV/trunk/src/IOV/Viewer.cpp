@@ -15,15 +15,20 @@
 #include <vpr/Util/FileUtils.h>
 #include <jccl/Config/Configuration.h>
 
+#include <IOV/EventData.h>
+#include <IOV/GrabData.h>
 #include <IOV/User.h>
+#include <IOV/Grab/IntersectionStrategy.h>
 #include <IOV/Plugin.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/PluginFactory.h>
 #include <IOV/Viewer.h>
+#include <IOV/SceneObject.h>
+#include <IOV/Status.h>
+#include <IOV/Util/OpenSGHelpers.h>
 
 // Embedded plugins
 #include <IOV/StatusPanelPlugin.h>
-
 
 namespace fs = boost::filesystem;
 
@@ -67,6 +72,8 @@ void Viewer::init()
    mScene = Scene::create();
    mScene->init();
 
+   mEventData = mScene->getSceneData<EventData>();
+
    // Load plugins embedded in library
    getPluginFactory()->registerCreator(
       new inf::PluginCreator<inf::Plugin>(&inf::StatusPanelPlugin::create,
@@ -90,7 +97,7 @@ void Viewer::init()
 
       if ( app_cfg )
       {
-         const unsigned int app_cfg_ver(3);
+         const unsigned int app_cfg_ver(4);
          if ( app_cfg->getVersion() < app_cfg_ver )
          {
             std::cerr << "WARNING: IOV config element '" << app_cfg->getName()
@@ -98,7 +105,7 @@ void Viewer::init()
                       << "         Current config element version is "
                       << app_cfg_ver << ", but this one is version "
                       << app_cfg->getVersion() << std::endl
-                      << "         IOV configuration may fail or be incomplete"
+                      << "         IOV configuration may fail or be incomplete."
                       << std::endl;
          }
 
@@ -113,6 +120,7 @@ void Viewer::init()
          OSG::endEditCP(root_node);
 
          // Setup the plugins that are configured to load
+         config(app_cfg);
          loadAndInitPlugins(app_cfg);
       }
 
@@ -131,24 +139,91 @@ void Viewer::init()
 
 void Viewer::preFrame()
 {
+   ViewerPtr myself = shared_from_this();
+
+   // Strategy for intersection
+   if (NULL != mIsectStrategy.get())
+   {
+      mIsectStrategy->update(myself);
+
+      // Get the intersected object.
+      gmtl::Point3f cur_ip;
+      SceneObjectPtr cur_obj = mIsectStrategy->findIntersection(myself, mObjects, cur_ip);
+
+      // Save results from calling intersect on grabbable objects.
+      SceneObjectPtr intersect_obj;
+      SceneObjectPtr parent_obj;
+      gmtl::Point3f intersect_point;
+      intersect_obj = cur_obj;
+      parent_obj = cur_obj;
+      intersect_point = cur_ip;
+
+      std::vector<SceneObjectPtr> objs;
+      while (NULL != cur_obj && intersect_obj->hasChildren())
+      {
+         objs = cur_obj->getChildren();
+         cur_ip.set(0.0f, 0.0f, 0.0f);
+         cur_obj = mIsectStrategy->findIntersection(myself, objs, cur_ip);
+
+         // If we intersected a child, save results
+         if (NULL != cur_obj)
+         {
+            intersect_obj = cur_obj;
+            intersect_point = cur_ip;
+         }
+      }
+
+      // If the intersected object is different than the one with which the
+      // wand intersected during the last frame, we need to make updates to
+      // the application and scene state.
+      if ( intersect_obj != mIntersectedObj )
+      {
+         // If we were intersecting a different object, then emit a
+         // de-intersection signal for mIntersectedObj.
+         if ( mIntersectedObj != NULL &&
+              mIntersectedObj->getRoot() != OSG::NullFC )
+         {
+            OSG::FieldContainerPtr fcp = mIntersectedObj->getRoot().get();
+            mEventData->mObjectDeintersectedSignal(mIntersectedObj);
+            std::cout << "Deintersected: " << inf::getName(fcp) << std::endl;
+         }
+
+         // Change the intersected object to the one we found above.
+         mIntersectedObj = intersect_obj;
+
+         // If the new node of mIntersectedObj is non-NULL, then we are
+         // intersecting a new object since the last frame. Emit an
+         // intersection signal for this new object.
+         if ( mIntersectedObj != NULL &&
+              mIntersectedObj->getRoot() != OSG::NullFC)
+         {
+            //mIntersectSound.trigger();
+
+            OSG::FieldContainerPtr fcp = mIntersectedObj->getRoot().get();
+            mEventData->mObjectIntersectedSignal(mIntersectedObj, parent_obj, intersect_point);
+            std::cout << "Intersected: " << inf::getName(fcp) << std::endl;
+         }
+      }
+   }
+
    std::vector<inf::PluginPtr>::iterator i;
 
    // First, we update the state of each plug-in.  All plug-ins will get a
    // consistent view of the run-time state of the system before being run.
    for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
-      (*i)->updateState(shared_from_this());
+      (*i)->updateState(myself);
    }
 
    // Then, we tell each plug-in to do its thing.  Any given plug-in may
    // change the state of the system as a result of performing its task(s).
    for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
-      (*i)->run(shared_from_this());
+      (*i)->run(myself);
    }
 
    // Update the user (and navigation)
-   getUser()->update(shared_from_this());
+   getUser()->update(myself);
 }
 
 void Viewer::latePreFrame()
@@ -384,21 +459,22 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr clusterCfg)
    }
 }
 
-void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
+void Viewer::config(jccl::ConfigElementPtr appCfg)
 {
-   std::cout << "Viewer: Loading plugins" << std::endl;
-
    const std::string plugin_path_prop("plugin_path");
-   const std::string plugin_prop("plugin");
+   const std::string strategy_plugin_path_prop("strategy_plugin_path");
 
    const std::string iov_base_dir_tkn("IOV_BASE_DIR");
 
    std::vector<std::string> search_path;
 
-   // Set up two default search paths:
+   // Set up four default search paths:
    //    1. Relative path to './plugins'
    //    2. IOV_BASE_DIR/lib/IOV/plugins
+   //    3. Relative path to './plugins/grab'
+   //    4. IOV_BASE_DIR/lib/IOV/plugins/grab
    search_path.push_back("plugins");
+   search_path.push_back("plugins/grab");
 
    std::string iov_base_dir;
    if ( vpr::System::getenv(iov_base_dir_tkn, iov_base_dir).success() )
@@ -420,7 +496,25 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
                    << def_iov_plugin_path.native_directory_string()
                    << std::endl;
       }
+
+      fs::path def_strategy_path = iov_base_path / "lib/IOV/plugins/grab";
+
+      if ( fs::exists(def_strategy_path) )
+      {
+         std::string def_search_path =
+            def_strategy_path.native_directory_string();
+         std::cout << "Setting default IOV intersection strategy plug-in path: " << def_search_path
+                   << std::endl;
+         search_path.push_back(def_search_path);
+      }
+      else
+      {
+         std::cerr << "Default IOV intersection strategy plug-in path does not exist: "
+                   << def_strategy_path.native_directory_string()
+                   << std::endl;
+      }
    }
+
 
    // Add paths from the application configuration
    const unsigned int num_paths(appCfg->getNum(plugin_path_prop));
@@ -431,8 +525,23 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
       search_path.push_back(vpr::replaceEnvVars(dir));
    }
 
-   mPluginFactory->init(search_path);
+   // Add paths from the application configuration.
+   const unsigned int num_plugin_paths(appCfg->getNum(strategy_plugin_path_prop));
+   for ( unsigned int i = 0; i < num_plugin_paths; ++i )
+   {
+      std::string dir = appCfg->getProperty<std::string>(strategy_plugin_path_prop, i);
+      search_path.push_back(vpr::replaceEnvVars(dir));
+   }
 
+   mPluginFactory->init(search_path);
+}
+
+void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
+{
+   std::cout << "Viewer: Loading plugins" << std::endl;
+
+   const std::string plugin_prop("plugin");
+   const std::string isect_strategy_prop("isect_strategy");
    const unsigned int num_plugins(appCfg->getNum(plugin_prop));
 
    for ( unsigned int i = 0; i < num_plugins; ++i )
@@ -466,6 +575,50 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
          std::cout << "[FAILED]\n   WARNING: Failed to load plug-in '"
                    << plugin_name << "': " << ex.what() << std::endl;
       }
+   }
+
+   mIsectStrategyName = appCfg->getProperty<std::string>(isect_strategy_prop);
+
+   // Build the IntersectionStrategy instance.
+   try
+   {
+      IOV_STATUS << "   Loading intersection strategy plug-in '"
+                 << mIsectStrategyName << "' ..." << std::flush;
+      inf::PluginCreator<inf::IntersectionStrategy>* creator =
+         mPluginFactory->getPluginCreator<inf::IntersectionStrategy>(mIsectStrategyName);
+
+      if ( NULL != creator )
+      {
+         mIsectStrategy = creator->createPlugin();
+         mIsectStrategy->init(shared_from_this());
+         IOV_STATUS << "[OK]" << std::endl;
+      }
+      else
+      {
+         IOV_STATUS << "[ERROR]\nWARNING: No creator for strategy plug-in "
+                    << mIsectStrategyName << std::endl;
+      }
+   }
+   catch (std::runtime_error& ex)
+   {
+      IOV_STATUS << "[ERROR]\nWARNING: Failed to load strategy plug-in "
+                 << mIsectStrategyName << ":\n" << ex.what() << std::endl;
+   }
+}
+
+void Viewer::addObject(SceneObjectPtr obj)
+{
+   mObjects.push_back(obj);
+}
+
+void Viewer::removeObject(SceneObjectPtr obj)
+{
+   object_list_t::iterator found
+      = std::find(mObjects.begin(), mObjects.end(), obj);
+
+   if (mObjects.end() != found)
+   {
+      mObjects.erase(found);
    }
 }
 

@@ -16,9 +16,13 @@
 
 #include <IOV/ViewerPtr.h>
 
+#include <IOV/EventDataPtr.h>
+#include <IOV/GrabDataPtr.h>
+#include <IOV/Grab/IntersectionStrategyPtr.h>
 #include <IOV/PluginPtr.h>
 #include <IOV/UserPtr.h>
 #include <IOV/ScenePtr.h>
+#include <IOV/SceneObjectPtr.h>
 #include <IOV/PluginFactoryPtr.h>
 
 #include <IOV/Scene.h>
@@ -156,6 +160,19 @@ protected:
     */
    virtual void deallocate();
 
+   typedef std::vector<SceneObjectPtr> object_list_t;
+   void addObject(SceneObjectPtr obj);
+
+   /**
+    * Remove given object from grabbable list.
+    */
+   void removeObject(SceneObjectPtr obj);
+
+   const object_list_t& getObjects() const
+   {
+      return mObjects;
+   }
+
 private:
    /**
     * Based on the given configuration, this method determines if this
@@ -181,6 +198,8 @@ private:
     * @see getConfiguration()
     */
    void loadAndInitPlugins(jccl::ConfigElementPtr appCfg);
+
+   void config(jccl::ConfigElementPtr appCfg);
 
 private:
    /** The user for the viewer.
@@ -213,6 +232,19 @@ private:
 
    /** The configuration for the system (and the viewer). */
    inf::Configuration  mConfiguration;
+
+   /** @name Intersection Strategy */
+   //@{
+   std::vector<std::string> mStrategyPluginPath;
+   IntersectionStrategyPtr mIsectStrategy;
+   std::string mIsectStrategyName;
+   SceneObjectPtr mIntersectedObj;
+   //@}
+
+   object_list_t mObjects;
+
+protected:
+   EventDataPtr mEventData;
 };
 
 }
