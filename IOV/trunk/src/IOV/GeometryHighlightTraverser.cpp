@@ -136,7 +136,8 @@ void swapHighlight(CorePtr core, OSG::MaterialRefPtr oldMat,
    if ( OSG::NullFC == mat )
    {
       std::ostringstream msg_stream;
-      msg_stream << "Node core " << core << " is supposed to have a material";
+      msg_stream << "Node core " << (OSG::FieldContainerPtr) core
+                 << " is supposed to have a material";
       throw inf::Exception(msg_stream.str(), IOV_LOCATION);
    }
 
@@ -148,7 +149,7 @@ void swapHighlight(CorePtr core, OSG::MaterialRefPtr oldMat,
    if ( OSG::NullFC == mpass_mat )
    {
       std::ostringstream msg_stream;
-      msg_stream << "Node core " << core
+      msg_stream << "Node core " << (OSG::FieldContainerPtr) core
                  << " is supposed to have an OSG::MultiPassMaterial, but its"
                  << "material is of type " << mat->getType().getCName();
       throw inf::Exception(msg_stream.str(), IOV_LOCATION);
