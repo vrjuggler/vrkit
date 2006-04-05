@@ -303,8 +303,7 @@ createSHLMaterial(const std::string& vertexShaderFile,
       OSG::endEditCP(chunk_material, OSG::ChunkMaterial::ChunksFieldMask);
 
       OSG::MaterialRefPtr material(chunk_material.get());
-      id = mMaterials.size();
-      mMaterials.push_back(material);
+      id = registerMaterial(material);
    }
 
    return id;
