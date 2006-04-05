@@ -148,11 +148,12 @@ void OpenSgViewer::init()
    // Initialize panel
    const float feet_to_app_units(0.3048f * getDrawScaleFactor());
    mMaterialChooser->init(getDrawScaleFactor());
-   mMaterialChooser->setWidthHeight(10.0f * feet_to_app_units, 15.0f * feet_to_app_units);
+   mMaterialChooser->setWidthHeight(1.0f * feet_to_app_units, 1.5f * feet_to_app_units);
 
    // Add widget to scene.
    inf::WidgetDataPtr widget_data = scene->getSceneData<inf::WidgetData>();
    widget_data->addWidget(mMaterialChooser);
+   addObject(mMaterialChooser);
 
    OSG::RefPtr<OSG::NodePtr> model_root;
 
@@ -240,6 +241,7 @@ void OpenSgViewer::init()
    inf::StaticSceneObjectPtr model_obj = inf::StaticSceneObject::create();
    model_obj->init(model_xform);
    grab_data->addObject(model_obj);
+   addObject(model_obj);
 }
 
 void OpenSgViewer::initGl()
