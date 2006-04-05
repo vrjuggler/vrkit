@@ -4,6 +4,7 @@
 #define _INF_OPENSG_HELPERS_H_
 
 #include <OpenSG/OSGCoredNodePtr.h>
+#include <OpenSG/OSGSimpleAttachments.h>
 
 namespace inf
 {
@@ -25,6 +26,19 @@ struct CoredNode2NodePred
       return lhs.node() == rhs;
    }
 };
+
+inline std::string getName(OSG::FieldContainerPtr& fcp)
+{
+   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
+   std::string name_str = "<NULL>";
+   if (OSG::NullFC != acp)
+   {
+      const char* name = OSG::getName(acp);
+      if(NULL != name)
+      { name_str = name; }
+   }
+   return name_str;
+}
 
 }
 
