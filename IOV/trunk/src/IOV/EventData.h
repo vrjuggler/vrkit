@@ -16,6 +16,7 @@
 #include <boost/signal.hpp>
 
 #include <gmtl/Matrix.h>
+#include <gmtl/Point.h>
 
 namespace inf
 {
@@ -54,7 +55,8 @@ public:
     *
     * @since 0.19.0
     */
-   basic_action_t mObjectIntersectedSignal;
+   boost::signal<Event::ResultType (SceneObjectPtr, SceneObjectPtr, gmtl::Point3f),
+      Event::ResultOperator> mObjectIntersectedSignal;
 
    /**
     * Signal emitted when an object changes from being intersected to not being
@@ -67,6 +69,9 @@ public:
 
    basic_action_t mObjectSelectedSignal;
    basic_action_t mObjectDeselectedSignal;
+
+   basic_action_t mObjectPickedSignal;
+   basic_action_t mObjectUnpickedSignal;
    //@}
 
 protected:
