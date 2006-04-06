@@ -95,13 +95,6 @@ void Widget::move(const OSG::Pnt3f& pnt)
    OSG::endEditCP(mRootWidgetNode.core(), OSG::Transform::MatrixFieldMask);
 }
 
-void Widget::move(const OSG::Matrix& xform)
-{
-   OSG::beginEditCP(mRootWidgetNode.core(), OSG::Transform::MatrixFieldMask);
-      mRootWidgetNode.core()->setMatrix(xform);
-   OSG::endEditCP(mRootWidgetNode.core(), OSG::Transform::MatrixFieldMask);
-}
-
 void Widget::updatePanelScene()
 {
    float radius = (mWidth < mHeight ? mWidth : mHeight);
