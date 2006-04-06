@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-04-05 aronb    Centralized the intersection test code in inf::Viewer.
+                    -- VERSION -- 0.20.0
 2006-04-03 patrick  Added an overload of inf::Widget::move() that takes an
                     OSG::Matrix reference so that widgets can be positioned
                     using a full transformation matrix.
