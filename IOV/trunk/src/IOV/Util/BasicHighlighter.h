@@ -3,6 +3,8 @@
 #ifndef _INF_BASIC_HIGHLIGHTER_H_
 #define _INF_BASIC_HIGHLIGHTER_H_
 
+#include <IOV/Config.h>
+
 #include <string>
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
@@ -32,7 +34,7 @@ namespace inf
  *
  * @since 0.19.0
  */
-class BasicHighlighter
+class IOV_CLASS_API BasicHighlighter
    : public boost::enable_shared_from_this<BasicHighlighter>
 {
 public:
