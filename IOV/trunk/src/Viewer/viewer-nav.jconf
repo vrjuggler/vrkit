@@ -154,10 +154,11 @@
          <grab_button_nums>0</grab_button_nums>
          <move_strategy>Basic Move</move_strategy>
       </iov_grab_plugin>
-      <slide_move_strategy name="Slide Move Strategy" version="1">
+      <slide_move_strategy name="Slide Move Strategy" version="2">
          <analog_input>0</analog_input>
          <slide_target>Intersection Point</slide_target>
          <forward_slide_value>1.0</forward_slide_value>
+         <slide_epsilon>0.1</slide_epsilon>
       </slide_move_strategy>
       <ray_intersection_strategy name="Ray Intersection Strategy" version="2">
          <ray_length>10.0</ray_length>

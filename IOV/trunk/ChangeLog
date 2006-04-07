@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-04-07 patrick  Extended the Slide Move Strategy plug-in so that its slide
+                    threshold is configurable.
+                    -- VERSION -- 0.20.3
 2006-04-07 patrick  Changed the type of inf::Event::ResultType from int to
                     enum.
                     -- VERSION -- 0.20.2

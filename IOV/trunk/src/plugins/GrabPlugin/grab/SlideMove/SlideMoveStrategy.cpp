@@ -98,7 +98,7 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
       // Rescale [0,1] to [-1,1]
       float in_out_val = analog_value * 2.0 - 1.0f;
 
-      const float eps_limit(0.1 * to_meters);
+      const float eps_limit(mSlideEpsilon * to_meters);
 
       if ( gmtl::Math::abs(in_out_val) < eps_limit )
       {
@@ -179,6 +179,7 @@ SlideMoveStrategy::SlideMoveStrategy()
    , mTransValue(0.0f)
    , mAnalogNum(0)
    , mForwardValue(1.0f)
+   , mSlideEpsilon(0.1f)
 {
    /* Do nothing. */ ;
 }
@@ -188,7 +189,7 @@ void SlideMoveStrategy::configure(jccl::ConfigElementPtr cfgElt)
 {
    vprASSERT(cfgElt->getID() == getElementType());
 
-   const unsigned int req_cfg_version(1);
+   const unsigned int req_cfg_version(2);
 
    if ( cfgElt->getVersion() < req_cfg_version )
    {
@@ -202,6 +203,7 @@ void SlideMoveStrategy::configure(jccl::ConfigElementPtr cfgElt)
    const std::string slide_target_prop("slide_target");
    const std::string analog_input_prop("analog_input");
    const std::string forward_value_prop("forward_slide_value");
+   const std::string slide_epsilon_prop("slide_epsilon");
 
    const unsigned int slide_target =
       cfgElt->getProperty<unsigned int>(slide_target_prop);
@@ -242,6 +244,17 @@ void SlideMoveStrategy::configure(jccl::ConfigElementPtr cfgElt)
       IOV_STATUS << "ERROR: Invalid forward sliding value (" << fwd_val
                  << ") given!\n"
                  << "This must be either 0.0 or 1.0" << std::endl;
+   }
+
+   const float eps = cfgElt->getProperty<float>(slide_epsilon_prop);
+
+   if ( eps >= 0.0f )
+   {
+      mSlideEpsilon = eps;
+   }
+   else
+   {
+      IOV_STATUS << "ERROR: Slide epsilon must be non-negative!" << std::endl;
    }
 }
 

@@ -78,6 +78,7 @@ private:
    SlideTarget  mSlideTarget;   /**< */
    int          mAnalogNum;     /**< The wand interface analog index */
    float        mForwardValue;  /**< Value for foroward sliing (0 or 1) */
+   float        mSlideEpsilon;  /**< The slide start threshold */
    //@}
 };
 
