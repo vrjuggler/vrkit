@@ -129,7 +129,7 @@ void PickPlugin::updateState(ViewerPtr viewer)
    // If we are intersecting an object but not grabbing it and the grab
    // button has just been pressed, grab the intersected object.
    if ( mPickBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) &&
-        NULL != mIntersectedObj)
+        NULL != mIntersectedObj.get() )
    {
       if (mIntersectedObj == mPickedObj)
       {

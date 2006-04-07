@@ -159,14 +159,14 @@ void Viewer::preFrame()
       intersect_point = cur_ip;
 
       std::vector<SceneObjectPtr> objs;
-      while (NULL != cur_obj && intersect_obj->hasChildren())
+      while ( NULL != cur_obj.get() && intersect_obj->hasChildren() )
       {
          objs = cur_obj->getChildren();
          cur_ip.set(0.0f, 0.0f, 0.0f);
          cur_obj = mIsectStrategy->findIntersection(myself, objs, cur_ip);
 
          // If we intersected a child, save results
-         if (NULL != cur_obj)
+         if ( NULL != cur_obj.get() )
          {
             intersect_obj = cur_obj;
             intersect_point = cur_ip;
@@ -311,8 +311,16 @@ void Viewer::deallocate()
       delete mConnection;
    }
 
+#if defined(_MSC_VER)
+   std::vector<inf::PluginPtr>::iterator p;
+   for ( p = mPlugins.begin(); p != mPlugins.end(); ++p )
+   {
+      (*p).reset();
+   }
+#else
    std::for_each(mPlugins.begin(), mPlugins.end(),
                  boost::bind((void (inf::PluginPtr::*)()) &inf::PluginPtr::reset, _1));
+#endif
 
    mUser.reset();
    mScene.reset();

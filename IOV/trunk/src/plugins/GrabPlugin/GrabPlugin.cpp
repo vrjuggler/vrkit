@@ -232,7 +232,9 @@ void GrabPlugin::run(inf::ViewerPtr viewer)
    // Move the grabbed object.
    if ( mGrabbing )
    {
-      vprASSERT(NULL != mGrabbedObj && "GrabbedObj can not be NULL if we are grabbing an object.");
+      vprASSERT(NULL != mGrabbedObj.get() &&
+                "GrabbedObj can not be NULL if we are grabbing an object.");
+
       if ( !mMoveStrategies.empty() )
       {
          // Get the wand transformation in virtual world coordinates.
