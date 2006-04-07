@@ -3,10 +3,6 @@
 #ifndef _INF_EVENT_H_
 #define _INF_EVENT_H_
 
-//#include <IOV/Widget/WidgetPtr.h>
-
-#include <gmtl/Matrix.h>
-#include <vector>
 
 namespace inf
 {
@@ -42,41 +38,9 @@ public:
          return DONE;
       }
    };
-public:
-   enum Type
-   {
-      WandEnter = 0,
-      WandExit = 1,
-      WandButtonPress = 2,
-      WandButtonRelease = 3,
-      WandMove = 4
-   };
-
-/*
-   Event(WidgetPtr src, Type type) : mSource(src), mType(type)
-   {;}
-
-   virtual ~Event();
-
-   Type getType()
-   {
-      return mType;
-   }
-
-   WidgetPtr getSource()
-   {
-      return mSource;
-   }
-*/
-
-protected:
-//   WidgetPtr            mSource;
-   Type                 mType;
-   gmtl::Matrix44f      mWandPos;
-   std::vector<int>     mButtons;
 };
 
 }
 
-#endif
 
+#endif
