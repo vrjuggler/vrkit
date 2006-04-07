@@ -3,7 +3,6 @@
 #ifndef _INF_EVENT_H_
 #define _INF_EVENT_H_
 
-#include <IOV/Config.h>
 //#include <IOV/Widget/WidgetPtr.h>
 
 #include <gmtl/Matrix.h>
@@ -12,7 +11,7 @@
 namespace inf
 {
 
-class IOV_CLASS_API Event
+class Event
 {
 public:
    /**
