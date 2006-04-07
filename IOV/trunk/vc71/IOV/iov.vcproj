@@ -4,6 +4,7 @@
 	Version="7.10"
 	Name="IOV DLL"
 	ProjectGUID="{624282D0-8169-423E-B330-0C7CBD4C9254}"
+	RootNamespace="IOV DLL"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -35,11 +36,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vrj_d.lib vrj_ogl_d.lib gadget_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
+				AdditionalDependencies="vrj_d.lib vrj_ogl_d.lib gadget_d.lib jccl_d.lib vpr_d.lib boost_signals-vc71-mt-gd-1_33_1.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/iov_d.dll"
 				Version=""
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(OSGROOT)\lib&quot;;&quot;$(BOOST_ROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/iov_d.pdb"
@@ -94,11 +95,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vrj.lib vrj_ogl.lib gadget.lib jccl.lib vpr.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
+				AdditionalDependencies="vrj.lib vrj_ogl.lib gadget.lib jccl.lib vpr.lib boost_signals-vc71-mt-1_33_1.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/iov.dll"
 				Version=""
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(OSGROOT)\lib&quot;;&quot;$(BOOST_ROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="FALSE"
 				SubSystem="1"
@@ -135,13 +136,25 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
+				RelativePath="..\..\src\Iov\Util\BasicHighlighter.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Configuration.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Util\DigitalCommand.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\DynamicSceneObject.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\EventData.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Util\Exceptions.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\Frame.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\GeometryHighlightTraverser.cpp">
@@ -151,6 +164,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Grab\IntersectionStrategy.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\MaterialChooser.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Grab\MoveStrategy.cpp">
@@ -165,13 +181,28 @@
 				RelativePath="..\..\src\Iov\PluginFactory.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Util\RemoteAspectFilter.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Scene.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\SceneData.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\SceneObject.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\ScrollBar.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Slave\SlaveViewer.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\SphereButton.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\StaticSceneObject.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Status.cpp">
@@ -197,10 +228,22 @@
 			<File
 				RelativePath="..\..\src\Iov\WandInterface.cpp">
 			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\Widget.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\WidgetData.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
+			<File
+				RelativePath="..\..\src\Iov\Util\BasicHighlighter.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Util\BasicHighlighterPtr.h">
+			</File>
 			<File
 				RelativePath="..\..\src\Iov\Plugin\Buttons.h">
 			</File>
@@ -217,10 +260,31 @@
 				RelativePath="..\..\src\Iov\Util\DigitalCommand.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\DynamicSceneObject.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\DynamicSceneObjectPtr.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Event.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\EventData.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\EventDataPtr.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Util\Exceptions.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\ExitCodes.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\Frame.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\FramePtr.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\GeometryHighlightTraverser.h">
@@ -241,6 +305,12 @@
 				RelativePath="..\..\src\Iov\Grab\IntersectionStrategyPtr.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Widget\MaterialChooser.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\MaterialChooserPtr.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Grab\MoveStrategy.h">
 			</File>
 			<File
@@ -248,6 +318,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Plugin\NavPlugin.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Util\OpenSGHelpers.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Plugin.h">
@@ -271,7 +344,10 @@
 				RelativePath="..\..\src\Iov\PluginPtr.h">
 			</File>
 			<File
-				RelativePath="..\..\src\Iov\resource.h">
+				RelativePath="..\..\src\Iov\Util\RemoteAspectFilter.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Util\RemoteAspectFilterPtr.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\ResourceMgr.h">
@@ -286,10 +362,34 @@
 				RelativePath="..\..\src\Iov\SceneDataPtr.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\SceneObject.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\SceneObjectPtr.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\ScenePtr.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Widget\ScrollBar.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\ScrollBarPtr.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Slave\SlaveViewer.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\SphereButton.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\SphereButtonPtr.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\StaticSceneObject.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\StaticSceneObjectPtr.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Status.h">
@@ -326,6 +426,18 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\WandInterfacePtr.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\Widget.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\WidgetData.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\WidgetDataPtr.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Widget\WidgetPtr.h">
 			</File>
 		</Filter>
 		<Filter

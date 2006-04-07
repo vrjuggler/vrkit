@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="Grab Plug-in"
-	ProjectGUID="{A0218102-78F5-48BB-A6C6-F81B3759ED60}"
+	Name="Grid Plug-in"
+	ProjectGUID="{C48C7C74-9F70-4238-ADA8-F213E403F87C}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -35,14 +35,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iov_d.lib vrj_d.lib vrj_ogl_d.lib gadget_d.lib sonix_d.lib jccl_d.lib vpr_d.lib boost_signals-vc71-mt-gd-1_33_1.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
-				OutputFile="$(OutDir)/GrabPlugin_d.dll"
+				AdditionalDependencies="iov_d.lib vrj_d.lib vrj_ogl_d.lib gadget_d.lib sonix_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
+				OutputFile="$(OutDir)/GridPlugin_d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(BOOST_ROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/GrabPlugin_d.pdb"
+				ProgramDatabaseFile="$(OutDir)/GridPlugin_d.pdb"
 				SubSystem="1"
-				ImportLibrary="$(OutDir)/GrabPlugin_d.lib"
+				ImportLibrary="$(OutDir)/GridPlugin_d.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -92,15 +92,15 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iov.lib vrj.lib vrj_ogl.lib gadget.lib sonix.lib jccl.lib vpr.lib boost_signals-vc71-mt-1_33_1.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
-				OutputFile="$(OutDir)/GrabPlugin.dll"
+				AdditionalDependencies="iov.lib vrj.lib vrj_ogl.lib gadget.lib sonix.lib jccl.lib vpr.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
+				OutputFile="$(OutDir)/GridPlugin.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(BOOST_ROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
 				GenerateDebugInformation="FALSE"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/GrabPlugin.lib"
+				ImportLibrary="$(OutDir)/GridPlugin.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -131,14 +131,23 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
-				RelativePath="..\..\src\plugins\GrabPlugin\GrabPlugin.cpp">
+				RelativePath="..\..\src\plugins\GridPlugin\Grid.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\plugins\GridPlugin\GridPlugin.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
 			<File
-				RelativePath="..\..\src\plugins\GrabPlugin\GrabPlugin.h">
+				RelativePath="..\..\src\plugins\GridPlugin\Grid.h">
+			</File>
+			<File
+				RelativePath="..\..\src\plugins\GridPlugin\GridPlugin.h">
+			</File>
+			<File
+				RelativePath="..\..\src\plugins\GridPlugin\GridPtr.h">
 			</File>
 		</Filter>
 		<Filter
