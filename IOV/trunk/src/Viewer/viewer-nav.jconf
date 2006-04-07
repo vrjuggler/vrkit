@@ -2,10 +2,11 @@
 <?org-vrjuggler-jccl-settings configuration.version="3.0"?>
 <configuration xmlns="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" name="/home/patrick/src/pro/Assembly/src/external/common/OpenSG/VRJ/Viewer/viewer.jconf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.0/configuration http://www.vrjuggler.org/jccl/xsd/3.0/configuration.xsd">
    <elements>
-      <infiscape_opensg_viewer name="Viewer" version="3">
+      <infiscape_opensg_viewer name="Viewer" version="4">
          <root_name>RootNode</root_name>
          <plugin>ModeSwitchPlugin</plugin>
          <plugin>StatusPanelPlugin</plugin>
+         <isect_strategy>PointIntersection</isect_strategy>
       </infiscape_opensg_viewer>
       <wand_nav_plugin name="Viewer Wand Nav" version="2">
          <max_velocity>5.0</max_velocity>
@@ -149,9 +150,8 @@
          <initial_rot>0.0</initial_rot>
          <initial_rot>0.0</initial_rot>
       </status_panel_plugin>
-      <iov_grab_plugin name="Grab Plug-in" version="2">
+      <iov_grab_plugin name="Grab Plug-in" version="3">
          <grab_button_nums>0</grab_button_nums>
-         <isect_strategy>PointIntersection</isect_strategy>
          <move_strategy>Basic Move</move_strategy>
       </iov_grab_plugin>
       <slide_move_strategy name="Slide Move Strategy" version="1">
