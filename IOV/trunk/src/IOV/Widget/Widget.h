@@ -62,6 +62,17 @@ public:  // Configuration params //
 
    void move(const OSG::Pnt3f& pnt);
 
+   /**
+    * Positions this widget using the given transformation. This overrides
+    * inf::SceneObject::moveTo().
+    *
+    * @post The transform core of \c mRootWidgetNode has its matrix replaced
+    *       by \p xform.
+    *
+    * @param xform The transformation to use for positioning this widget.
+    */
+   void moveTo(const OSG::Matrix& xform);
+
    void setMaterial(OSG::MaterialPtr mat = OSG::MaterialPtr());
 protected:
    virtual void updatePanelScene();
