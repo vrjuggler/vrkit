@@ -48,8 +48,7 @@ public:
    /** Factory method for scenes. */
    static ScenePtr create();
 
-   virtual ~Scene()
-   {;}
+   virtual ~Scene();
 
    /** Initialize the scene data structures.
     * @post: All OpenSG scene data structures for this object will be setup.

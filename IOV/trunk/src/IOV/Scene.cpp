@@ -11,6 +11,15 @@ ScenePtr Scene::create()
    return new_scene;
 }
 
+Scene::~Scene()
+{
+   std::map<vpr::GUID, SceneDataPtr>::iterator d;
+   for ( d = mSceneData.begin(); d != mSceneData.end(); ++d )
+   {
+      (*d).second.reset();
+   }
+}
+
 void Scene::init()
 {
    mSceneRoot     = OSG::GroupNodePtr::create();

@@ -311,6 +311,10 @@ void Viewer::deallocate()
       delete mConnection;
    }
 
+//   mPluginFactory  = inf::PluginFactoryPtr();
+   mIntersectedObj = inf::SceneObjectPtr();
+   mIsectStrategy  = inf::IntersectionStrategyPtr();
+
 #if defined(_MSC_VER)
    std::vector<inf::PluginPtr>::iterator p;
    for ( p = mPlugins.begin(); p != mPlugins.end(); ++p )
@@ -323,7 +327,9 @@ void Viewer::deallocate()
 #endif
 
    mUser.reset();
+   mEventData.reset();
    mScene.reset();
+   mObjects.clear();
    mPlugins.clear();
    mPluginFactory.reset();
 
