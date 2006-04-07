@@ -72,7 +72,7 @@ void SphereButton::wandPressed()
                                         mPressedHighlightID);
    mActiveHighlightID = mPressedHighlightID;
 */
-   Event::ResultType result = mClickedSignal();
+   mClickedSignal();
 }
 
 void SphereButton::wandReleased()
