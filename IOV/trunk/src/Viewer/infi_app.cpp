@@ -60,7 +60,8 @@ public:
 
    // Callback methods
 
-   int objectMovedSlot(inf::SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat);
+   inf::Event::ResultType objectMovedSlot(inf::SceneObjectPtr obj,
+                                          const gmtl::Matrix44f& newObjMat);
 
    virtual void init();
    virtual void contextInit();
@@ -122,7 +123,9 @@ void OpenSgViewer::deallocate()
    mHighlighter     = inf::BasicHighlighterPtr();
 }
 
-int OpenSgViewer::objectMovedSlot(inf::SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat)
+inf::Event::ResultType
+OpenSgViewer::objectMovedSlot(inf::SceneObjectPtr obj,
+                              const gmtl::Matrix44f& newObjMat)
 {
    //std::cout << "MOVED" << std::endl;
    //return inf::EventResult::DONE;

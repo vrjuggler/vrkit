@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-04-07 patrick  Changed the type of inf::Event::ResultType from int to
+                    enum.
+                    -- VERSION -- 0.20.2
 2006-04-06 patrick  Removed inf::Widget::move() since it duplicates the
                     inherited inf::SceneObject::moveTo().
                     -- VERSION -- 0.20.1

@@ -15,9 +15,14 @@ namespace inf
 class IOV_CLASS_API Event
 {
 public:
-   typedef int ResultType;
-   static const ResultType DONE = 0;
-   static const ResultType CONTINUE = 1;
+   /**
+    * The return type to be used for slots that receive emitted signals.
+    */
+   enum ResultType
+   {
+      DONE     = 0,     /**< Indicates that signal processing must stop */
+      CONTINUE = 1      /**< Indicates that signal processing should continue */
+   };
 
    struct ResultOperator
    {

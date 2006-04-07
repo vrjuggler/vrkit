@@ -80,7 +80,9 @@ protected:
 
    void focusChanged(inf::ViewerPtr viewer);
 
-   int defaultObjectMovedSlot(SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat);
+   inf::Event::ResultType
+      defaultObjectMovedSlot(SceneObjectPtr obj,
+                             const gmtl::Matrix44f& newObjMat);
 
 private:
    static std::string getElementType()

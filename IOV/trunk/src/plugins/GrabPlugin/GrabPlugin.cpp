@@ -255,7 +255,9 @@ void GrabPlugin::run(inf::ViewerPtr viewer)
    }
 }
 
-int GrabPlugin::defaultObjectMovedSlot(SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat)
+inf::Event::ResultType
+GrabPlugin::defaultObjectMovedSlot(SceneObjectPtr obj,
+                                   const gmtl::Matrix44f& newObjMat)
 {
 
    OSG::Matrix obj_mat_osg;
