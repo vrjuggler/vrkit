@@ -143,21 +143,40 @@ void BasicHighlighter::init(inf::ViewerPtr viewer)
    mDeIsectConnection = event_data->mObjectDeintersectedSignal.connect(100,
       boost::bind(&BasicHighlighter::objectDeintersected, this, _1));
 
-   // Connect the selection signal to our slot.
-   mSelectConnection = event_data->mObjectSelectedSignal.connect(100,
-      boost::bind(&BasicHighlighter::objectSelected, this, _1, true));
-
-   // Connect the de-selection signal to our slot.
-   mDeselectConnection = event_data->mObjectDeselectedSignal.connect(100,
-      boost::bind(&BasicHighlighter::objectSelected, this, _1, false));
+   // NOTE: The boost::function<T> cast in the following statements is to deal
+   //       with a baffling compile error when using GCC 4.1.
 
    // Connect the selection signal to our slot.
-   mSelectConnection = event_data->mObjectPickedSignal.connect(100,
-      boost::bind(&BasicHighlighter::objectPicked, this, _1, true));
+   mSelectConnection =
+      event_data->mObjectSelectedSignal.connect(
+         100,
+         (boost::function<inf::Event::ResultType(inf::SceneObjectPtr)>)
+            boost::bind(&BasicHighlighter::objectSelected, this, _1, true)
+      );
 
    // Connect the de-selection signal to our slot.
-   mDeselectConnection = event_data->mObjectUnpickedSignal.connect(100,
-      boost::bind(&BasicHighlighter::objectPicked, this, _1, false));
+   mDeselectConnection =
+      event_data->mObjectDeselectedSignal.connect(
+         100,
+         (boost::function<inf::Event::ResultType(inf::SceneObjectPtr)>)
+            boost::bind(&BasicHighlighter::objectSelected, this, _1, false)
+      );
+
+   // Connect the selection signal to our slot.
+   mSelectConnection =
+      event_data->mObjectPickedSignal.connect(
+         100,
+         (boost::function<inf::Event::ResultType(inf::SceneObjectPtr)>)
+            boost::bind(&BasicHighlighter::objectPicked, this, _1, true)
+      );
+
+   // Connect the de-selection signal to our slot.
+   mDeselectConnection =
+      event_data->mObjectUnpickedSignal.connect(
+         100,
+         (boost::function<inf::Event::ResultType(inf::SceneObjectPtr)>)
+            boost::bind(&BasicHighlighter::objectPicked, this, _1, false)
+      );
 }
 
 inf::Event::ResultType
