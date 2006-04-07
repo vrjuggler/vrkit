@@ -21,9 +21,11 @@
 #include <gmtl/Coord.h>
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
+#include <gmtl/External/OpenSGConvert.h>
 
 #include <vpr/vpr.h>
 #include <vpr/System.h>
+#include <jccl/Config/ConfigElement.h>
 #include <vrj/Kernel/Kernel.h>
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
 
@@ -32,6 +34,7 @@
 #include <IOV/User.h>
 #include <IOV/Scene.h>
 #include <IOV/GrabData.h>
+#include <IOV/DynamicSceneObject.h>
 #include <IOV/StaticSceneObject.h>
 #include <IOV/WandInterface.h>
 #include <IOV/Util/BasicHighlighter.h>
@@ -41,6 +44,15 @@
 
 #include <IOV/Status.h>
 
+
+
+template<typename T>
+boost::shared_ptr<T> makeSceneObject(OSG::TransformNodePtr modelXform)
+{
+   boost::shared_ptr<T> obj = T::create();
+   obj->init(modelXform);
+   return obj;
+}
 
 class OpenSgViewer;
 typedef boost::shared_ptr<OpenSgViewer> OpenSgViewerPtr;
@@ -81,13 +93,39 @@ protected:
 
    OpenSgViewer()
       : inf::Viewer()
-   {;}
+      , mEnableGrab(true)
+      , mSceneObjTypeName("StaticSceneObject")
+      , mMatChooserWidth(1.0f)  // 1 foot wide
+      , mMatChooserHeight(1.5f) // 1.5 feet tall
+   {
+      /* Do nothing. */ ;
+   }
+
+   static std::string getElementType()
+   {
+      return std::string("iov_app");
+   }
+
+   void configure(jccl::ConfigElementPtr cfgElt);
 
 protected:
    std::string              mFileName;
-   inf::MaterialChooserPtr  mMaterialChooser; /**< The status panel we are using. */
-   OSG::MaterialPoolPtr     mMaterialPool;
    inf::BasicHighlighterPtr mHighlighter;
+
+   /** @name Scene Object Handling */
+   //@{
+   bool        mEnableGrab;
+   std::string mSceneObjTypeName;
+   //@}
+
+   /** @name Material Chooser Properties */
+   //@{
+   float                   mMatChooserWidth;
+   float                   mMatChooserHeight;
+   gmtl::Coord3fXYZ        mMatChooserCoord;
+   inf::MaterialChooserPtr mMaterialChooser; /**< The chooser we are using. */
+   OSG::MaterialPoolPtr    mMaterialPool;
+   //@}
 };
 
 
@@ -136,6 +174,21 @@ void OpenSgViewer::init()
 {
    inf::Viewer::init();
 
+   jccl::ConfigElementPtr app_cfg =
+      getConfiguration().getConfigElement(getElementType());
+
+   if ( app_cfg )
+   {
+      try
+      {
+         configure(app_cfg);
+      }
+      catch (inf::Exception& ex)
+      {
+         std::cerr << ex.what() << std::endl;
+      }
+   }
+
    mHighlighter = inf::BasicHighlighter::create();
    mHighlighter->init(shared_from_this());
 
@@ -151,7 +204,13 @@ void OpenSgViewer::init()
    // Initialize panel
    const float feet_to_app_units(0.3048f * getDrawScaleFactor());
    mMaterialChooser->init(getDrawScaleFactor());
-   mMaterialChooser->setWidthHeight(1.0f * feet_to_app_units, 1.5f * feet_to_app_units);
+   mMaterialChooser->setWidthHeight(mMatChooserWidth * feet_to_app_units,
+                                    mMatChooserWidth * feet_to_app_units);
+
+   // Set at T*R
+   OSG::Matrix xform_osg;
+   gmtl::set(xform_osg, gmtl::make<gmtl::Matrix44f>(mMatChooserCoord));
+   mMaterialChooser->moveTo(xform_osg);
 
    // Add widget to scene.
    inf::WidgetDataPtr widget_data = scene->getSceneData<inf::WidgetData>();
@@ -240,11 +299,33 @@ void OpenSgViewer::init()
       scene_transform_root.node()->addChild(light_node);
    osg::endEditCP(scene_transform_root.node());
 
-   inf::GrabDataPtr grab_data = scene->getSceneData<inf::GrabData>();
-   inf::StaticSceneObjectPtr model_obj = inf::StaticSceneObject::create();
-   model_obj->init(model_xform);
-   grab_data->addObject(model_obj);
-   addObject(model_obj);
+   if ( mEnableGrab )
+   {
+      inf::GrabDataPtr grab_data = scene->getSceneData<inf::GrabData>();
+
+      inf::SceneObjectPtr model_obj;
+
+      if ( mSceneObjTypeName == "StaticSceneObject" )
+      {
+         model_obj = makeSceneObject<inf::StaticSceneObject>(model_xform);
+      }
+      else if ( mSceneObjTypeName == "DynamicSceneObject" )
+      {
+         model_obj = makeSceneObject<inf::DynamicSceneObject>(model_xform);
+      }
+      else
+      {
+         IOV_STATUS << "ERROR: Invalid scene object type name '"
+                    << mSceneObjTypeName << "'" << std::endl
+                    << "Falling back on StaticSceneObject" << std::endl;
+         model_obj = makeSceneObject<inf::StaticSceneObject>(model_xform);
+      }
+
+      grab_data->addObject(model_obj);
+
+      // Register object for intersection.
+      addObject(model_obj);
+   }
 }
 
 void OpenSgViewer::initGl()
@@ -280,6 +361,72 @@ void OpenSgViewer::initGl()
    glEnable(GL_LIGHT0);
    glEnable(GL_COLOR_MATERIAL);
    glShadeModel(GL_SMOOTH);
+}
+
+void OpenSgViewer::configure(jccl::ConfigElementPtr cfgElt)
+{
+   const unsigned int req_cfg_ver(1);
+
+   if ( cfgElt->getVersion() < req_cfg_ver )
+   {
+      std::ostringstream msg_stream;
+      msg_stream << "WARNING: IOV viewer application config element '"
+                 << cfgElt->getName() << "' is out of date!" << std::endl
+                 << "         Current config element version is "
+                 << req_cfg_ver << ", but this one is version "
+                 << cfgElt->getVersion() << std::endl;
+      throw inf::Exception(msg_stream.str(), IOV_LOCATION);
+   }
+
+   const std::string enable_grab_prop("enable_grabbing");
+   const std::string scene_obj_type_prop("scene_object_type");
+   const std::string use_mchooser_prop("use_material_chooser");
+   const std::string initial_size_prop("chooser_initial_size");
+   const std::string initial_pos_prop("chooser_initial_position");
+   const std::string initial_rot_prop("chooser_initial_rotation");
+
+   mEnableGrab       = cfgElt->getProperty<bool>(enable_grab_prop);
+   mSceneObjTypeName = cfgElt->getProperty<std::string>(scene_obj_type_prop);
+
+   const float width  = cfgElt->getProperty<float>(initial_size_prop, 0);
+   const float height = cfgElt->getProperty<float>(initial_size_prop, 1);
+
+   if ( width > 0.0f )
+   {
+      mMatChooserWidth = width;
+   }
+   else
+   {
+      IOV_STATUS << "ERROR: Invalid width for material chooser " << width
+                 << std::endl;
+   }
+
+   if ( height > 0.0f )
+   {
+      mMatChooserHeight = height;
+   }
+   else
+   {
+      IOV_STATUS << "ERROR: Invalid height for material chooser " << height
+                 << std::endl;
+   }
+
+   const float feet_to_app_units(0.3048f * getDrawScaleFactor());
+
+   const float xt = cfgElt->getProperty<float>(initial_pos_prop, 0);
+   const float yt = cfgElt->getProperty<float>(initial_pos_prop, 1);
+   const float zt = cfgElt->getProperty<float>(initial_pos_prop, 2);
+
+   const float xr = cfgElt->getProperty<float>(initial_rot_prop, 0);
+   const float yr = cfgElt->getProperty<float>(initial_rot_prop, 1);
+   const float zr = cfgElt->getProperty<float>(initial_rot_prop, 2);
+
+   mMatChooserCoord.pos().set(xt * feet_to_app_units,
+                              yt * feet_to_app_units,
+                              zt * feet_to_app_units);
+   mMatChooserCoord.rot().set(gmtl::Math::deg2Rad(xr),
+                              gmtl::Math::deg2Rad(yr),
+                              gmtl::Math::deg2Rad(zr));
 }
 
 namespace po = boost::program_options;
@@ -345,10 +492,12 @@ int main(int argc, char* argv[])
             std::cerr << "WARNING: Environment variable IOV_BASE_DIR is not\n"
                       << "         set or is set to an empty value.  Expect\n"
                       << "         problems later." << std::endl;
+            jdef_dir = ".";
          }
          else
          {
-            jdef_dir = iov_base_dir + std::string("/share/IOV/definitions");
+            jdef_dir =
+               iov_base_dir + std::string("/share/IOV/definitions") + ":.";
          }
       }
       IOV_STATUS << "Using jdef path: " << jdef_dir << std::endl;

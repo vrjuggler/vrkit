@@ -23,10 +23,12 @@ if boost_options.isAvailable():
    po_lib = boost_options.buildFullLibName('program_options')
    viewerEnv.Prepend(LIBS = [po_lib])
 
+   jdef_files = ['iov_app.jdef',]
    jconf_files = ['viewer-nav.jconf', 'viewer-vp.jconf']
    infi_app_prog = viewerEnv.Program('infi_app', ['infi_app.cpp',])
-   viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), infi_app_prog)
-   viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), jconf_files)
+   viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), infi_app_prog)
+   viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jconf_files)
+   viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jdef_files)
 else:
    print "WARNING: Cannot build infi_app without Boost.program_options"
 
