@@ -285,12 +285,34 @@ def installIOV(prefix, platform):
    installPlugins(prefix, platform, share_root, jdef_destdir)
 
 def installProgs(prefix, platform):
-   destdir = os.path.join(prefix, 'bin')
+   installViewer(prefix, platform)
+   installSlaveViewer(prefix, platform)
 
-   prog_build_dirs = glob.glob(os.path.join(gProjectDir, 'vc71', '*',
-                                            platform, '*'))
+def installViewer(prefix, platform):
+   destdir = os.path.join(prefix, 'share', 'IOV', 'apps', 'Viewer')
+   mkinstalldirs(destdir)
 
-   for d in prog_build_dirs:
+   srcdir = os.path.join(gProjectDir, 'src', 'Viewer')
+   for f in glob.glob(os.path.join(srcdir, '*.jconf')):
+      shutil.copy2(f, destdir)
+   for f in glob.glob(os.path.join(srcdir, '*.jdef')):
+      shutil.copy2(f, destdir)
+
+   srcdirs = glob.glob(os.path.join(gProjectDir, 'vc71', 'infi_app',
+                                    platform, '*'))
+
+   for d in srcdirs:
+      for f in glob.glob(os.path.join(d, '*.exe')):
+         shutil.copy2(f, destdir)
+
+def installSlaveViewer(prefix, platform):
+   destdir = os.path.join(prefix, 'share', 'IOV', 'apps', 'slaveViewer')
+   mkinstalldirs(destdir)
+
+   srcdirs = glob.glob(os.path.join(gProjectDir, 'vc71', 'SlaveViewer',
+                                    platform, '*'))
+
+   for d in srcdirs:
       for f in glob.glob(os.path.join(d, '*.exe')):
          shutil.copy2(f, destdir)
 
