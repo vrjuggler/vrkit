@@ -18,7 +18,6 @@
 #include <IOV/ViewerPtr.h>
 #include <IOV/SceneObjectPtr.h>
 #include <IOV/GeometryHighlightTraverser.h>
-#include <IOV/Widget/Event.h>
 #include <IOV/Util/RemoteAspectFilterPtr.h>
 
 #include <boost/function.hpp>

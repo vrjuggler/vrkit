@@ -11,7 +11,7 @@
 #include <IOV/SceneData.h>
 #include <IOV/EventDataPtr.h>
 #include <IOV/SceneObjectPtr.h>
-#include <IOV/Widget/Event.h>
+#include <IOV/Event.h>
 
 #include <boost/signal.hpp>
 

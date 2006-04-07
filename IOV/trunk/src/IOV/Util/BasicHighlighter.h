@@ -16,7 +16,7 @@
 #include <IOV/ViewerPtr.h>
 #include <IOV/SceneObjectPtr.h>
 #include <IOV/GeometryHighlightTraverser.h>
-#include <IOV/Widget/Event.h>
+#include <IOV/Event.h>
 #include <IOV/Util/BasicHighlighterPtr.h>
 
 

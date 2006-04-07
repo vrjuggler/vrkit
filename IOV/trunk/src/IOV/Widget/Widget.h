@@ -15,7 +15,6 @@
 #include <IOV/UiBuilder.h>
 #include <IOV/StaticSceneObject.h>
 #include <IOV/Widget/WidgetPtr.h>
-#include <IOV/Widget/Event.h>
 
 #include <boost/noncopyable.hpp>
 #include <boost/enable_shared_from_this.hpp>

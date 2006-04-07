@@ -22,7 +22,7 @@
 #include <IOV/Widget/WidgetDataPtr.h>
 #include <IOV/Widget/WidgetPtr.h>
 
-#include <IOV/Widget/Event.h>
+#include <IOV/Event.h>
 #include <gmtl/Matrix.h>
 
 namespace inf

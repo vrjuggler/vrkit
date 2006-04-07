@@ -1,10 +1,10 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef _INF_WAND_EVENT_H_
-#define _INF_WAND_EVENT_H_
+#ifndef _INF_EVENT_H_
+#define _INF_EVENT_H_
 
 #include <IOV/Config.h>
-#include <IOV/Widget/WidgetPtr.h>
+//#include <IOV/Widget/WidgetPtr.h>
 
 #include <gmtl/Matrix.h>
 #include <vector>
@@ -48,6 +48,7 @@ public:
       WandMove = 4
    };
 
+/*
    Event(WidgetPtr src, Type type) : mSource(src), mType(type)
    {;}
 
@@ -62,8 +63,10 @@ public:
    {
       return mSource;
    }
+*/
+
 protected:
-   WidgetPtr            mSource;
+//   WidgetPtr            mSource;
    Type                 mType;
    gmtl::Matrix44f      mWandPos;
    std::vector<int>     mButtons;

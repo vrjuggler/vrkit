@@ -5,6 +5,7 @@
 
 #include <IOV/Config.h>
 
+#include <IOV/Event.h>
 #include <IOV/Widget/Widget.h>
 #include <IOV/Widget/ScrollBarPtr.h>
 #include <IOV/Widget/SphereButtonPtr.h>
