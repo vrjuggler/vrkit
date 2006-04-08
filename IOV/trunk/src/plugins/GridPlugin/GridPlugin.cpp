@@ -374,9 +374,11 @@ void GridPlugin::configure(jccl::ConfigElementPtr elt)
    {
       try
       {
-         inf::GridPtr grid = inf::Grid::create();
-         grid->init(elt->getProperty<jccl::ConfigElementPtr>(grids_prop, i));
-         mGrids.push_back(grid);
+         mGrids.push_back(
+            inf::Grid::create()->init(
+               elt->getProperty<jccl::ConfigElementPtr>(grids_prop, i)
+            )
+         );
       }
       catch (inf::Exception& ex)
       {

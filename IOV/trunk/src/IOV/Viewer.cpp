@@ -65,12 +65,10 @@ void Viewer::init()
    }
 
    // Create an initialize the user
-   mUser = User::create();
-   mUser->init();
+   mUser = User::create()->init();
 
    // Create and initialize the base scene object
-   mScene = Scene::create();
-   mScene->init();
+   mScene = Scene::create()->init();
 
    mEventData = mScene->getSceneData<EventData>();
 

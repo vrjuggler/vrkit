@@ -71,9 +71,7 @@ SceneObjectPtr DynamicSceneObject::getParent()
       if (isTransform(parent))
       {
          OSG::TransformNodePtr parent_node(parent);
-         DynamicSceneObjectPtr parent_obj = DynamicSceneObject::create();
-         parent_obj->init(parent_node);
-         return parent_obj;
+         return DynamicSceneObject::create()->init(parent_node);
       }
       parent = parent->getParent();
    }
@@ -120,9 +118,7 @@ OSG::Action::ResultE DynamicSceneObject::enter(OSG::NodePtr& node)
    if(node->getCore()->getType().isDerivedFrom(OSG::Transform::getClassType()))
    {
       OSG::TransformNodePtr parent_node(node);
-      DynamicSceneObjectPtr parent_obj = DynamicSceneObject::create();
-      parent_obj->init(parent_node);
-      mChildren.push_back(parent_obj);
+      mChildren.push_back(DynamicSceneObject::create()->init(parent_node));
       /*
       std::string node_str("<NULL>");
       const char* node_name = OSG::getName(node);

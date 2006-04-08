@@ -49,9 +49,7 @@
 template<typename T>
 boost::shared_ptr<T> makeSceneObject(OSG::TransformNodePtr modelXform)
 {
-   boost::shared_ptr<T> obj = T::create();
-   obj->init(modelXform);
-   return obj;
+   return T::create()->init(modelXform);
 }
 
 class OpenSgViewer;
@@ -189,8 +187,7 @@ void OpenSgViewer::init()
       }
    }
 
-   mHighlighter = inf::BasicHighlighter::create();
-   mHighlighter->init(shared_from_this());
+   mHighlighter = inf::BasicHighlighter::create()->init(shared_from_this());
 
    inf::EventDataPtr event_data = getSceneObj()->getSceneData<inf::EventData>();
    event_data->mObjectMovedSignal.connect(0, boost::bind(&OpenSgViewer::objectMovedSlot, this, _1, _2));
