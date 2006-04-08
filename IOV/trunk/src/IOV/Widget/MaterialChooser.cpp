@@ -86,7 +86,7 @@ Event::ResultType MaterialChooser::onButtonClicked(unsigned int index)
    std::string mat_str("<NULL>");
    
    int current_row = mScrollBar->value();
-   int mat_index = (current_row*3) + index;
+   unsigned int mat_index = (current_row*3) + index;
 
    if (mat_index >= mMaterialPool->getCount())
    {
