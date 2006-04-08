@@ -5,14 +5,16 @@
 namespace inf
 {
 
-void Frame::init(const float metersToAppUnits)
+WidgetPtr Frame::init(const float metersToAppUnits)
 {
-   Widget::init(metersToAppUnits);
+   WidgetPtr myself = Widget::init(metersToAppUnits);
 
    const float feet_to_app_units(0.3048f * mMetersToAppUnits);
    mBorderWidth = 0.4f * feet_to_app_units;
    mBorderDepth = 0.2f * feet_to_app_units;
    mBorderColor.setValuesRGB(1,1,1);
+
+   return myself;
 }
 
 void Frame::setWidthHeight(const float w, const float h, const float borderWidth)

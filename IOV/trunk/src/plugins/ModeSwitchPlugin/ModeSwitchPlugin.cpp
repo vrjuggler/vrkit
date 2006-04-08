@@ -84,7 +84,7 @@ std::string ModeSwitchPlugin::getDescription()
    }
 }
 
-void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
+PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
 {
    const std::string plugin_path_prop("plugin_path");
    const std::string plugins_prop("plugins");
@@ -217,6 +217,8 @@ void ModeSwitchPlugin::init(inf::ViewerPtr viewer)
    }
 
    switchToMode(0, viewer);
+
+   return shared_from_this();
 }
 
 void ModeSwitchPlugin::updateState(inf::ViewerPtr viewer)

@@ -17,11 +17,11 @@ MaterialChooser::MaterialChooser()
    : Frame(), mHNum(3), mVNum(3), mSpacing(0.25f)
 {;}
 
-void MaterialChooser::init(const float metersToAppUnits)
+WidgetPtr MaterialChooser::init(const float metersToAppUnits)
 {
    mMaterialPool = OSG::MaterialPool::create();
 
-   Frame::init(metersToAppUnits);
+   WidgetPtr myself = Frame::init(metersToAppUnits);
 
    for (int i = 0 ; i < mVNum ; i++)
    {
@@ -54,6 +54,8 @@ void MaterialChooser::init(const float metersToAppUnits)
    mScrollBar->mValueChangedSignal.connect(boost::bind(&MaterialChooser::onScrolled, this, _1));
 
    setDirty();
+
+   return myself;
 }
 
 Event::ResultType MaterialChooser::onScrolled(int value)

@@ -35,8 +35,12 @@ public:
 
    virtual std::string getDescription();
 
-   /** Initialize the plugin. */
-   virtual void init(inf::ViewerPtr viewer);
+   /**
+    * Initializes this plug-in.
+    *
+    * @return This object is returned as a shared pointer.
+    */
+   virtual inf::PluginPtr init(inf::ViewerPtr viewer);
 
    virtual void updateState(inf::ViewerPtr viewer);
 

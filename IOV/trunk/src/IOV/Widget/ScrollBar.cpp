@@ -15,9 +15,9 @@ ScrollBar::ScrollBar() : mValue(0), mMinValue(0), mMaxValue(100), mIncrement(10)
 ScrollBar::~ScrollBar()
 {;}
 
-void ScrollBar::init(const float metersToAppUnits)
+WidgetPtr ScrollBar::init(const float metersToAppUnits)
 {
-   Widget::init(metersToAppUnits);
+   WidgetPtr myself = Widget::init(metersToAppUnits);
 
    // Add buttons
    mUpButton = SphereButton::create();
@@ -40,6 +40,8 @@ void ScrollBar::init(const float metersToAppUnits)
 
    mUpButton->mClickedSignal.connect(boost::bind(&ScrollBar::onButtonClicked, this, true));
    mDownButton->mClickedSignal.connect(boost::bind(&ScrollBar::onButtonClicked, this, false));
+
+   return myself;
 }
 
 Event::ResultType ScrollBar::onButtonClicked(bool upButton)

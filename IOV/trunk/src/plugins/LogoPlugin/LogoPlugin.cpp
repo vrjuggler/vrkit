@@ -74,7 +74,7 @@ PluginPtr LogoPlugin::create()
    return PluginPtr(new LogoPlugin);
 }
 
-void LogoPlugin::init(inf::ViewerPtr viewer)
+PluginPtr LogoPlugin::init(inf::ViewerPtr viewer)
 {
    const unsigned int req_cfg_version(1);
 
@@ -212,6 +212,8 @@ void LogoPlugin::init(inf::ViewerPtr viewer)
          dec_root.node()->addChild(mLogos[i].xformNode);
       }
    OSG::endEditCP(dec_root);
+
+   return shared_from_this();
 }
 
 // Nothing to update

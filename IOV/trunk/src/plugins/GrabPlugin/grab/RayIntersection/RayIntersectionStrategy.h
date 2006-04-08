@@ -47,7 +47,7 @@ public:
       return IntersectionStrategyPtr(new RayIntersectionStrategy());
    }
 
-   virtual void init(ViewerPtr viewer);
+   virtual inf::IntersectionStrategyPtr init(ViewerPtr viewer);
 
    virtual void update(ViewerPtr viewer);
 

@@ -38,7 +38,7 @@ public:
       return std::string("Navigation");
    }
 
-   virtual void init(ViewerPtr viewer);
+   virtual PluginPtr init(ViewerPtr viewer);
 
    /**
     * @pre \c canHandleElement() returned true.

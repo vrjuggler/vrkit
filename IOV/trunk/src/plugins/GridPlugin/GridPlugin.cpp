@@ -44,7 +44,7 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
-void GridPlugin::init(inf::ViewerPtr viewer)
+PluginPtr GridPlugin::init(inf::ViewerPtr viewer)
 {
    mWandInterface = viewer->getUser()->getInterfaceTrader().getWandInterface();
 
@@ -66,6 +66,8 @@ void GridPlugin::init(inf::ViewerPtr viewer)
       OSG::endEditCP(decorator_root.node(), OSG::Node::ChildrenFieldMask);
       (*g)->setVisible(mGridsVisible);
    }
+
+   return shared_from_this();
 }
 
 void GridPlugin::updateState(inf::ViewerPtr viewer)

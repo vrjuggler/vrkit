@@ -39,9 +39,9 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getMoveStrategyCreator()
 namespace inf
 {
 
-void CenterPointMoveStrategy::init(inf::ViewerPtr)
+inf::MoveStrategyPtr CenterPointMoveStrategy::init(inf::ViewerPtr)
 {
-   /* Do nothing. */ ;
+   return shared_from_this();
 }
 
 void CenterPointMoveStrategy::objectGrabbed(inf::ViewerPtr,

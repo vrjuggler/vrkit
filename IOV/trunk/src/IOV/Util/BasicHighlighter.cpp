@@ -34,7 +34,7 @@ BasicHighlighter::~BasicHighlighter()
    mDeselectConnection.disconnect();
 }
 
-void BasicHighlighter::init(inf::ViewerPtr viewer)
+BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
 {
    std::string iov_base_dir;
    vpr::System::getenv("IOV_BASE_DIR", iov_base_dir);
@@ -177,6 +177,8 @@ void BasicHighlighter::init(inf::ViewerPtr viewer)
          (boost::function<inf::Event::ResultType(inf::SceneObjectPtr)>)
             boost::bind(&BasicHighlighter::objectPicked, this, _1, false)
       );
+
+   return shared_from_this();
 }
 
 inf::Event::ResultType

@@ -71,7 +71,7 @@ StatusPanel& StatusPanelPlugin::getPanel()
    return *mStatusPanel;
 }
 
-void StatusPanelPlugin::init(inf::ViewerPtr viewer)
+inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
 {
    IOV_STATUS << "StatusPanelPlugin::init: Initializing plugin." << std::endl;
 
@@ -141,6 +141,8 @@ void StatusPanelPlugin::init(inf::ViewerPtr viewer)
    StatusPanelPluginDataPtr status_panel_data =
       scene_obj->getSceneData<StatusPanelPluginData>();
    status_panel_data->mStatusPanelPlugin = shared_from_this();
+
+   return shared_from_this();
 }
 
 void StatusPanelPlugin::updateState(inf::ViewerPtr viewer)

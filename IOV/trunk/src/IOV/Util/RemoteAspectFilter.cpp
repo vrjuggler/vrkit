@@ -45,7 +45,7 @@ RemoteAspectFilter::RemoteAspectFilter()
    /* Do nothing. */
 }
 
-void RemoteAspectFilter::init(OSG::RemoteAspect* remoteAspect)
+RemoteAspectFilterPtr RemoteAspectFilter::init(OSG::RemoteAspect* remoteAspect)
 {
    // XXX: Do we really need to keep a pointer to this?
    mRemoteAspect = remoteAspect;
@@ -72,6 +72,7 @@ void RemoteAspectFilter::init(OSG::RemoteAspect* remoteAspect)
        }
    }
 
+   return shared_from_this();
 }
 
 void RemoteAspectFilter::addChangedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback)

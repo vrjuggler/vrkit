@@ -44,7 +44,7 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getMoveStrategyCreator()
 namespace inf
 {
 
-void SlideMoveStrategy::init(inf::ViewerPtr viewer)
+inf::MoveStrategyPtr SlideMoveStrategy::init(inf::ViewerPtr viewer)
 {
    jccl::ConfigElementPtr cfg_elt =
       viewer->getConfiguration().getConfigElement(getElementType());
@@ -63,6 +63,8 @@ void SlideMoveStrategy::init(inf::ViewerPtr viewer)
 
    vprASSERT(mForwardValue == 0.0f || mForwardValue == 1.0f &&
              "Invalid setting for mForwardValue");
+
+   return shared_from_this();
 }
 
 void SlideMoveStrategy::objectGrabbed(inf::ViewerPtr,

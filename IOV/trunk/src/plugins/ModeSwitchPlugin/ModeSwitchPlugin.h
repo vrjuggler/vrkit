@@ -46,7 +46,7 @@ public:
     * This loads the needed support plugins
     * and switches to the first mode.
     */
-   virtual void init(inf::ViewerPtr viewer);
+   virtual PluginPtr init(inf::ViewerPtr viewer);
 
    virtual void updateState(inf::ViewerPtr viewer);
 

@@ -42,8 +42,9 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getMoveStrategyCreator()
 namespace inf
 {
 
-void BasicMoveStrategy::init(inf::ViewerPtr)
+inf::MoveStrategyPtr BasicMoveStrategy::init(inf::ViewerPtr)
 {
+   return shared_from_this();
 }
 
 void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,

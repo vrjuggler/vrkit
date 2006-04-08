@@ -59,12 +59,16 @@ public:
     */
    virtual std::string getDescription() = 0;
 
-   /** Intialize the plugin.
-    * This method is called as part of the setup in the Viewer init method.
-    * The plugin should read configuration from the Viewer configuration object
-    * and take care of any setup needed.
+   /**
+    * Intializes this plug-in. This method is called as part of the setup in
+    * the Viewer init method. This plug-in should read configuration from the
+    * Viewer configuration object and take care of any setup needed.
+    *
+    * @param viewer The VR Juggler application object.
+    *
+    * @return This object is returned as a shared pointer.
     */
-   virtual void init(inf::ViewerPtr viewer) = 0;
+   virtual PluginPtr init(inf::ViewerPtr viewer) = 0;
 
    /**
     * Tells this plug-in to update its state, which generally means that it

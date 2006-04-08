@@ -13,6 +13,12 @@ StaticSceneObject::~StaticSceneObject()
    /* Do nothing. */ ;
 }
 
+StaticSceneObjectPtr StaticSceneObject::init(OSG::TransformNodePtr node)
+{
+   mTransformNode = node;
+   return boost::dynamic_pointer_cast<StaticSceneObject>(shared_from_this());
+}
+
 StaticSceneObject::StaticSceneObject()
 {
    mEmptyVolume.setEmpty();

@@ -20,7 +20,7 @@ Scene::~Scene()
    }
 }
 
-void Scene::init()
+ScenePtr Scene::init()
 {
    mSceneRoot     = OSG::GroupNodePtr::create();
    mDecoratorRoot = OSG::GroupNodePtr::create();
@@ -30,6 +30,8 @@ void Scene::init()
       mSceneRoot.node()->addChild(mDecoratorRoot.node());
       mSceneRoot.node()->addChild(mTransformRoot.node());
    OSG::endEditCP(mSceneRoot);
+
+   return shared_from_this();
 }
 
 // NOTE: This implementation is based on Java's java.util.Collection.put()

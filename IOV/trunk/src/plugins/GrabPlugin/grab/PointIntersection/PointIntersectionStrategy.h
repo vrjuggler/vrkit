@@ -34,7 +34,8 @@ public:
    {
       return IntersectionStrategyPtr(new PointIntersectionStrategy());
    }
-   virtual void init(ViewerPtr viewer);
+
+   virtual inf::IntersectionStrategyPtr init(ViewerPtr viewer);
 
    virtual SceneObjectPtr findIntersection(ViewerPtr viewer,
       const std::vector<SceneObjectPtr>& objs, gmtl::Point3f& intersectPoint);

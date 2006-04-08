@@ -16,9 +16,10 @@ DynamicSceneObject::DynamicSceneObject()
    mEmptyVolume.setEmpty();
 }
 
-void DynamicSceneObject::init(OSG::TransformNodePtr node)
+DynamicSceneObjectPtr DynamicSceneObject::init(OSG::TransformNodePtr node)
 {
    mTransformNode = node;
+   return boost::dynamic_pointer_cast<DynamicSceneObject>(shared_from_this());
 }
 
 OSG::DynamicVolume& DynamicSceneObject::getVolume(const bool update)

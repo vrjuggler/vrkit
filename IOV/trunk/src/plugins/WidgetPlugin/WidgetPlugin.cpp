@@ -48,7 +48,7 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
-void WidgetPlugin::init(inf::ViewerPtr viewer)
+PluginPtr WidgetPlugin::init(inf::ViewerPtr viewer)
 {
    mWandInterface = viewer->getUser()->getInterfaceTrader().getWandInterface();
 
@@ -84,6 +84,8 @@ void WidgetPlugin::init(inf::ViewerPtr viewer)
    }
 
    mWidgetData = scene->getSceneData<WidgetData>();
+
+   return shared_from_this();
 }
 
 inf::Event::ResultType

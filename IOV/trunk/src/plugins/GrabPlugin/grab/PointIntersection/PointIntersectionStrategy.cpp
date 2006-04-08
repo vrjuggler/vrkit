@@ -38,8 +38,10 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getIntersectionStrategyCreator()
 namespace inf
 {
 
-void PointIntersectionStrategy::init(ViewerPtr viewer)
-{;}
+inf::IntersectionStrategyPtr PointIntersectionStrategy::init(ViewerPtr)
+{
+   return shared_from_this();
+}
 
 SceneObjectPtr PointIntersectionStrategy::findIntersection(ViewerPtr viewer,
    const std::vector<SceneObjectPtr>& objs, gmtl::Point3f& intersectPoint)

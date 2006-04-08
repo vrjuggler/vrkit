@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-04-08 patrick  Those types that are stored using boost::shared_ptr<T> and
+                    have an init() method now return their shared pointer from
+                    the init() method.
+                    -- VERSION -- 0.21.0
 2006-04-07 patrick  Extended the Slide Move Strategy plug-in so that its slide
                     threshold is configurable.
                     -- VERSION -- 0.20.3

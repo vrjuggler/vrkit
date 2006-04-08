@@ -70,8 +70,10 @@ public:
     * @post This intersection strategy is initialized and ready to be used.
     *
     * @param viewer The VR Juggler application object.
+    *
+    * @return This object is returned as a shared pointer.
     */
-   virtual void init(ViewerPtr viewer) = 0;
+   virtual IntersectionStrategyPtr init(ViewerPtr viewer) = 0;
 
    /**
     * Updates this intersection strategy. This method is invoked once per

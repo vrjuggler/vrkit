@@ -33,7 +33,7 @@ public:
       return std::string("Viewpoints Plugin");
    }
 
-   virtual void init(inf::ViewerPtr viewer);
+   virtual PluginPtr init(inf::ViewerPtr viewer);
 
    virtual void updateState(inf::ViewerPtr viewer);
 

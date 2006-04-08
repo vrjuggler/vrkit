@@ -60,7 +60,7 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
-void PickPlugin::init(ViewerPtr viewer)
+PluginPtr PickPlugin::init(ViewerPtr viewer)
 {
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
    mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
@@ -87,6 +87,8 @@ void PickPlugin::init(ViewerPtr viewer)
       // Configure it
       config(cfg_elt);
    }
+
+   return shared_from_this();
 }
 
 inf::Event::ResultType

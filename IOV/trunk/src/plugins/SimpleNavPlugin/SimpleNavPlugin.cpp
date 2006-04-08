@@ -74,7 +74,7 @@ SimpleNavPlugin::SimpleNavPlugin()
    mCanNavigate = isFocused();
 }
 
-void SimpleNavPlugin::init(ViewerPtr viewer)
+PluginPtr SimpleNavPlugin::init(ViewerPtr viewer)
 {
    const std::string plugin_path_prop("plugin_path");
    const std::string plugin_prop("plugin");
@@ -112,6 +112,8 @@ void SimpleNavPlugin::init(ViewerPtr viewer)
    mRevBtn = elt->getProperty<int>(rev_btn_prop);
    mRotateBtn = elt->getProperty<int>(rot_btn_prop);
    mModeBtn = elt->getProperty<int>(mode_btn_prop);
+
+   return shared_from_this();
 }
 
 void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)

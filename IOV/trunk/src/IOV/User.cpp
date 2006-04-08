@@ -11,6 +11,11 @@ UserPtr User::create()
    return new_user;
 }
 
+UserPtr User::init()
+{
+   return shared_from_this();
+}
+
 void User::update(ViewerPtr viewer)
 {
    mViewPlatform.update(viewer);

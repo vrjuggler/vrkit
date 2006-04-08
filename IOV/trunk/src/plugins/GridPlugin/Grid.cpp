@@ -20,7 +20,7 @@
 namespace inf
 {
 
-void Grid::init(jccl::ConfigElementPtr cfgElt)
+GridPtr Grid::init(jccl::ConfigElementPtr cfgElt)
 {
    vprASSERT(cfgElt->getID() == std::string("grid"));
 
@@ -119,6 +119,8 @@ void Grid::init(jccl::ConfigElementPtr cfgElt)
 
    initGeometry(width, height, granularity, corner, corner_pos, rot,
                 OSG::Color3f(red, green, blue));
+
+   return shared_from_this();
 }
 
 OSG::NodeRefPtr Grid::getRoot() const

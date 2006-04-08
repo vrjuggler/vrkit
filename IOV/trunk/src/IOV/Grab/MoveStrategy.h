@@ -65,8 +65,10 @@ public:
     * @post This move strategy is initialized and ready to be used.
     *
     * @param viewer The VR Juggler application object.
+    *
+    * @return This object is returned as a shared pointer.
     */
-   virtual void init(ViewerPtr viewer) = 0;
+   virtual MoveStrategyPtr init(ViewerPtr viewer) = 0;
 
    /**
     * Indicates to this move strategy that an object has been grabbed.

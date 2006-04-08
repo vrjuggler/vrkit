@@ -24,8 +24,12 @@ class User : public boost::enable_shared_from_this<User>
 public:
    static UserPtr create();
 
-   void init()
-   {;}
+   /**
+    * Initializes this user object.
+    *
+    * @return This object is returned as a shared pointer.
+    */
+   UserPtr init();
 
    /** Update user and user associated information.
     * @post: User and viewplatform are updated.

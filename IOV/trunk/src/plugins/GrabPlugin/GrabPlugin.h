@@ -49,7 +49,7 @@ public:
       return std::string("Grabbing");
    }
 
-   virtual void init(inf::ViewerPtr viewer);
+   virtual PluginPtr init(inf::ViewerPtr viewer);
 
    virtual void updateState(inf::ViewerPtr viewer);
 

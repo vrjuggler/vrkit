@@ -71,7 +71,7 @@ PluginPtr ViewpointsPlugin::create()
    return PluginPtr(new ViewpointsPlugin);
 }
 
-void ViewpointsPlugin::init(inf::ViewerPtr viewer)
+PluginPtr ViewpointsPlugin::init(inf::ViewerPtr viewer)
 {
    const unsigned int req_cfg_version(1);
 
@@ -145,6 +145,8 @@ void ViewpointsPlugin::init(inf::ViewerPtr viewer)
       mNextViewpoint = 1;
    }
    */
+
+   return shared_from_this();
 }
 
 //

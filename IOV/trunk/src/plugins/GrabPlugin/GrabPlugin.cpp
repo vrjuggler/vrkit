@@ -60,7 +60,7 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
-void GrabPlugin::init(ViewerPtr viewer)
+PluginPtr GrabPlugin::init(ViewerPtr viewer)
 {
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
    mEventData->mObjectMovedSignal.connect(100, boost::bind(&GrabPlugin::defaultObjectMovedSlot, this, _1, _2));
@@ -124,6 +124,8 @@ void GrabPlugin::init(ViewerPtr viewer)
                     << *itr << ":\n" << ex.what() << std::endl;
       }
    }
+
+   return shared_from_this();
 }
 
 inf::Event::ResultType

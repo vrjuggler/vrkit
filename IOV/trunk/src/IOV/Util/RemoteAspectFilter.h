@@ -43,8 +43,12 @@ public:
    void addCreatedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback);
    void addDestroyedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback);
    
-   /** Registers callback functions with RemoteAspect for all field containers. */
-   void init(OSG::RemoteAspect* remoteAspect);
+   /**
+    * Registers callback functions with RemoteAspect for all field containers.
+    *
+    * @return This object is returned as a shared pointer.
+    */
+   RemoteAspectFilterPtr init(OSG::RemoteAspect* remoteAspect);
 
    /** @name OpenSG RemoteAspect callbacks */
    //@{

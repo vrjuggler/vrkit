@@ -59,9 +59,11 @@ public:
     * @param viewer The VR Juggler application object with which this
     *               highlighter will be used.
     *
+    * @return This object is returned as a shared pointer.
+    *
     * @see getElementType()
     */
-   void init(inf::ViewerPtr viewer);
+   BasicHighlighterPtr init(inf::ViewerPtr viewer);
 
    /**
     * Responds to object intersection signals. If \p obj is newly intersected,

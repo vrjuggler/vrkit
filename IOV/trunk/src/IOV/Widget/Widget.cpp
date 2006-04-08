@@ -42,7 +42,7 @@ void Widget::wandMoved()
    std::cout << "Wand Moved: " << i << std::endl;
 }
 
-void Widget::init(const float metersToAppUnits)
+WidgetPtr Widget::init(const float metersToAppUnits)
 {
    mMetersToAppUnits = metersToAppUnits;
 
@@ -63,6 +63,8 @@ void Widget::init(const float metersToAppUnits)
    mRootWidgetNode.node()->addChild(mWidgetGeomNode);
 
    setDirty();
+
+   return boost::dynamic_pointer_cast<Widget>(shared_from_this());
 }
 
 void Widget::setDirty()

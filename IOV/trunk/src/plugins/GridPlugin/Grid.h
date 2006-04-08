@@ -41,7 +41,7 @@ public:
     * @throw inf::PluginException is thrown if \p cfgElt contains bad data,
     *        is out of date, or is otherwise unusable.
     */
-   void init(jccl::ConfigElementPtr cfgElt);
+   GridPtr init(jccl::ConfigElementPtr cfgElt);
 
    const std::string& getName() const
    {

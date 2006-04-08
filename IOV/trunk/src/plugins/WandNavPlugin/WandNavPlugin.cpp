@@ -78,7 +78,7 @@ WandNavPlugin::WandNavPlugin()
    mCanNavigate = isFocused();
 }
 
-void WandNavPlugin::init(ViewerPtr viewer)
+PluginPtr WandNavPlugin::init(ViewerPtr viewer)
 {
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
@@ -96,6 +96,8 @@ void WandNavPlugin::init(ViewerPtr viewer)
 
    // Configure it
    config(cfg_elt);
+
+   return shared_from_this();
 }
 
 bool WandNavPlugin::config(jccl::ConfigElementPtr elt)

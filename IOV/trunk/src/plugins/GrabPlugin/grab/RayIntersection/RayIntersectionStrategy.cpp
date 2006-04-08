@@ -92,7 +92,7 @@ RayIntersectionStrategy::RayIntersectionStrategy()
    /* Do nothing. */ ;
 }
 
-void RayIntersectionStrategy::init(ViewerPtr viewer)
+inf::IntersectionStrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
 {
    jccl::ConfigElementPtr cfg_elt =
       viewer->getConfiguration().getConfigElement(getElementType());
@@ -131,6 +131,8 @@ void RayIntersectionStrategy::init(ViewerPtr viewer)
       decorator_root.node()->addChild(mSwitchNode);
    OSG::endEditCP(decorator_root.node());
    setVisible(true);
+
+   return shared_from_this();
 }
 
 void RayIntersectionStrategy::update(ViewerPtr viewer)

@@ -36,7 +36,7 @@ public:
       return std::string("Navigation");
    }
 
-   virtual void init(ViewerPtr viewer);
+   virtual PluginPtr init(ViewerPtr viewer);
 
    /**
     * Invokes the global scope delete operator.  This is required for proper

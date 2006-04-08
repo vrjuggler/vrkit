@@ -50,10 +50,14 @@ public:
 
    virtual ~Scene();
 
-   /** Initialize the scene data structures.
-    * @post: All OpenSG scene data structures for this object will be setup.
+   /**
+    * Initializes the scene data structures.
+    *
+    * @post All OpenSG scene data structures for this object will be setup.
+    *
+    * @return This object is returned as a shared pointer.
     */
-   virtual void init();
+   virtual ScenePtr init();
 
    /** Getter/Setters for the scene data. */
    //@{

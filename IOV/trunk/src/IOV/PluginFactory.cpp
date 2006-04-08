@@ -23,9 +23,10 @@ namespace fs = boost::filesystem;
 namespace inf
 {
 
-void PluginFactory::init(const std::vector<std::string>& scanPath)
+PluginFactoryPtr PluginFactory::init(const std::vector<std::string>& scanPath)
 {
    addScanPath(scanPath);
+   return shared_from_this();
 }
 
 void PluginFactory::addScanPath(const std::vector<std::string>& scanPath)

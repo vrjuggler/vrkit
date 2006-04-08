@@ -36,10 +36,16 @@ public:
       return StaticSceneObjectPtr(new StaticSceneObject());
    }
 
-   virtual void init(OSG::TransformNodePtr node)
-   {
-      mTransformNode = node;
-   }
+   /**
+    * Initializes this static scene object.
+    *
+    * @param node The OpenSG node with a transform core that is the root of
+    *             the scene graph sub-tree represented by this static scene
+    *             object.
+    *
+    * @return This object is returned as a shared pointer.
+    */
+   virtual StaticSceneObjectPtr init(OSG::TransformNodePtr node);
 
    /**
     * Return the dynamic volume that bounds the object.

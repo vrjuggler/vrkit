@@ -33,7 +33,7 @@ public:
       /* Do nothing. */ ;
    }
 
-   virtual void init(inf::ViewerPtr viewer);
+   virtual inf::MoveStrategyPtr init(inf::ViewerPtr viewer);
 
    virtual void objectGrabbed(inf::ViewerPtr viewer,
                               SceneObjectPtr obj,

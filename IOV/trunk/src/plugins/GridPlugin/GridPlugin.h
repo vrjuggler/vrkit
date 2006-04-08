@@ -43,7 +43,7 @@ public:
       return std::string("Grid");
    }
 
-   virtual void init(inf::ViewerPtr viewer);
+   virtual PluginPtr init(inf::ViewerPtr viewer);
 
    /**
     * Updates the state of the grids based on input from the wand interface.

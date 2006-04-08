@@ -30,8 +30,18 @@ public:
       return MaterialChooserPtr(new MaterialChooser());
    }
 
-   /** Initialize scene graph, fonts and everything else that is used. */
-   virtual void init(const float metersToAppUnits);
+   /**
+    * Initializes scene graph, fonts, and everything else that is used.
+    *
+    * @param metersToAppUnits The conversion factor from meters (VR Juggler's
+    *                         internal units) to the application-specific
+    *                         units.
+    *
+    * @return This object is returned as a shared pointer. A inf::WidgetPtr is
+    *         returned rather than inf::FramePtr because these types do not
+    *         allow for covariant return types in the method override.
+    */
+   virtual WidgetPtr init(const float metersToAppUnits);
 
 public:  // Configuration params //
    virtual void setWidthHeight(const float w, const float h, const float borderWidth=0.0f);

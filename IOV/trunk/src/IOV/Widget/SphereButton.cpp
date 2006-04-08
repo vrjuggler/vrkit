@@ -12,9 +12,9 @@ SphereButton::SphereButton() : mActiveHighlightID(0), mPressed(false)
 SphereButton::~SphereButton()
 {;}
 
-void SphereButton::init(const float metersToAppUnits)
+WidgetPtr SphereButton::init(const float metersToAppUnits)
 {
-   Widget::init(metersToAppUnits);
+   WidgetPtr myself = Widget::init(metersToAppUnits);
 
    mIntersectColor = OSG::Color3f(1.0f, 0.0, 0.0f);
    mGrabColor = OSG::Color3f(0.0f, 1.0, 0.0f);
@@ -28,6 +28,8 @@ void SphereButton::init(const float metersToAppUnits)
                                                            false, 0.05f,
                                                            1.0f,
                                                            mGrabColor);
+
+   return myself;
 }
 
 void SphereButton::updatePanelScene()

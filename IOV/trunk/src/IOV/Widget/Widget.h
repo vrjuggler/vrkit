@@ -37,8 +37,16 @@ public:
 
    virtual ~Widget();
 
-   /** Initialize scene graph, fonts and everything else that is used. */
-   virtual void init(const float metersToAppUnits);
+   /**
+    * Initialize scene graph, fonts and everything else that is used.
+    *
+    * @param metersToAppUnits The conversion factor from meters (VR Juggler's
+    *                         internal units) to the application-specific
+    *                         units.
+    *
+    * @return This object is returned as a shared pointer.
+    */
+   virtual WidgetPtr init(const float metersToAppUnits);
 
    virtual void wandEntered();
    virtual void wandExited();

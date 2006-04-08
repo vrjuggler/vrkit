@@ -48,7 +48,7 @@ public:
       return std::string("WidgetPlugin");
    }
 
-   virtual void init(inf::ViewerPtr viewer);
+   virtual PluginPtr init(inf::ViewerPtr viewer);
 
    /**
     * Updates the state of the widgets based on input from the wand interface.

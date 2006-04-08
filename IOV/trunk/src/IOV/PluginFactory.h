@@ -49,10 +49,12 @@ public:
     *
     * @param scanPath A list of directories to scan for plug-ins.
     *
+    * @return This object is returned as a shared pointer.
+    *
     * @see getPluginLibrary
     * @see getPluginCreator
     */
-   void init(const std::vector<std::string>& scanPath);
+   PluginFactoryPtr init(const std::vector<std::string>& scanPath);
 
    /**
     * Extends the current list of plugin libraries by searching the given path

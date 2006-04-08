@@ -37,7 +37,16 @@ public:
       return DynamicSceneObjectPtr(new DynamicSceneObject());
    }
 
-   void init(OSG::TransformNodePtr node);
+   /**
+    * Initializes this dynamic scene object.
+    *
+    * @param node The OpenSG node with a transform core that is the root of
+    *             the scene graph sub-tree represented by this dynamic scene
+    *             object.
+    *
+    * @return This object is returned as a shared pointer.
+    */
+   DynamicSceneObjectPtr init(OSG::TransformNodePtr node);
 
    /**
     * Return the dynamic volume that bounds the object.
