@@ -32,82 +32,82 @@ DATE       AUTHOR   CHANGE
                     type inf::SceneObject instead of dealing with the scene
                     graph directly.
                     -- VERSION -- 0.18.0
-2006-03-21 patrickh Added the Grid Plug-in.
+2006-03-21 patrick  Added the Grid Plug-in.
                     -- VERSION -- 0.17.1
 2006-03-21 aronb    Use Boost.Signals to handle event generation by the Grab
                     Plug-in.
                     -- VERSION -- 0.17.0
-2006-03-17 patrickh The functionality of the Point Grab Plug-in has been
+2006-03-17 patrick  The functionality of the Point Grab Plug-in has been
                     superceded by the Grab Plug-in and its Basic Move Strategy
                     plug-in.
                     -- VERSION -- 0.16.2
-2006-03-17 patrickh Replaced the Center Point Grab Plug-in with a move strategy
+2006-03-17 patrick  Replaced the Center Point Grab Plug-in with a move strategy
                     used by the Grab Plug-in.
                     -- VERSION -- 0.16.1
 2006-03-16 arnob    Added a new grab plug-in whose intersection and object
                     movement behaviors are defined by strategies that are
                     plugged in at run time.
-2006-03-16 patrickh Made inf::PluginCreator and inf::PluginFactory templated
+2006-03-16 patrick  Made inf::PluginCreator and inf::PluginFactory templated
            aronb    types to allow them to be used for plug-in types beyond
                     those deriving from inf::Plugin.
-2006-03-15 patrickh IOV 0.15 branch created.
+2006-03-15 patrick  IOV 0.15 branch created.
                     -- VERSION -- 0.16.0
-2006-02-07 patrickh Extended ModeSwitchPlugin to allow multiple buttons to be
+2006-02-07 patrick  Extended ModeSwitchPlugin to allow multiple buttons to be
                     used for activating mode swapping.
                     -- VERSION -- 0.15.1
-2006-02-07 patrickh Added inf::DigitalCommand, which was factored from code
+2006-02-07 patrick  Added inf::DigitalCommand, which was factored from code
                     formerly in PointGrabPlugin and WandNavPlugin.
                     -- VERSION -- 0.15.0
-2005-12-23 patrickh Added an overload of inf::Scene::getSceneData<T>() that
+2005-12-23 patrick  Added an overload of inf::Scene::getSceneData<T>() that
                     takes no argument and instead requires the availability of
                     T::type_guid.
                     -- VERSION -- 0.14.1
 2005-12-03 allenb   Extended WandInterface to support analog values.
                     -- VERSION -- 0.14.0
-2005-12-01 patrickh Split the IOV cluster configuration into a separate
+2005-12-01 patrick  Split the IOV cluster configuration into a separate
                     "mix-in" config element type (iov_cluster).
                     -- VERSION -- 0.13.0
-2005-11-09 patrickh Changed the interpretation of the listen_addr property in
+2005-11-09 patrick  Changed the interpretation of the listen_addr property in
                     the configuration so that an empty value is treated as a
                     request to bind to the local machine's standard network
                     interface.
                     -- VERSION -- 0.12.1
-2005-11-05 patrickh Fixed a bug in the cluster master connection setup on
+2005-11-05 patrick  Fixed a bug in the cluster master connection setup on
                     multi-homed hosts.
                     -- VERSION -- 0.12.0
-2005-07-28 patrickh Extended inf::StatusPanel to handle multi-button commands.
+2005-07-28 patrick  Extended inf::StatusPanel to handle multi-button commands.
                     -- VERSION -- 0.10.0
-2005-07-28 patrickh Made the intersection and grab shaders for PointGrabPlugin
+2005-07-28 patrick  Made the intersection and grab shaders for PointGrabPlugin
                     more configurable through an extension to the config
                     element for that plug-in.
                     -- VERSION -- 0.9.1
-2005-07-28 patrickh Handle shader uniform parameters in
+2005-07-28 patrick  Handle shader uniform parameters in
                     inf::GeometryHighlightTraverser::createSHLMaterial().
                     -- VERSION -- 0.9.0
-2005-07-28 patrickh Fixed another clustering bug in
+2005-07-28 patrick  Fixed another clustering bug in
                     inf::GeometryHighlightTraverser.
                     -- VERSION -- 0.8.1
-2005-07-25 patrickh Send the near/far projection settings to the slaves every
+2005-07-25 patrick  Send the near/far projection settings to the slaves every
                     frame when running in a cluster configuration.
                     -- VERSION -- 0.8.0
-2005-07-24 patrickh Fixed serious cluster bugs tied to the class
+2005-07-24 patrick  Fixed serious cluster bugs tied to the class
                     inf::GeometryHighlightTraverser.
                     -- VERSION -- 0.7.3
-2005-07-24 patrickh Added inf::StatusPanel::setStatusHistorySize().
+2005-07-24 patrick  Added inf::StatusPanel::setStatusHistorySize().
                     -- VERSION -- 0.7.2
-2005-07-23 patrickh Added uniform parameters (color, exponent, and scale) to
+2005-07-23 patrick  Added uniform parameters (color, exponent, and scale) to
            terry    to the GLSL shader files data/shaders/highlight.vs and
                     data/shaders/highlight.vs.
-2005-07-23 patrickh Extended the flexibility of the method
+2005-07-23 patrick  Extended the flexibility of the method
                     inf::GeometryHighlightTraverser::createSHLMaterial().  The
                     chunk material by this method no longer has a hard-coded
                     blend chunk.
                     -- VERSION -- 0.7.1
-2005-07-22 patrickh Refactored inf::GeometryHighlightTraverser yet again so
+2005-07-22 patrick  Refactored inf::GeometryHighlightTraverser yet again so
                     that the node's subtree is traversed automatically before
                     every material modification.
                     -- VERSION -- 0.7.0
-2005-07-21 patrickh Extended inf::StatusPanel with functionality needed for
+2005-07-21 patrick  Extended inf::StatusPanel with functionality needed for
                     interactive plug-ins to be able to display their controls.
                     Changed the signature of inf::Plugin::focusChanged() to
                     take a parameter of type inf::ViewerPtr.
@@ -115,20 +115,20 @@ DATE       AUTHOR   CHANGE
 2005-07-21 patrichk Switch to using OpenSG typdef's for instantiations of
                     OSG::CoredNodePtr<T>.
                     -- VERSION -- 0.5.2
-2005-07-21 patrickh Added the helper method for creating scribe materials
+2005-07-21 patrick  Added the helper method for creating scribe materials
                     inf::GeometryHighlightTraverser::createScribeMaterial().
                     -- VERSION -- 0.5.1
-2005-07-20 patrickh Added material management to the class
+2005-07-20 patrick  Added material management to the class
                     inf::GeometryHighlightTraverser.
                     -- VERSION -- 0.5.0
-2005-07-20 patrickh Extended inf::StatusPanel to account for application units.
+2005-07-20 patrick  Extended inf::StatusPanel to account for application units.
                     -- VERSION -- 0.4.2
-2005-07-18 patrickh Added inf::UiBuilder::resetGeomGeo().
+2005-07-18 patrick  Added inf::UiBuilder::resetGeomGeo().
                     -- VERSION -- 0.4.1
-2005-07-15 patrickh Refactored inf::GeometryHighlightTraverser so that uesrs of
+2005-07-15 patrick  Refactored inf::GeometryHighlightTraverser so that uesrs of
                     the class can add and remove multiple materials.
                     -- VERSION -- 0.4.0
-2005-07-15 patrickh Changed the interface of inf::GeometryHighlightTraverser
+2005-07-15 patrick  Changed the interface of inf::GeometryHighlightTraverser
                     so that it performs the sub-tree traversal itself.
                     -- VERSION -- 0.3.1
 2005-06-15 allenb   MERGE: rev:247
