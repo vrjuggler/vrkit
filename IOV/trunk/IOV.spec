@@ -16,12 +16,12 @@ URL: http://www.infiscape.com
 Group: System Environment/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 License: Copyright Infiscape Corporation
-Requires: vrjuggler >= %{vrj_version}
-Requires: OpenSG >= %{opensg_version}
+Requires: vrjuggler = %{vrj_version}
+Requires: OpenSG = %{opensg_version}
 Requires: boost >= %{boost_version}
 Requires: cppdom >= 0.3.3
-BuildRequires: vrjuggler-devel >= %{vrj_version}
-BuildRequires: OpenSG-devel >= %{opensg_version}
+BuildRequires: vrjuggler-devel = %{vrj_version}
+BuildRequires: OpenSG-devel = %{opensg_version}
 BuildRequires: boost-devel >= %{boost_version}
 BuildRequires: cppdom-devel >= 0.3.3
 BuildRequires: gmtl >= 0.4.5
