@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef SCENE_H
-#define SCENE_H
+#ifndef _INF_SCENE_H
+#define _INF_SCENE_H
 
 #include <IOV/Config.h>
 

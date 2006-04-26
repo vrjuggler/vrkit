@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef IOV_UI_BUILDER_H_
-#define IOV_UI_BUILDER_H_
+#ifndef _INF_UI_BUILDER_H_
+#define _INF_UI_BUILDER_H_
 
 #include <IOV/Config.h>
 #include <OpenSG/OSGGeometry.h>

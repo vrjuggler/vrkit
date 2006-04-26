@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef INF_CONFIGURATION_H
-#define INF_CONFIGURATION_H
+#ifndef _INF_CONFIGURATION_H
+#define _INF_CONFIGURATION_H
 
 #include <IOV/Config.h>
 

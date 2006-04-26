@@ -169,9 +169,9 @@ protected:
    OSG::Action::ResultE enter(OSG::NodePtr& node);
 
 protected:
-   OSG::TransformNodePtr        mTransformNode;
-   OSG::DynamicVolume           mEmptyVolume;
-   std::vector<SceneObjectPtr>  mChildren;
+   OSG::TransformNodePtr        mTransformNode; /**< Root transform node of scene object. */
+   OSG::DynamicVolume           mEmptyVolume;   /**< Volume to use when we have an invalid object. */
+   std::vector<SceneObjectPtr>  mChildren;      /**< Children scene objects. */
 };
 
 }

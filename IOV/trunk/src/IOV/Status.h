@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef _IOV_STATUS_H_
-#define _IOV_STATUS_H_
+#ifndef _INF_STATUS_H_
+#define _INF_STATUS_H_
 
 #include <IOV/Config.h>
 

@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef DEVICEINTERFACE_H
-#define DEVICEINTERFACE_H
+#ifndef _INF_DEVICEINTERFACE_H
+#define _INF_DEVICEINTERFACE_H
 
 
 namespace inf

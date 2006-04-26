@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef USER_H
-#define USER_H
+#ifndef _INF_USER_H
+#define _INF_USER_H
 
 #include <IOV/UserPtr.h>
 #include <IOV/InterfaceTrader.h>

@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef WAND_INTERFACE_PTR_H_
-#define WAND_INTERFACE_PTR_H_
+#ifndef _INF_WAND_INTERFACE_PTR_H_
+#define _INF_WAND_INTERFACE_PTR_H_
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>

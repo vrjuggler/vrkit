@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef VIEWER_H
-#define VIEWER_H
+#ifndef _INF_VIEWER_H
+#define _INF_VIEWER_H
 
 #include <IOV/Config.h>
 

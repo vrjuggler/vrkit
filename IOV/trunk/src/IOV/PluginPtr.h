@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef PLUGIN_PTR_H_
-#define PLUGIN_PTR_H_
+#ifndef _INF_PLUGIN_PTR_H_
+#define _INF_PLUGIN_PTR_H_
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>

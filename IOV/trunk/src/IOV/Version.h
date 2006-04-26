@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef _IOV_VERSION_H_
-#define _IOV_VERSION_H_
+#ifndef _INF_VERSION_H_
+#define _INF_VERSION_H_
 
 /**
  * This file contains two useful items.

@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef VIEWPLATFORM_H
-#define VIEWPLATFORM_H
+#ifndef _INF_VIEWPLATFORM_H
+#define _INF_VIEWPLATFORM_H
 
 #include <IOV/ViewerPtr.h>
 

@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#ifndef INFI_WANDINTERFACE_H
-#define INFI_WANDINTERFACE_H
+#ifndef _INF_WANDINTERFACE_H
+#define _INF_WANDINTERFACE_H
 
 #include <IOV/Config.h>
 #include <vector>
