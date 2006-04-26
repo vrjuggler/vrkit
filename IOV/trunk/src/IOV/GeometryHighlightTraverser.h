@@ -25,6 +25,9 @@
 namespace inf
 {
 
+/**
+ * Allows sub-trees to have highlight materials applied to them.
+ */
 class IOV_CLASS_API GeometryHighlightTraverser
 {
 public:
@@ -179,6 +182,9 @@ public:
                                      const float offsetBias,
                                      const OSG::Color3f& diffuseColor);
 
+   /**
+    * Register material with list of materials that are highlighted.
+    */
    unsigned int registerMaterial(OSG::MaterialRefPtr mat);
 
    /** Return the material with the given id. */
@@ -187,21 +193,61 @@ public:
    /** Return the number of materials current registered. */
    unsigned int getNumMaterials() const;
 
+   /**
+    * Returns if the specified material currently has a highlight
+    * material.
+    *
+    * @param mat The material to test.
+    */
    bool hasHighlight(OSG::MaterialRefPtr mat) const;
 
+   /**
+    * Adds the specified highlight material to all nodes under
+    * the given node.
+    * 
+    * @param node The root of the sub-tree that you want to remove
+    *             the material from.
+    * @param id The material id of the highlight that you want to add.
+    * @throw inf::Exception if id is not a valid material id.
+    */
    void addHighlightMaterial(OSG::NodePtr node, const unsigned int id)
       throw(inf::Exception);
 
+   /**
+    * Swap the specified highlight materials for all nodes under
+    * the given node.
+    * 
+    * @param node The root of the sub-tree that you want to remove
+    *             the material from.
+    * @param oldId The material id of the highlight that you want to remove.
+    * @param newId The material id of the highlight that you want to add.
+    * @throw inf::Exception if oldId or newId is not a valid material id.
+    */
    void swapHighlightMaterial(OSG::NodePtr node, const unsigned int oldId,
                               const unsigned int newId)
       throw(inf::Exception);
 
+   /**
+    * Removes the specified highlight material from all nodes under
+    * the given node.
+    * 
+    * @param node The root of the sub-tree that you want to remove
+    *             the material from.
+    * @param id The material id of the highlight that you want to remove.
+    * @throw inf::Exception if id is not a valid material id.
+    */
    void removeHighlightMaterial(OSG::NodePtr node, const unsigned int id)
       throw(inf::Exception);
 
 private:
+   /**
+    * Create default scribing materials with different diffuse colors.
+    */
    void createDefaultMaterials();
 
+   /**
+    * Clear the internal list of MaterialGroups and Geometry cores.
+    */
    void reset();
 
    /**
@@ -215,17 +261,33 @@ private:
     */
    void traverse(OSG::NodePtr node);
 
+   /**
+    * Enter method that is called from the traverser to build
+    * a list of all MaterialGroups and Geometry cores.
+    */
    OSG::Action::ResultE enter(OSG::NodePtr& node);
 
+   /**
+    * The the absolute path to the specified shader file.
+    *
+    * @param filename The basename of the shader file.
+    * @returns The absolute path the shader file.
+    */
    boost::filesystem::path getCompleteShaderFile(const std::string& filename);
 
+   /**
+    * Determines if the specified material id is valid.
+    *
+    * @param id The material id to check.
+    * @throw inf::Exception if material id is invalid.
+    */
    void validateMaterialID(const unsigned int id) throw(inf::Exception);
 
-   std::vector<OSG::MaterialGroupRefPtr> mMatGroupCores;
-   std::vector<OSG::GeometryRefPtr> mGeomCores;
+   std::vector<OSG::MaterialGroupRefPtr> mMatGroupCores;   /*< MaterialGroups to change. */
+   std::vector<OSG::GeometryRefPtr> mGeomCores;            /*< Geometry cores to change. */
 
-   std::vector<boost::filesystem::path> mShaderSearchPath;
-   std::vector<OSG::MaterialRefPtr> mMaterials;
+   std::vector<boost::filesystem::path> mShaderSearchPath; /*< Path used to find named shader. */
+   std::vector<OSG::MaterialRefPtr> mMaterials;            /*< Highlight materials that can be assigned. */
 };
 
 }

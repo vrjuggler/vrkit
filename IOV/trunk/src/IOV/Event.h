@@ -3,10 +3,12 @@
 #ifndef _INF_EVENT_H_
 #define _INF_EVENT_H_
 
-
 namespace inf
 {
 
+/**
+ * Provides event signaling types.
+ */
 class Event
 {
 public:
@@ -19,6 +21,10 @@ public:
       CONTINUE = 1      /**< Indicates that signal processing should continue */
    };
 
+   /**
+    * Combiner that evaluate an InputIterator sequence until it gets a
+    * return value of DONE. This allows a signal to be consumed.
+    */
    struct ResultOperator
    {
       typedef ResultType result_type;

@@ -25,6 +25,9 @@ namespace fs = boost::filesystem;
 namespace
 {
 
+/**
+ * Static visitor that is used to set uniform parameters on SHL chunks.
+ */
 class UniformVisitor : public boost::static_visitor<>
 {
 public:

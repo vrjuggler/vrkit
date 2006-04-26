@@ -21,6 +21,10 @@
 namespace inf
 {
 
+/**
+ * Contains event signals that you can register with to recieve events
+ * when they are activated.
+ */
 class IOV_CLASS_API EventData : public inf::SceneData
 {
 public:
