@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-05-12 patrick  Removed exception specifications from methods.
+                    -- VERSION -- 0.22.0
 2006-04-08 patrick  Those types that are stored using boost::shared_ptr<T> and
                     have an init() method now return their shared pointer from
                     the init() method.
