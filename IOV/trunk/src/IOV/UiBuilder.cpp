@@ -506,7 +506,6 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f& color,
 
 UiBuilder::Font::Font(const std::string& family, OSG::TextFace::Style style,
                       const unsigned int size)
-   throw(inf::Exception)
    : mFamilyName(family)
    , mStyle(style)
    , mFace(NULL)
@@ -516,7 +515,7 @@ UiBuilder::Font::Font(const std::string& family, OSG::TextFace::Style style,
    update();
 }
 
-void UiBuilder::Font::update() throw(inf::Exception)
+void UiBuilder::Font::update()
 {
    OSG::TextTXFFace* new_face = OSG::TextTXFFace::create(mFamilyName, mStyle, mParams);
    if (NULL == new_face)

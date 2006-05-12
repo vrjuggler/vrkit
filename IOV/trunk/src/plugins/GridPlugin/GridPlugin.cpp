@@ -341,7 +341,6 @@ void GridPlugin::focusChanged(inf::ViewerPtr viewer)
 }
 
 void GridPlugin::configure(jccl::ConfigElementPtr elt)
-   throw (inf::Exception)
 {
    vprASSERT(elt->getID() == getElementType());
 

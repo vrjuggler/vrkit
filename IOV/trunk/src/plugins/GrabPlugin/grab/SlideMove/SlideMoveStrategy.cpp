@@ -187,7 +187,6 @@ SlideMoveStrategy::SlideMoveStrategy()
 }
 
 void SlideMoveStrategy::configure(jccl::ConfigElementPtr cfgElt)
-   throw (inf::Exception)
 {
    vprASSERT(cfgElt->getID() == getElementType());
 

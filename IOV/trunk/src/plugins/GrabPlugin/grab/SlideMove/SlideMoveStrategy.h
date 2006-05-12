@@ -62,7 +62,18 @@ private:
       return "slide_move_strategy";
    }
 
-   void configure(jccl::ConfigElementPtr cfgElt) throw (inf::Exception);
+   /**
+    * Configures this move strategy.
+    *
+    * @pre The type of the given config element matches the identifier
+    *      returned by getElementType().
+    *
+    * @param cfgElt The config element to use for configuring this object.
+    *
+    * @throw inf::PluginException is thrown if the version of the given
+    *        config element is too old.
+    */
+   void configure(jccl::ConfigElementPtr cfgElt);
 
    float mTransValue;
    gmtl::Point3f mIntersectPoint;

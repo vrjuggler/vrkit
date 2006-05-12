@@ -234,7 +234,6 @@ createSHLMaterial(const std::string& vertexShaderFile,
                   const std::vector<OSG::StateChunkRefPtr>& chunks,
                   GeometryHighlightTraverser::uniform_map_t& uniformParams,
                   OSG::SHLChunkRefPtr shlChunk)
-   throw(inf::Exception)
 {
    unsigned int id(0);
    fs::path vs_file_path(getCompleteShaderFile(vertexShaderFile));
@@ -384,7 +383,6 @@ bool GeometryHighlightTraverser::hasHighlight(OSG::MaterialRefPtr mat) const
 
 void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
                                                       const unsigned int id)
-   throw(inf::Exception)
 {
    validateMaterialID(id);
 
@@ -408,7 +406,6 @@ void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
 void GeometryHighlightTraverser::swapHighlightMaterial(OSG::NodePtr node,
                                                        const unsigned int oldID,
                                                        const unsigned int newID)
-   throw(inf::Exception)
 {
    validateMaterialID(oldID);
    validateMaterialID(newID);
@@ -459,7 +456,6 @@ void GeometryHighlightTraverser::swapHighlightMaterial(OSG::NodePtr node,
 
 void GeometryHighlightTraverser::removeHighlightMaterial(OSG::NodePtr node,
                                                          const unsigned int id)
-   throw(inf::Exception)
 {
    validateMaterialID(id);
 
@@ -589,7 +585,6 @@ getCompleteShaderFile(const std::string& filename)
 }
 
 void GeometryHighlightTraverser::validateMaterialID(const unsigned int id)
-   throw(inf::Exception)
 {
    if ( id >= mMaterials.size() )
    {

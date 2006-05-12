@@ -124,12 +124,19 @@ public:
    class IOV_CLASS_API Font
    {
    public:
+      /**
+       * @throw inf::Exception is thrown if the font face allocation fails.
+       *
+       * @see update()
+       */
       Font(const std::string& family,
            OSG::TextFace::Style style = OSG::TextFace::STYLE_PLAIN,
-           const unsigned int size = 48)
-         throw(inf::Exception);
+           const unsigned int size = 48);
 
-      void update() throw(inf::Exception);
+      /**
+       * @throw inf::Exception is thrown if the font face allocation fails.
+       */
+      void update();
 
    public:
       std::string          mFamilyName;

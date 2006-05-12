@@ -78,8 +78,7 @@ public:
     *           Thrown if the given plug-in name does not match any of the
     *           plug-ins discovered when this object was initialized.
     */
-   vpr::LibraryPtr getPluginLibrary(const std::string& name) const
-      throw (inf::NoSuchPluginException);
+   vpr::LibraryPtr getPluginLibrary(const std::string& name) const;
 
    /**
     * Returns the inf::PluginCreator<T>* instance retrieved from the plug-in
@@ -103,8 +102,6 @@ public:
     */
    template<typename T>
    inf::PluginCreator<T>* getPluginCreator(const std::string& name)
-      throw (inf::NoSuchPluginException, inf::PluginLoadException,
-             inf::PluginInterfaceException)
    {
       typename plugin_creator_map_t::iterator i = mPluginCreators.find(name);
 
@@ -145,10 +142,33 @@ protected:
    }
 
 private:
+   /**
+    * Registers the creator query function for the named plug-in. First, the
+    * dynamic link library identified by \p name is looked up. If the library
+    * has not been loaded, it is loaded now.
+    *
+    * @param name               The platform-agnostic name of the plug-in that
+    *                           will be used as the key for registering the
+    *                           inf::PluginCreatorBase instance.
+    * @param getCreatorFuncName The name of the function used to retrieve the
+    *                           plug-in creator from the dynamic link library.
+    * @param validator          The validator for the plug-in.
+    *
+    * @throw NoSuchPluginException
+    *           Thrown if the given plug-in name does not match any of the
+    *           plug-ins discovered when this object was initialized.
+    * @throw PluginLoadException
+    *           Thrown if the named plug-in fails to load.
+    *
+    * @note This function is primarily a wrapper around
+    *       registerCreatorFromLib() that allows by-name library lookups.
+    *
+    * @see getPluginLibrary()
+    * @see registerCreatorFromLib()
+    */
    void registerCreatorFromName(const std::string& name,
                                 const std::string& getCreatorFuncName,
-                                boost::function<bool (vpr::LibraryPtr)> validator)
-      throw (inf::PluginLoadException);
+                                boost::function<bool (vpr::LibraryPtr)> validator);
 
    /**
     * Registers an instance of inf::PluginCreatorBase retrieved from the given
@@ -160,11 +180,15 @@ private:
     *       mPluginCreators associating \c name with an instance of
     *       inf::PluginCreatorBase.
     *
-    * @param pluginLib  The plug-in library that will be examined to get the
-    *                   inf::PluginCreator<inf::Plugin> instance to reigster.
-    * @param name       The platform-agnostic name of the plug-in that will
-    *                   be used as the key for registering the
-    *                   inf::PluginCreatorBase instance.
+    * @param pluginLib          The plug-in library that will be examined to
+    *                           get the inf::PluginCreator<inf::Plugin>
+    *                           instance to reigster.
+    * @param name               The platform-agnostic name of the plug-in that
+    *                           will be used as the key for registering the
+    *                           inf::PluginCreatorBase instance.
+    * @param getCreatorFuncName The name of the function used to retrieve the
+    *                           plug-in creator from the dynamic link library.
+    * @param validator          The validator for the plug-in.
     *
     * @throw inf::PluginInterfaceException
     *           Thrown if the given plug-in library does not contain an
@@ -174,8 +198,7 @@ private:
    void registerCreatorFromLib(vpr::LibraryPtr pluginLib,
                                const std::string& name,
                                const std::string& getCreatorFuncName,
-                               boost::function<bool (vpr::LibraryPtr)> validator)
-      throw (inf::PluginInterfaceException);
+                               boost::function<bool (vpr::LibraryPtr)> validator);
 
    typedef std::map<std::string, vpr::LibraryPtr> plugin_libs_map_t;
    typedef std::map<std::string, inf::PluginCreatorBase*> plugin_creator_map_t;

@@ -333,7 +333,6 @@ findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
 }
 
 void RayIntersectionStrategy::configure(jccl::ConfigElementPtr cfgElt)
-   throw (inf::Exception)
 {
    vprASSERT(cfgElt->getID() == getElementType());
 

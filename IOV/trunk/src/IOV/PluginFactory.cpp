@@ -103,7 +103,6 @@ void PluginFactory::addScanPath(const std::vector<std::string>& scanPath)
 }
 
 vpr::LibraryPtr PluginFactory::getPluginLibrary(const std::string& name) const
-   throw(inf::NoSuchPluginException)
 {
    std::map<std::string, vpr::LibraryPtr>::const_iterator lib =
       mPluginLibs.find(name);
@@ -140,7 +139,6 @@ void PluginFactory::
 registerCreatorFromName(const std::string& name,
                         const std::string& getCreatorFuncName,
                         boost::function<bool (vpr::LibraryPtr)> validator)
-   throw (inf::PluginLoadException)
 {
    // Get the vpr::LibraryPtr for the named plug-in.  This will throw an
    // exception if name is not a valid plug-in name.
@@ -188,7 +186,6 @@ void PluginFactory::
 registerCreatorFromLib(vpr::LibraryPtr pluginLib, const std::string& name,
                        const std::string& getCreatorFuncName,
                        boost::function<bool (vpr::LibraryPtr)> validator)
-   throw (inf::PluginInterfaceException)
 {
    vprASSERT(pluginLib->isLoaded() && "Plug-in library is not loaded");
 

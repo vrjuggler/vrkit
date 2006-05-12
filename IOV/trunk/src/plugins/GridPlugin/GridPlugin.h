@@ -113,7 +113,7 @@ private:
     * @throw inf::Exception is thrown if the given config element contains
     *        bad data, is out of date, or is otherwise unusable.
     */
-   void configure(jccl::ConfigElementPtr elt) throw (inf::Exception);
+   void configure(jccl::ConfigElementPtr elt);
 
    /**
     * Transforms the given vector of zero-based button IDs to one-based IDs.

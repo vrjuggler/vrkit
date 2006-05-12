@@ -66,7 +66,18 @@ private:
       return "ray_intersection_strategy";
    }
 
-   void configure(jccl::ConfigElementPtr cfgElt) throw (inf::Exception);
+   /**
+    * Configures this intersection strategy.
+    *
+    * @pre The type of the given config element matches the identifier
+    *      returned by getElementType().
+    *
+    * @param cfgElt The config element to use for configuring this object.
+    *
+    * @throw inf::PluginException is thrown if the version of the given
+    *        config element is too old.
+    */
+   void configure(jccl::ConfigElementPtr cfgElt);
 
    OSG::Line            mSelectionRay;    /**< The ray used for selection. */
 

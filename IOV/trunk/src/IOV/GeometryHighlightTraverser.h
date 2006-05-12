@@ -92,6 +92,9 @@ public:
     * @return The unique identifier (with respect to this instance) for the
     *         newly created material.
     *
+    * @throw inf::Exception is thrown if either the vertex or the fragment
+    *        shader files cannot be read for whatever reason.
+    *
     * @see extendShaderSearchPath
     *
     * @since 0.9.0
@@ -99,7 +102,6 @@ public:
    unsigned int createSHLMaterial(const std::string& vertexShaderFile,
                                   const std::string& fragmentShaderFile,
                                   const std::vector<OSG::StateChunkRefPtr>& chunks = std::vector<OSG::StateChunkRefPtr>())
-      throw (inf::Exception)
    {
       uniform_map_t uniform_params;
       return createSHLMaterial(vertexShaderFile, fragmentShaderFile, chunks,
@@ -146,6 +148,9 @@ public:
     * @return The unique identifier (with respect to this instance) for the
     *         newly created material.
     *
+    * @throw inf::Exception is thrown if either the vertex or the fragment
+    *        shader files cannot be read for whatever reason.
+    *
     * @see extendShaderSearchPath
     *
     * @since 0.9.0
@@ -154,8 +159,7 @@ public:
                                   const std::string& fragmentShaderFile,
                                   const std::vector<OSG::StateChunkRefPtr>& chunks,
                                   uniform_map_t& uniformParams,
-                                  OSG::SHLChunkRefPtr shlChunk = OSG::SHLChunkRefPtr())
-      throw (inf::Exception);
+                                  OSG::SHLChunkRefPtr shlChunk = OSG::SHLChunkRefPtr());
 
    /**
     * Creates and registers a very simple scribing material.
@@ -208,10 +212,10 @@ public:
     * @param node The root of the sub-tree that you want to remove
     *             the material from.
     * @param id The material id of the highlight that you want to add.
-    * @throw inf::Exception if id is not a valid material id.
+    *
+    * @throw inf::Exception is thrown if \p id is not a valid material ID.
     */
-   void addHighlightMaterial(OSG::NodePtr node, const unsigned int id)
-      throw(inf::Exception);
+   void addHighlightMaterial(OSG::NodePtr node, const unsigned int id);
 
    /**
     * Swap the specified highlight materials for all nodes under
@@ -221,11 +225,12 @@ public:
     *             the material from.
     * @param oldId The material id of the highlight that you want to remove.
     * @param newId The material id of the highlight that you want to add.
-    * @throw inf::Exception if oldId or newId is not a valid material id.
+    *
+    * @throw inf::Exception is thrown if \p oldId or \p newId is not a valid
+    *        material ID.
     */
    void swapHighlightMaterial(OSG::NodePtr node, const unsigned int oldId,
-                              const unsigned int newId)
-      throw(inf::Exception);
+                              const unsigned int newId);
 
    /**
     * Removes the specified highlight material from all nodes under
@@ -234,10 +239,10 @@ public:
     * @param node The root of the sub-tree that you want to remove
     *             the material from.
     * @param id The material id of the highlight that you want to remove.
-    * @throw inf::Exception if id is not a valid material id.
+    *
+    * @throw inf::Exception is thrown if \p id is not a valid material ID.
     */
-   void removeHighlightMaterial(OSG::NodePtr node, const unsigned int id)
-      throw(inf::Exception);
+   void removeHighlightMaterial(OSG::NodePtr node, const unsigned int id);
 
 private:
    /**
@@ -276,18 +281,19 @@ private:
    boost::filesystem::path getCompleteShaderFile(const std::string& filename);
 
    /**
-    * Determines if the specified material id is valid.
+    * Determines if the specified material ID is valid.
     *
-    * @param id The material id to check.
-    * @throw inf::Exception if material id is invalid.
+    * @param id The material ID to check.
+    *
+    * @throw inf::Exception is thrown if \p id is an invalid material ID.
     */
-   void validateMaterialID(const unsigned int id) throw(inf::Exception);
+   void validateMaterialID(const unsigned int id);
 
-   std::vector<OSG::MaterialGroupRefPtr> mMatGroupCores;   /*< MaterialGroups to change. */
-   std::vector<OSG::GeometryRefPtr> mGeomCores;            /*< Geometry cores to change. */
+   std::vector<OSG::MaterialGroupRefPtr> mMatGroupCores;   /**< MaterialGroups to change. */
+   std::vector<OSG::GeometryRefPtr> mGeomCores;            /**< Geometry cores to change. */
 
-   std::vector<boost::filesystem::path> mShaderSearchPath; /*< Path used to find named shader. */
-   std::vector<OSG::MaterialRefPtr> mMaterials;            /*< Highlight materials that can be assigned. */
+   std::vector<boost::filesystem::path> mShaderSearchPath; /**< Path used to find named shader. */
+   std::vector<OSG::MaterialRefPtr> mMaterials;            /**< Highlight materials that can be assigned. */
 };
 
 }

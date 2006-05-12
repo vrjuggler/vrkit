@@ -367,7 +367,6 @@ void WidgetPlugin::focusChanged(inf::ViewerPtr viewer)
 }
 
 void WidgetPlugin::configure(jccl::ConfigElementPtr elt)
-   throw (inf::Exception)
 {
    vprASSERT(elt->getID() == getElementType());
 
