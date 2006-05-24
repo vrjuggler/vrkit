@@ -182,6 +182,7 @@
             <enum label="GrabPlugin" value="GrabPlugin"/>
             <enum label="GridPlugin" value="GridPlugin"/>
             <enum label="LogoPlugin" value="LogoPlugin"/>
+            <enum label="ModeHarnessPlugin" value="ModeHarnessPlugin"/>
             <enum label="ModeSwitchPlugin" value="ModeSwitchPlugin"/>
             <enum label="PickPlugin" value="PickPlugin"/>
             <enum label="SimpleNavPlugin" value="SimpleNavPlugin"/>
