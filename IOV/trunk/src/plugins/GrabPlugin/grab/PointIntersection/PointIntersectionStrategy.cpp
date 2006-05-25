@@ -1,8 +1,8 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
-#include "PointIntersectionStrategy.h"
 #include <gmtl/Matrix.h>
 #include <gmtl/External/OpenSGConvert.h>
+
 #include <IOV/InterfaceTrader.h>
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
@@ -11,8 +11,12 @@
 #include <IOV/WandInterface.h>
 #include <IOV/SceneObject.h>
 
+#include "PointIntersectionStrategy.h"
+
+
 static inf::PluginCreator<inf::IntersectionStrategy> sPluginCreator(
-   &inf::PointIntersectionStrategy::create, "Point Intersection Strategy Plug-in"
+   &inf::PointIntersectionStrategy::create,
+   "Point Intersection Strategy Plug-in"
 );
 
 extern "C"
@@ -43,12 +47,14 @@ inf::IntersectionStrategyPtr PointIntersectionStrategy::init(ViewerPtr)
    return shared_from_this();
 }
 
-SceneObjectPtr PointIntersectionStrategy::findIntersection(ViewerPtr viewer,
-   const std::vector<SceneObjectPtr>& objs, gmtl::Point3f& intersectPoint)
+SceneObjectPtr PointIntersectionStrategy::
+findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
+                 gmtl::Point3f& intersectPoint)
 {
    intersectPoint.set(0.0f, 0.0f, 0.0f);
 
-   WandInterfacePtr wand = viewer->getUser()->getInterfaceTrader().getWandInterface();
+   WandInterfacePtr wand =
+      viewer->getUser()->getInterfaceTrader().getWandInterface();
    const gmtl::Matrix44f vp_M_wand_xform(
       wand->getWandPos()->getData(viewer->getDrawScaleFactor())
    );
@@ -73,11 +79,12 @@ SceneObjectPtr PointIntersectionStrategy::findIntersection(ViewerPtr viewer,
       gmtl::set(obj_M_vp, world_xform);
       gmtl::invert(obj_M_vp);
 
-      // Get the wand transformation in virtual world coordinates,
-      // including any transformations in the scene graph below the
-      // transformation root.
+      // Get the wand transformation in virtual world coordinates, including
+      // any transformations in the scene graph below the transformation root.
       const gmtl::Matrix44f obj_M_wand_xform = obj_M_vp * vp_M_wand_xform;
-      const gmtl::Vec3f wand_pos_vw(gmtl::makeTrans<gmtl::Vec3f>(obj_M_wand_xform));
+      const gmtl::Vec3f wand_pos_vw(
+         gmtl::makeTrans<gmtl::Vec3f>(obj_M_wand_xform)
+      );
       const OSG::Pnt3f wand_point(wand_pos_vw[0], wand_pos_vw[1],
                                   wand_pos_vw[2]);
 
@@ -90,6 +97,7 @@ SceneObjectPtr PointIntersectionStrategy::findIntersection(ViewerPtr viewer,
          break;
       }
    }
+
    return intersect_obj;
 }
 
