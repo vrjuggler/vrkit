@@ -187,15 +187,10 @@ void GrabPlugin::updateState(ViewerPtr viewer)
 
       gmtl::set(mGrabbed_pobj_M_obj, mGrabbedObj->getPos());
    
-      if ( ! mMoveStrategies.empty() )
-      {
-         for (std::vector<MoveStrategyPtr>::iterator itr = mMoveStrategies.begin();
-              itr != mMoveStrategies.end(); ++itr)
-         {
-            (*itr)->objectGrabbed(viewer, mGrabbedObj, mIntersectPoint,
-                                  vp_M_wand_xform);
-         }
-      }
+      std::for_each(mMoveStrategies.begin(), mMoveStrategies.end(),
+                    boost::bind(&inf::MoveStrategy::objectGrabbed, _1,
+                                viewer, mGrabbedObj, mIntersectPoint,
+                                vp_M_wand_xform));
 
       // Send a select event.
       mEventData->mObjectSelectedSignal(mGrabbedObj);
@@ -212,14 +207,10 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       {
          gmtl::identity(mGrabbed_pobj_M_obj);
 
-         if ( !mMoveStrategies.empty() )
-         {
-            for (std::vector<MoveStrategyPtr>::iterator itr = mMoveStrategies.begin();
-                 itr != mMoveStrategies.end(); ++itr)
-            {
-               (*itr)->objectReleased(viewer, mGrabbedObj);
-            }
-         }
+         std::for_each(mMoveStrategies.begin(), mMoveStrategies.end(),
+                       boost::bind(&inf::MoveStrategy::objectReleased, _1,
+                                   viewer, mGrabbedObj));
+
          // Send a select event.
          mEventData->mObjectDeselectedSignal(mGrabbedObj);
       }
