@@ -18,9 +18,20 @@ GrabData::GrabData()
    /* Do nothing. */ ;
 }
 
+boost::signals::connection GrabData::connectToAdd(signal_t::slot_type slot)
+{
+   return mAddSignal.connect(slot);
+}
+
+boost::signals::connection GrabData::connectToRemove(signal_t::slot_type slot)
+{
+   return mRemoveSignal.connect(slot);
+}
+
 void GrabData::addObject(SceneObjectPtr obj)
 {
    mObjects.push_back(obj);
+   mAddSignal(obj);
 }
 
 void GrabData::removeObject(SceneObjectPtr obj)
@@ -31,6 +42,7 @@ void GrabData::removeObject(SceneObjectPtr obj)
    if (mObjects.end() != found)
    {
       mObjects.erase(found);
+      mRemoveSignal(obj);
    }
 }
 

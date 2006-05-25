@@ -42,6 +42,7 @@ public:
    {
       mIsectConnection.disconnect();
       mDeIsectConnection.disconnect();
+      mGrabDataConnection.disconnect();
    }
 
    virtual std::string getDescription()
@@ -113,6 +114,27 @@ private:
     */
    inf::Event::ResultType objectDeintersected(inf::SceneObjectPtr obj);
 
+   /**
+    * @post \c mGrabbing is false, and \c mGrabbedObj holds a NULL pointer.
+    *
+    * @param viewer The VR Juggler application object within which this
+    *               plug-in is active.
+    */
+   void releaseGrabbedObject(inf::ViewerPtr viewer);
+
+   /**
+    * Responds to the signal emitted when an object is removed from
+    * inf::GrabData. If \p obj is the object that is currently grabbed, then
+    * the grabbed object is released.
+    *
+    * @param obj    The scene object that was removed from inf::GrabData.
+    * @param viewer The VR Juggler application object within which this
+    *               plug-in is active.
+    *
+    * @see releaseGrabbedObject()
+    */
+   void grabbableObjectRemoved(inf::SceneObjectPtr obj, inf::ViewerPtr viewer);
+
    WandInterfacePtr mWandInterface;
 
    /** Button for grabbing and releasing objects. */
@@ -135,6 +157,7 @@ private:
    bool mGrabbing;
    snx::SoundHandle mGrabSound;
    GrabDataPtr  mGrabData;
+   boost::signals::connection mGrabDataConnection;
    //@}
 
    std::vector<std::string> mStrategyPluginPath;

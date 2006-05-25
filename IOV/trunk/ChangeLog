@@ -1,7 +1,11 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-05-25 patrick  inf::GrabData now emits signals when objects are added and
+                    removed.
+                    -- VERSION -- 0.23.1
 2006-05-24 patrick  Added the Mode Harness Plug-in and associated types
                     inf::ModeComponent and inf::SignalRepository.
+                    -- VERSION -- 0.23.0
 2006-05-12 patrick  Removed exception specifications from methods.
                     -- VERSION -- 0.22.0
 2006-04-08 patrick  Those types that are stored using boost::shared_ptr<T> and
