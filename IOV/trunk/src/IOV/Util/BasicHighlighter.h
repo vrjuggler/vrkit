@@ -65,6 +65,9 @@ public:
     */
    BasicHighlighterPtr init(inf::ViewerPtr viewer);
 
+protected:
+   /** @name inf::EventData Slots */
+   //@{
    /**
     * Responds to object intersection signals. If \p obj is newly intersected,
     * then our intersection highlight is applied to it.
@@ -108,8 +111,8 @@ public:
 
    inf::Event::ResultType objectPicked(inf::SceneObjectPtr obj,
                                        const bool picked);
+   //@}
 
-protected:
    BasicHighlighter();
 
 private:
