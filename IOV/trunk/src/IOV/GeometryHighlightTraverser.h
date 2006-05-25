@@ -95,7 +95,7 @@ public:
     * @throw inf::Exception is thrown if either the vertex or the fragment
     *        shader files cannot be read for whatever reason.
     *
-    * @see extendShaderSearchPath
+    * @see extendShaderSearchPath()
     *
     * @since 0.9.0
     */
@@ -151,7 +151,7 @@ public:
     * @throw inf::Exception is thrown if either the vertex or the fragment
     *        shader files cannot be read for whatever reason.
     *
-    * @see extendShaderSearchPath
+    * @see extendShaderSearchPath()
     *
     * @since 0.9.0
     */
@@ -187,44 +187,58 @@ public:
                                      const OSG::Color3f& diffuseColor);
 
    /**
-    * Register material with list of materials that are highlighted.
+    * Adds the given material to the collection of materials available for
+    * highlighting.
+    *
+    * @return The unique ID for the added material.
     */
    unsigned int registerMaterial(OSG::MaterialRefPtr mat);
 
-   /** Return the material with the given id. */
+   /**
+    * Returns the material with the given identifier.
+    *
+    * @param id The unique ID for the highlight material to be returned.
+    */
    OSG::MaterialRefPtr getHighlight(const unsigned int id);
 
-   /** Return the number of materials current registered. */
+   /**
+    * Returns the number of materials currently registered.
+    */
    unsigned int getNumMaterials() const;
 
    /**
-    * Returns if the specified material currently has a highlight
-    * material.
+    * Determines whether the given material is registered with this traverser.
     *
-    * @param mat The material to test.
+    * @param mat The material to look up in this traverser's collection of
+    *            highlight materials.
+    *
+    * @return \c true is returned if \p mat is a known highlight material;
+    *         otherwise, \c false is returned.
     */
    bool hasHighlight(OSG::MaterialRefPtr mat) const;
 
    /**
-    * Adds the specified highlight material to all nodes under
-    * the given node.
+    * Adds the specified highlight material to the sub-tree rooted at the
+    * given node.
     * 
-    * @param node The root of the sub-tree that you want to remove
-    *             the material from.
-    * @param id The material id of the highlight that you want to add.
+    * @param node The root of the sub-tree to which the identified material
+    *             will be added.
+    * @param id   The ID of the highlight material to be added to the
+    *             sub-tree rooted at \p node.
     *
     * @throw inf::Exception is thrown if \p id is not a valid material ID.
     */
    void addHighlightMaterial(OSG::NodePtr node, const unsigned int id);
 
    /**
-    * Swap the specified highlight materials for all nodes under
-    * the given node.
+    * Swaps one highlight material (the "old" highlight) for another (the
+    * "new" highlight) for the sub-tree rooted at \p node.
     * 
-    * @param node The root of the sub-tree that you want to remove
-    *             the material from.
-    * @param oldId The material id of the highlight that you want to remove.
-    * @param newId The material id of the highlight that you want to add.
+    * @param node  The root of the sub-tree whose highlight material will be
+    *              replaced.
+    * @param oldId The identifier for the highlight material to be removed.
+    * @param newId The identifier for the highlight material that will replace
+    *              the highlight identified by \p oldId.
     *
     * @throw inf::Exception is thrown if \p oldId or \p newId is not a valid
     *        material ID.
@@ -233,12 +247,13 @@ public:
                               const unsigned int newId);
 
    /**
-    * Removes the specified highlight material from all nodes under
-    * the given node.
+    * Removes the specified highlight material from the sub-tree rooted at the
+    * given node.
     * 
-    * @param node The root of the sub-tree that you want to remove
-    *             the material from.
-    * @param id The material id of the highlight that you want to remove.
+    * @param node The root of the sub-tree from which the identified material
+    *             will be removed.
+    * @param id   The ID of the highlight material to be removed from the
+    *             sub-tree rooted at \p node.
     *
     * @throw inf::Exception is thrown if \p id is not a valid material ID.
     */
@@ -246,19 +261,18 @@ public:
 
 private:
    /**
-    * Create default scribing materials with different diffuse colors.
+    * Creates default scribing materials with different diffuse colors.
     */
    void createDefaultMaterials();
 
    /**
-    * Clear the internal list of MaterialGroups and Geometry cores.
+    * Clears the internal list of OSG::MaterialGroup and OSG::Geometry cores.
     */
    void reset();
 
    /**
-    * Performs a new traversal rooted at the given node and stores
-    * the necessary information for later use with material
-    * applications.
+    * Performs a new traversal rooted at the given node and stores the
+    * necessary information for later use with material applications.
     *
     * @see addHighlightMaterial()
     * @see changeHighlightMaterial()
@@ -267,15 +281,18 @@ private:
    void traverse(OSG::NodePtr node);
 
    /**
-    * Enter method that is called from the traverser to build
-    * a list of all MaterialGroups and Geometry cores.
+    * Traversal enter method. This is invoked from the OpenSG traverser to
+    * build a list of all OSG::MaterialGroup and OSG::Geometry cores.
+    *
+    * @param node The current node being visited by the traverser.
     */
    OSG::Action::ResultE enter(OSG::NodePtr& node);
 
    /**
-    * The the absolute path to the specified shader file.
+    * Returns the absolute path to the specified shader file.
     *
     * @param filename The basename of the shader file.
+    *
     * @returns The absolute path the shader file.
     */
    boost::filesystem::path getCompleteShaderFile(const std::string& filename);
