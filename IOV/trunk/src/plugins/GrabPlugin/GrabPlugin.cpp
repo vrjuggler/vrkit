@@ -405,10 +405,8 @@ void GrabPlugin::releaseGrabbedObject(inf::ViewerPtr viewer)
 void GrabPlugin::grabbableObjectRemoved(inf::SceneObjectPtr obj,
                                         inf::ViewerPtr viewer)
 {
-   std::cout << "GrabPlugin::grabbableObjectRemoved()" << std::endl;
    if ( mGrabbing && mGrabbedObj == obj )
    {
-      std::cout << "Releasing grabbed object that was removed" << std::endl;
       releaseGrabbedObject(viewer);
    }
 }
