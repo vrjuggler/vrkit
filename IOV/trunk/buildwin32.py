@@ -188,9 +188,9 @@ def writeCacheFile(optionDict):
       cache_file.write(output)
    cache_file.close()
 
-def doInstall(prefix, platform):
+def doInstall(prefix, platform, vcDir):
    makeTree(prefix)
-   installIOV(prefix, platform)
+   installIOV(prefix, platform, vcDir)
 
 def mkinstalldirs(dir):
    if dir != '' and not os.path.exists(dir):
@@ -261,15 +261,15 @@ def installLibs(srcRoot, destdir,
          if os.path.exists(srcdir):
             installDir(srcdir, destdir, extensions)
 
-def installIOV(prefix, platform):
-   installProgs(prefix, platform)
+def installIOV(prefix, platform, vcDir):
+   installProgs(prefix, platform, vcDir)
 
    destdir = os.path.join(prefix, 'include', 'IOV')
    srcdir  = os.path.join(gProjectDir, 'src', 'IOV')
    installDir(srcdir, destdir, ['.h'])
 
    destdir = os.path.join(prefix, 'lib')
-   srcroot = os.path.join(gProjectDir, 'vc71', 'IOV')
+   srcroot = os.path.join(gProjectDir, vcDir, 'IOV')
    installLibs(srcroot, destdir, buildPlatforms = [platform])
 
    share_root = os.path.join(prefix, 'share', 'IOV')
@@ -282,13 +282,13 @@ def installIOV(prefix, platform):
    installDir(srcdir, destdir, ['.jdef'])
    jdef_destdir = destdir
 
-   installPlugins(prefix, platform, share_root, jdef_destdir)
+   installPlugins(prefix, platform, share_root, jdef_destdir, vcDir)
 
-def installProgs(prefix, platform):
-   installViewer(prefix, platform)
-   installSlaveViewer(prefix, platform)
+def installProgs(prefix, platform, vcDir):
+   installViewer(prefix, platform, vcDir)
+   installSlaveViewer(prefix, platform, vcDir)
 
-def installViewer(prefix, platform):
+def installViewer(prefix, platform, vcDir):
    destdir = os.path.join(prefix, 'share', 'IOV', 'apps', 'Viewer')
    mkinstalldirs(destdir)
 
@@ -298,27 +298,27 @@ def installViewer(prefix, platform):
    for f in glob.glob(os.path.join(srcdir, '*.jdef')):
       shutil.copy2(f, destdir)
 
-   srcdirs = glob.glob(os.path.join(gProjectDir, 'vc71', 'infi_app',
+   srcdirs = glob.glob(os.path.join(gProjectDir, vcDir, 'infi_app',
                                     platform, '*'))
 
    for d in srcdirs:
       for f in glob.glob(os.path.join(d, '*.exe')):
          shutil.copy2(f, destdir)
 
-def installSlaveViewer(prefix, platform):
+def installSlaveViewer(prefix, platform, vcDir):
    destdir = os.path.join(prefix, 'share', 'IOV', 'apps', 'slaveViewer')
    mkinstalldirs(destdir)
 
-   srcdirs = glob.glob(os.path.join(gProjectDir, 'vc71', 'SlaveViewer',
+   srcdirs = glob.glob(os.path.join(gProjectDir, vcDir, 'SlaveViewer',
                                     platform, '*'))
 
    for d in srcdirs:
       for f in glob.glob(os.path.join(d, '*.exe')):
          shutil.copy2(f, destdir)
 
-def installPlugins(prefix, platform, shareRoot, jdefDir):
+def installPlugins(prefix, platform, shareRoot, jdefDir, vcDir):
    destdir = os.path.join(prefix, 'lib', 'IOV', 'plugins')
-   plugin_build_dir = os.path.join(gProjectDir, 'vc71', platform, 'plugins')
+   plugin_build_dir = os.path.join(gProjectDir, vcDir, platform, 'plugins')
    installDir(plugin_build_dir, destdir, ['.dll'])
 
    plugin_src_glob = os.path.join(gProjectDir, 'src', 'plugins', '*Plugin')
@@ -361,10 +361,12 @@ def main():
    try:
       status = 0
 
+      vc_dir = 'vc71'
+
       if not skip_vs:
          devenv_cmd    = getVSCmd()
-         solution_file = r'"%s"' % os.path.join(gProjectDir, 'vc71',
-                                              'Viewer.sln')
+         solution_file = r'"%s"' % os.path.join(gProjectDir, vc_dir,
+                                                'Viewer.sln')
          status = os.spawnl(os.P_WAIT, devenv_cmd, 'devenv', solution_file)
 
       if status == 0:
@@ -372,7 +374,7 @@ def main():
          proceed = sys.stdin.readline().strip(" \n")
 
          if proceed == '' or proceed.lower().startswith('y'):
-            doInstall(options['prefix'], 'Win32')
+            doInstall(options['prefix'], 'Win32', vc_dir)
    except OSError, osEx:
       print "Could not execute %s: %s" % (devenv_cmd, osEx)
       sys.exit(EXIT_STATUS_MSVS_START_ERROR)
