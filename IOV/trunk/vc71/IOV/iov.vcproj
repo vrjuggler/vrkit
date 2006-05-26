@@ -36,7 +36,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vrj_d.lib vrj_ogl_d.lib gadget_d.lib jccl_d.lib vpr_d.lib boost_signals-vc71-mt-gd-1_33_1.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
+				AdditionalDependencies="vrj_d.lib vrj_ogl_d.lib gadget_d.lib jccl_d.lib vpr_d.lib boost_signals-vc71-mt-gd-1_33_1.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/iov_d.dll"
 				Version=""
 				LinkIncremental="2"
@@ -95,7 +95,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vrj.lib vrj_ogl.lib gadget.lib jccl.lib vpr.lib boost_signals-vc71-mt-1_33_1.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib glut32.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
+				AdditionalDependencies="vrj.lib vrj_ogl.lib gadget.lib jccl.lib vpr.lib boost_signals-vc71-mt-1_33_1.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/iov.dll"
 				Version=""
 				LinkIncremental="1"
@@ -169,6 +169,9 @@
 				RelativePath="..\..\src\Iov\Widget\MaterialChooser.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\ModeComponent.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Grab\MoveStrategy.cpp">
 			</File>
 			<File
@@ -194,6 +197,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Widget\ScrollBar.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\SignalRepository.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Slave\SlaveViewer.cpp">
@@ -311,6 +317,15 @@
 				RelativePath="..\..\src\Iov\Widget\MaterialChooserPtr.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\ModeComponent.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\ModeComponent\ModeComponentConfig.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\ModeComponentPtr.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Grab\MoveStrategy.h">
 			</File>
 			<File
@@ -375,6 +390,12 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Widget\ScrollBarPtr.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\SignalRepository.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\SignalRepositoryPtr.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Slave\SlaveViewer.h">
