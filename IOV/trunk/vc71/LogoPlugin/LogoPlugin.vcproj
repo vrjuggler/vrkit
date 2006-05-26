@@ -36,7 +36,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iov_d.lib vrj_d.lib vrj_ogl_d.lib gadget_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
+				AdditionalDependencies="iov_d.lib vrj_d.lib vrj_ogl_d.lib gadget_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib opengl32.lib glu32.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/LogoPlugin_d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
@@ -94,7 +94,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iov.lib vrj.lib vrj_ogl.lib gadget.lib jccl.lib vpr.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib opengl32.lib glu32.lib tif32.lib libjpeg.lib libpng.lib $(NOINHERIT)"
+				AdditionalDependencies="iov.lib vrj.lib vrj_ogl.lib gadget.lib jccl.lib vpr.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib opengl32.lib glu32.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/LogoPlugin.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;"
