@@ -99,6 +99,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Object Space Move Strategy 
 		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mode Harness Plug-in", "ModeHarnessPlugin\ModeHarnessPlugin.vcproj", "{972511E2-29B8-4121-88A4-7DB6FC7B56C9}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		DebugDLL = DebugDLL
@@ -181,6 +185,10 @@ Global
 		{F5F088C5-8ED8-4880-AB0F-AFC737DB50AB}.DebugDLL.Build.0 = DebugDLL|Win32
 		{F5F088C5-8ED8-4880-AB0F-AFC737DB50AB}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
 		{F5F088C5-8ED8-4880-AB0F-AFC737DB50AB}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
+		{972511E2-29B8-4121-88A4-7DB6FC7B56C9}.DebugDLL.ActiveCfg = DebugDLL|Win32
+		{972511E2-29B8-4121-88A4-7DB6FC7B56C9}.DebugDLL.Build.0 = DebugDLL|Win32
+		{972511E2-29B8-4121-88A4-7DB6FC7B56C9}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
+		{972511E2-29B8-4121-88A4-7DB6FC7B56C9}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
