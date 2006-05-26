@@ -21,7 +21,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\src;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;WINVER=0x0400;_WIN32_WINDOWS=0x0410;_WIN32_WINNT=0x0400;_OSG_HAVE_CONFIGURED_H_;OSG_BUILD_DLL;_DEBUG;OSG_DEBUG;OSG_WITH_GLUT;OSG_WITH_GIF;OSG_WITH_TIF;OSG_WITH_JPG;_CONSOLE;_USRDLL;_IOV_BUILD_;WININC"
+				PreprocessorDefinitions="BOOST_DYN_LINK;WIN32;_WINDOWS;WINVER=0x0400;_WIN32_WINDOWS=0x0410;_WIN32_WINNT=0x0400;_OSG_HAVE_CONFIGURED_H_;OSG_BUILD_DLL;_DEBUG;OSG_DEBUG;OSG_WITH_GLUT;OSG_WITH_GIF;OSG_WITH_TIF;OSG_WITH_JPG;_CONSOLE;_USRDLL;_IOV_BUILD_;WININC"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -36,7 +36,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vrj_d.lib vrj_ogl_d.lib gadget_d.lib jccl_d.lib vpr_d.lib boost_signals-vc71-mt-gd-1_33_1.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib opengl32.lib glu32.lib $(NOINHERIT)"
+				AdditionalDependencies="vrj_d.lib vrj_ogl_d.lib gadget_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib OSGWindowGLUTD.lib opengl32.lib glu32.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/iov_d.dll"
 				Version=""
 				LinkIncremental="2"
@@ -80,7 +80,7 @@
 				InlineFunctionExpansion="1"
 				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="..\..\src;&quot;$(OSGROOT)\include&quot;;&quot;$(VJ_DEPS_DIR)\include&quot;;&quot;$(VJ_BASE_DIR)\include&quot;"
-				PreprocessorDefinitions="_OPT;NDEBUG;WIN32;_WINDOWS;WINVER=0x0400;_WIN32_WINDOWS=0x0410;_WIN32_WINNT=0x0400;_OSG_HAVE_CONFIGURED_H_;OSG_BUILD_DLL;OSG_WITH_GLUT;OSG_WITH_GIF;OSG_WITH_TIF;OSG_WITH_JPG;_CONSOLE;_USRDLL;_IOV_BUILD_;WININC"
+				PreprocessorDefinitions="BOOST_DYN_LINK;_OPT;NDEBUG;WIN32;_WINDOWS;WINVER=0x0400;_WIN32_WINDOWS=0x0410;_WIN32_WINNT=0x0400;_OSG_HAVE_CONFIGURED_H_;OSG_BUILD_DLL;OSG_WITH_GLUT;OSG_WITH_GIF;OSG_WITH_TIF;OSG_WITH_JPG;_CONSOLE;_USRDLL;_IOV_BUILD_;WININC"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="FALSE"
@@ -95,7 +95,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vrj.lib vrj_ogl.lib gadget.lib jccl.lib vpr.lib boost_signals-vc71-mt-1_33_1.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib opengl32.lib glu32.lib $(NOINHERIT)"
+				AdditionalDependencies="vrj.lib vrj_ogl.lib gadget.lib jccl.lib vpr.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib OSGWindowGLUT.lib opengl32.lib glu32.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/iov.dll"
 				Version=""
 				LinkIncremental="1"
