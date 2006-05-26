@@ -93,7 +93,7 @@ PluginPtr SimpleNavPlugin::init(ViewerPtr viewer)
 
    if(!elt)
    {
-      throw PluginException("ModeSwitchPlugin not find its configuration.", IOV_LOCATION);
+      throw PluginException("SimpleNavPlugin could not find its configuration.", IOV_LOCATION);
    }
    vprASSERT(elt->getID() == getElementType());
 
