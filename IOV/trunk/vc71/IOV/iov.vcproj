@@ -392,6 +392,12 @@
 				RelativePath="..\..\src\Iov\Widget\ScrollBarPtr.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\SignalData.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\SignalEmitter.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\SignalRepository.h">
 			</File>
 			<File
