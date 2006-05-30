@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-05-30 patrick  Added inf::SignalEmitter and inf::SignalData.
+                    -- VERSION -- 0.23.2
 2006-05-25 patrick  inf::GrabData now emits signals when objects are added and
                     removed.
                     -- VERSION -- 0.23.1
