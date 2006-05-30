@@ -11,6 +11,8 @@ SceneObject::~SceneObject()
 }
 
 SceneObject::SceneObject()
+   : mCanIntersect(true)
+   , mGrabbable(true)
 {
    mEmptyVolume.setEmpty();
 }
@@ -38,6 +40,26 @@ void SceneObject::wandReleased()
 void SceneObject::wandMoved()
 {
    /* Do nothing */;
+}
+
+bool SceneObject::canIntersect() const
+{
+   return mCanIntersect;
+}
+
+void SceneObject::setAllowIntersect(const bool allowIntersect)
+{
+   mCanIntersect = allowIntersect;
+}
+
+bool SceneObject::isGrabbable() const
+{
+   return mGrabbable;
+}
+
+void SceneObject::setGrabbable(const bool grabbable)
+{
+   mGrabbable = grabbable;
 }
 
 OSG::DynamicVolume& SceneObject::getVolume(const bool update)

@@ -52,6 +52,63 @@ public:
    virtual void wandMoved();
 
    /**
+    * Determines if this scene object can be intersected for the purposes of
+    * being grabbed (object intersection is usually done before grabbing).
+    * Scene objects allow intersection by default.
+    *
+    * @return \c true is returned if intersection with this scene object is
+    *         allowed; \c false is returned otherwise.
+    *
+    * @see setAllowIntersect()
+    * @see isGrabbable()
+    * @see setGrabbable()
+    *
+    * @since 0.23.3
+    */
+   virtual bool canIntersect() const;
+
+   /**
+    * Changes whether intersection is allowed with this scene object.
+    * Disallowing intersection testing may have the side effect of preventing
+    * the object from being grabbed.
+    *
+    * @param allowIntersect Flag indicating whether intersction with this
+    *                       scene object is allowed.
+    *
+    * @see canIntersect()
+    * @see isGrabbable()
+    * @see setGrabbable()
+    *
+    * @since 0.23.3
+    */
+   virtual void setAllowIntersect(const bool allowIntersect);
+
+   /**
+    * Determines if this scene object can be grabbed. Scene objects are
+    * grabbable by default.
+    *
+    * @return \c true is returned if grabbing of this scene object is allowed;
+    *         \c false is returned otherwise.
+    *
+    * @see setGrabbable()
+    *
+    * @since 0.23.3
+    */
+   virtual bool isGrabbable() const;
+
+   /**
+    * Sets the grabbable state for this scene object.
+    *
+    * @param grabbable Flag indicating whether this scene object should be
+    *                  grabbable.
+    *
+    * @see isGrabbable()
+    *
+    * @since 0.23.3
+    */
+   virtual void setGrabbable(const bool grabbable);
+
+   /**
     * Move to the specified location.
     */
    virtual void moveTo(const OSG::Matrix& matrix);
@@ -164,6 +221,12 @@ public:
    //@}
 
 protected:
+   /** @name Intersection and Grab State */
+   //@{
+   bool mCanIntersect;  /**< Indicates whether intersection is allowed. */
+   bool mGrabbable;     /**< Indicates whether grabbing is allowed. */
+   //@}
+
    OSG::DynamicVolume           mEmptyVolume;
 };
 

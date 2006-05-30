@@ -182,9 +182,10 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
    );
 
-   // If we are intersecting an object but not grabbing it and the grab
-   // button has just been pressed, grab the intersected object.
-   if ( mIntersecting && ! mGrabbing &&
+   // If we are intersecting an object but not grabbing it, the grab
+   // button has just been pressed, and the intersected object is grabbable,
+   // then we can grab the intersected object.
+   if ( mIntersecting && ! mGrabbing && mIntersectedObj->isGrabbable() &&
         mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
    {
       mGrabSound.trigger();

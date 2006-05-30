@@ -144,7 +144,10 @@ void Viewer::preFrame()
    {
       mIsectStrategy->update(myself);
 
-      // Get the intersected object.
+      // Get the intersected object using a breadth-first search. Beginning
+      // at the most shallow level of the object hierarchy, a scan is
+      // performed for an object that the intersection strategy identifies as
+      // being intersected.
       gmtl::Point3f cur_ip;
       SceneObjectPtr cur_obj = mIsectStrategy->findIntersection(myself, mObjects, cur_ip);
 
@@ -156,6 +159,9 @@ void Viewer::preFrame()
       parent_obj = cur_obj;
       intersect_point = cur_ip;
 
+      // If intersected_obj has children, then we continue the breadth-first
+      // search in its children. We want to find the deepest intersected
+      // object.
       std::vector<SceneObjectPtr> objs;
       while ( NULL != cur_obj.get() && intersect_obj->hasChildren() )
       {
@@ -169,6 +175,15 @@ void Viewer::preFrame()
             intersect_obj = cur_obj;
             intersect_point = cur_ip;
          }
+      }
+
+      // If we have an intersected object, make sure that the intersection is
+      // valid. Yes, this is an afterthought that ought to be in the algorithm
+      // above. As a breadth-first search, however, it is not clear how to
+      // factor in the allowed intersection state.
+      while ( NULL != intersect_obj.get() && ! intersect_obj->canIntersect() )
+      {
+         intersect_obj = intersect_obj->getParent();
       }
 
       // If the intersected object is different than the one with which the
