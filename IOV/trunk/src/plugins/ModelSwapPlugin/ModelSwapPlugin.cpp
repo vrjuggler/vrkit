@@ -4,7 +4,13 @@
 
 #include <gmtl/Matrix.h>
 #include <gmtl/Generate.h>
+#include <gmtl/External/OpenSGConvert.h>
 #include <iostream>  // for debug
+
+#include <OpenSG/OSGSwitch.h>
+#include <OpenSG/OSGTransform.h>
+#include <OpenSG/OSGNode.h>
+#include <OpenSG/OSGSceneFileHandler.h>
 
 #include <IOV/Viewer.h>
 #include <IOV/WandInterface.h>
@@ -101,6 +107,31 @@ namespace inf
       // Get the scaling factor
       float to_meters_scalar = elt->getProperty<float>(units_to_meters_tkn);
       
+      // Get the paths to all the models, load them, and add them to the switch
+      OSG::NodePtr switch_node = OSG::Node::create();
+      mSwitchCore = OSG::Switch::create();
+      
+      OSG::beginEditCP(switch_node);
+         switch_node->setCore(mSwitchCore);
+         const unsigned int num_models(elt->getNum(model_tkn));
+         for( unsigned int i = 0; i < num_models; ++i )
+         {
+            std::string model_path = elt->getProperty<std::string>(model_tkn, i);
+            OSG::NodePtr model_node = OSG::SceneFileHandler::the().read(model_path.c_str());
+            if (model_node != OSG::NullFC)
+               switch_node->addChild(model_node);
+            else
+            {
+              std::cerr << "The model " << model_path 
+                   << " could not be loaded correctly!" << std::endl;
+            }
+         }
+      OSG::endEditCP(switch_node);
+         
+      OSG::beginEditCP(mSwitchCore);
+         mSwitchCore->setChoice(0);
+      OSG::endEditCP(mSwitchCore);
+      
       // Set up the model switch transform
       float xt = elt->getProperty<float>(position_tkn, 0);
       float yt = elt->getProperty<float>(position_tkn, 1);
@@ -119,17 +150,30 @@ namespace inf
                          gmtl::Math::deg2Rad(yr),
                          gmtl::Math::deg2Rad(zr));
 
-      mXform = gmtl::make<gmtl::Matrix44f>(coord); // Set at T*R
-            
-      // Get the paths to all the models and load them
-      const unsigned int num_models(elt->getNum(model_tkn));
-      for( unsigned int i = 0; i < num_models; ++i )
-      {
-         std::string model = elt->getProperty<std::string>(model_tkn, i);
-         // TODO: finish loading models
-      }
+      gmtl::Matrix44f xform_mat = gmtl::make<gmtl::Matrix44f>(coord); // Set at T*R
+      OSG::Matrix xform_mat_osg;
+      gmtl::set(xform_mat_osg, xform_mat);
       
-      // TODO: fill in initialization code
+      OSG::NodePtr xform_node = OSG::Node::create();
+      OSG::TransformPtr xform_core = OSG::Transform::create();
+      
+      OSG::beginEditCP(xform_core);
+         xform_core->setMatrix(xform_mat_osg);
+      OSG::endEditCP(xform_core);
+      
+      OSG::beginEditCP(xform_node);
+         xform_node->setCore(xform_core);
+         xform_node->addChild(switch_node);
+      OSG::endEditCP(xform_node);
+      
+      // add switchable scene to the scene root
+      inf::ScenePtr scene = viewer->getSceneObj();
+
+      OSG::TransformNodePtr scene_xform_root = scene->getTransformRoot();
+      
+      OSG::beginEditCP(scene_xform_root);
+         scene_xform_root.node()->addChild(xform_node);
+      OSG::endEditCP(scene_xform_root);
       
       return shared_from_this(); 
    }

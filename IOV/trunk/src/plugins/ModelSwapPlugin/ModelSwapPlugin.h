@@ -1,12 +1,12 @@
 #ifndef _INF_MODEL_SWAP_PLUGIN_H_
 #define _INF_MODEL_SWAP_PLUGIN_H_
 
-#include <IOV/Plugin/PluginConfig.h>
-
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
-#include <gmtl/Matrix.h>
 
+#include <OpenSG/OSGSwitch.h>
+
+#include <IOV/Plugin/PluginConfig.h>
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
 #include <IOV/Util/DigitalCommand.h>
@@ -64,7 +64,7 @@ protected:
 protected:
    WandInterfacePtr        mWandInterface;      /**< Ptr to the wand interface to use. */
    inf::DigitalCommand     mSwapButton;       /**< Ptr to the digital button. */
-   gmtl::Matrix44f         mXform;
+   OSG::SwitchPtr          mSwitchCore;
 
 }; // ModelSwapPlugin
    
