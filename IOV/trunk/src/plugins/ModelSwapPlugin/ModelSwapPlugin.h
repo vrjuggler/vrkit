@@ -63,7 +63,7 @@ protected:
 
 protected:
    WandInterfacePtr        mWandInterface;      /**< Ptr to the wand interface to use. */
-   inf::DigitalCommand     mSwitchButton;       /**< Ptr to the digital button. */
+   inf::DigitalCommand     mSwapButton;       /**< Ptr to the digital button. */
    gmtl::Matrix44f         mXform;
 
 }; // ModelSwapPlugin
