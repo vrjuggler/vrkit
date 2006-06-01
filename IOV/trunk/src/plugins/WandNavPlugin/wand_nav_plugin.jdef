@@ -128,9 +128,7 @@
          </xsl:stylesheet>
       </upgrade_transform>
    </definition_version>
-
-
-	<definition_version version="3" label="Infiscape Wand Navigation Plug-In">
+   <definition_version version="3" label="Infiscape Wand Navigation Plug-In">
       <abstract>false</abstract>
       <help>Plug-in to the Infiscape OpenSG Viewer application for performing wand-based navigation. A wand is expected to be tracked and have four buttons (digital input sources).</help>
       <category>/Infiscape/</category>
@@ -142,14 +140,14 @@
          <help>Acceleration value used when navigating.</help>
          <value label="Acceleration" defaultvalue="0.0050" />
       </property>
-		<property valuetype="boolean" variable="false" name="enable_deceleration">
-			<help>Enable deceleration when no buttons are being pressed.</help>
-			<value label="Enable Deceleration" defaultvalue="true" />
-		</property>
-		<property valuetype="float" variable="false" name="deceleration">
-			<help>Deceleration value used when navigating.</help>
-			<value label="Deceleration" defaultvalue="0.0050" />
-		</property>
+      <property valuetype="boolean" variable="false" name="enable_deceleration">
+         <help>Enable deceleration when no buttons are being pressed.</help>
+         <value label="Enable Deceleration" defaultvalue="true" />
+      </property>
+      <property valuetype="float" variable="false" name="deceleration">
+         <help>Deceleration value used when navigating.</help>
+         <value label="Deceleration" defaultvalue="0.0050" />
+      </property>
       <property valuetype="float" variable="false" name="rotation_sensitivity">
          <help>Sensitivity for rotation.  Amount rotated = (angle*delta_time*sensitivity).</help>
          <value label="Rotation Sensitivity" defaultvalue="0.5" />
@@ -177,7 +175,7 @@
       <property valuetype="integer" variable="false" name="initial_mode">
          <help>The initial navigation mode.</help>
          <value label="Initial Mode" defaultvalue="0" />
-                 <enumeration>
+         <enumeration>
             <enum label="Walk" value="0" />
             <enum label="Fly" value="1" />
          </enumeration>
@@ -203,7 +201,7 @@
                   <xsl:element namespace="{$jconf}" name="enable_deceleration">
                      <xsl:text>true</xsl:text>
                   </xsl:element>
-						<xsl:element namespace="{$jconf}" name="deceleration">
+                  <xsl:element namespace="{$jconf}" name="deceleration">
                      <xsl:text>0.0050</xsl:text>
                   </xsl:element>
                </xsl:element>
