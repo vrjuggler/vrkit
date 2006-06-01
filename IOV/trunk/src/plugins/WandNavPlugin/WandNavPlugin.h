@@ -49,6 +49,7 @@ public:
    //@{
    void setMaximumVelocity(const float minVelocity);
    void setAcceleration(const float acceleration);
+   void setDeceleration(const float deceleration);
    //@}
 
    /**
@@ -109,6 +110,8 @@ protected:
    float mVelocity;
    float mMaxVelocity;
    float mAcceleration;
+   float mDeceleration;
+   bool mIsDecelerationEnabled;
    float mRotationSensitivity;      /**< Scalar on rotation delta.  Used to adjust sensitivity. */
    NavMode mNavMode;
 

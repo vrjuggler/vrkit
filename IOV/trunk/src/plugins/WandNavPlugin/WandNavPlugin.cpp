@@ -109,7 +109,7 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    const std::string reset_btn_prop("reset_button_nums");
    const std::string initial_mode_prop("initial_mode");
    const std::string rotation_sensitivity("rotation_sensitivity");
-   const unsigned int req_cfg_version(2);
+   const unsigned int req_cfg_version(3);
 
    vprASSERT(elt->getID() == getElementType() &&
              "Got unexpected config element type");
@@ -126,6 +126,8 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
 
    float max_velocity = elt->getProperty<float>("max_velocity");
    float accel        = elt->getProperty<float>("acceleration");
+   float decel        = elt->getProperty<float>("deceleration");
+   mIsDecelerationEnabled = elt->getProperty<bool>("enable_deceleration");
    mRotationSensitivity = elt->getProperty<float>(rotation_sensitivity);
 
    if ( max_velocity > 0.0f )
@@ -136,6 +138,11 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    if ( accel > 0.0f )
    {
       setAcceleration(accel);
+   }
+   
+   if ( decel > 0.0f )
+   {
+      setDeceleration(decel);
    }
 
    // Get the buttons for navigation.
@@ -293,7 +300,25 @@ void WandNavPlugin::updateNavState(ViewerPtr viewer,
    }
    else if ( mVelocity != 0.0f )
    {
-      mVelocity = 0.0f;
+      if(mIsDecelerationEnabled)
+      {
+         if( fabs(mVelocity) <= mDeceleration )
+         {
+            mVelocity = 0.0f;
+         }
+         else if(mVelocity > 0.0f)
+         {
+            mVelocity -= mDeceleration;
+         }
+         else
+         {
+            mVelocity += mDeceleration;
+         }
+      }
+      else
+      {
+         mVelocity = 0.0f;
+      }
    }
 
    // Restrict velocity range to [0.0,max_vel].
@@ -435,6 +460,11 @@ void WandNavPlugin::setMaximumVelocity(const float maxVelocity)
 void WandNavPlugin::setAcceleration(const float acceleration)
 {
    mAcceleration = acceleration;
+}
+
+void WandNavPlugin::setDeceleration(const float deceleration)
+{
+   mDeceleration = deceleration;
 }
 
 struct IncValue
