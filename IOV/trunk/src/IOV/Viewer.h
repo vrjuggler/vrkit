@@ -17,7 +17,6 @@
 #include <IOV/ViewerPtr.h>
 
 #include <IOV/EventDataPtr.h>
-#include <IOV/GrabDataPtr.h>
 #include <IOV/Grab/IntersectionStrategyPtr.h>
 #include <IOV/PluginPtr.h>
 #include <IOV/UserPtr.h>

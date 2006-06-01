@@ -16,7 +16,6 @@
 #include <jccl/Config/Configuration.h>
 
 #include <IOV/EventData.h>
-#include <IOV/GrabData.h>
 #include <IOV/User.h>
 #include <IOV/Grab/IntersectionStrategy.h>
 #include <IOV/Plugin.h>
