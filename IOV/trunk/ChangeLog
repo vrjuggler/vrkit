@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-01 jalane   Extended Wand Nav Plug-in to allow for negative
+                    acceleration for stopping.
+                    -- VERSION -- 0.24.0
+2006-05-31 jalane   Added Model Switch Plug-in.
 2006-05-30 patrick  Extended inf::SceneObject with state information for
                     (dis)allowing intersection and grabbing.
                     -- VERSION -- 0.23.3
