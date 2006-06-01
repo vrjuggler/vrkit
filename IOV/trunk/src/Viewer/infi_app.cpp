@@ -34,7 +34,7 @@
 #include <IOV/User.h>
 #include <IOV/Scene.h>
 #include <IOV/DynamicSceneObject.h>
-#include <IOV/StaticSceneObject.h>mConnection
+#include <IOV/StaticSceneObject.h>
 #include <IOV/WandInterface.h>
 #include <IOV/Util/BasicHighlighter.h>
 
