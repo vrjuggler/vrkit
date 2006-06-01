@@ -42,7 +42,7 @@ public:
    {
       mIsectConnection.disconnect();
       mDeIsectConnection.disconnect();
-      mGrabDataConnection.disconnect();
+      mGrabbedObjConnection.disconnect();
    }
 
    virtual std::string getDescription()
@@ -102,7 +102,8 @@ private:
     */
    inf::Event::ResultType objectIntersected(inf::SceneObjectPtr obj,
                                             inf::SceneObjectPtr parentObj,
-                                            gmtl::Point3f pnt);
+                                            gmtl::Point3f pnt,
+                                            inf::ViewerPtr viewer);
 
    /**
     * Responds to object de-intersection signals. Our intersection highlight
@@ -133,7 +134,8 @@ private:
     *
     * @see releaseGrabbedObject()
     */
-   void grabbableObjectRemoved(inf::SceneObjectPtr obj, inf::ViewerPtr viewer);
+   void grabbableObjStateChanged(inf::SceneObjectPtr obj,
+                                 inf::ViewerPtr viewer);
 
    WandInterfacePtr mWandInterface;
 
@@ -157,7 +159,7 @@ private:
    bool mGrabbing;
    snx::SoundHandle mGrabSound;
    GrabDataPtr  mGrabData;
-   boost::signals::connection mGrabDataConnection;
+   boost::signals::connection mGrabbedObjConnection;
    //@}
 
    std::vector<std::string> mStrategyPluginPath;

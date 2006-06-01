@@ -3,15 +3,18 @@
 #ifndef _INF_SCENE_OBJECT_H_
 #define _INF_SCENE_OBJECT_H_
 
-#include <IOV/Config.h>
-#include <IOV/SceneObjectPtr.h>
+#include <vector>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/signal.hpp>
 
 #include <OpenSG/OSGDynamicVolume.h>
 #include <OpenSG/OSGNodePtr.h>
 #include <OpenSG/OSGMatrix.h>
 
-#include <boost/enable_shared_from_this.hpp>
-#include <vector>
+#include <IOV/Config.h>
+#include <IOV/SceneObjectPtr.h>
+#include <IOV/Util/SignalProxy.h>
+
 
 namespace inf
 {
@@ -220,6 +223,65 @@ public:
    virtual std::vector<SceneObjectPtr> getChildren();
    //@}
 
+   /** @name Signal Accessors for Slot Connection */
+   //@{
+   /**
+    * A signal whose slot takes the source scene object as its only parameter.
+    *
+    * @since 0.24.1
+    */
+   typedef boost::signal<void (inf::SceneObjectPtr)> self_signal_t;
+
+   /**
+    * A signal whose slot takes the source scene object and another modified
+    * scene object as its parameters.
+    *
+    * @since 0.24.1
+    */
+   typedef boost::signal<void (inf::SceneObjectPtr, inf::SceneObjectPtr)>
+      self_obj_signal_t;
+
+   /**
+    * Retrieves a proxy to the signal object for intersection state changes.
+    *
+    * @since 0.24.1
+    */
+   SignalProxy<self_signal_t> intersectStateChanged()
+   {
+      return SignalProxy<self_signal_t>(mIntersectStateChanged);
+   }
+
+   /**
+    * Retrieves a proxy to the signal object for grab state changes.
+    *
+    * @since 0.24.1
+    */
+   SignalProxy<self_signal_t> grabbableStateChanged()
+   {
+      return SignalProxy<self_signal_t>(mGrabbableStateChanged);
+   }
+
+   /**
+    * Retrieves a proxy to the signal object for child addition.
+    *
+    * @since 0.24.1
+    */
+   SignalProxy<self_obj_signal_t> childAdded()
+   {
+      return SignalProxy<self_obj_signal_t>(mChildAdded);
+   }
+
+   /**
+    * Retrieves a proxy to the signal object for child removal.
+    *
+    * @since 0.24.1
+    */
+   SignalProxy<self_obj_signal_t> childRemoved()
+   {
+      return SignalProxy<self_obj_signal_t>(mChildRemoved);
+   }
+   //@}
+
 protected:
    /** @name Intersection and Grab State */
    //@{
@@ -228,8 +290,40 @@ protected:
    //@}
 
    OSG::DynamicVolume           mEmptyVolume;
+
+   /** @name Signals */
+   //@{
+   /**
+    * Signal for changes to \c mCanIntersect.
+    *
+    * @since 0.24.1
+    */
+   self_signal_t mIntersectStateChanged;
+
+   /**
+    * Signal for changes to \c mGrabbable.
+    *
+    * @since 0.24.1
+    */
+   self_signal_t mGrabbableStateChanged;
+
+   /**
+    * Signal emitted when a child is added to this scene object.
+    *
+    * @since 0.24.1
+    */
+   self_obj_signal_t mChildAdded;
+
+   /**
+    * Signal emitted when a child is removed from this scene object.
+    *
+    * @since 0.24.1
+    */
+   self_obj_signal_t mChildRemoved;
+   //@}
 };
 
 }
+
 
 #endif

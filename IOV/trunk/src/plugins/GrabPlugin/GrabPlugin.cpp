@@ -66,18 +66,16 @@ PluginPtr GrabPlugin::init(ViewerPtr viewer)
    mEventData->mObjectMovedSignal.connect(100, boost::bind(&GrabPlugin::defaultObjectMovedSlot, this, _1, _2));
 
    // Connect the intersection signal to our slot.
-   mIsectConnection = mEventData->mObjectIntersectedSignal.connect(0, boost::bind(&GrabPlugin::objectIntersected, this, _1, _2, _3));
+   mIsectConnection =
+      mEventData->mObjectIntersectedSignal.connect(
+         0, boost::bind(&GrabPlugin::objectIntersected, this, _1, _2, _3,
+                        viewer)
+      );
 
    // Connect the de-intersection signal to our slot.
    mDeIsectConnection = mEventData->mObjectDeintersectedSignal.connect(0, boost::bind(&GrabPlugin::objectDeintersected, this, _1));
 
    mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
-
-   // Connect the grabbable object removal signal to our slot.
-   mGrabDataConnection =
-      mGrabData->connectToRemove(
-         boost::bind(&GrabPlugin::grabbableObjectRemoved, this, _1, viewer)
-      );
 
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
@@ -137,7 +135,7 @@ PluginPtr GrabPlugin::init(ViewerPtr viewer)
 inf::Event::ResultType
 GrabPlugin::objectIntersected(inf::SceneObjectPtr obj,
                               inf::SceneObjectPtr parentObj,
-                              gmtl::Point3f pnt)
+                              gmtl::Point3f pnt, inf::ViewerPtr viewer)
 {
    if (!mGrabbing)
    {
@@ -150,6 +148,13 @@ GrabPlugin::objectIntersected(inf::SceneObjectPtr obj,
          mIntersectPoint = pnt;
          mIntersectSound.trigger();
          mIntersecting = true;
+
+         // Connect the grabbable object state change signal to our slot.
+         mGrabbedObjConnection =
+            mIntersectedObj->grabbableStateChanged().connect(
+               boost::bind(&GrabPlugin::grabbableObjStateChanged, this, _1,
+                           viewer)
+            );
       }
    }
    else
@@ -401,12 +406,15 @@ void GrabPlugin::releaseGrabbedObject(inf::ViewerPtr viewer)
 
    mGrabbing   = false;
    mGrabbedObj = SceneObjectPtr();
+   mGrabbedObjConnection.disconnect();
 }
 
-void GrabPlugin::grabbableObjectRemoved(inf::SceneObjectPtr obj,
-                                        inf::ViewerPtr viewer)
+void GrabPlugin::grabbableObjStateChanged(inf::SceneObjectPtr obj,
+                                          inf::ViewerPtr viewer)
 {
-   if ( mGrabbing && mGrabbedObj == obj )
+   // If we are currently grabbing obj and its grabbable state has changed so
+   // that it is no longer grabbable, we must release it.
+   if ( mGrabbing && mGrabbedObj == obj && ! mGrabbedObj->isGrabbable() )
    {
       releaseGrabbedObject(viewer);
    }

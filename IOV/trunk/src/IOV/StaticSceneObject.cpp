@@ -87,10 +87,11 @@ void StaticSceneObject::addChild(SceneObjectPtr child)
          child->getParent()->removeChild(child);
       }
 
-      child->setParent(shared_from_this());
+      inf::SceneObjectPtr myself(shared_from_this());
+      child->setParent(myself);
       mChildren.push_back(child);
 
-      //fireChildAdded(child);
+      mChildAdded(myself, child);
    }
 }
 
@@ -106,7 +107,7 @@ void StaticSceneObject::removeChild(SceneObjectPtr child)
       child->setParent(SceneObjectPtr());
       mChildren.erase(c);
 
-      //fireChildRemoved(child);
+      mChildRemoved(shared_from_this(), child);
    }
 }
 

@@ -49,7 +49,13 @@ bool SceneObject::canIntersect() const
 
 void SceneObject::setAllowIntersect(const bool allowIntersect)
 {
+   const bool old_intersect(mCanIntersect);
    mCanIntersect = allowIntersect;
+
+   if ( old_intersect != allowIntersect )
+   {
+      mIntersectStateChanged(shared_from_this());
+   }
 }
 
 bool SceneObject::isGrabbable() const
@@ -59,7 +65,13 @@ bool SceneObject::isGrabbable() const
 
 void SceneObject::setGrabbable(const bool grabbable)
 {
+   const bool old_grabbable(mGrabbable);
    mGrabbable = grabbable;
+
+   if ( old_grabbable != grabbable )
+   {
+      mGrabbableStateChanged(shared_from_this());
+   }
 }
 
 OSG::DynamicVolume& SceneObject::getVolume(const bool update)
