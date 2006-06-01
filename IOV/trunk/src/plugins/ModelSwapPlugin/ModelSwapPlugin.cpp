@@ -5,7 +5,6 @@
 #include <gmtl/Matrix.h>
 #include <gmtl/Generate.h>
 #include <gmtl/External/OpenSGConvert.h>
-#include <iostream>  // for debug
 
 #include <OpenSG/OSGSwitch.h>
 #include <OpenSG/OSGTransform.h>
@@ -62,10 +61,7 @@ namespace inf
    }
    
    PluginPtr ModelSwapPlugin::init(inf::ViewerPtr viewer)
-   {
-      // DEBUG
-      std::cerr << "Initializing ModelSwapPlugin" << std::endl;
-      
+   {      
       const std::string plugin_tkn("model_swap_plugin");
       const std::string button_tkn("control_button_num");
       const std::string units_to_meters_tkn("units_to_meters");
@@ -119,11 +115,8 @@ namespace inf
             std::string model_path = elt->getProperty<std::string>(model_tkn, i);
             OSG::NodePtr model_node = OSG::SceneFileHandler::the().read(model_path.c_str());
             if (model_node != OSG::NullFC)
-               mSwitchNode->addChild(model_node);
-            else
             {
-              std::cerr << "The model " << model_path 
-                   << " could not be loaded correctly!" << std::endl;
+               mSwitchNode->addChild(model_node);
             }
          }
       OSG::endEditCP(mSwitchNode);
