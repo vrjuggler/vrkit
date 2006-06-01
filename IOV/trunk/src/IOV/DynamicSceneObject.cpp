@@ -12,8 +12,9 @@ DynamicSceneObject::~DynamicSceneObject()
 }
 
 DynamicSceneObject::DynamicSceneObject()
+   : SceneObject()
 {
-   mEmptyVolume.setEmpty();
+   /* Do nothing. */ ;
 }
 
 DynamicSceneObjectPtr DynamicSceneObject::init(OSG::TransformNodePtr node)

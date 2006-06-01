@@ -170,7 +170,6 @@ protected:
 
 protected:
    OSG::TransformNodePtr        mTransformNode; /**< Root transform node of scene object. */
-   OSG::DynamicVolume           mEmptyVolume;   /**< Volume to use when we have an invalid object. */
    std::vector<SceneObjectPtr>  mChildren;      /**< Children scene objects. */
 };
 
