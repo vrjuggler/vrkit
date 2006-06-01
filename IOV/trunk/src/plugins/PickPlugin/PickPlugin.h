@@ -15,7 +15,6 @@
 #include <snx/SoundHandle.h>
 
 #include <IOV/EventDataPtr.h>
-#include <IOV/GrabDataPtr.h>
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
 #include <IOV/PluginFactory.h>
@@ -134,7 +133,6 @@ private:
    boost::signals::connection mDeIsectConnection;
    //@}
 
-   GrabDataPtr  mGrabData;
    EventDataPtr mEventData;
 };
 

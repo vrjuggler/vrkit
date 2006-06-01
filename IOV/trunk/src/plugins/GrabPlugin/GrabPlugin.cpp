@@ -15,7 +15,6 @@
 #include <vpr/Util/FileUtils.h>
 
 #include <IOV/EventData.h>
-#include <IOV/GrabData.h>
 #include <IOV/Viewer.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/PluginPtr.h>
@@ -74,8 +73,6 @@ PluginPtr GrabPlugin::init(ViewerPtr viewer)
 
    // Connect the de-intersection signal to our slot.
    mDeIsectConnection = mEventData->mObjectDeintersectedSignal.connect(0, boost::bind(&GrabPlugin::objectDeintersected, this, _1));
-
-   mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
 
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
@@ -139,10 +136,8 @@ GrabPlugin::objectIntersected(inf::SceneObjectPtr obj,
 {
    if (!mGrabbing)
    {
-      const std::vector<SceneObjectPtr>& objs = mGrabData->getObjects();
-
       // If we intersected a grabbable object.
-      if ( std::find(objs.begin(), objs.end(), parentObj) != objs.end() )
+      if ( obj->isGrabbable() )
       {
          mIntersectedObj = obj;
          mIntersectPoint = pnt;

@@ -15,7 +15,6 @@
 #include <vpr/Util/FileUtils.h>
 
 #include <IOV/EventData.h>
-#include <IOV/GrabData.h>
 #include <IOV/Viewer.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/PluginPtr.h>
@@ -63,7 +62,6 @@ namespace inf
 PluginPtr PickPlugin::init(ViewerPtr viewer)
 {
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
-   mGrabData = viewer->getSceneObj()->getSceneData<GrabData>();
 
    // Connect the intersection signal to our slot.
    mIsectConnection = mEventData->mObjectIntersectedSignal.connect(0, boost::bind(&PickPlugin::objectIntersected, this, _1, _2, _3));
@@ -96,10 +94,8 @@ PickPlugin::objectIntersected(inf::SceneObjectPtr obj,
                               inf::SceneObjectPtr parentObj,
                               gmtl::Point3f pnt)
 {
-   const std::vector<SceneObjectPtr>& objs = mGrabData->getObjects();
-
    // If we intersected a grabbable object.
-   if ( std::find(objs.begin(), objs.end(), parentObj) != objs.end() )
+   if ( obj->isGrabbable() )
    {
       mIntersectedObj = obj;
       mIntersectPoint = pnt;

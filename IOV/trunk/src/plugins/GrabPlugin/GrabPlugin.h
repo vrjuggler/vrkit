@@ -15,7 +15,6 @@
 #include <snx/SoundHandle.h>
 
 #include <IOV/EventDataPtr.h>
-#include <IOV/GrabDataPtr.h>
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
 #include <IOV/PluginFactory.h>
@@ -158,7 +157,6 @@ private:
    //@{
    bool mGrabbing;
    snx::SoundHandle mGrabSound;
-   GrabDataPtr  mGrabData;
    boost::signals::connection mGrabbedObjConnection;
    //@}
 

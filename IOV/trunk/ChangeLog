@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-01 patrick  Removed inf::GrabData in favor of using
+                    inf::SceneObject::isGrabbable().
+                    -- VERSION -- 0.25.0
 2006-06-01 patrick  Added state change notification to inf::SceneObject and
                     inf::StaticSceneObject.
                     -- VERSION -- 0.24.1

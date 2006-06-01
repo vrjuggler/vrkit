@@ -33,7 +33,6 @@
 #include <IOV/EventData.h>
 #include <IOV/User.h>
 #include <IOV/Scene.h>
-#include <IOV/GrabData.h>
 #include <IOV/DynamicSceneObject.h>
 #include <IOV/StaticSceneObject.h>mConnection
 #include <IOV/WandInterface.h>
@@ -298,8 +297,6 @@ void OpenSgViewer::init()
 
    if ( mEnableGrab )
    {
-      inf::GrabDataPtr grab_data = scene->getSceneData<inf::GrabData>();
-
       inf::SceneObjectPtr model_obj;
 
       if ( mSceneObjTypeName == "StaticSceneObject" )
@@ -317,8 +314,6 @@ void OpenSgViewer::init()
                     << "Falling back on StaticSceneObject" << std::endl;
          model_obj = makeSceneObject<inf::StaticSceneObject>(model_xform);
       }
-
-      grab_data->addObject(model_obj);
 
       // Register object for intersection.
       addObject(model_obj);
