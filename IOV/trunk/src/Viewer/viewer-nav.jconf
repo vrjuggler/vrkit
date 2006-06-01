@@ -8,9 +8,11 @@
          <plugin>StatusPanelPlugin</plugin>
          <isect_strategy>PointIntersection</isect_strategy>
       </infiscape_opensg_viewer>
-      <wand_nav_plugin name="Viewer Wand Nav" version="2">
+      <wand_nav_plugin name="Viewer Wand Nav" version="3">
          <max_velocity>5.0</max_velocity>
          <acceleration>0.05</acceleration>
+         <enable_deceleration>true</enable_deceleration>
+         <deceleration>0.0050</deceleration>
          <rotation_sensitivity>0.5</rotation_sensitivity>
          <forward_button_nums>1</forward_button_nums>
          <reverse_button_nums>-1</reverse_button_nums>
@@ -191,6 +193,7 @@
       <iov_app name="Basic Viewer Application" version="1">
          <enable_grabbing>true</enable_grabbing>
          <scene_object_type>StaticSceneObject</scene_object_type>
+         <use_material_chooser>false</use_material_chooser>
          <chooser_initial_size>2.0</chooser_initial_size>
          <chooser_initial_size>3.0</chooser_initial_size>
          <chooser_initial_position>-5.0</chooser_initial_position>
