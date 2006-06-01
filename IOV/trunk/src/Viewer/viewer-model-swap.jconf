@@ -11,9 +11,9 @@
 			<control_button_num>1</control_button_num>
 			<units_to_meters>Meters</units_to_meters>
 			<position>0.0</position>
+			<position>10.0</position>
 			<position>0.0</position>
-			<position>0.0</position>
-			<rotation>0.0</rotation>
+			<rotation>90.0</rotation>
 			<rotation>0.0</rotation>
 			<rotation>0.0</rotation>
 			<model>/home/jalane/cvs/OpenSG/Tutorials/Data/tie.wrl</model>

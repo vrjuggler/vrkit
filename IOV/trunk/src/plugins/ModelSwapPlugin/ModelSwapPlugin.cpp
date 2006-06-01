@@ -108,25 +108,25 @@ namespace inf
       float to_meters_scalar = elt->getProperty<float>(units_to_meters_tkn);
       
       // Get the paths to all the models, load them, and add them to the switch
-      OSG::NodePtr switch_node = OSG::Node::create();
+      mSwitchNode = OSG::Node::create();
       mSwitchCore = OSG::Switch::create();
       
-      OSG::beginEditCP(switch_node);
-         switch_node->setCore(mSwitchCore);
+      OSG::beginEditCP(mSwitchNode);
+         mSwitchNode->setCore(mSwitchCore);
          const unsigned int num_models(elt->getNum(model_tkn));
          for( unsigned int i = 0; i < num_models; ++i )
          {
             std::string model_path = elt->getProperty<std::string>(model_tkn, i);
             OSG::NodePtr model_node = OSG::SceneFileHandler::the().read(model_path.c_str());
             if (model_node != OSG::NullFC)
-               switch_node->addChild(model_node);
+               mSwitchNode->addChild(model_node);
             else
             {
               std::cerr << "The model " << model_path 
                    << " could not be loaded correctly!" << std::endl;
             }
          }
-      OSG::endEditCP(switch_node);
+      OSG::endEditCP(mSwitchNode);
          
       OSG::beginEditCP(mSwitchCore);
          mSwitchCore->setChoice(0);
@@ -163,7 +163,7 @@ namespace inf
       
       OSG::beginEditCP(xform_node);
          xform_node->setCore(xform_core);
-         xform_node->addChild(switch_node);
+         xform_node->addChild(mSwitchNode);
       OSG::endEditCP(xform_node);
       
       // add switchable scene to the scene root
@@ -180,14 +180,17 @@ namespace inf
    
    void ModelSwapPlugin::updateState(inf::ViewerPtr viewer)
    {
-      // TODO: fill in update state code
+      if ( mSwapButton.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      {
+         unsigned int num_models = mSwitchNode->getNChildren();
+         unsigned int cur_model = mSwitchCore->getChoice();
+         mSwitchCore->setChoice((cur_model + 1) % num_models);
+      }
    }
    
    void ModelSwapPlugin::run(inf::ViewerPtr viewer)
    {
-      // DEBUG
-      //std::cout << "ModelSwapPlugin running" << std::endl;
-      // TODO: fill in run code
+      /* Do nothing. */ ;
    }
    
    
