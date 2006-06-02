@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-02 patrick  Added inf::SceneObjectTraverser.
+                    -- VERSION -- 0.25.1
 2006-06-01 patrick  Removed inf::GrabData in favor of using
                     inf::SceneObject::isGrabbable().
                     -- VERSION -- 0.25.0
