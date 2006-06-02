@@ -605,30 +605,35 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
 
    mIsectStrategyName = appCfg->getProperty<std::string>(isect_strategy_prop);
 
-   // Build the IntersectionStrategy instance.
-   try
+   if ( ! mIsectStrategyName.empty() )
    {
-      IOV_STATUS << "   Loading intersection strategy plug-in '"
-                 << mIsectStrategyName << "' ..." << std::flush;
-      inf::PluginCreator<inf::IntersectionStrategy>* creator =
-         mPluginFactory->getPluginCreator<inf::IntersectionStrategy>(mIsectStrategyName);
+      // Build the IntersectionStrategy instance.
+      try
+      {
+         IOV_STATUS << "   Loading intersection strategy plug-in '"
+                    << mIsectStrategyName << "' ..." << std::flush;
+         inf::PluginCreator<inf::IntersectionStrategy>* creator =
+            mPluginFactory->getPluginCreator<inf::IntersectionStrategy>(
+               mIsectStrategyName
+            );
 
-      if ( NULL != creator )
-      {
-         mIsectStrategy = creator->createPlugin();
-         mIsectStrategy->init(shared_from_this());
-         IOV_STATUS << "[OK]" << std::endl;
+         if ( NULL != creator )
+         {
+            mIsectStrategy = creator->createPlugin();
+            mIsectStrategy->init(shared_from_this());
+            IOV_STATUS << "[OK]" << std::endl;
+         }
+         else
+         {
+            IOV_STATUS << "[ERROR]\nWARNING: No creator for strategy plug-in "
+                       << mIsectStrategyName << std::endl;
+         }
       }
-      else
+      catch (std::runtime_error& ex)
       {
-         IOV_STATUS << "[ERROR]\nWARNING: No creator for strategy plug-in "
-                    << mIsectStrategyName << std::endl;
+         IOV_STATUS << "[ERROR]\nWARNING: Failed to load strategy plug-in "
+                    << mIsectStrategyName << ":\n" << ex.what() << std::endl;
       }
-   }
-   catch (std::runtime_error& ex)
-   {
-      IOV_STATUS << "[ERROR]\nWARNING: Failed to load strategy plug-in "
-                 << mIsectStrategyName << ":\n" << ex.what() << std::endl;
    }
 }
 
