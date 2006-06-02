@@ -80,7 +80,8 @@ void PluginFactory::addScanPath(const std::vector<std::string>& scanPath)
                if(mPluginLibs.find(plugin_name) == mPluginLibs.end())
                {
                   mPluginLibs[plugin_name] = libs[j];
-                  std::cout << "IOV: Found plugin: [" << plugin_name << "]" << std::endl;
+                  std::cout << "IOV Plug-in Factory found plug-in named '"
+                            << plugin_name << "'" << std::endl;
                }
                else
                {
