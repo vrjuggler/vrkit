@@ -635,6 +635,12 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
                     << mIsectStrategyName << ":\n" << ex.what() << std::endl;
       }
    }
+   else
+   {
+      IOV_STATUS << "NOTE: No intersection strategy has been configured.\n"
+                 << "      inf::Viewer will not test for object intersections."
+                 << std::endl;
+   }
 }
 
 void Viewer::addObject(SceneObjectPtr obj)
