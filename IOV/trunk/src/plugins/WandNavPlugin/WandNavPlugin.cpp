@@ -117,11 +117,25 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    // Check for correct version of plugin configuration
    if ( elt->getVersion() < req_cfg_version )
    {
-      std::stringstream msg;
-      msg << "Configuration of WandNavPlugin failed.  Required config "
-          << "element version is " << req_cfg_version << ", but element '"
-          << elt->getName() << "' is version " << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      // Version 3 is backwards compatible with version 2.
+      if ( elt->getVersion() == 2 )
+      {
+         IOV_STATUS << "WARNING: Config element '" << elt->getName()
+                    << "', version " << elt->getVersion()
+                    << ", for the Wand Nav Plug-in is out of date!\n"
+                    << "         The current config element version is "
+                    << req_cfg_version << ". Use VRJConfig to update."
+                    << std::endl;
+      }
+      // Version 1 is incompatible.
+      else
+      {
+         std::stringstream msg;
+         msg << "Configuration of WandNavPlugin failed.  Required config "
+             << "element version is " << req_cfg_version << ", but element '"
+             << elt->getName() << "' is version " << elt->getVersion();
+         throw PluginException(msg.str(), IOV_LOCATION);
+      }
    }
 
    float max_velocity = elt->getProperty<float>("max_velocity");
