@@ -47,6 +47,22 @@ public:
       return mSignal.connect(slot);
    }
 
+   /**
+    * Connects the given slot to the contained signal using the identified
+    * group.
+    *
+    * @param group The group in which the given slot will be connected.
+    * @param slot  The slot to connect to this signal.
+    *
+    * @since 0.26.1
+    */
+   boost::signals::connection
+   connect(const typename signal_t::group_type& group,
+           typename signal_t::slot_type slot)
+   {
+      return mSignal.connect(group, slot);
+   }
+
 private:
    signal_t& mSignal;
 };
