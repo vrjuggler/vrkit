@@ -77,9 +77,6 @@ PluginPtr GrabPlugin::init(ViewerPtr viewer)
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
 
-   mIntersectSound.init("intersect");
-   mGrabSound.init("grab");
-
    // Configure
    std::string elt_type_name = getElementType();
    jccl::ConfigElementPtr cfg_elt =
@@ -141,7 +138,6 @@ GrabPlugin::objectIntersected(inf::SceneObjectPtr obj,
       {
          mIntersectedObj = obj;
          mIntersectPoint = pnt;
-         mIntersectSound.trigger();
          mIntersecting = true;
 
          // Connect the grabbable object state change signal to our slot.
@@ -188,7 +184,6 @@ void GrabPlugin::updateState(ViewerPtr viewer)
    if ( mIntersecting && ! mGrabbing && mIntersectedObj->isGrabbable() &&
         mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
    {
-      mGrabSound.trigger();
       mGrabbing = true;
       mGrabbedObj = mIntersectedObj;
 

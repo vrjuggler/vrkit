@@ -37,6 +37,7 @@
 #include <IOV/StaticSceneObject.h>
 #include <IOV/WandInterface.h>
 #include <IOV/Util/BasicHighlighter.h>
+#include <IOV/Util/EventSoundPlayer.h>
 
 #include <IOV/Widget/MaterialChooser.h>
 #include <IOV/Widget/WidgetData.h>
@@ -108,6 +109,7 @@ protected:
 protected:
    std::string              mFileName;
    inf::BasicHighlighterPtr mHighlighter;
+   inf::EventSoundPlayerPtr mSoundPlayer;
 
    /** @name Scene Object Handling */
    //@{
@@ -156,6 +158,7 @@ void OpenSgViewer::deallocate()
    mMaterialChooser = inf::MaterialChooserPtr();
    mMaterialPool    = OSG::NullFC;
    mHighlighter     = inf::BasicHighlighterPtr();
+   mSoundPlayer     = inf::EventSoundPlayerPtr();
 }
 
 inf::Event::ResultType
@@ -187,6 +190,7 @@ void OpenSgViewer::init()
    }
 
    mHighlighter = inf::BasicHighlighter::create()->init(shared_from_this());
+   mSoundPlayer = inf::EventSoundPlayer::create()->init(shared_from_this());
 
    inf::EventDataPtr event_data = getSceneObj()->getSceneData<inf::EventData>();
    event_data->mObjectMovedSignal.connect(0, boost::bind(&OpenSgViewer::objectMovedSlot, this, _1, _2));

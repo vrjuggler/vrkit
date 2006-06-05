@@ -12,8 +12,6 @@
 #include <boost/function.hpp>
 #include <gmtl/Matrix.h>
 
-#include <snx/SoundHandle.h>
-
 #include <IOV/EventDataPtr.h>
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
@@ -148,7 +146,6 @@ private:
    SceneObjectPtr mGrabbedObj;
    SceneObjectPtr mIntersectedObj;
    gmtl::Point3f mIntersectPoint;
-   snx::SoundHandle mIntersectSound;
    boost::signals::connection mIsectConnection;
    boost::signals::connection mDeIsectConnection;
    //@}
@@ -156,7 +153,6 @@ private:
    /** @name Grabbing data */
    //@{
    bool mGrabbing;
-   snx::SoundHandle mGrabSound;
    boost::signals::connection mGrabbedObjConnection;
    //@}
 

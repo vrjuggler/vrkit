@@ -203,6 +203,10 @@
          <chooser_initial_rotation>0.0</chooser_initial_rotation>
          <chooser_initial_rotation>0.0</chooser_initial_rotation>
       </iov_app>
+      <event_sound_player name="Event Sound Player" version="1">
+         <intersect_sound_name>intersect</intersect_sound_name>
+         <select_sound_name>select</select_sound_name>
+      </event_sound_player>
    </elements>
 </configuration>
 
