@@ -148,6 +148,22 @@ public:
    virtual void readDataFromSlave(OSG::BinaryDataHandler& reader);
    //@}
 
+   /** @name Scene Object Management */
+   //@{
+   typedef std::vector<SceneObjectPtr> object_list_t;
+
+   /**
+    * Returns the current collection of registered scene objects. Children
+    * of the nodes in the returned list are considered to be registered.
+    *
+    * @note This method was made public in IOV 0.26.2.
+    */
+   const object_list_t& getObjects() const
+   {
+      return mObjects;
+   }
+   //@}
+
 protected:
    Viewer();
 
@@ -159,18 +175,12 @@ protected:
     */
    virtual void deallocate();
 
-   typedef std::vector<SceneObjectPtr> object_list_t;
    void addObject(SceneObjectPtr obj);
 
    /**
     * Remove given object from grabbable list.
     */
    void removeObject(SceneObjectPtr obj);
-
-   const object_list_t& getObjects() const
-   {
-      return mObjects;
-   }
 
 private:
    /**

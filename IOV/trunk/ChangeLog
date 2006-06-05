@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-05 patrick  Made inf::Viewer::getObjects() public.
+                    -- VERSION -- 0.26.2
 2006-06-05 patrick  Added an overload of inf::SignalProxy<T>::connect for group
                     connection handling.
                     -- VERSION -- 0.26.1
