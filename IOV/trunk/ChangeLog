@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-06 patrick  Added vpr::DebugCategory objects infDBG_VIEWER and
+                    infDBG_PLUGIN.
+                    -- VERSION -- 0.26.4
 2006-06-06 patrick  Allow the Grab Plug-in to use different buttons for the
                     grab and release operations.
                     -- VERSION -- 0.26.3

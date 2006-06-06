@@ -12,6 +12,7 @@
 
 #include <vpr/vpr.h>
 #include <vpr/System.h>
+#include <vpr/Util/Debug.h>
 #include <vpr/Util/FileUtils.h>
 #include <jccl/Config/Configuration.h>
 
@@ -25,6 +26,7 @@
 #include <IOV/SceneObject.h>
 #include <IOV/Status.h>
 #include <IOV/Util/OpenSGHelpers.h>
+#include <IOV/Util/Debug.h>
 
 // Embedded plugins
 #include <IOV/StatusPanelPlugin.h>
@@ -197,7 +199,9 @@ void Viewer::preFrame()
          {
             OSG::FieldContainerPtr fcp = mIntersectedObj->getRoot().get();
             mEventData->mObjectDeintersectedSignal(mIntersectedObj);
-            std::cout << "Deintersected: " << inf::getName(fcp) << std::endl;
+            vprDEBUG(infDBG_VIEWER, vprDBG_VERB_LVL)
+               << "Deintersected: " << inf::getName(fcp) << std::endl
+               << vprDEBUG_FLUSH;
          }
 
          // Change the intersected object to the one we found above.
@@ -213,7 +217,9 @@ void Viewer::preFrame()
 
             OSG::FieldContainerPtr fcp = mIntersectedObj->getRoot().get();
             mEventData->mObjectIntersectedSignal(mIntersectedObj, parent_obj, intersect_point);
-            std::cout << "Intersected: " << inf::getName(fcp) << std::endl;
+            vprDEBUG(infDBG_VIEWER, vprDBG_VERB_LVL)
+               << "Intersected: " << inf::getName(fcp) << std::endl
+               << vprDEBUG_FLUSH;
          }
       }
    }
