@@ -152,8 +152,9 @@
          <initial_rot>0.0</initial_rot>
          <initial_rot>0.0</initial_rot>
       </status_panel_plugin>
-      <iov_grab_plugin name="Grab Plug-in" version="3">
+      <iov_grab_plugin name="Grab Plug-in" version="4">
          <grab_button_nums>0</grab_button_nums>
+         <release_button_nums>0</release_button_nums>
          <move_strategy>Basic Move</move_strategy>
       </iov_grab_plugin>
       <slide_move_strategy name="Slide Move Strategy" version="2">

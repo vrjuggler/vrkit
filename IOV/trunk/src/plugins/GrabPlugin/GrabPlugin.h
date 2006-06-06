@@ -88,6 +88,8 @@ private:
       return std::string("iov_grab_plugin");
    }
 
+   std::vector<int> transformButtonVec(const std::vector<int>& btns);
+
    /**
     * Responds to object intersection signals. If \p obj is newly intersected,
     * then our intersection highlight is applied to it.
@@ -136,9 +138,17 @@ private:
 
    WandInterfacePtr mWandInterface;
 
-   /** Button for grabbing and releasing objects. */
+   /** @name Button(s) for grabbing objects. */
+   //@{
    inf::DigitalCommand mGrabBtn;
    std::string mGrabText;
+   //@}
+
+   /** @name Button(s) for releasing objects. */
+   //@{
+   inf::DigitalCommand mReleaseBtn;
+   std::string mReleaseText;
+   //@}
 
    /** @name Intersection Strategy */
    //@{

@@ -126,6 +126,22 @@ PluginPtr GrabPlugin::init(ViewerPtr viewer)
    return shared_from_this();
 }
 
+struct IncValue
+{
+   int operator()(int v)
+   {
+      return v + 1;
+   }
+};
+
+std::vector<int> GrabPlugin::transformButtonVec(const std::vector<int>& btns)
+{
+   std::vector<int> result(btns.size());
+   IncValue inc;
+   std::transform(btns.begin(), btns.end(), result.begin(), inc);
+   return result;
+}
+
 inf::Event::ResultType
 GrabPlugin::objectIntersected(inf::SceneObjectPtr obj,
                               inf::SceneObjectPtr parentObj,
@@ -197,10 +213,10 @@ void GrabPlugin::updateState(ViewerPtr viewer)
       // Send a select event.
       mEventData->mObjectSelectedSignal(mGrabbedObj);
    }
-   // If we are grabbing an object and the grab button has just been pressed
-   // again, release the grabbed object.
+   // If we are grabbing an object and the release button has just been
+   // pressed, then release the grabbed object.
    else if ( mGrabbing &&
-             mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+             mReleaseBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
    {
       releaseGrabbedObject(viewer);
    }
@@ -252,7 +268,7 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
 {
    vprASSERT(elt->getID() == getElementType());
 
-   const unsigned int req_cfg_version(3);
+   const unsigned int req_cfg_version(4);
 
    // Check for correct version of plugin configuration.
    if ( elt->getVersion() < req_cfg_version )
@@ -265,10 +281,12 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
    }
 
    const std::string grab_btn_prop("grab_button_nums");
+   const std::string release_btn_prop("release_button_nums");
    const std::string strategy_plugin_path_prop("strategy_plugin_path");
    const std::string move_strategy_prop("move_strategy");
 
    mGrabBtn.configButtons(elt->getProperty<std::string>(grab_btn_prop));
+   mReleaseBtn.configButtons(elt->getProperty<std::string>(release_btn_prop));
 
    // Set up two default search paths:
    //    1. Relative path to './plugins/grab'
@@ -315,26 +333,19 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
 }
 
 GrabPlugin::GrabPlugin()
-   : mGrabText("Grab/Release Toggle")
+   : mGrabText("Grab")
+   , mReleaseText("Release")
    , mIntersecting(false)
    , mGrabbing(false)
 {
    ;
 }
 
-struct IncValue
-{
-   int operator()(int v)
-   {
-      return v + 1;
-   }
-};
-
 void GrabPlugin::focusChanged(inf::ViewerPtr viewer)
 {
-   // If we have focus and our grab/release button is configured, we
-   // will update the status panel to include our command.
-   if ( isFocused() && mGrabBtn.isConfigured() )
+   // If we have focus, we will try to update the staus panel to include our
+   // commands.
+   if ( isFocused() )
    {
       inf::ScenePtr scene = viewer->getSceneObj();
       StatusPanelPluginDataPtr status_panel_data =
@@ -342,18 +353,34 @@ void GrabPlugin::focusChanged(inf::ViewerPtr viewer)
 
       if ( status_panel_data->mStatusPanelPlugin )
       {
-         inf::StatusPanel& panel =
-            status_panel_data->mStatusPanelPlugin->getPanel();
-         if ( ! panel.hasControlText(mGrabBtn.getButtons(), mGrabText) )
+         // If grab button(s) is/are configured, we will update the status
+         // panel to include that information.
+         if ( mGrabBtn.isConfigured() )
          {
-            // The button numbers in mGrabBtn are zero-based, but we would like
-            // them to be one-based in the status panel display.
-            std::vector<int> btns(mGrabBtn.getButtons().size());
-            IncValue inc;
-            std::transform(mGrabBtn.getButtons().begin(),
-                           mGrabBtn.getButtons().end(), btns.begin(), inc);
-
-            panel.addControlText(btns, mGrabText);
+            inf::StatusPanel& panel =
+               status_panel_data->mStatusPanelPlugin->getPanel();
+            if ( ! panel.hasControlText(mGrabBtn.getButtons(), mGrabText) )
+            {
+               // The button numbers in mGrabBtn are zero-based, but we would
+               // like them to be one-based in the status panel display.
+               panel.addControlText(transformButtonVec(mGrabBtn.getButtons()),
+                                    mGrabText);
+            }
+         }
+         // If release button(s) is/are configured, we will update the status
+         // panel to include that information.
+         if ( mReleaseBtn.isConfigured() )
+         {
+            inf::StatusPanel& panel =
+               status_panel_data->mStatusPanelPlugin->getPanel();
+            if ( ! panel.hasControlText(mReleaseBtn.getButtons(), mReleaseText) )
+            {
+               // The button numbers in mReleaseBtn are zero-based, but we
+               // would like them to be one-based in the status panel display.
+               panel.addControlText(
+                  transformButtonVec(mReleaseBtn.getButtons()), mReleaseText
+               );
+            }
          }
       }
    }
@@ -370,12 +397,13 @@ void GrabPlugin::focusChanged(inf::ViewerPtr viewer)
 
          // The button numbers in mGrabBtn are zero-based, but we would like
          // them to be one-based in the status panel display.
-         std::vector<int> btns(mGrabBtn.getButtons().size());
-         IncValue inc;
-         std::transform(mGrabBtn.getButtons().begin(),
-                        mGrabBtn.getButtons().end(), btns.begin(), inc);
+         panel.removeControlText(transformButtonVec(mGrabBtn.getButtons()),
+                                 mGrabText);
 
-         panel.removeControlText(btns, mGrabText);
+         // The button numbers in mReleaseBtn are zero-based, but we would like
+         // them to be one-based in the status panel display.
+         panel.removeControlText(transformButtonVec(mReleaseBtn.getButtons()),
+                                 mReleaseText);
       }
    }
 }

@@ -214,5 +214,58 @@
          </xsl:stylesheet>
       </upgrade_transform>
    </definition_version>
+   <definition_version version="4" label="IOV Grab Plug-In (Infiscape)">
+      <abstract>false</abstract>
+      <help />
+      <parent />
+      <category>/Infiscape/</category>
+      <property valuetype="string" variable="false" name="grab_button_nums">
+         <help>Select the number(s) of the button that should activate grabbing. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <value label="Grab Button Number(s)" defaultvalue="-1" />
+      </property>
+      <property valuetype="string" variable="false" name="release_button_nums">
+         <help>Select the number(s) of the button that should deactivate grabbing. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <value label="Release Button Number(s)" defaultvalue="-1" />
+      </property>
+      <property valuetype="string" variable="true" name="strategy_plugin_path">
+         <help>Each value adds to the path where dynamically loadable intersection and move strategy plug-ins can be found. The path may make use of environment variables. For example: &lt;tt&gt;${HOME}/inf-plugins&lt;/tt&gt;. If no values are set for this property, the default search path will be &lt;tt&gt;${VJ_BASE_DIR}/lib{,32,64}/infiscape/viewer/plugins/grab&lt;/tt&gt; depending on the compile-time application binary interface (ABI).</help>
+         <value label="Strategy Plug-In Path" defaultvalue=""/>
+      </property>
+      <property valuetype="string" variable="true" name="move_strategy">
+         <help></help>
+         <value label="Move Strategy" defaultvalue="Basic Move" />
+         <enumeration editable="true">
+            <enum label="Basic Move" value="BasicMove"/>
+            <enum label="Center Point Move" value="CenterPointMove"/>
+            <enum label="Object Space Move" value="ObjectSpaceMove"/>
+            <enum label="Slide Move" value="SlideMove"/>
+         </enumeration>
+      </property>
+      <upgrade_transform>
+         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jconf="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" version="1.0">
+            <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
+            <xsl:variable name="jconf">http://www.vrjuggler.org/jccl/xsd/3.0/configuration</xsl:variable>
+
+            <xsl:template match="/">
+                <xsl:apply-templates/>
+            </xsl:template>
+
+            <xsl:template match="jconf:iov_grab_plugin">
+               <xsl:element namespace="{$jconf}" name="iov_grab_plugin">
+                  <xsl:attribute name="name">
+                     <xsl:value-of select="@name"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="version">4</xsl:attribute>
+                  <xsl:for-each select="./*">
+                     <xsl:copy-of select="." />
+                  </xsl:for-each>
+                  <xsl:element namespace="{$jconf}" name="release_button_nums">
+                     <xsl:value-of select="./jconf:grab_button_nums" />
+                  </xsl:element>
+               </xsl:element>
+            </xsl:template>
+         </xsl:stylesheet>
+      </upgrade_transform>
+   </definition_version>
 </definition>
 
