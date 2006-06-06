@@ -1,5 +1,6 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
+#include <limits>
 #include <boost/cast.hpp>
 
 #include <OpenSG/OSGChunkMaterial.h>
@@ -252,7 +253,7 @@ findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
 
    SceneObjectPtr intersect_obj;
 
-   float min_dist = 999999999.9f;   // Set to a max
+   float min_dist = std::numeric_limits<float>::max();   // Set to a max
    OSG::Line osg_pick_ray;
    OSG::Pnt3f osg_intersect_point;
 
