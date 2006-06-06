@@ -27,7 +27,7 @@ struct CoredNode2NodePred
    }
 };
 
-inline std::string getName(OSG::FieldContainerPtr& fcp)
+inline std::string getName(const OSG::FieldContainerPtr& fcp)
 {
    OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
    std::string name_str = "<NULL>";
