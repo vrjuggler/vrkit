@@ -36,7 +36,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vrj_d.lib vrj_ogl_d.lib gadget_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib opengl32.lib glu32.lib $(NOINHERIT)"
+				AdditionalDependencies="vrj_d.lib vrj_ogl_d.lib sonix_d.lib gadget_d.lib jccl_d.lib vpr_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib opengl32.lib glu32.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/iov_d.dll"
 				Version=""
 				LinkIncremental="2"
@@ -95,7 +95,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vrj.lib vrj_ogl.lib gadget.lib jccl.lib vpr.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib opengl32.lib glu32.lib $(NOINHERIT)"
+				AdditionalDependencies="vrj.lib vrj_ogl.lib sonix.lib gadget.lib jccl.lib vpr.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib opengl32.lib glu32.lib $(NOINHERIT)"
 				OutputFile="$(OutDir)/iov.dll"
 				Version=""
 				LinkIncremental="1"
@@ -151,6 +151,9 @@
 				RelativePath="..\..\src\Iov\EventData.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Util\EventSoundPlayer.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Util\Exceptions.cpp">
 			</File>
 			<File
@@ -158,9 +161,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\GeometryHighlightTraverser.cpp">
-			</File>
-			<File
-				RelativePath="..\..\src\Iov\GrabData.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Grab\IntersectionStrategy.cpp">
@@ -194,6 +194,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\SceneObject.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Util\SceneObjectTraverser.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Widget\ScrollBar.cpp">
@@ -260,6 +263,9 @@
 				RelativePath="..\..\src\Iov\Configuration.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Util\Debug.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\DeviceInterface.h">
 			</File>
 			<File
@@ -281,6 +287,12 @@
 				RelativePath="..\..\src\Iov\EventDataPtr.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Util\EventSoundPlayer.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Util\EventSoundPlayerPtr.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Util\Exceptions.h">
 			</File>
 			<File
@@ -294,12 +306,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\GeometryHighlightTraverser.h">
-			</File>
-			<File
-				RelativePath="..\..\src\Iov\GrabData.h">
-			</File>
-			<File
-				RelativePath="..\..\src\Iov\GrabDataPtr.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\InterfaceTrader.h">
@@ -383,6 +389,9 @@
 				RelativePath="..\..\src\Iov\SceneObjectPtr.h">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Util\SceneObjectTraverser.h">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\ScenePtr.h">
 			</File>
 			<File
@@ -396,6 +405,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\SignalEmitter.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\Util\SignalProxy.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\SignalRepository.h">
