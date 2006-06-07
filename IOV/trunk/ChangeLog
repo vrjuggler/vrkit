@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-05 patrick  Made the inf::Viewer methods addObject() and removeObject()
+                    public.
+                    -- VERSION -- 0.26.5
 2006-06-06 patrick  Added vpr::DebugCategory objects infDBG_VIEWER and
                     infDBG_PLUGIN.
                     -- VERSION -- 0.26.4

@@ -162,6 +162,32 @@ public:
    {
       return mObjects;
    }
+
+   /**
+    * Registers the given scene object for intersection testing.
+    *
+    * @post \p obj not in the list of scene objects registered for intersection
+    *       testing.
+    *
+    * @param obj The object to register for intersetion testing.
+    *
+    * @note This method was made public in IOV 0.26.5.
+    */
+   void addObject(SceneObjectPtr obj);
+
+   /**
+    * Removes the identified object from the list scene objects registered for
+    * intersection testing. If \p obj is not currently registered, this method
+    * has no effect.
+    *
+    * @post \p obj is not in the list of scene objects registered for
+    *       intersection testing.
+    *
+    * @param obj The object to un-register for intersetion testing.
+    *
+    * @note This method was made public in IOV 0.26.5.
+    */
+   void removeObject(SceneObjectPtr obj);
    //@}
 
 protected:
@@ -174,13 +200,6 @@ protected:
     * as its last step.
     */
    virtual void deallocate();
-
-   void addObject(SceneObjectPtr obj);
-
-   /**
-    * Remove given object from grabbable list.
-    */
-   void removeObject(SceneObjectPtr obj);
 
 private:
    /**
