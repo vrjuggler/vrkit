@@ -21,5 +21,6 @@
 			<value label="Model" />
 			<allowed_type>model</allowed_type>
 		</property>
+		<upgrade_transform />
    </definition_version>
 </definition>

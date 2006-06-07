@@ -7,7 +7,7 @@
       <category>/Infiscape/</category>
 		<property valuetype="string" variable="false" name="path">
 			<help>Model path</help>
-			<value label="Path" />
+			<value label="Path" defaultvalue=""/>
 		</property>
       <property valuetype="float" variable="false" name="position">
          <help>Model position</help>
