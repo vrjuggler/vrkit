@@ -5,10 +5,10 @@
       <abstract>false</abstract>
       <help />
       <category>/Infiscape/</category>
-		<property valuetype="string" variable="false" name="path">
-			<help>Model path</help>
-			<value label="Path" defaultvalue=""/>
-		</property>
+      <property valuetype="string" variable="false" name="path">
+         <help>Model path</help>
+         <value label="Path" defaultvalue=""/>
+      </property>
       <property valuetype="float" variable="false" name="position">
          <help>Model position</help>
          <value label="X" defaultvalue="0.0"/>

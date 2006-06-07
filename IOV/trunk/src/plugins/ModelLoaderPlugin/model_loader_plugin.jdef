@@ -5,7 +5,7 @@
       <abstract>false</abstract>
       <help />
       <category>/Infiscape/</category>
-		<property valuetype="float" variable="false" name="units_to_meters">
+      <property valuetype="float" variable="false" name="units_to_meters">
          <help>The units the viewpoint data is using. This is the scale factor to convert from the units entered to meters.</help>
          <value label="Units:" defaultvalue="1.0" />
          <enumeration>
@@ -16,11 +16,11 @@
             <enum label="Millimeters" value="0.001" />
          </enumeration>
       </property>
-		<property valuetype="configelement" variable="true" name="models">
-			<help>List of models to be loaded</help>
-			<value label="Model" />
-			<allowed_type>model</allowed_type>
-		</property>
-		<upgrade_transform />
+      <property valuetype="configelement" variable="true" name="models">
+         <help>List of models to be loaded</help>
+         <value label="Model" />
+         <allowed_type>model</allowed_type>
+      </property>
+      <upgrade_transform />
    </definition_version>
 </definition>
