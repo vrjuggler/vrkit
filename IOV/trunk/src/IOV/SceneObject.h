@@ -149,7 +149,7 @@ public:
     *
     * @param parent The new parent for this scene object.
     */
-   void setParent(SceneObjectPtr parent);
+   virtual void setParent(SceneObjectPtr parent);
 
    /**
     * Indicates whether this composite object has any children. This
