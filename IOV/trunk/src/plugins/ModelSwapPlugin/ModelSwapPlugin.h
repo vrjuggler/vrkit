@@ -67,8 +67,8 @@ protected:
 protected:
    WandInterfacePtr        mWandInterface;      /**< Ptr to the wand interface to use. */
    inf::DigitalCommand     mSwapButton;       /**< Ptr to the digital button. */
-   OSG::RefPtr<OSG::NodePtr>            mSwitchNode;
-   OSG::RefPtr<OSG::SwitchPtr>          mSwitchCore;
+   OSG::NodeRefPtr            mSwitchNode;
+   OSG::SwitchRefPtr          mSwitchCore;
 
 }; // ModelSwapPlugin
    

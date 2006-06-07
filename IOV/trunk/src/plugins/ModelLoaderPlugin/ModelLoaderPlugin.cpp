@@ -112,7 +112,7 @@ namespace inf
             vprASSERT(model_elt.get() != NULL);
             std::string model_path = model_elt->getProperty<std::string>(path_tkn);
             std::cout << model_path << "." << std::endl;
-            OSG::RefPtr<OSG::NodePtr> model_node(OSG::SceneFileHandler::the().read(model_path.c_str()));
+            OSG::NodeRefPtr model_node(OSG::SceneFileHandler::the().read(model_path.c_str()));
             if (model_node != OSG::NullFC)
             {
                // Set up the model switch transform
@@ -137,8 +137,8 @@ namespace inf
                OSG::Matrix xform_mat_osg;
                gmtl::set(xform_mat_osg, xform_mat);
                
-               OSG::RefPtr<OSG::NodePtr> xform_node(OSG::Node::create());
-               OSG::RefPtr<OSG::TransformPtr> xform_core(OSG::Transform::create());
+               OSG::NodeRefPtr xform_node(OSG::Node::create());
+               OSG::TransformRefPtr xform_core(OSG::Transform::create());
                
                OSG::beginEditCP(xform_core);
                   xform_core->setMatrix(xform_mat_osg);
