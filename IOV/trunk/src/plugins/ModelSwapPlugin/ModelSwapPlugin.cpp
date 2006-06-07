@@ -115,7 +115,7 @@ namespace inf
          for( unsigned int i = 0; i < num_models; ++i )
          {
             std::string model_path = elt->getProperty<std::string>(model_tkn, i);
-            OSG::NodePtr model_node = OSG::SceneFileHandler::the().read(model_path.c_str());
+            OSG::RefPtr<OSG::NodePtr> model_node(OSG::SceneFileHandler::the().read(model_path.c_str()));
             if (model_node != OSG::NullFC)
             {
                mSwitchNode->addChild(model_node);
@@ -149,8 +149,8 @@ namespace inf
       OSG::Matrix xform_mat_osg;
       gmtl::set(xform_mat_osg, xform_mat);
       
-      OSG::NodePtr xform_node = OSG::Node::create();
-      OSG::TransformPtr xform_core = OSG::Transform::create();
+      OSG::RefPtr<OSG::NodePtr> xform_node(OSG::Node::create());
+      OSG::RefPtr<OSG::TransformPtr> xform_core(OSG::Transform::create());
       
       OSG::beginEditCP(xform_core);
          xform_core->setMatrix(xform_mat_osg);

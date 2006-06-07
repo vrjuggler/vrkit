@@ -6,6 +6,7 @@
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 
+#include <OpenSG/OSGRefPtr.h>
 #include <OpenSG/OSGSwitch.h>
 
 #include <IOV/Plugin/PluginConfig.h>
@@ -66,8 +67,8 @@ protected:
 protected:
    WandInterfacePtr        mWandInterface;      /**< Ptr to the wand interface to use. */
    inf::DigitalCommand     mSwapButton;       /**< Ptr to the digital button. */
-   OSG::NodePtr            mSwitchNode;
-   OSG::SwitchPtr          mSwitchCore;
+   OSG::RefPtr<OSG::NodePtr>            mSwitchNode;
+   OSG::RefPtr<OSG::SwitchPtr>          mSwitchCore;
 
 }; // ModelSwapPlugin
    
