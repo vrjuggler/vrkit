@@ -288,9 +288,14 @@ findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
 
       if ( root->getVolume().intersect(osg_pick_ray, enter_val, exit_val) )
       {
-         // If enter_val is less than min_dist, then our ray has intersected
-         // an object that is closer than the last intersected object.
-         if ( enter_val < min_dist )
+         // If enter_val is 0.0, then the ray is inside of or on the edge of
+         // root's volume. In this case, we only want to consider that for
+         // intersection if no other object has been intersected already.
+         // Otherwise, if enter_val is less than min_dist, then our ray has
+         // intersected an object that is closer than the last intersected
+         // object.
+         if ( enter_val == 0.0f && intersect_obj.get() == NULL ||
+              0.0f < enter_val && enter_val < min_dist )
          {
             // If we are doing triangle-level intersection, then we create an
             // intersect action and apply it to the intersected object.
