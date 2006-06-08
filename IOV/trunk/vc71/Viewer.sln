@@ -103,6 +103,23 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mode Harness Plug-in", "Mod
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Model Load Plug-in", "ModelLoadPlugin\ModelLoadPlugin.vcproj", "{86AF5D6A-2049-4014-AED1-12C3297708C2}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Model Swap Plug-in", "ModelSwapPlugin\ModelSwapPlugin.vcproj", "{F40CFACF-18B8-4A6E-BD27-2AC0E7B03555}"
+	ProjectSection(ProjectDependencies) = postProject
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Model Loader Plug-in", "ModelLoaderPlugin\ModelLoaderPlugin.vcproj", "{86AF5D6A-2049-4014-AED1-12C3297708C2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		DebugDLL = DebugDLL
@@ -189,6 +206,18 @@ Global
 		{972511E2-29B8-4121-88A4-7DB6FC7B56C9}.DebugDLL.Build.0 = DebugDLL|Win32
 		{972511E2-29B8-4121-88A4-7DB6FC7B56C9}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
 		{972511E2-29B8-4121-88A4-7DB6FC7B56C9}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
+		{86AF5D6A-2049-4014-AED1-12C3297708C2}.DebugDLL.ActiveCfg = DebugDLL|Win32
+		{86AF5D6A-2049-4014-AED1-12C3297708C2}.DebugDLL.Build.0 = DebugDLL|Win32
+		{86AF5D6A-2049-4014-AED1-12C3297708C2}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
+		{86AF5D6A-2049-4014-AED1-12C3297708C2}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
+		{F40CFACF-18B8-4A6E-BD27-2AC0E7B03555}.DebugDLL.ActiveCfg = DebugDLL|Win32
+		{F40CFACF-18B8-4A6E-BD27-2AC0E7B03555}.DebugDLL.Build.0 = DebugDLL|Win32
+		{F40CFACF-18B8-4A6E-BD27-2AC0E7B03555}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
+		{F40CFACF-18B8-4A6E-BD27-2AC0E7B03555}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
+		{86AF5D6A-2049-4014-AED1-12C3297708C2}.DebugDLL.ActiveCfg = DebugDLL|Win32
+		{86AF5D6A-2049-4014-AED1-12C3297708C2}.DebugDLL.Build.0 = DebugDLL|Win32
+		{86AF5D6A-2049-4014-AED1-12C3297708C2}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
+		{86AF5D6A-2049-4014-AED1-12C3297708C2}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
