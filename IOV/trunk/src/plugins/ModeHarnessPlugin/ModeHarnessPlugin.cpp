@@ -149,8 +149,9 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
          if ( component )
          {
             IOV_STATUS << "[Mode Harness] Connecting mode component '"
-                       << component->getDescription() << "'\n(from " << name
-                       << ") to signal '" << signal_id << "'" << std::endl;
+                       << component->getDescription() << "'\n"
+                       << "               (from " << name << ") to signal '"
+                       << signal_id << "'" << std::endl;
 
             // Connect the newly instantiated component with its signal.
             mConnections.push_back(
