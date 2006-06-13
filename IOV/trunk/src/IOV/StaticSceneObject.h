@@ -70,16 +70,12 @@ public:
    /** @name Composite construction and query interface. */
    //@{
    /**
-    * Indicates whether this composite object has a parent. This
-    * implementation always returns false.
-    *
-    * @return false is always returned by this implementation.
+    * Indicates whether this composite object has a parent.
     */
    virtual bool hasParent();
 
    /**
-    * Returns the parent of this composite object. This implementation always
-    * returns a null pointer.
+    * Returns the parent of this composite object.
     */
    virtual SceneObjectPtr getParent();
 
@@ -93,32 +89,24 @@ public:
    void setParent(SceneObjectPtr parent);
 
    /**
-    * Indicates whether this composite object has any children. This
-    * implementation always returns false.
-    *
-    * @return false is always returned by this implementation.
+    * Indicates whether this composite object has any children.
     */
    virtual bool hasChildren();
 
    /**
-    * Returns the number of children of this composite object. This
-    * implementation always returns 0.
-    *
-    * @return 0 is always returned by this implementation.
+    * Returns the number of children of this composite object.
     */
    virtual unsigned int getChildCount();
 
    /**
     * Adds the given child to this composite object's collection of children.
-    * This implementation does nothing.
     *
     * @param child The child to add.
     */
    virtual void addChild(SceneObjectPtr child);
 
    /**
-    * Removes the given child from the collection of children. This
-    * implementation does nothing.
+    * Removes the given child from the collection of children.
     *
     * @param child The child to remove.
     *
@@ -128,8 +116,7 @@ public:
    virtual void removeChild(SceneObjectPtr child);
 
    /**
-    * Removes the identified child from the collection of children. This
-    * implementation does nothing.
+    * Removes the identified child from the collection of children.
     *
     * @param childIndex The index of the child to remove within the collection
     *                   of children.
@@ -141,7 +128,6 @@ public:
 
    /**
     * Returns the child at the given index within the collection of children.
-    * This implementation always returns a null pointer.
     *
     * @param childIndex The index of the child to return from within the
     *                   collection of children.
@@ -152,12 +138,9 @@ public:
    virtual SceneObjectPtr getChild(const unsigned int childIndex);
 
    /**
-    * Returns the children of this node in a vector. This method builds up
-    * the vector using getChildCount() and getChild(). This implementation
+    * Returns the children of this node in a vector. This implementation
     * should be sufficient in general, but this method can be overridden
-    * if necessary. One likely case when it would make sense (for performance
-    * reasons) to override this method would be when the collection of
-    * children held by a scene object is already maintained as a vector.
+    * if necessary.
     *
     * @return A vector containing all the children of this node.
     */

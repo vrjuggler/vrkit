@@ -211,14 +211,10 @@ public:
    virtual SceneObjectPtr getChild(const unsigned int childIndex);
 
    /**
-    * Returns the children of this node in a vector. This method builds up
-    * the vector using getChildCount() and getChild(). This implementation
-    * should be sufficient in general, but this method can be overridden
-    * if necessary. One likely case when it would make sense (for performance
-    * reasons) to override this method would be when the collection of
-    * children held by a scene object is already maintained as a vector.
+    * Returns the children of this node in a vector. This implementation
+    * always returns an empty vector.
     *
-    * @return A vector containing all the children of this node.
+    * @return An empty vector is returned.
     */
    virtual std::vector<SceneObjectPtr> getChildren();
    //@}
