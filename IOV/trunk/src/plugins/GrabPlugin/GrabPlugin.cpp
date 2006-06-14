@@ -410,6 +410,17 @@ void GrabPlugin::focusChanged(inf::ViewerPtr viewer)
 
 void GrabPlugin::releaseGrabbedObject(inf::ViewerPtr viewer)
 {
+   // Update our state to reflect that we are no longer grabbing an object.
+   mGrabbing = false;
+
+   // Disconnect mGrabbedObjConnection so that any state changes to
+   // mGrabbedObj do not propagate back to us. We are no longer interested in
+   // changes since we have released the object.
+   mGrabbedObjConnection.disconnect();
+
+   // If mGrabbedObj is a valid scene object (the one that we were grabbing),
+   // then inform the move strategies that the grabbed object has been released
+   // and emit the object de-selelcted signal.
    if ( mGrabbedObj != NULL && mGrabbedObj->getRoot() != OSG::NullFC )
    {
       gmtl::identity(mGrabbed_pobj_M_obj);
@@ -422,9 +433,9 @@ void GrabPlugin::releaseGrabbedObject(inf::ViewerPtr viewer)
       mEventData->mObjectDeselectedSignal(mGrabbedObj);
    }
 
-   mGrabbing   = false;
+   // Finish off the object release operation by clearing our reference to
+   // the formerly grabbed object.
    mGrabbedObj = SceneObjectPtr();
-   mGrabbedObjConnection.disconnect();
 }
 
 void GrabPlugin::grabbableObjStateChanged(inf::SceneObjectPtr obj,
