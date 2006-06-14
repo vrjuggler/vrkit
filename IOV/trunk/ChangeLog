@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-14 patrick  Fixed a bug in the Grab Plug-in object release code that
+                    could result in the object de-selected signal being
+                    emitted twice.
+                    -- VERSION -- 0.26.6
 2006-06-08 patrick  GMTL 0.4.11 or newer is now required to build IOV.
 2006-06-05 patrick  Made the inf::Viewer methods addObject() and removeObject()
                     public.
