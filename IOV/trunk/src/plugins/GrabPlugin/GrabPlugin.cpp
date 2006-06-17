@@ -186,44 +186,43 @@ GrabPlugin::objectDeintersected(inf::SceneObjectPtr obj)
    return inf::Event::CONTINUE;
 }
 
-
-void GrabPlugin::updateState(ViewerPtr viewer)
+void GrabPlugin::update(ViewerPtr viewer)
 {
    // Get the wand transformation in virtual platform coordinates.
    const gmtl::Matrix44f vp_M_wand_xform(
       mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
    );
 
-   // If we are intersecting an object but not grabbing it, the grab
-   // button has just been pressed, and the intersected object is grabbable,
-   // then we can grab the intersected object.
-   if ( mIntersecting && ! mGrabbing && mIntersectedObj->isGrabbable() &&
-        mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+   if ( isFocused() )
    {
-      mGrabbing = true;
-      mGrabbedObj = mIntersectedObj;
+      // If we are intersecting an object but not grabbing it, the grab
+      // button has just been pressed, and the intersected object is grabbable,
+      // then we can grab the intersected object.
+      if ( mIntersecting && ! mGrabbing && mIntersectedObj->isGrabbable() &&
+           mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      {
+         mGrabbing = true;
+         mGrabbedObj = mIntersectedObj;
 
-      gmtl::set(mGrabbed_pobj_M_obj, mGrabbedObj->getPos());
-   
-      std::for_each(mMoveStrategies.begin(), mMoveStrategies.end(),
-                    boost::bind(&inf::MoveStrategy::objectGrabbed, _1,
-                                viewer, mGrabbedObj, mIntersectPoint,
-                                vp_M_wand_xform));
+         gmtl::set(mGrabbed_pobj_M_obj, mGrabbedObj->getPos());
+      
+         std::for_each(mMoveStrategies.begin(), mMoveStrategies.end(),
+                       boost::bind(&inf::MoveStrategy::objectGrabbed, _1,
+                                   viewer, mGrabbedObj, mIntersectPoint,
+                                   vp_M_wand_xform));
 
-      // Send a select event.
-      mEventData->mObjectSelectedSignal(mGrabbedObj);
+         // Send a select event.
+         mEventData->mObjectSelectedSignal(mGrabbedObj);
+      }
+      // If we are grabbing an object and the release button has just been
+      // pressed, then release the grabbed object.
+      else if ( mGrabbing &&
+                mReleaseBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      {
+         releaseGrabbedObject(viewer);
+      }
    }
-   // If we are grabbing an object and the release button has just been
-   // pressed, then release the grabbed object.
-   else if ( mGrabbing &&
-             mReleaseBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
-   {
-      releaseGrabbedObject(viewer);
-   }
-}
 
-void GrabPlugin::run(inf::ViewerPtr viewer)
-{
    // Move the grabbed object.
    if ( mGrabbing )
    {
@@ -232,11 +231,6 @@ void GrabPlugin::run(inf::ViewerPtr viewer)
 
       if ( !mMoveStrategies.empty() )
       {
-         // Get the wand transformation in virtual world coordinates.
-         const gmtl::Matrix44f vp_M_wand_xform(
-            mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
-         );
-
          gmtl::Matrix44f new_obj_mat = mGrabbed_pobj_M_obj;
 
          for (std::vector<MoveStrategyPtr>::iterator itr = mMoveStrategies.begin();

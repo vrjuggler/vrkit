@@ -157,15 +157,9 @@ namespace inf
       return shared_from_this(); 
    }
    
-   void ModelLoaderPlugin::updateState(inf::ViewerPtr viewer)
+   void ModelLoaderPlugin::update(inf::ViewerPtr)
    {
       /* Do nothing. */ ;
    }
-   
-   void ModelLoaderPlugin::run(inf::ViewerPtr viewer)
-   {
-      /* Do nothing. */ ;
-   }
-   
-   
+
 }  // namespace inf

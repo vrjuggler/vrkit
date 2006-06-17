@@ -228,12 +228,7 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
-void ModeHarnessPlugin::updateState(inf::ViewerPtr)
-{
-   /* Do nothing. */ ;
-}
-
-void ModeHarnessPlugin::run(inf::ViewerPtr viewer)
+void ModeHarnessPlugin::update(inf::ViewerPtr viewer)
 {
    // Sanity check.
    vprASSERT(mViewer == viewer && "Our viewer changed!");

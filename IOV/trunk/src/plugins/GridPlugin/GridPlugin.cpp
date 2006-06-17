@@ -70,143 +70,142 @@ PluginPtr GridPlugin::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
-void GridPlugin::updateState(inf::ViewerPtr viewer)
+void GridPlugin::update(inf::ViewerPtr viewer)
 {
-   // Change the visiblity of all the grids of the activate/deactivate button
-   // is toggled on.
-   if ( mActivateBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+   if ( isFocused() )
    {
-      mGridsVisible = ! mGridsVisible;
-      std::vector<inf::GridPtr>::iterator g;
-      for ( g = mGrids.begin(); g != mGrids.end(); ++g )
+      // Change the visiblity of all the grids of the activate/deactivate
+      // button is toggled on.
+      if ( mActivateBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
       {
-         (*g)->setVisible(mGridsVisible);
-      }
-   }
-
-   // Change the grid selection state if the cycle button has toggled on.
-   if ( mCycleBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
-   {
-      if ( mSelectedGridIndex != -1 )
-      {
-         mGrids[mSelectedGridIndex]->setSelected(false);
-      }
-
-      // If there are grids defined, move mSelectedGridIndex to the next one
-      // (using a circular increment) and tell that grid that it is now
-      // selected.
-      if ( ! mGrids.empty() )
-      {
-         mSelectedGridIndex = (mSelectedGridIndex + 1) % mGrids.size();
-         mGrids[mSelectedGridIndex]->setSelected(true);
-
-         IOV_STATUS << "Grid #" << mSelectedGridIndex
-                    << " (" << mGrids[mSelectedGridIndex]->getName()
-                    << ") selected" << std::endl;
-
-         // XXX: Should the visible state change when the grid is selected?
-         // If it doesn't, then there is no visual cue to the user that the
-         // grid has been selected. On the other hand, if the user is just
-         // trying to cycle to some other grid (visible or not), it may not
-         // be desirable to make invisible grids along the way visible.
-//         mGrids[mSelectedGridIndex]->setVisible(true);
-      }
-   }
-
-   // If the user has selected a grid, check to see if any manipulations are
-   // being performed on it.
-   if ( mSelectedGridIndex != -1 )
-   {
-      float in_out_val(0.0f);
-
-      // If an analog device index is configured, check to see if analog data
-      // is available that would result in the selected grid being slid along
-      // its Z-axis.
-      if ( -1 != mAnalogNum )
-      {
-         gadget::AnalogInterface& analog_dev =
-            mWandInterface->getAnalog(mAnalogNum);
-
-         // Only check for analog data if the indicated analog device is not
-         // stupefied.
-         if ( ! analog_dev->isStupefied() )
-         {
-            const float to_meters(viewer->getDrawScaleFactor());
-            const float analog_value(analog_dev->getData());
-
-            // Rescale [0,1] to [-1,1].
-            in_out_val = analog_value * 2.0 - 1.0f;
-
-            const float eps_limit(0.1f * to_meters);
-
-            if ( gmtl::Math::abs(in_out_val) < eps_limit )
-            {
-               in_out_val = 0.0f;
-            }
-
-            // The above code treats the forward value as 1.0. If the forward
-            // value is 1.0, then we need to invert the sliding direction.
-            if ( mForwardVal == 0.0f )
-            {
-               in_out_val = -in_out_val;
-            }
-         }
-      }
-
-      // If in_out_val is not zero, then slide the selected grid along its
-      // Z-axis based on in_out_val.
-      if ( in_out_val != 0.0f )
-      {
-         const float in_out_scale(0.20f);
-         const float trans_val(-in_out_val * in_out_scale);
-
-         const gmtl::Matrix44f delta_trans_mat =
-            gmtl::makeTrans<gmtl::Matrix44f>(gmtl::Vec3f(0.0f, 0.0f,
-                                                         trans_val));
-
-         inf::GridPtr grid = mGrids[mSelectedGridIndex];
-         gmtl::Matrix44f grid_xform;
-         gmtl::set(grid_xform, grid->getCurrentXform());
-         grid->move(grid_xform * delta_trans_mat);
-      }
-      // If no sliding is being performed and the reset button is on, then
-      // reset the position of the selected grid.
-      else if ( mResetBtn.test(mWandInterface, gadget::Digital::ON) )
-      {
-         mGrids[mSelectedGridIndex]->reset();
-      }
-
-      // If the show/hide button has been toggled on, toggle the visible state
-      // of the selected grid.
-      if ( mHideBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
-      {
-         mGrids[mSelectedGridIndex]->setVisible(
-            ! mGrids[mSelectedGridIndex]->isVisible()
-         );
-
-         // Determine if at least one grid is visible now. If there is one
-         // such grid, then mGridsVisible should remain true. Otherwise,
-         // it should be set to false so that all the grids can be toggled on
-         // at once.
-         bool grid_visible(false);
+         mGridsVisible = ! mGridsVisible;
          std::vector<inf::GridPtr>::iterator g;
          for ( g = mGrids.begin(); g != mGrids.end(); ++g )
          {
-            if ( (*g)->isVisible() )
+            (*g)->setVisible(mGridsVisible);
+         }
+      }
+
+      // Change the grid selection state if the cycle button has toggled on.
+      if ( mCycleBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      {
+         if ( mSelectedGridIndex != -1 )
+         {
+            mGrids[mSelectedGridIndex]->setSelected(false);
+         }
+
+         // If there are grids defined, move mSelectedGridIndex to the next one
+         // (using a circular increment) and tell that grid that it is now
+         // selected.
+         if ( ! mGrids.empty() )
+         {
+            mSelectedGridIndex = (mSelectedGridIndex + 1) % mGrids.size();
+            mGrids[mSelectedGridIndex]->setSelected(true);
+
+            IOV_STATUS << "Grid #" << mSelectedGridIndex
+                       << " (" << mGrids[mSelectedGridIndex]->getName()
+                       << ") selected" << std::endl;
+
+            // XXX: Should the visible state change when the grid is selected?
+            // If it doesn't, then there is no visual cue to the user that the
+            // grid has been selected. On the other hand, if the user is just
+            // trying to cycle to some other grid (visible or not), it may not
+            // be desirable to make invisible grids along the way visible.
+//            mGrids[mSelectedGridIndex]->setVisible(true);
+         }
+      }
+
+      // If the user has selected a grid, check to see if any manipulations are
+      // being performed on it.
+      if ( mSelectedGridIndex != -1 )
+      {
+         float in_out_val(0.0f);
+
+         // If an analog device index is configured, check to see if analog
+         // data is available that would result in the selected grid being
+         // slid along its Z-axis.
+         if ( -1 != mAnalogNum )
+         {
+            gadget::AnalogInterface& analog_dev =
+               mWandInterface->getAnalog(mAnalogNum);
+
+            // Only check for analog data if the indicated analog device is not
+            // stupefied.
+            if ( ! analog_dev->isStupefied() )
             {
-               grid_visible = true;
-               break;
+               const float to_meters(viewer->getDrawScaleFactor());
+               const float analog_value(analog_dev->getData());
+
+               // Rescale [0,1] to [-1,1].
+               in_out_val = analog_value * 2.0 - 1.0f;
+
+               const float eps_limit(0.1f * to_meters);
+
+               if ( gmtl::Math::abs(in_out_val) < eps_limit )
+               {
+                  in_out_val = 0.0f;
+               }
+
+               // The above code treats the forward value as 1.0. If the
+               // forward value is 1.0, then we need to invert the sliding
+               // direction.
+               if ( mForwardVal == 0.0f )
+               {
+                  in_out_val = -in_out_val;
+               }
             }
          }
 
-         mGridsVisible = grid_visible;
+         // If in_out_val is not zero, then slide the selected grid along its
+         // Z-axis based on in_out_val.
+         if ( in_out_val != 0.0f )
+         {
+            const float in_out_scale(0.20f);
+            const float trans_val(-in_out_val * in_out_scale);
+
+            const gmtl::Matrix44f delta_trans_mat =
+               gmtl::makeTrans<gmtl::Matrix44f>(gmtl::Vec3f(0.0f, 0.0f,
+                                                            trans_val));
+
+            inf::GridPtr grid = mGrids[mSelectedGridIndex];
+            gmtl::Matrix44f grid_xform;
+            gmtl::set(grid_xform, grid->getCurrentXform());
+            grid->move(grid_xform * delta_trans_mat);
+         }
+         // If no sliding is being performed and the reset button is on, then
+         // reset the position of the selected grid.
+         else if ( mResetBtn.test(mWandInterface, gadget::Digital::ON) )
+         {
+            mGrids[mSelectedGridIndex]->reset();
+         }
+
+         // If the show/hide button has been toggled on, toggle the visible
+         // state of the selected grid.
+         if ( mHideBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+         {
+            mGrids[mSelectedGridIndex]->setVisible(
+               ! mGrids[mSelectedGridIndex]->isVisible()
+            );
+
+            // Determine if at least one grid is visible now. If there is one
+            // such grid, then mGridsVisible should remain true. Otherwise,
+            // it should be set to false so that all the grids can be toggled
+            // on at once.
+            bool grid_visible(false);
+            std::vector<inf::GridPtr>::iterator g;
+            for ( g = mGrids.begin(); g != mGrids.end(); ++g )
+            {
+               if ( (*g)->isVisible() )
+               {
+                  grid_visible = true;
+                  break;
+               }
+            }
+
+            mGridsVisible = grid_visible;
+         }
       }
    }
-}
-
-void GridPlugin::run(inf::ViewerPtr)
-{
-   /* Do nothing. */ ;
 }
 
 GridPlugin::GridPlugin()

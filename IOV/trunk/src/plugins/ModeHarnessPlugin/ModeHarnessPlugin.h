@@ -85,13 +85,6 @@ public:
    virtual inf::PluginPtr init(inf::ViewerPtr viewer);
 
    /**
-    * This does nothing.
-    *
-    * @param viewer The viewer application object.
-    */
-   virtual void updateState(inf::ViewerPtr viewer);
-
-   /**
     * If a component switch is scheduled to occur, the currently active
     * component (if there is one) is deactivated. Then, the component switch
     * occurs. If there is a new component to replace the old, the new
@@ -104,7 +97,7 @@ public:
     *
     * @param viewer The viewer application object.
     */
-   virtual void run(inf::ViewerPtr viewer);
+   virtual void update(inf::ViewerPtr viewer);
 
    /**
     * Invokes the global scope delete operator.  This is required for proper

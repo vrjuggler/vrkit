@@ -156,38 +156,37 @@ PluginPtr ViewpointsPlugin::init(inf::ViewerPtr viewer)
 //    - Set it on the viewplatform
 //    - Get ready for the next location
 //
-void ViewpointsPlugin::updateState(inf::ViewerPtr viewer)
+void ViewpointsPlugin::update(inf::ViewerPtr viewer)
 {
-   gadget::DigitalInterface& control_button = mWandInterface->getButton(mControlBtnNum);
-
-   // If we have viewpoints and the button has been pressed
-   if(!mViewpoints.empty() &&
-      control_button->getData() == gadget::Digital::TOGGLE_ON)
+   if ( isFocused() )
    {
+      gadget::DigitalInterface& control_button =
+         mWandInterface->getButton(mControlBtnNum);
 
-      vprASSERT(mNextViewpoint < mViewpoints.size());
-      Viewpoint vp = mViewpoints[mNextViewpoint];
-
-      IOV_STATUS << boost::format("Selecting new viewpoint: [%s] %s") % mNextViewpoint % vp.mName << std::endl;
-
-      gmtl::Coord3fXYZ new_coord = gmtl::make<gmtl::Coord3fXYZ>(vp.mXform);
-      IOV_STATUS << "   New pos: " << new_coord << std::endl;
-
-      inf::ViewPlatform& viewplatform = viewer->getUser()->getViewPlatform();
-      viewplatform.setCurPos(vp.mXform);
-
-      mNextViewpoint += 1;
-      if(mNextViewpoint >= mViewpoints.size())
+      // If we have viewpoints and the button has been pressed
+      if ( ! mViewpoints.empty() &&
+           control_button->getData() == gadget::Digital::TOGGLE_ON )
       {
-         mNextViewpoint = 0;
+         vprASSERT(mNextViewpoint < mViewpoints.size());
+         Viewpoint vp = mViewpoints[mNextViewpoint];
+
+         IOV_STATUS << boost::format("Selecting new viewpoint: [%s] %s") % mNextViewpoint % vp.mName
+                    << std::endl;
+
+         gmtl::Coord3fXYZ new_coord = gmtl::make<gmtl::Coord3fXYZ>(vp.mXform);
+         IOV_STATUS << "   New pos: " << new_coord << std::endl;
+
+         inf::ViewPlatform& viewplatform = viewer->getUser()->getViewPlatform();
+         viewplatform.setCurPos(vp.mXform);
+
+         mNextViewpoint += 1;
+         if ( mNextViewpoint >= mViewpoints.size() )
+         {
+            mNextViewpoint = 0;
+         }
       }
    }
 }
-
-void ViewpointsPlugin::run(inf::ViewerPtr viewer)
-{
-}
-
 
 } // namespace inf
 

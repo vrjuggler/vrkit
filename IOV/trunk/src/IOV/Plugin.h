@@ -13,7 +13,7 @@
 #include <IOV/PluginPtr.h>
 
 #define INF_PLUGIN_API_MAJOR    1
-#define INF_PLUGIN_API_MINOR    1
+#define INF_PLUGIN_API_MINOR    2
 
 namespace inf
 {
@@ -71,22 +71,26 @@ public:
    virtual PluginPtr init(inf::ViewerPtr viewer) = 0;
 
    /**
-    * Tells this plug-in to update its state, which generally means that it
-    * should do whatever it needs to do before run() is invoked.
-    *
-    * @pre This plug-in has focus.
-    */
-   virtual void updateState(inf::ViewerPtr viewer) = 0;
-
-   /**
     * Tells this plug-in that it can perform its specific action(s) based on
-    * its current state.  The state of this plug-in may or may not have been
-    * updated depending on its focus, but this method will be invoked
-    * regardless of the focus state.
+    * its current state. The implementation should take the focus of this
+    * plug-in into account. That is, a plug-in that does not have focus should
+    * not receive input or examine the state of input devices, but it may
+    * still have some function to perform based on its current state.
     *
-    * @see updateState(), setFocused()
+    * @param viewer The VR Juggler application object instance within which
+    *               this plug-in is active.
+    *
+    * @see isFocused()
+    * @see setFocused()
+    *
+    * @since 0.27.0
+    *
+    * @note In version 0.27.0, updateState() and run() were merged back into
+    *       this single method, and the plug-in API changed from 1.1 to 1.2.
+    *       Plug-ins updating to this change should block the contents of
+    *       their old updateState() method in a test for being focused.
     */
-   virtual void run(inf::ViewerPtr viewer) = 0;
+   virtual void update(inf::ViewerPtr viewer) = 0;
 
    bool isFocused() const
    {

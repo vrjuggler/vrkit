@@ -221,33 +221,25 @@ PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
-void ModeSwitchPlugin::updateState(inf::ViewerPtr viewer)
+void ModeSwitchPlugin::update(inf::ViewerPtr viewer)
 {
-   if ( mSwitchButton.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+   if ( isFocused() )
    {
-      unsigned int new_mode(0);
-      if ( mMaxMode != 0 )
+      if ( mSwitchButton.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
       {
-         new_mode = (mCurrentMode + 1) % (mMaxMode + 1);
-      }
-      switchToMode(new_mode, viewer);
-   }
-
-   for ( unsigned int i = 0; i < mPlugins.size(); ++i )
-   {
-      if ( mPlugins[i].mPlugin->isFocused() )
-      {
-         mPlugins[i].mPlugin->updateState(viewer);
+         unsigned int new_mode(0);
+         if ( mMaxMode != 0 )
+         {
+            new_mode = (mCurrentMode + 1) % (mMaxMode + 1);
+         }
+         switchToMode(new_mode, viewer);
       }
    }
-}
 
-void ModeSwitchPlugin::run(inf::ViewerPtr viewer)
-{
    std::vector<PluginData>::iterator i;
    for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
-      (*i).mPlugin->run(viewer);
+      (*i).mPlugin->update(viewer);
    }
 }
 

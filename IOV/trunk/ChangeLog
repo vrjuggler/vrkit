@@ -1,5 +1,10 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-17 patrick  Merged inf::Plugin::updateState() and inf::Plugin::run()
+                    back into inf::Plugin::update(). This reverts most of
+                    Revision 62, which predates this file.
+                    -- PLUG-IN API VERSION -- 1.2
+                    -- VERSION -- 0.27.0
 2006-06-17 patrick  inf::User now updates its view platform every time the
                     view platform moves.
 2006-06-17 patrick  inf::ViewPlatform now emits a signal when it is moved.

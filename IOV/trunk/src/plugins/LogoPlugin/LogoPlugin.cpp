@@ -216,16 +216,9 @@ PluginPtr LogoPlugin::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
-// Nothing to update
-void LogoPlugin::updateState(inf::ViewerPtr viewer)
-{
-
-}
-
-void LogoPlugin::run(inf::ViewerPtr viewer)
+// Nothing to update or do.
+void LogoPlugin::update(inf::ViewerPtr)
 {
 }
-
 
 } // namespace inf
-

@@ -115,50 +115,48 @@ PickPlugin::objectDeintersected(inf::SceneObjectPtr obj)
    return inf::Event::CONTINUE;
 }
 
-void PickPlugin::updateState(ViewerPtr viewer)
+void PickPlugin::update(ViewerPtr)
 {
-   // if Button pressed
-   //   if mIsect == mPicked
-   //     release mPicked
-   //   else if mIsect != NULL
-   //     release mPicked
-   //     pick mIsect
-
-   // If we are intersecting an object but not grabbing it and the grab
-   // button has just been pressed, grab the intersected object.
-   if ( mPickBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) &&
-        NULL != mIntersectedObj.get() )
+   if ( isFocused() )
    {
-      if (mIntersectedObj == mPickedObj)
+      // if Button pressed
+      //   if mIsect == mPicked
+      //     release mPicked
+      //   else if mIsect != NULL
+      //     release mPicked
+      //     pick mIsect
+
+      // If we are intersecting an object but not grabbing it and the grab
+      // button has just been pressed, grab the intersected object.
+      if ( mPickBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) &&
+           NULL != mIntersectedObj.get() )
       {
-         std::cout << "Double click deselect" << std::endl;
-         mEventData->mObjectUnpickedSignal(mPickedObj);
-         mPickedObj = SceneObjectPtr();
-         mPicking = false;
-      }
-      else // We picked a new object.
-      {
-         if (mPickedObj != NULL)
+         if (mIntersectedObj == mPickedObj)
          {
-            std::cout << "New object selected, so deselect" << std::endl;
+            std::cout << "Double click deselect" << std::endl;
             mEventData->mObjectUnpickedSignal(mPickedObj);
             mPickedObj = SceneObjectPtr();
             mPicking = false;
          }
+         else // We picked a new object.
+         {
+            if (mPickedObj != NULL)
+            {
+               std::cout << "New object selected, so deselect" << std::endl;
+               mEventData->mObjectUnpickedSignal(mPickedObj);
+               mPickedObj = SceneObjectPtr();
+               mPicking = false;
+            }
 
-         mPickSound.trigger();
-         mPickedObj = mIntersectedObj;
-         mPicking = true;
+            mPickSound.trigger();
+            mPickedObj = mIntersectedObj;
+            mPicking = true;
 
-         // Send a select event.
-         mEventData->mObjectPickedSignal(mPickedObj);
+            // Send a select event.
+            mEventData->mObjectPickedSignal(mPickedObj);
+         }
       }
    }
-}
-
-void PickPlugin::run(inf::ViewerPtr viewer)
-{
-   ;
 }
 
 bool PickPlugin::config(jccl::ConfigElementPtr elt)

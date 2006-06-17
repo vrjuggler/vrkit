@@ -42,9 +42,7 @@ public:
     */
    virtual inf::PluginPtr init(inf::ViewerPtr viewer);
 
-   virtual void updateState(inf::ViewerPtr viewer);
-
-   virtual void run(inf::ViewerPtr viewer);
+   virtual void update(inf::ViewerPtr viewer);
 
    /** Get status panel for direct usage. */
    StatusPanel& getPanel();

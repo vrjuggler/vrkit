@@ -58,15 +58,7 @@ public:
     *
     * @param viewer The VR Juggler application object.
     */
-   virtual void updateState(inf::ViewerPtr viewer);
-
-   /**
-    * Does nothing.
-    *
-    * @param viewer The VR Juggler application object. This parameter is
-    *               ignored.
-    */
-   virtual void run(inf::ViewerPtr viewer);
+   virtual void update(inf::ViewerPtr viewer);
 
    /**
     * Invokes the global scope delete operator.  This is required for proper

@@ -173,20 +173,17 @@ namespace inf
       return shared_from_this(); 
    }
    
-   void ModelSwapPlugin::updateState(inf::ViewerPtr viewer)
+   void ModelSwapPlugin::update(inf::ViewerPtr)
    {
-      if ( mSwapButton.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      if ( isFocused() )
       {
-         unsigned int num_models = mSwitchNode->getNChildren();
-         unsigned int cur_model = mSwitchCore->getChoice();
-         mSwitchCore->setChoice((cur_model + 1) % num_models);
+         if ( mSwapButton.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+         {
+            unsigned int num_models = mSwitchNode->getNChildren();
+            unsigned int cur_model = mSwitchCore->getChoice();
+            mSwitchCore->setChoice((cur_model + 1) % num_models);
+         }
       }
    }
-   
-   void ModelSwapPlugin::run(inf::ViewerPtr viewer)
-   {
-      /* Do nothing. */ ;
-   }
-   
-   
+
 }  // namespace inf

@@ -145,12 +145,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
-void StatusPanelPlugin::updateState(inf::ViewerPtr viewer)
-{
-
-}
-
-void StatusPanelPlugin::run(inf::ViewerPtr viewer)
+void StatusPanelPlugin::update(inf::ViewerPtr)
 {
    mStatusPanel->update();        // Do any updates that we need from this frame
 }

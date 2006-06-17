@@ -89,9 +89,7 @@ protected:
 
    virtual void focusChanged(inf::ViewerPtr viewer);
 
-   virtual void updateNavState(ViewerPtr viewer, ViewPlatform& viewPlatform);
-
-   virtual void runNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
+   virtual void updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
    std::vector<int> transformButtonVec(const std::vector<int>& btns);
 
@@ -105,7 +103,6 @@ protected:
    WandInterfacePtr mWandInterface;
 
    bool mCanNavigate;
-   NavState mNavState;
 
    float mVelocity;
    float mMaxVelocity;

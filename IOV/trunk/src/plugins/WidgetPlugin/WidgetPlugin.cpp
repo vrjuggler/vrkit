@@ -136,50 +136,51 @@ WidgetPlugin::objectDeintersected(inf::SceneObjectPtr obj)
    return inf::Event::CONTINUE;
 }
 
-void WidgetPlugin::updateState(inf::ViewerPtr viewer)
+void WidgetPlugin::update(inf::ViewerPtr viewer)
 {
-   // XXX: Mouse move is not currently implemented.
-   //gmtl::Point3f last_isect_point = mIntersectPoint;
-
-   // If we are intersecting an object but not grabbing it and the grab
-   // button has just been pressed, grab the intersected object.
-   if ( mIntersecting && !mWidgetPressed &&
-        mSelectBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+   if ( isFocused() )
    {
-      mWidgetPressed = true;
+      // XXX: Mouse move is not currently implemented.
+      //gmtl::Point3f last_isect_point = mIntersectPoint;
 
-      mIntersectedObj->wandPressed();
-   }
-   // If we are grabbing an object and the grab button has just been pressed
-   // again, release the grabbed object.
-   else if ( mWidgetPressed &&
-             mSelectBtn.test(mWandInterface, gadget::Digital::TOGGLE_OFF) )
-   {
-      mWidgetPressed = false;
-
-      // We have just released the grabbed object, but we are still
-      // intersecting it.  Set the bounding box state back to the
-      // intersecting state and clear mIntersectedObj.
-      if ( mIntersectedObj != NULL && mIntersectedObj->getRoot() != OSG::NullFC )
+      // If we are intersecting an object but not grabbing it and the grab
+      // button has just been pressed, grab the intersected object.
+      if ( mIntersecting && ! mWidgetPressed &&
+           mSelectBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
       {
-         mIntersectedObj->wandReleased();
+         mWidgetPressed = true;
+
+         mIntersectedObj->wandPressed();
       }
+      // If we are grabbing an object and the grab button has just been
+      // pressed again, release the grabbed object.
+      else if ( mWidgetPressed &&
+                mSelectBtn.test(mWandInterface, gadget::Digital::TOGGLE_OFF) )
+      {
+         mWidgetPressed = false;
+
+         // We have just released the grabbed object, but we are still
+         // intersecting it.  Set the bounding box state back to the
+         // intersecting state and clear mIntersectedObj.
+         if ( mIntersectedObj != NULL &&
+              mIntersectedObj->getRoot() != OSG::NullFC )
+         {
+            mIntersectedObj->wandReleased();
+         }
+      }
+
+      // XXX: Mouse move is not currently implemented.
+      /*
+      if ( mIntersecting  &&  last_isect_point != mIntersectPoint)
+      {
+         static int i = 0;
+         i++;
+
+         mIntersectedObj->wandMoved();
+      }
+      */
    }
 
-   // XXX: Mouse move is not currently implemented.
-   /*
-   if ( mIntersecting  &&  last_isect_point != mIntersectPoint)
-   {
-      static int i = 0;
-      i++;
-
-      mIntersectedObj->wandMoved();
-   }
-   */
-}
-
-void WidgetPlugin::run(inf::ViewerPtr viewer)
-{
    if (mWidgetData->widgetsAddedOrRemoved())
    {
       OSG::GroupNodePtr decorator_root =

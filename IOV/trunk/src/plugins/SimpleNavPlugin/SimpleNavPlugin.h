@@ -75,9 +75,7 @@ protected:
 
    virtual void focusChanged(inf::ViewerPtr viewer);
 
-   virtual void updateNavState(ViewerPtr viewer, ViewPlatform& viewPlatform);
-
-   virtual void runNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
+   virtual void updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
    static std::string getElementType()
    {
@@ -87,7 +85,6 @@ protected:
    WandInterfacePtr mWandInterface;
 
    bool mCanNavigate;
-   NavState mNavState;
 
    float mVelocity;
    NavMode mNavMode;

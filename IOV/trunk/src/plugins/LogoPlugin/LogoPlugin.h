@@ -35,10 +35,7 @@ public:
 
    virtual PluginPtr init(inf::ViewerPtr viewer);
 
-   virtual void updateState(inf::ViewerPtr viewer);
-
-   virtual void run(inf::ViewerPtr viewer);
-
+   virtual void update(inf::ViewerPtr viewer);
 
    /**
     * Invokes the global scope delete operator.  This is required for proper

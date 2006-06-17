@@ -226,21 +226,10 @@ void Viewer::preFrame()
       }
    }
 
-   std::vector<inf::PluginPtr>::iterator i;
-
-   // First, we update the state of each plug-in.  All plug-ins will get a
-   // consistent view of the run-time state of the system before being run.
-   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
-   {
-      (*i)->updateState(myself);
-   }
-
-   // Then, we tell each plug-in to do its thing.  Any given plug-in may
-   // change the state of the system as a result of performing its task(s).
-   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
-   {
-      (*i)->run(myself);
-   }
+   // Tell each plug-in to do its thing. Any given plug-in may change the
+   // state of the system as a result of performing its task(s).
+   std::for_each(mPlugins.begin(), mPlugins.end(),
+                 boost::bind(&Plugin::update, _1, myself));
 
    // Update the user (and navigation)
    getUser()->update(myself);

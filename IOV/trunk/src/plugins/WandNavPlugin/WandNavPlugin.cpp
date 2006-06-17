@@ -63,7 +63,6 @@ namespace inf
 WandNavPlugin::WandNavPlugin()
    : mLastFrameTime(0, vpr::Interval::Sec)
    , mCanNavigate(false)
-   , mNavState(RESET)
    , mVelocity(0.0f)
    , mMaxVelocity(0.5f)
    , mAcceleration(0.005f)
@@ -298,78 +297,80 @@ void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
    }
 }
 
-void WandNavPlugin::updateNavState(ViewerPtr viewer,
-                                   ViewPlatform& viewPlatform)
+void WandNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
 {
-   vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
+   NavState nav_state(RESET);
 
-   // Update velocity
-   if ( mForwardBtn.test(mWandInterface, gadget::Digital::ON) )
+   if ( isFocused() )
    {
-      mVelocity += mAcceleration;
-   }
-   else if ( mReverseBtn.test(mWandInterface, gadget::Digital::ON) )
-   {
-      mVelocity -= mAcceleration;
-   }
-   else if ( mVelocity != 0.0f )
-   {
-      if(mIsDecelerationEnabled)
+      vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
+
+      // Update velocity
+      if ( mForwardBtn.test(mWandInterface, gadget::Digital::ON) )
       {
-         if( fabs(mVelocity) <= mDeceleration )
+         mVelocity += mAcceleration;
+      }
+      else if ( mReverseBtn.test(mWandInterface, gadget::Digital::ON) )
+      {
+         mVelocity -= mAcceleration;
+      }
+      else if ( mVelocity != 0.0f )
+      {
+         if ( mIsDecelerationEnabled )
          {
-            mVelocity = 0.0f;
-         }
-         else if(mVelocity > 0.0f)
-         {
-            mVelocity -= mDeceleration;
+            if( fabs(mVelocity) <= mDeceleration )
+            {
+               mVelocity = 0.0f;
+            }
+            else if ( mVelocity > 0.0f )
+            {
+               mVelocity -= mDeceleration;
+            }
+            else
+            {
+               mVelocity += mDeceleration;
+            }
          }
          else
          {
-            mVelocity += mDeceleration;
+            mVelocity = 0.0f;
          }
+      }
+
+      // Restrict velocity range to [0.0,max_vel].
+      if ( mVelocity < -mMaxVelocity )
+      {
+         mVelocity = -mMaxVelocity;
+      }
+      if ( mVelocity > mMaxVelocity )
+      {
+         mVelocity = mMaxVelocity;
+      }
+
+      // Swap the navigation mode if the mode switching button was toggled on.
+      if ( mModeBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      {
+         mNavMode = (mNavMode == WALK ? FLY : WALK);
+         IOV_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
+                   << std::endl;
+      }
+      // If the accelerate button and the rotate button are pressed together,
+      // then reset to the starting point translation and rotation.
+      else if ( mResetBtn.test(mWandInterface, gadget::Digital::ON) )
+      {
+         nav_state = RESET;
+      }
+      else if ( mRotateBtn.test(mWandInterface, gadget::Digital::ON) )
+      {
+         nav_state = ROTATE;
       }
       else
       {
-         mVelocity = 0.0f;
+         nav_state = TRANSLATE;
       }
    }
 
-   // Restrict velocity range to [0.0,max_vel].
-   if ( mVelocity < -mMaxVelocity )
-   {
-      mVelocity = -mMaxVelocity;
-   }
-   if ( mVelocity > mMaxVelocity )
-   {
-      mVelocity = mMaxVelocity;
-   }
-
-   // Swap the navigation mode if the mode switching button was toggled on.
-   if ( mModeBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
-   {
-      mNavMode = (mNavMode == WALK ? FLY : WALK);
-      IOV_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
-                << std::endl;
-   }
-   // If the accelerate button and the rotate button are pressed together,
-   // then reset to the starting point translation and rotation.
-   else if ( mResetBtn.test(mWandInterface, gadget::Digital::ON) )
-   {
-      mNavState = RESET;
-   }
-   else if ( mRotateBtn.test(mWandInterface, gadget::Digital::ON) )
-   {
-      mNavState = ROTATE;
-   }
-   else
-   {
-      mNavState = TRANSLATE;
-   }
-}
-
-void WandNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
-{
+   // Perform the work of navigating.
    const vpr::Interval cur_time(mWandInterface->getWandPos()->getTimeStamp());
    const vpr::Interval delta(cur_time - mLastFrameTime);
    float delta_sec(0.0f);
@@ -392,7 +393,7 @@ void WandNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
       gmtl::Matrix44f cur_pos = viewPlatform.getCurPos();
       const float scale_factor(viewer->getDrawScaleFactor());
 
-      switch ( mNavState )
+      switch ( nav_state )
       {
          case RESET:
             mVelocity = 0.0f;
@@ -458,7 +459,7 @@ void WandNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
             }
             break;
          default:
-            vprASSERT(false && "Bad value for mNavState");
+            vprASSERT(false && "Bad value for nav_state");
             break;
       }
 

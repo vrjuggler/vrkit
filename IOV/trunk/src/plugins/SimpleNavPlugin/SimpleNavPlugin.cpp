@@ -59,7 +59,6 @@ namespace inf
 
 SimpleNavPlugin::SimpleNavPlugin()
    : mCanNavigate(false)
-   , mNavState(RESET)
    , mVelocity(0.0f)
    , mNavMode(WALK)
    , mForBtn(-1)
@@ -197,80 +196,81 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
    }
 }
 
-void SimpleNavPlugin::updateNavState(ViewerPtr viewer,
-                                     ViewPlatform& viewPlatform)
+void SimpleNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
 {
-   vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
+   NavState nav_state(RESET);
 
-   const float inc_vel(0.005f);
-   const float max_vel(0.5f);
+   if ( isFocused() )
+   {
+      vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
 
-   gadget::DigitalInterface& accel_button =
-      mWandInterface->getButton(mForBtn);
-   gadget::DigitalInterface& deccel_button =
-      mWandInterface->getButton(mRevBtn);
-   gadget::DigitalInterface& rotate_button =
-      mWandInterface->getButton(mRotateBtn);
-   gadget::DigitalInterface& mode_button =
-      mWandInterface->getButton(mModeBtn);
+      const float inc_vel(0.005f);
+      const float max_vel(0.5f);
 
-   // Update velocity
-   if ( accel_button->getData() == gadget::Digital::ON )
-   {
-      mVelocity += inc_vel;
-   }
-   else if ( deccel_button->getData() == gadget::Digital::ON )
-   {
-      mVelocity -= inc_vel;
-   }
-   else if(mVelocity > 0)
-   {
-      mVelocity = 0.0f;
+      gadget::DigitalInterface& accel_button =
+         mWandInterface->getButton(mForBtn);
+      gadget::DigitalInterface& deccel_button =
+         mWandInterface->getButton(mRevBtn);
+      gadget::DigitalInterface& rotate_button =
+         mWandInterface->getButton(mRotateBtn);
+      gadget::DigitalInterface& mode_button =
+         mWandInterface->getButton(mModeBtn);
+
+      // Update velocity
+      if ( accel_button->getData() == gadget::Digital::ON )
+      {
+         mVelocity += inc_vel;
+      }
+      else if ( deccel_button->getData() == gadget::Digital::ON )
+      {
+         mVelocity -= inc_vel;
+      }
+      else if ( mVelocity > 0 )
+      {
+         mVelocity = 0.0f;
+      }
+
+      // Restrict range
+      if ( mVelocity < -max_vel )
+      {
+         mVelocity = -max_vel;
+      }
+      if ( mVelocity > max_vel )
+      {
+         mVelocity = max_vel;
+      }
+
+      // Swap the navigation mode if the mode switching button was toggled on.
+      if ( mode_button->getData() == gadget::Digital::TOGGLE_ON )
+      {
+         mNavMode = (mNavMode == WALK ? FLY : WALK);
+         IOV_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
+                   << std::endl;
+      }
+
+      // If the accelerate button and the rotate button are pressed together,
+      // then reset to the starting point translation and rotation.
+      if ( accel_button->getData() && rotate_button->getData() )
+      {
+         nav_state = RESET;
+      }
+      else if ( rotate_button->getData() == gadget::Digital::ON )
+      {
+         nav_state = ROTATE;
+      }
+      else
+      {
+         nav_state = TRANSLATE;
+      }
    }
 
-   // Restrict range
-   if(mVelocity < -max_vel)
-   {
-      mVelocity = -max_vel;
-   }
-   if(mVelocity > max_vel)
-   {
-      mVelocity = max_vel;
-   }
-
-   // Swap the navigation mode if the mode switching button was toggled on.
-   if ( mode_button->getData() == gadget::Digital::TOGGLE_ON )
-   {
-      mNavMode = (mNavMode == WALK ? FLY : WALK);
-      IOV_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
-                << std::endl;
-   }
-
-   // If the accelerate button and the rotate button are pressed together,
-   // then reset to the starting point translation and rotation.
-   if ( accel_button->getData() && rotate_button->getData() )
-   {
-      mNavState = RESET;
-   }
-   else if ( rotate_button->getData() == gadget::Digital::ON )
-   {
-      mNavState = ROTATE;
-   }
-   else
-   {
-      mNavState = TRANSLATE;
-   }
-}
-
-void SimpleNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
-{
    if ( mCanNavigate )
    {
       gmtl::Matrix44f cur_pos = viewPlatform.getCurPos();
 
       const float scale_factor(viewer->getDrawScaleFactor());
 
-      switch ( mNavState )
+      switch ( nav_state )
       {
          case RESET:
             mVelocity = 0.0f;
@@ -332,7 +332,7 @@ void SimpleNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
             }
             break;
          default:
-            vprASSERT(false && "Bad value in mNavState");
+            vprASSERT(false && "Bad value in nav_state");
             break;
       }
 

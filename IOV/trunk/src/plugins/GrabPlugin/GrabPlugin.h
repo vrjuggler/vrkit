@@ -49,9 +49,7 @@ public:
 
    virtual PluginPtr init(inf::ViewerPtr viewer);
 
-   virtual void updateState(inf::ViewerPtr viewer);
-
-   virtual void run(inf::ViewerPtr viewer);
+   virtual void update(inf::ViewerPtr viewer);
 
    bool config(jccl::ConfigElementPtr elt);
 
