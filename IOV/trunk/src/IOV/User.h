@@ -33,12 +33,10 @@ public:
     *
     * @return This object is returned as a shared pointer.
     */
-   UserPtr init();
+   UserPtr init(ViewerPtr viewer);
 
    /**
     * Updates the user and user-associated information.
-    *
-    * @post User and view platform are updated.
     */
    void update(ViewerPtr viewer);
 
@@ -58,6 +56,8 @@ protected:
    {;}
 
 private:
+   void platformMoved(ViewerPtr viewer);
+
    /** Devices abstraction for the user. */
    InterfaceTrader    mInterfaceTrader;
 

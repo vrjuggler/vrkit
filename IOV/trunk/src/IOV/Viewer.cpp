@@ -65,8 +65,10 @@ void Viewer::init()
                 << "Viewer application!" << std::endl;
    }
 
+   ViewerPtr myself(shared_from_this());
+
    // Create an initialize the user
-   mUser = User::create()->init();
+   mUser = User::create()->init(myself);
 
    // Create and initialize the base scene object
    mScene = Scene::create()->init();
