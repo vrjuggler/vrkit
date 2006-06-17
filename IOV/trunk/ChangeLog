@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-17 patrick  Added the Volume Drawing Plug-in for rendering OpenSG
+                    volumes.
 2006-06-17 patrick  Extended the inf::Plugin interface to include methods for
                     context-specific actions (including rendering).
                     -- PLUG-IN API VERSION -- 1.3
