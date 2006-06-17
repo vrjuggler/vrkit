@@ -48,7 +48,17 @@ public:
     */
    virtual PluginPtr init(inf::ViewerPtr viewer);
 
+   virtual void contextInit(inf::ViewerPtr viewer);
+
    virtual void update(inf::ViewerPtr viewer);
+
+   virtual void contextPreDraw(inf::ViewerPtr viewer);
+
+   virtual void draw(inf::ViewerPtr viewer);
+
+   virtual void contextPostDraw(inf::ViewerPtr viewer);
+
+   virtual void contextClose(inf::ViewerPtr viewer);
 
    /**
     * Invokes the global scope delete operator.  This is required for proper

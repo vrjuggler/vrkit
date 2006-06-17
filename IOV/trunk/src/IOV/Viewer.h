@@ -69,29 +69,49 @@ public:
     */
    virtual void init();
 
-   /** Intitialize the context.
-    * @note: Derived classes must call base class implementation.
+   /**
+    * Intitializes the context and informs plug-ins of same.
+    *
+    * @note Derived classes must call base class implementation.
     */
-   virtual void contextInit()
-   {
-      vrj::OpenSGApp::contextInit();
-   }
+   virtual void contextInit();
 
-   /** Called at the beginning of each frame.
+   /**
+    * Called at the beginning of each frame.
     * Updates the plugins and then updates the scene graph over the network.
-    * @note: Derived class implementations <b>MUST</b> call up to this method.
+    *
+    * @note Derived class implementations \em MUST call up to this method.
     */
    virtual void preFrame();
 
-   /** Called after cluster data sync and after preFrame is complete.
+   /**
+    * Called after cluster data sync and after preFrame is complete.
     * We use it to send out OpenSG scene graph updates to the other nodes.
-    * @post: OpenSG data (changelist) has been sent to all remote nodes.
-    *        Local change list has been cleared (after send).
+    *
+    * @post OpenSG data (change list) has been sent to all remote nodes.
+    *       Local change list has been cleared (after send).
     */
    virtual void latePreFrame();
 
-   /** Called at the end of each frame.
-    * @note: Derived class implementations <b>MUST</b> call up to this method.
+   /**
+    * @note Derived classes must call base class implementation.
+    */
+   virtual void contextPreDraw();
+
+   /**
+    * @note Derived classes must call base class implementation.
+    */
+   virtual void draw();
+
+   /**
+    * @note Derived classes must call base class implementation.
+    */
+   virtual void contextPostDraw();
+
+   /**
+    * Called at the end of each frame.
+    *
+    * @note Derived class implementations \em MUST call up to this method.
     */
    virtual void postFrame()
    {;}
@@ -102,6 +122,22 @@ public:
       return mScene;
    }
 
+   /**
+    * Returns the context-specific render action for this viewer. This method
+    * may only be called when an OpenGL context is active.
+    *
+    * @since 0.28.0
+    */
+   OSG::RenderAction* getRenderAction();
+
+   /**
+    * @note Derived classes must call base class implementation.
+    */
+   virtual void contextClose();
+
+   /**
+    * @note Derived classes must call base class implementation.
+    */
    virtual void exit();
 
 public:

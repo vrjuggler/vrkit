@@ -63,6 +63,31 @@ Plugin::~Plugin()
    /* Do nothing. */ ;
 }
 
+void Plugin::contextInit(inf::ViewerPtr)
+{
+   /* Do nothing. */ ;
+}
+
+void Plugin::contextPreDraw(inf::ViewerPtr)
+{
+   /* Do nothing. */ ;
+}
+
+void Plugin::draw(inf::ViewerPtr)
+{
+   /* Do nothing. */ ;
+}
+
+void Plugin::contextPostDraw(inf::ViewerPtr)
+{
+   /* Do nothing. */ ;
+}
+
+void Plugin::contextClose(inf::ViewerPtr)
+{
+   /* Do nothing. */ ;
+}
+
 // NOTE: This is here in the .cpp file to ensure that inf::Plugin is
 // compiled properly.  Should this code ever become part of a library, it is
 // important to ensure that polymorphic types are compiled into the correct

@@ -221,6 +221,16 @@ PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
+void ModeSwitchPlugin::contextInit(inf::ViewerPtr viewer)
+{
+   // Inform all plug-ins of context initialization.
+   std::vector<PluginData>::iterator i;
+   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   {
+      (*i).mPlugin->contextInit(viewer);
+   }
+}
+
 void ModeSwitchPlugin::update(inf::ViewerPtr viewer)
 {
    if ( isFocused() )
@@ -240,6 +250,58 @@ void ModeSwitchPlugin::update(inf::ViewerPtr viewer)
    for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
       (*i).mPlugin->update(viewer);
+   }
+}
+
+void ModeSwitchPlugin::contextPreDraw(inf::ViewerPtr viewer)
+{
+   // Only tell the focused plug-in(s) to perform context-specific pre-draw
+   // operations.
+   std::vector<PluginData>::iterator i;
+   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   {
+      if ( (*i).mPlugin->isFocused() )
+      {
+         (*i).mPlugin->contextPreDraw(viewer);
+      }
+   }
+}
+
+void ModeSwitchPlugin::draw(inf::ViewerPtr viewer)
+{
+   // Only tell the focused plug-in(s) to perform context-specific draw
+   // operations.
+   std::vector<PluginData>::iterator i;
+   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   {
+      if ( (*i).mPlugin->isFocused() )
+      {
+         (*i).mPlugin->draw(viewer);
+      }
+   }
+}
+
+void ModeSwitchPlugin::contextPostDraw(inf::ViewerPtr viewer)
+{
+   // Only tell the focused plug-in(s) to perform context-specific post-draw
+   // operations.
+   std::vector<PluginData>::iterator i;
+   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   {
+      if ( (*i).mPlugin->isFocused() )
+      {
+         (*i).mPlugin->contextPostDraw(viewer);
+      }
+   }
+}
+
+void ModeSwitchPlugin::contextClose(inf::ViewerPtr viewer)
+{
+   // Inform all plug-ins of context shutdown.
+   std::vector<PluginData>::iterator i;
+   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   {
+      (*i).mPlugin->contextClose(viewer);
    }
 }
 

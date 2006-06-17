@@ -138,6 +138,17 @@ void Viewer::init()
    }
 }
 
+void Viewer::contextInit()
+{
+   vrj::OpenSGApp::contextInit();
+
+   // Tell each plug-in to do its thing. Any given plug-in may change the
+   // state of the system as a result of performing its context initialization
+   // task(s).
+   std::for_each(mPlugins.begin(), mPlugins.end(),
+                 boost::bind(&Plugin::contextInit, _1, shared_from_this()));
+}
+
 void Viewer::preFrame()
 {
    ViewerPtr myself = shared_from_this();
@@ -295,6 +306,55 @@ void Viewer::readDataFromSlave(OSG::BinaryDataHandler& reader)
 {
    OSG::UInt8 junk;
    reader.getValue(junk);
+}
+
+void Viewer::contextPreDraw()
+{
+   vrj::OpenSGApp::contextPreDraw();
+
+   // Tell each plug-in to do its thing. Any given plug-in may change the
+   // state of the system as a result of performing its context pre-draw
+   // task(s).
+   std::for_each(mPlugins.begin(), mPlugins.end(),
+                 boost::bind(&Plugin::contextPreDraw, _1, shared_from_this()));
+}
+
+void Viewer::draw()
+{
+   vrj::OpenSGApp::draw();
+
+   // Tell each plug-in to do its thing. Any given plug-in may change the
+   // state of the system as a result of performing its rendering task(s).
+   std::for_each(mPlugins.begin(), mPlugins.end(),
+                 boost::bind(&Plugin::draw, _1, shared_from_this()));
+}
+
+void Viewer::contextPostDraw()
+{
+   vrj::OpenSGApp::contextPostDraw();
+
+   // Tell each plug-in to do its thing. Any given plug-in may change the
+   // state of the system as a result of performing its rendering context
+   // post-draw task(s).
+   std::for_each(mPlugins.begin(), mPlugins.end(),
+                 boost::bind(&Plugin::contextPostDraw, _1,
+                             shared_from_this()));
+}
+
+OSG::RenderAction* Viewer::getRenderAction()
+{
+   return mContextData->mRenderAction;
+}
+
+void Viewer::contextClose()
+{
+   vrj::OpenSGApp::contextClose();
+
+   // Tell each plug-in to do its thing. Any given plug-in may change the
+   // state of the system as a result of performing its rendering context
+   // shutdown task(s).
+   std::for_each(mPlugins.begin(), mPlugins.end(),
+                 boost::bind(&Plugin::contextClose, _1, shared_from_this()));
 }
 
 void Viewer::exit()

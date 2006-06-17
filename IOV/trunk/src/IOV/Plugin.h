@@ -13,7 +13,7 @@
 #include <IOV/PluginPtr.h>
 
 #define INF_PLUGIN_API_MAJOR    1
-#define INF_PLUGIN_API_MINOR    2
+#define INF_PLUGIN_API_MINOR    3
 
 namespace inf
 {
@@ -71,6 +71,20 @@ public:
    virtual PluginPtr init(inf::ViewerPtr viewer) = 0;
 
    /**
+    * Perform context-specific activities when a context is opened. This
+    * implementation does nothing.
+    *
+    * @pre vrj::OpenSGApp::contextInit() has been invoked.
+    *
+    * @param viewer The VR Juggler application object instance within which
+    *               this plug-in is active. This parameter is ignored by
+    *               this implementation.
+    *
+    * @since 0.28.0
+    */
+   virtual void contextInit(inf::ViewerPtr viewer);
+
+   /**
     * Tells this plug-in that it can perform its specific action(s) based on
     * its current state. The implementation should take the focus of this
     * plug-in into account. That is, a plug-in that does not have focus should
@@ -91,6 +105,62 @@ public:
     *       their old updateState() method in a test for being focused.
     */
    virtual void update(inf::ViewerPtr viewer) = 0;
+
+   /**
+    * Perform context-specific activities before the main rendering is
+    * started. This implementation does nothing.
+    *
+    * @pre vrj::OpenSGApp::contextPreDraw() has been invoked.
+    *
+    * @param viewer The VR Juggler application object instance within which
+    *               this plug-in is active. This parameter is ignored by
+    *               this implementation.
+    *
+    * @since 0.28.0
+    */
+   virtual void contextPreDraw(inf::ViewerPtr viewer);
+
+   /**
+    * Perform context-specific rendering activities. This implementation does
+    * nothing.
+    *
+    * @pre vrj::OpenSGApp::draw() has been invoked.
+    *
+    * @param viewer The VR Juggler application object instance within which
+    *               this plug-in is active. This parameter is ignored by
+    *               this implementation.
+    *
+    * @since 0.28.0
+    */
+   virtual void draw(inf::ViewerPtr viewer);
+
+   /**
+    * Perform context-specific activities after the main rendering has
+    * completed. This implementation does nothing.
+    *
+    * @pre vrj::OpenSGApp::contextPostDraw() has been invoked.
+    *
+    * @param viewer The VR Juggler application object instance within which
+    *               this plug-in is active. This parameter is ignored by
+    *               this implementation.
+    *
+    * @since 0.28.0
+    */
+   virtual void contextPostDraw(inf::ViewerPtr viewer);
+
+   /**
+    * Perform context-specific activities when a context is closing. This
+    * implementation does nothing.
+    *
+    * @pre vrj::OpenSGApp::contextClose() has been invoked.
+    *
+    * @param viewer The VR Juggler application object instance within which
+    *               this plug-in is active. This parameter is ignored by
+    *               this implementation.
+    *
+    * @since 0.28.0
+    */
+   virtual void contextClose(inf::ViewerPtr viewer);
 
    bool isFocused() const
    {

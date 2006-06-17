@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-17 patrick  Extended the inf::Plugin interface to include methods for
+                    context-specific actions (including rendering).
+                    -- PLUG-IN API VERSION -- 1.3
+                    -- VERSION -- 0.28.0
 2006-06-17 patrick  Merged inf::Plugin::updateState() and inf::Plugin::run()
                     back into inf::Plugin::update(). This reverts most of
                     Revision 62, which predates this file.
@@ -168,7 +172,7 @@ DATE       AUTHOR   CHANGE
                     Changed the signature of inf::Plugin::focusChanged() to
                     take a parameter of type inf::ViewerPtr.
                     -- VERSION -- 0.6.0
-2005-07-21 patrichk Switch to using OpenSG typdef's for instantiations of
+2005-07-21 patrick  Switch to using OpenSG typdef's for instantiations of
                     OSG::CoredNodePtr<T>.
                     -- VERSION -- 0.5.2
 2005-07-21 patrick  Added the helper method for creating scribe materials
