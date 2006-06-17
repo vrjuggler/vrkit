@@ -2,9 +2,10 @@
 
 #include <gmtl/External/OpenSGConvert.h>
 
-#include <IOV/ViewPlatform.h>
 #include <IOV/Scene.h>
 #include <IOV/Viewer.h>
+#include <IOV/ViewPlatform.h>
+
 
 namespace inf
 {
@@ -20,6 +21,13 @@ void ViewPlatform::update(ViewerPtr viewer)
    OSG::beginEditCP(xform_node);
       xform_node->setMatrix(new_xform);
    OSG::endEditCP(xform_node);
+}
+
+void ViewPlatform::setCurPos(const gmtl::Matrix44f& mat)
+{
+   mCurPos = mat;
+   gmtl::invert(mCurPosInv, mCurPos);
+   mPlatformMoved();
 }
 
 }

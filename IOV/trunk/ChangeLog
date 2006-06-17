@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-17 patrick  inf::ViewPlatform now emits a signal when it is moved.
+                    -- VERSION -- 0.26.7
 2006-06-14 patrick  Fixed a bug in the Grab Plug-in object release code that
                     could result in the object de-selected signal being
                     emitted twice.
