@@ -3,6 +3,8 @@
 #ifndef _INF_NAV_PLUGIN_H_
 #define _INF_NAV_PLUGIN_H_
 
+#include <IOV/Config.h>
+
 #include <IOV/ViewerPtr.h>
 #include <IOV/Plugin.h>
 
@@ -10,24 +12,16 @@
 namespace inf
 {
 
-class NavPlugin : public inf::Plugin
+class IOV_CLASS_API NavPlugin
+   : public inf::Plugin
 {
 public:
-   virtual ~NavPlugin()
-   {
-      /* Do nothing. */ ;
-   }
+   virtual ~NavPlugin();
 
-   void update(inf::ViewerPtr viewer)
-   {
-      updateNav(viewer, viewer->getUser()->getViewPlatform());
-   }
+   void update(inf::ViewerPtr viewer);
 
 protected:
-   NavPlugin()
-   {
-      /* Do nothing. */ ;
-   }
+   NavPlugin();
 
    /**
     * Template method pattern interface used for navigation strategies to
