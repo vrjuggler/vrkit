@@ -1,5 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
+#include <OpenSG/OSGSimpleAttachments.h>
+
 #include <IOV/Scene.h>
 
 namespace inf
@@ -25,6 +27,9 @@ ScenePtr Scene::init()
    mSceneRoot     = OSG::GroupNodePtr::create();
    mDecoratorRoot = OSG::GroupNodePtr::create();
    mTransformRoot = OSG::TransformNodePtr::create();
+
+   OSG::setName(mDecoratorRoot.node(), "Decorator Root");
+   OSG::setName(mTransformRoot.node(), "Transform Root");
 
    OSG::beginEditCP(mSceneRoot);
       mSceneRoot.node()->addChild(mDecoratorRoot.node());
