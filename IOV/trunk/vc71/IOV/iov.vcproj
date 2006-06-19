@@ -175,6 +175,9 @@
 				RelativePath="..\..\src\Iov\Grab\MoveStrategy.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\Plugin\NavPlugin.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Plugin.cpp">
 			</File>
 			<File

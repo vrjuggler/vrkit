@@ -113,6 +113,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Model Loader Plug-in", "Mod
 		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Volume Drawing Plug-in", "VolumeDrawingPlugin\VolumeDrawingPlugin.vcproj", "{D6F482D1-8E91-4A3F-B3A4-F2187CABD222}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		DebugDLL = DebugDLL
@@ -207,6 +211,10 @@ Global
 		{86AF5D6A-2049-4014-AED1-12C3297708C2}.DebugDLL.Build.0 = DebugDLL|Win32
 		{86AF5D6A-2049-4014-AED1-12C3297708C2}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
 		{86AF5D6A-2049-4014-AED1-12C3297708C2}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
+		{D6F482D1-8E91-4A3F-B3A4-F2187CABD222}.DebugDLL.ActiveCfg = DebugDLL|Win32
+		{D6F482D1-8E91-4A3F-B3A4-F2187CABD222}.DebugDLL.Build.0 = DebugDLL|Win32
+		{D6F482D1-8E91-4A3F-B3A4-F2187CABD222}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
+		{D6F482D1-8E91-4A3F-B3A4-F2187CABD222}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
