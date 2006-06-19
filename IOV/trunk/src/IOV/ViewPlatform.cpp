@@ -23,11 +23,4 @@ void ViewPlatform::update(ViewerPtr viewer)
    OSG::endEditCP(xform_node);
 }
 
-void ViewPlatform::setCurPos(const gmtl::Matrix44f& mat)
-{
-   mCurPos = mat;
-   gmtl::invert(mCurPosInv, mCurPos);
-   mPlatformMoved();
-}
-
 }

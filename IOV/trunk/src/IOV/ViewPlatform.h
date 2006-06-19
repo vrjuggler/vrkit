@@ -53,7 +53,12 @@ public:
     *
     * @param mat The new transformation matrix for the view platform.
     */
-   void setCurPos(const gmtl::Matrix44f& mat);
+   void setCurPos(const gmtl::Matrix44f& mat)
+   {
+      mCurPos = mat;
+      gmtl::invert(mCurPosInv, mCurPos);
+      mPlatformMoved();
+   }
 
    /**
     * Returns the inverse of the current position: vp_M_vw.
