@@ -25,7 +25,7 @@ namespace inf
  *
  * @see inf::Scene
  */
-class ViewPlatform
+class IOV_CLASS_API ViewPlatform
 {
 public:
    ViewPlatform()
