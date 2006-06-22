@@ -18,7 +18,7 @@
          </enumeration>
       </property>
       <property valuetype="float" variable="false" name="forward_slide_value">
-         <help>Sets the analog data value to use for sliding a grabbed object forward along the grabbing ray. Valid values are either 0.0 or 1.0. By setting the forward value to one of these, the reverse slide value is automatically assumed to be the other. For example, with a DirectX or Linux game controller, the forward slide direction should be 1.0. With an InterSense IS-900 wand, the forward slide directino should be 0.0.</help>
+         <help>Sets the analog data value to use for sliding a grabbed object forward along the grabbing ray. Valid values are either 0.0 or 1.0. By setting the forward value to one of these, the reverse slide value is automatically assumed to be the other. For example, with a DirectX or Linux game controller, the forward slide direction should be 1.0. With an InterSense IS-900 wand, the forward slide direction should be 0.0.</help>
          <value label="Forward Slide Value" defaultvalue="1.0"/>
          <enumeration editable="false">
             <enum label="1.0" value="1.0"/>
@@ -44,7 +44,7 @@
          </enumeration>
       </property>
       <property valuetype="float" variable="false" name="forward_slide_value">
-         <help>Sets the analog data value to use for sliding a grabbed object forward along the grabbing ray. Valid values are either 0.0 or 1.0. By setting the forward value to one of these, the reverse slide value is automatically assumed to be the other. For example, with a DirectX or Linux game controller, the forward slide direction should be 1.0. With an InterSense IS-900 wand, the forward slide directino should be 0.0.</help>
+         <help>Sets the analog data value to use for sliding a grabbed object forward along the grabbing ray. Valid values are either 0.0 or 1.0. By setting the forward value to one of these, the reverse slide value is automatically assumed to be the other. For example, with a DirectX or Linux game controller, the forward slide direction should be 1.0. With an InterSense IS-900 wand, the forward slide direction should be 0.0.</help>
          <value label="Forward Slide Value" defaultvalue="1.0"/>
          <enumeration editable="false">
             <enum label="1.0" value="1.0"/>
