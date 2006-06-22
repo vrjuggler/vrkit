@@ -67,16 +67,16 @@ inf::MoveStrategyPtr SlideMoveStrategy::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
-void SlideMoveStrategy::objectGrabbed(inf::ViewerPtr,
-                                      SceneObjectPtr obj,
-                                      const gmtl::Point3f& intersectPoint,
-                                      const gmtl::Matrix44f& vp_M_wand)
+void SlideMoveStrategy::objectsGrabbed(inf::ViewerPtr,
+                                       const std::vector<SceneObjectPtr>&,
+                                       const gmtl::Point3f& intersectPoint,
+                                       const gmtl::Matrix44f&)
 {
    mIntersectPoint = intersectPoint;
 }
 
-void SlideMoveStrategy::objectReleased(inf::ViewerPtr viewer,
-                                       SceneObjectPtr obj)
+void SlideMoveStrategy::objectsReleased(inf::ViewerPtr,
+                                        const std::vector<SceneObjectPtr>&)
 {
    mTransValue = 0.0f;
 }
@@ -85,7 +85,7 @@ gmtl::Matrix44f
 SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
                                SceneObjectPtr obj,
                                const gmtl::Matrix44f& vp_M_wand,
-                               gmtl::Matrix44f& curObjPos)
+                               const gmtl::Matrix44f& curObjPos)
 {
    WandInterfacePtr wand_if =
       viewer->getUser()->getInterfaceTrader().getWandInterface();

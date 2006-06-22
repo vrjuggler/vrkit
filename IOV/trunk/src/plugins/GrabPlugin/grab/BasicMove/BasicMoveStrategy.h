@@ -3,6 +3,7 @@
 #ifndef _INF_BASIC_MOVE_STRATEGY_H_
 #define _INF_BASIC_MOVE_STRATEGY_H_
 
+#include <map>
 #include <boost/enable_shared_from_this.hpp>
 
 #include <IOV/Grab/MoveStrategy.h>
@@ -33,18 +34,18 @@ public:
 
    virtual inf::MoveStrategyPtr init(inf::ViewerPtr viewer);
 
-   virtual void objectGrabbed(inf::ViewerPtr viewer,
-                              SceneObjectPtr obj,
-                              const gmtl::Point3f& intersectPoint,
-                              const gmtl::Matrix44f& vp_M_wand);
+   virtual void objectsGrabbed(inf::ViewerPtr viewer,
+                               const std::vector<SceneObjectPtr>& objs,
+                               const gmtl::Point3f& intersectPoint,
+                               const gmtl::Matrix44f& vp_M_wand);
 
-   virtual void objectReleased(inf::ViewerPtr viewer,
-                               SceneObjectPtr obj);
+   virtual void objectsReleased(inf::ViewerPtr viewer,
+                                const std::vector<SceneObjectPtr>& objs);
 
    virtual gmtl::Matrix44f computeMove(inf::ViewerPtr viewer,
                                        SceneObjectPtr obj,
                                        const gmtl::Matrix44f& vp_M_wand,
-                                       gmtl::Matrix44f& curObjMat);
+                                       const gmtl::Matrix44f& curObjMat);
 
 protected:
    BasicMoveStrategy()
@@ -53,7 +54,14 @@ protected:
       /* Do nothing. */ ;
    }
 
-   gmtl::Matrix44f m_wand_M_pobj;
+private:
+   void objectGrabbed(SceneObjectPtr obj, const gmtl::Matrix44f& vp_M_wand);
+
+   /**
+    * Map of transformations from the wand coordinate space into the
+    * coordinate space of the parent of a grabbed scene object.
+    */
+   std::map<SceneObjectPtr, gmtl::Matrix44f> m_wand_M_pobj_map;
 };
 
 }

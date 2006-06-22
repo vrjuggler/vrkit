@@ -12,6 +12,7 @@
 
 #include "CenterPointMoveStrategy.h"
 
+
 static inf::PluginCreator<inf::MoveStrategy> sPluginCreator(
    &inf::CenterPointMoveStrategy::create, "Center Point Move Strategy Plug-in"
 );
@@ -44,25 +45,22 @@ inf::MoveStrategyPtr CenterPointMoveStrategy::init(inf::ViewerPtr)
    return shared_from_this();
 }
 
-void CenterPointMoveStrategy::objectGrabbed(inf::ViewerPtr,
-                                            SceneObjectPtr,
-                                            const gmtl::Point3f&,
-                                            const gmtl::Matrix44f&)
+void CenterPointMoveStrategy::
+objectsGrabbed(inf::ViewerPtr, const std::vector<SceneObjectPtr>&,
+               const gmtl::Point3f&, const gmtl::Matrix44f&)
 {
    /* Do nothing. */ ;
 }
 
-void CenterPointMoveStrategy::objectReleased(inf::ViewerPtr,
-                                             SceneObjectPtr)
+void CenterPointMoveStrategy::
+objectsReleased(inf::ViewerPtr, const std::vector<SceneObjectPtr>&)
 {
    /* Do nothing. */ ;
 }
 
-gmtl::Matrix44f
-CenterPointMoveStrategy::computeMove(inf::ViewerPtr,
-                                     SceneObjectPtr obj,
-                                     const gmtl::Matrix44f& vp_M_wand,
-                                     gmtl::Matrix44f&)
+gmtl::Matrix44f CenterPointMoveStrategy::
+computeMove(inf::ViewerPtr, SceneObjectPtr obj,
+            const gmtl::Matrix44f& vp_M_wand, const gmtl::Matrix44f&)
 {
    // pobj_M_vp is the inverse of the object in view platform space.
    OSG::Matrix world_xform;

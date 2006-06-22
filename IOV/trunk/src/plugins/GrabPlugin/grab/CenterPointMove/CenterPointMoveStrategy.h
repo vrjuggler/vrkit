@@ -33,18 +33,18 @@ public:
 
    virtual inf::MoveStrategyPtr init(inf::ViewerPtr viewer);
 
-   virtual void objectGrabbed(inf::ViewerPtr viewer,
-                              SceneObjectPtr obj,
-                              const gmtl::Point3f& intersectPoint,
-                              const gmtl::Matrix44f& vp_M_wand);
+   virtual void objectsGrabbed(inf::ViewerPtr viewer,
+                               const std::vector<SceneObjectPtr>& objs,
+                               const gmtl::Point3f& intersectPoint,
+                               const gmtl::Matrix44f& vp_M_wand);
 
-   virtual void objectReleased(inf::ViewerPtr viewer,
-                               SceneObjectPtr obj);
+   virtual void objectsReleased(inf::ViewerPtr viewer,
+                                const std::vector<SceneObjectPtr>& objs);
 
    virtual gmtl::Matrix44f computeMove(inf::ViewerPtr viewer,
                                        SceneObjectPtr obj,
                                        const gmtl::Matrix44f& vp_M_wand,
-                                       gmtl::Matrix44f& curObjMat);
+                                       const gmtl::Matrix44f& curObjMat);
 
 protected:
    CenterPointMoveStrategy()

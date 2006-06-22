@@ -12,6 +12,7 @@
 
 #include <jccl/Config/ConfigElementPtr.h>
 
+#include <IOV/EventData.h>
 #include <IOV/Plugin.h>
 #include <IOV/PluginFactory.h>
 #include <IOV/ViewerPtr.h>
@@ -94,8 +95,10 @@ protected:
     */
    void focusChanged(inf::ViewerPtr viewer);
 
-   inf::Event::ResultType objectSelected(inf::SceneObjectPtr obj, bool selected);
-   inf::Event::ResultType objectMovedSlot(inf::SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat);
+   inf::Event::ResultType
+      objectsSelected(const std::vector<inf::SceneObjectPtr>& objs,
+		      bool selected);
+   inf::Event::ResultType objectsMovedSlot(const EventData::moved_obj_list_t&);
 
 private:
    static std::string getElementType()
@@ -114,7 +117,7 @@ private:
     */
    inf::Event::ResultType objectIntersected(inf::SceneObjectPtr obj,
                                             inf::SceneObjectPtr parentObj,
-                                            gmtl::Point3f pnt);
+                                            const gmtl::Point3f& pnt);
 
    /**
     * Responds to object de-intersection signals. Our intersection highlight

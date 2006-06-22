@@ -102,12 +102,13 @@ protected:
     *       \p obj. Otherwise, \p our selection highlight is replaced by our
     *       intersection highlight.
     *
-    * @param obj      The object associated with the selection signal.
+    * @param objs     The objects associated with the selection signal.
     * @param selected Indicates whether \p obj is newly selected or was
     *                 selected and is no longer.
     */
-   inf::Event::ResultType objectSelected(inf::SceneObjectPtr obj,
-                                         const bool selected);
+   inf::Event::ResultType
+      objectsSelected(const std::vector<inf::SceneObjectPtr>& objs,
+                      const bool selected);
 
    inf::Event::ResultType objectPicked(inf::SceneObjectPtr obj,
                                        const bool picked);

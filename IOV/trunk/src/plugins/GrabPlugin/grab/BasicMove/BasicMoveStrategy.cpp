@@ -2,6 +2,9 @@
 
 #include <IOV/Config.h>
 
+#include <algorithm>
+#include <boost/bind.hpp>
+
 #include <gmtl/MatrixOps.h>
 #include <gmtl/External/OpenSGConvert.h>
 
@@ -47,8 +50,55 @@ inf::MoveStrategyPtr BasicMoveStrategy::init(inf::ViewerPtr)
    return shared_from_this();
 }
 
-void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
-                                      SceneObjectPtr obj, const gmtl::Point3f&,
+void BasicMoveStrategy::objectsGrabbed(inf::ViewerPtr,
+                                       const std::vector<SceneObjectPtr>& objs,
+                                       const gmtl::Point3f&,
+                                       const gmtl::Matrix44f& vp_M_wand)
+{
+   std::for_each(objs.begin(), objs.end(),
+                 boost::bind(&BasicMoveStrategy::objectGrabbed, this, _1,
+                             vp_M_wand));
+}
+
+void BasicMoveStrategy::
+objectsReleased(inf::ViewerPtr, const std::vector<SceneObjectPtr>& objs)
+{
+   // This does not use std::for_each() because the cast needed to
+   // disambiguate which std::map<...>::erase() overload to use would make
+   // the code virtually unreadable.
+   std::vector<SceneObjectPtr>::const_iterator o;
+   for ( o = objs.begin(); o != objs.end(); ++o )
+   {
+      m_wand_M_pobj_map.erase(*o);
+   }
+}
+
+gmtl::Matrix44f
+BasicMoveStrategy::computeMove(inf::ViewerPtr, SceneObjectPtr obj,
+                               const gmtl::Matrix44f& vp_M_wand,
+                               const gmtl::Matrix44f& curObjMat)
+{
+   // pobj_M_vp is the inverse of the object in view platform space.
+   OSG::Matrix world_xform;
+   vprASSERT(obj->getRoot() != OSG::NullFC);
+   vprASSERT(m_wand_M_pobj_map.count(obj) != 0);
+
+   // If we have no parent then we want to use the identity.
+   if (obj->getRoot()->getParent() != OSG::NullFC)
+   {
+      obj->getRoot()->getParent()->getToWorld(world_xform);
+   }
+
+   gmtl::Matrix44f pobj_M_vp;
+   gmtl::set(pobj_M_vp, world_xform);
+   gmtl::invert(pobj_M_vp);
+
+   const gmtl::Matrix44f pobj_M_wand = pobj_M_vp * vp_M_wand;
+
+   return pobj_M_wand * m_wand_M_pobj_map[obj] * curObjMat;
+}
+
+void BasicMoveStrategy::objectGrabbed(SceneObjectPtr obj,
                                       const gmtl::Matrix44f& vp_M_wand)
 {
    // m_wand_M_pobj is the offset between the wand and the grabbed
@@ -72,36 +122,7 @@ void BasicMoveStrategy::objectGrabbed(inf::ViewerPtr viewer,
 
    gmtl::invert(wand_M_vp, vp_M_wand);
 
-   m_wand_M_pobj = wand_M_vp * vp_M_pobj;
-}
-
-void BasicMoveStrategy::objectReleased(inf::ViewerPtr, SceneObjectPtr)
-{
-   gmtl::identity(m_wand_M_pobj);
-}
-
-gmtl::Matrix44f
-BasicMoveStrategy::computeMove(inf::ViewerPtr, SceneObjectPtr obj,
-                               const gmtl::Matrix44f& vp_M_wand,
-                               gmtl::Matrix44f& curObjMat)
-{
-   // pobj_M_vp is the inverse of the object in view platform space.
-   OSG::Matrix world_xform;
-   vprASSERT(obj->getRoot() != OSG::NullFC);
-
-   // If we have no parent then we want to use the identity.
-   if (obj->getRoot()->getParent() != OSG::NullFC)
-   {
-      obj->getRoot()->getParent()->getToWorld(world_xform);
-   }
-
-   gmtl::Matrix44f pobj_M_vp;
-   gmtl::set(pobj_M_vp, world_xform);
-   gmtl::invert(pobj_M_vp);
-
-   const gmtl::Matrix44f pobj_M_wand = pobj_M_vp * vp_M_wand;
-
-   return pobj_M_wand * m_wand_M_pobj * curObjMat;
+   m_wand_M_pobj_map[obj] = wand_M_vp * vp_M_pobj;
 }
 
 }

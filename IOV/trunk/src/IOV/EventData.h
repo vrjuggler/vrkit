@@ -5,18 +5,21 @@
 
 #include <IOV/Config.h>
 
-#include <vpr/vpr.h>
-#include <vpr/Util/GUID.h>
+#include <vector>
+#include <utility>
+#include <boost/signal.hpp>
 
 #include <IOV/SceneData.h>
 #include <IOV/EventDataPtr.h>
 #include <IOV/SceneObjectPtr.h>
 #include <IOV/Event.h>
 
-#include <boost/signal.hpp>
+#include <vpr/vpr.h>
+#include <vpr/Util/GUID.h>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/Point.h>
+
 
 namespace inf
 {
@@ -48,10 +51,38 @@ public:
     */
    typedef boost::signal<Event::ResultType (SceneObjectPtr),
                          Event::ResultOperator> basic_action_t;
+   typedef boost::signal<Event::ResultType (const std::vector<SceneObjectPtr>&),
+                         Event::ResultOperator> multi_obj_action_t;
+
+   /** @name Object Movement Data Types */
+   //@{
+   /**
+    * Type information for a scene object that is moved to some new
+    * location described by the associated transformation matrix.
+    *
+    * @since 0.29.0
+    */
+   typedef std::pair<SceneObjectPtr, gmtl::Matrix44f> obj_move_data_t;
+
+   typedef std::vector<obj_move_data_t> moved_obj_list_t;
+
+   /**
+    * The type of the signal emitted when one or more objects are moved.
+    *
+    * @since 0.29.0
+    */
+   typedef boost::signal<Event::ResultType (const moved_obj_list_t&),
+                         Event::ResultOperator>
+      obj_move_action_t;
+   //@}
 
    /** @name Signals */
    //@{
-   boost::signal< Event::ResultType (SceneObjectPtr, gmtl::Matrix44f), Event::ResultOperator > mObjectMovedSignal;
+   /**
+    *
+    * @since 0.29.0
+    */
+   obj_move_action_t mObjectsMovedSignal;
 
    /**
     * Signal emitted when an object is intersected. This is similar to a
@@ -59,8 +90,9 @@ public:
     *
     * @since 0.19.0
     */
-   boost::signal<Event::ResultType (SceneObjectPtr, SceneObjectPtr, gmtl::Point3f),
-      Event::ResultOperator> mObjectIntersectedSignal;
+   boost::signal<Event::ResultType (SceneObjectPtr, SceneObjectPtr,
+                                    const gmtl::Point3f&),
+                 Event::ResultOperator> mObjectIntersectedSignal;
 
    /**
     * Signal emitted when an object changes from being intersected to not being
@@ -71,8 +103,20 @@ public:
     */
    basic_action_t mObjectDeintersectedSignal;
 
-   basic_action_t mObjectSelectedSignal;
-   basic_action_t mObjectDeselectedSignal;
+   /**
+    * Signal emitted when one or more objects are selected/grabbed.
+    *
+    * @since 0.29.0
+    */
+   multi_obj_action_t mObjectsSelectedSignal;
+
+   /**
+    * Signal emitted when one or more selected/grabed objects are
+    * de-selected/released.
+    *
+    * @since 0.29.0
+    */
+   multi_obj_action_t mObjectsDeselectedSignal;
 
    basic_action_t mObjectPickedSignal;
    basic_action_t mObjectUnpickedSignal;

@@ -148,18 +148,18 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
 
    // Connect the selection signal to our slot.
    mSelectConnection =
-      event_data->mObjectSelectedSignal.connect(
+      event_data->mObjectsSelectedSignal.connect(
          100,
-         (boost::function<inf::Event::ResultType(inf::SceneObjectPtr)>)
-            boost::bind(&BasicHighlighter::objectSelected, this, _1, true)
+         (boost::function<inf::Event::ResultType(const std::vector<inf::SceneObjectPtr>&)>)
+            boost::bind(&BasicHighlighter::objectsSelected, this, _1, true)
       );
 
    // Connect the de-selection signal to our slot.
    mDeselectConnection =
-      event_data->mObjectDeselectedSignal.connect(
+      event_data->mObjectsDeselectedSignal.connect(
          100,
-         (boost::function<inf::Event::ResultType(inf::SceneObjectPtr)>)
-            boost::bind(&BasicHighlighter::objectSelected, this, _1, false)
+         (boost::function<inf::Event::ResultType(const std::vector<inf::SceneObjectPtr>&)>)
+            boost::bind(&BasicHighlighter::objectsSelected, this, _1, false)
       );
 
    // Connect the selection signal to our slot.
@@ -203,22 +203,31 @@ BasicHighlighter::objectDeintersected(inf::SceneObjectPtr obj)
 
 
 
-inf::Event::ResultType
-BasicHighlighter::objectSelected(inf::SceneObjectPtr obj, const bool selected)
+inf::Event::ResultType BasicHighlighter::
+objectsSelected(const std::vector<inf::SceneObjectPtr>& objs,
+                const bool selected)
 {
+   unsigned int old_id;
+   unsigned int new_id;
+
    // Switch from the intersection highlight to the grab highlight.
    if ( selected )
    {
-      mGeomTraverser.swapHighlightMaterial(obj->getRoot().get(),
-                                           mIsectHighlightID,
-                                           mGrabHighlightID);
+      old_id = mIsectHighlightID;
+      new_id = mGrabHighlightID;
    }
    // Switch from the grab highlight to the intersection highlight.
    else
    {
-      mGeomTraverser.swapHighlightMaterial(obj->getRoot().get(),
-                                           mGrabHighlightID,
-                                           mIsectHighlightID);
+      old_id = mGrabHighlightID;
+      new_id = mIsectHighlightID;
+   }
+
+   std::vector<inf::SceneObjectPtr>::const_iterator o;
+   for ( o = objs.begin(); o != objs.end(); ++o )
+   {
+      mGeomTraverser.swapHighlightMaterial((*o)->getRoot().get(), old_id,
+                                           new_id);
    }
 
    return inf::Event::CONTINUE;

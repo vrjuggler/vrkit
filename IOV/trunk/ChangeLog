@@ -1,15 +1,19 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-22 patrick  Refactored select/move/de-select to operate in terms of
+                    multiple objects all the time.
+                    -- inf::MoveStrategy API VERSION -- 1.1
+                    -- VERSION -- 0.29.0
 2006-06-17 patrick  Added the Volume Drawing Plug-in for rendering OpenSG
                     volumes.
 2006-06-17 patrick  Extended the inf::Plugin interface to include methods for
                     context-specific actions (including rendering).
-                    -- PLUG-IN API VERSION -- 1.3
+                    -- inf::Plugin API VERSION -- 1.3
                     -- VERSION -- 0.28.0
 2006-06-17 patrick  Merged inf::Plugin::updateState() and inf::Plugin::run()
                     back into inf::Plugin::update(). This reverts most of
                     Revision 62, which predates this file.
-                    -- PLUG-IN API VERSION -- 1.2
+                    -- inf::Plugin API VERSION -- 1.2
                     -- VERSION -- 0.27.0
 2006-06-17 patrick  inf::User now updates its view platform every time the
                     view platform moves.

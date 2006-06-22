@@ -57,7 +57,10 @@ PluginPtr WidgetPlugin::init(inf::ViewerPtr viewer)
    // to select objects in the scene, but does not allow us to move them.
    inf::ScenePtr scene = viewer->getSceneObj();
    EventDataPtr event_data = scene->getSceneData<inf::EventData>();
-   mMovedConnection = event_data->mObjectMovedSignal.connect(0, boost::bind(&WidgetPlugin::objectMovedSlot, this, _1, _2));
+   mMovedConnection =
+      event_data->mObjectsMovedSignal.connect(
+         0, boost::bind(&WidgetPlugin::objectsMovedSlot, this, _1)
+      );
    mMovedConnection.block();
 
    // Connect the intersection signal to our slot.
@@ -66,9 +69,12 @@ PluginPtr WidgetPlugin::init(inf::ViewerPtr viewer)
    // Connect the de-intersection signal to our slot.
    mDeIsectConnection = event_data->mObjectDeintersectedSignal.connect(0, boost::bind(&WidgetPlugin::objectDeintersected, this, _1));
 
-
-   event_data->mObjectSelectedSignal.connect(0, boost::bind(&WidgetPlugin::objectSelected, this, _1, true));
-   event_data->mObjectDeselectedSignal.connect(0, boost::bind(&WidgetPlugin::objectSelected, this, _1, false));
+   event_data->mObjectsSelectedSignal.connect(
+      0, boost::bind(&WidgetPlugin::objectsSelected, this, _1, true)
+   );
+   event_data->mObjectsDeselectedSignal.connect(
+      0, boost::bind(&WidgetPlugin::objectsSelected, this, _1, false)
+   );
 
    jccl::ConfigElementPtr cfg_elt =
       viewer->getConfiguration().getConfigElement(getElementType());
@@ -90,8 +96,8 @@ PluginPtr WidgetPlugin::init(inf::ViewerPtr viewer)
 
 inf::Event::ResultType
 WidgetPlugin::objectIntersected(inf::SceneObjectPtr obj,
-                              inf::SceneObjectPtr parentObj,
-                              gmtl::Point3f pnt)
+                                inf::SceneObjectPtr parentObj,
+                                const gmtl::Point3f& pnt)
 {
    const std::vector<SceneObjectPtr>& objs = mWidgetData->getWidgets();
 
@@ -213,11 +219,13 @@ WidgetPlugin::WidgetPlugin()
    /* Do nothing. */ ;
 }
 
-inf::Event::ResultType WidgetPlugin::objectSelected(inf::SceneObjectPtr obj, bool selected)
+inf::Event::ResultType WidgetPlugin::
+objectsSelected(const std::vector<inf::SceneObjectPtr>& objs, bool selected)
 {
    if (selected)
    {
-      mSelectedObject = obj;
+      // TODO: Extend for handling multiple selected objects?
+      mSelectedObject = objs.front();
    }
    else
    {
@@ -226,7 +234,8 @@ inf::Event::ResultType WidgetPlugin::objectSelected(inf::SceneObjectPtr obj, boo
    return inf::Event::CONTINUE;
 }
 
-inf::Event::ResultType WidgetPlugin::objectMovedSlot(inf::SceneObjectPtr obj, const gmtl::Matrix44f& newObjMat)
+inf::Event::ResultType WidgetPlugin::
+objectsMovedSlot(const EventData::moved_obj_list_t&)
 {
    return inf::Event::DONE;
 }

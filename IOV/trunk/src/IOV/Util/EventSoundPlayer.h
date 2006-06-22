@@ -90,11 +90,12 @@ private:
    /**
     * Object select slot; triggers \c mSelectSound when invoked.
     *
-    * @param sceneObj The selected scene object. This parameter is ignored.
+    * @param sceneObjs The selected scene objects. This parameter is ignored.
     *
     * @return inf::Event::CONTINUE is returned.
     */
-   inf::Event::ResultType objectSelected(inf::SceneObjectPtr sceneObj);
+   inf::Event::ResultType
+      objectsSelected(const std::vector<inf::SceneObjectPtr>& sceneObjs);
 
    std::string                mSelectSoundName;
    snx::SoundHandle           mSelectSound;

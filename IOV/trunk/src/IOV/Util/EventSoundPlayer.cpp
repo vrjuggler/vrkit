@@ -53,8 +53,8 @@ inf::EventSoundPlayerPtr EventSoundPlayer::init(inf::ViewerPtr viewer)
          boost::bind(&EventSoundPlayer::objectIntersected, this, _1)
       );
    mSelectSlotConnection =
-      event_data->mObjectSelectedSignal.connect(
-         boost::bind(&EventSoundPlayer::objectSelected, this, _1)
+      event_data->mObjectsSelectedSignal.connect(
+         boost::bind(&EventSoundPlayer::objectsSelected, this, _1)
       );
 
    return shared_from_this();
@@ -96,7 +96,8 @@ inf::Event::ResultType EventSoundPlayer::objectIntersected(inf::SceneObjectPtr)
    return inf::Event::CONTINUE;
 }
 
-inf::Event::ResultType EventSoundPlayer::objectSelected(inf::SceneObjectPtr)
+inf::Event::ResultType EventSoundPlayer::
+objectsSelected(const std::vector<inf::SceneObjectPtr>&)
 {
    mSelectSound.trigger();
    return inf::Event::CONTINUE;

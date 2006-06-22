@@ -10,15 +10,16 @@
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>
-#include <gmtl/Matrix.h>
 
-#include <IOV/EventDataPtr.h>
+#include <gmtl/Matrix.h>
+#include <gmtl/Point.h>
+
+#include <IOV/EventData.h>
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
 #include <IOV/PluginFactory.h>
 #include <IOV/Util/DigitalCommand.h>
-#include <IOV/Grab/IntersectionStrategy.h>
-#include <IOV/Grab/MoveStrategy.h>
+#include <IOV/Grab/MoveStrategyPtr.h>
 #include <IOV/SceneObjectPtr.h>
 
 
@@ -35,12 +36,7 @@ public:
       return inf::PluginPtr(new GrabPlugin());
    }
 
-   virtual ~GrabPlugin()
-   {
-      mIsectConnection.disconnect();
-      mDeIsectConnection.disconnect();
-      mGrabbedObjConnection.disconnect();
-   }
+   virtual ~GrabPlugin();
 
    virtual std::string getDescription()
    {
@@ -77,8 +73,7 @@ protected:
    void focusChanged(inf::ViewerPtr viewer);
 
    inf::Event::ResultType
-      defaultObjectMovedSlot(SceneObjectPtr obj,
-                             const gmtl::Matrix44f& newObjMat);
+      defaultObjectsMovedSlot(const EventData::moved_obj_list_t& objs);
 
 private:
    static std::string getElementType()
@@ -118,7 +113,8 @@ private:
     * @param viewer The VR Juggler application object within which this
     *               plug-in is active.
     */
-   void releaseGrabbedObject(inf::ViewerPtr viewer);
+   void releaseGrabbedObjects(inf::ViewerPtr viewer,
+                              const std::vector<SceneObjectPtr>& objs);
 
    /**
     * Responds to the signal emitted when an object is removed from
@@ -129,7 +125,7 @@ private:
     * @param viewer The VR Juggler application object within which this
     *               plug-in is active.
     *
-    * @see releaseGrabbedObject()
+    * @see releaseGrabbedObjects()
     */
    void grabbableObjStateChanged(inf::SceneObjectPtr obj,
                                  inf::ViewerPtr viewer);
@@ -151,26 +147,23 @@ private:
    /** @name Intersection Strategy */
    //@{
    bool mIntersecting;
-   SceneObjectPtr mGrabbedObj;
    SceneObjectPtr mIntersectedObj;
    gmtl::Point3f mIntersectPoint;
    boost::signals::connection mIsectConnection;
    boost::signals::connection mDeIsectConnection;
    //@}
 
-   /** @name Grabbing data */
-   //@{
-   bool mGrabbing;
-   boost::signals::connection mGrabbedObjConnection;
-   //@}
-
    std::vector<std::string> mStrategyPluginPath;
 
    inf::PluginFactoryPtr mPluginFactory;
 
-   /** @name Move Strategy */
+   /** @name Move Strategies */
    //@{
-   gmtl::Matrix44f mGrabbed_pobj_M_obj;
+   bool mGrabbing;
+   std::vector<SceneObjectPtr> mGrabbedObjs;
+   typedef std::map<SceneObjectPtr, boost::signals::connection> grab_conn_map_t;
+   grab_conn_map_t mGrabbedObjConnections;
+   std::map<SceneObjectPtr, gmtl::Matrix44f> mGrabbed_pobj_M_obj_map;
    std::map< std::string, boost::function<MoveStrategyPtr ()> > mMoveStrategyMap;
    std::vector<MoveStrategyPtr> mMoveStrategies;
    std::vector<std::string> mMoveStrategyNames;
