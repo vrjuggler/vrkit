@@ -18,7 +18,7 @@
 #include <IOV/Grab/MoveStrategyPtr.h>
 
 #define INF_MOVE_STRATEGY_PLUGIN_API_MAJOR 1
-#define INF_MOVE_STRATEGY_PLUGIN_API_MINOR 1
+#define INF_MOVE_STRATEGY_PLUGIN_API_MINOR 2
 
 
 namespace inf
@@ -139,7 +139,31 @@ public:
                                        const gmtl::Matrix44f& vp_M_wand,
                                        const gmtl::Matrix44f& curObjPos) = 0;
 
+
+#if defined(WIN32) || defined(WIN64)
+   /**
+    * Overlaod delete so that we can delete our memory correctly. This is
+    * necessary for DLLs on Windows to release memory from the correct memory
+    * space. All subclasses must overload delete similarly.
+    */
+   void operator delete(void* p)
+   {
+      if ( NULL != p )
+      {
+         GrabStrategy* strategy_ptr = static_cast<GrabStrategy*>(p);
+         strategy_ptr->destroy();
+      }
+   }
+#endif
+
 protected:
+   /**
+    * Subclasses must implement this so that dynamically loaded plug-ins
+    * delete themselves in the correct memory space. This uses the Template
+    * Method Pattern.
+    */
+   virtual void destroy() = 0;
+
    /**
     * Constructor. This does nothing.
     */

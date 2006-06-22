@@ -1,5 +1,10 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-22 patrick  Added DLL memory clean-up bits to inf::MoveStrategy and
+                    inf::IntersectionStrategy.
+                    -- VERSION -- 0.30.2
+                    -- inf::MoveStrategy API VERSION -- 1.2
+                    -- inf::IntersectionStrategy API VERSION -- 1.1
 2006-06-22 patrick  Added a multi-object grab strategy for the Grab Plug-in.
                     -- VERSION -- 0.30.1
 2006-06-22 patrick  Refactored the Grab Plug-in to use strategies for
