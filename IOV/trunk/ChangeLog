@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-22 patrick  Added a multi-object grab strategy for the Grab Plug-in.
+                    -- VERSION -- 0.30.1
 2006-06-22 patrick  Refactored the Grab Plug-in to use strategies for
                     determining which object(s) to grab.
                     -- VERSION -- 0.30.0

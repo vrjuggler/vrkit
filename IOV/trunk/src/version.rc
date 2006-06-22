@@ -1,5 +1,5 @@
 #pragma once
 
-#define VERSION_NUM     0,30.0,0
-#define VERSION_STR     "0.30.0.0"
+#define VERSION_NUM     0,30.1,0
+#define VERSION_STR     "0.30.1.0"
 #define COPYRIGHT_STR   "Copyright © 2005–2006"
