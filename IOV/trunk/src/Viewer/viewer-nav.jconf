@@ -152,13 +152,13 @@
          <initial_rot>0.0</initial_rot>
          <initial_rot>0.0</initial_rot>
       </status_panel_plugin>
-      <iov_grab_plugin name="Grab Plug-in" version="4">
-         <grab_button_nums>0</grab_button_nums>
-         <release_button_nums>0</release_button_nums>
+      <iov_grab_plugin name="Grab Plug-in" version="5">
+         <grab_strategy>Single Object Grab</grab_strategy>
+         <move_strategy>Slide Move</move_strategy>
          <move_strategy>Basic Move</move_strategy>
       </iov_grab_plugin>
       <slide_move_strategy name="Slide Move Strategy" version="2">
-         <analog_input>0</analog_input>
+         <analog_input>1</analog_input>
          <slide_target>Intersection Point</slide_target>
          <forward_slide_value>1.0</forward_slide_value>
          <slide_epsilon>0.1</slide_epsilon>
@@ -208,6 +208,10 @@
          <intersect_sound_name>intersect</intersect_sound_name>
          <select_sound_name>select</select_sound_name>
       </event_sound_player>
+      <single_object_grab_strategy name="Single Object Grab Strategy" version="1">
+         <grab_button_nums>0</grab_button_nums>
+         <release_button_nums>0</release_button_nums>
+      </single_object_grab_strategy>
    </elements>
 </configuration>
 

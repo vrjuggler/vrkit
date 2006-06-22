@@ -70,8 +70,8 @@ public:
 
    // Callback methods
 
-   inf::Event::ResultType objectMovedSlot(inf::SceneObjectPtr obj,
-                                          const gmtl::Matrix44f& newObjMat);
+   inf::Event::ResultType
+      objectsMovedSlot(const inf::EventData::moved_obj_list_t& objs);
 
    virtual void init();
    virtual void contextInit();
@@ -161,9 +161,8 @@ void OpenSgViewer::deallocate()
    mSoundPlayer     = inf::EventSoundPlayerPtr();
 }
 
-inf::Event::ResultType
-OpenSgViewer::objectMovedSlot(inf::SceneObjectPtr obj,
-                              const gmtl::Matrix44f& newObjMat)
+inf::Event::ResultType OpenSgViewer::
+objectsMovedSlot(const inf::EventData::moved_obj_list_t&)
 {
    //std::cout << "MOVED" << std::endl;
    //return inf::EventResult::DONE;
@@ -193,7 +192,9 @@ void OpenSgViewer::init()
    mSoundPlayer = inf::EventSoundPlayer::create()->init(shared_from_this());
 
    inf::EventDataPtr event_data = getSceneObj()->getSceneData<inf::EventData>();
-   event_data->mObjectMovedSignal.connect(0, boost::bind(&OpenSgViewer::objectMovedSlot, this, _1, _2));
+   event_data->mObjectsMovedSignal.connect(
+      0, boost::bind(&OpenSgViewer::objectsMovedSlot, this, _1)
+   );
 
    vprASSERT(getSceneObj().get() != NULL);      // We should have valid scene
 
