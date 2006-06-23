@@ -205,17 +205,28 @@ void MultiObjectGrabStrategy::update(ViewerPtr viewer,
       if ( mCurIsectObject && mCurIsectObject->isGrabbable() &&
            mChooseBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
       {
-         mChosenObjects.push_back(mCurIsectObject);
+         std::vector<SceneObjectPtr>::iterator o =
+            std::find(mChosenObjects.begin(), mChosenObjects.end(),
+                      mCurIsectObject);
 
-         // Connect the grabbable object state change signal to our slot.
-         mObjConnections[mCurIsectObject] =
-            mCurIsectObject->grabbableStateChanged().connect(
-               boost::bind(&MultiObjectGrabStrategy::grabbableObjStateChanged,
-                           this, _1)
-            );
+         // Only choose mCurIsectObject for grabbing if it is not already in
+         // mChosenObjcts.
+         if ( o == mChosenObjects.end() )
+         {
+            mChosenObjects.push_back(mCurIsectObject);
 
-         // Use the intersection point of the most recently chosen object.
-         mIntersectPoint = mCurIntersectPoint;
+            // Connect the grabbable object state change signal to our slot.
+            mObjConnections[mCurIsectObject] =
+               mCurIsectObject->grabbableStateChanged().connect(
+                  boost::bind(
+                     &MultiObjectGrabStrategy::grabbableObjStateChanged,
+                     this, _1
+                  )
+               );
+
+            // Use the intersection point of the most recently chosen object.
+            mIntersectPoint = mCurIntersectPoint;
+         }
       }
       // The user has requested to grab all the selected objects (those in
       // mChosenObjects).
