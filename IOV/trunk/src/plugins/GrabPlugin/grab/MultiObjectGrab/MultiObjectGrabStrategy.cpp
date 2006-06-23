@@ -312,7 +312,7 @@ transformButtonVec(const std::vector<int>& btns)
 
 inf::Event::ResultType MultiObjectGrabStrategy::
 objectIntersected(SceneObjectPtr obj, SceneObjectPtr parentObj,
-                  gmtl::Point3f pnt, ViewerPtr viewer)
+                  const gmtl::Point3f& pnt, ViewerPtr viewer)
 {
    if ( ! mGrabbing )
    {

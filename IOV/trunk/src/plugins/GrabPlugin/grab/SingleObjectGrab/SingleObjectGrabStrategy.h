@@ -86,7 +86,7 @@ private:
     */
    inf::Event::ResultType objectIntersected(inf::SceneObjectPtr obj,
                                             inf::SceneObjectPtr parentObj,
-                                            gmtl::Point3f pnt,
+                                            const gmtl::Point3f& pnt,
                                             inf::ViewerPtr viewer);
 
    /**
