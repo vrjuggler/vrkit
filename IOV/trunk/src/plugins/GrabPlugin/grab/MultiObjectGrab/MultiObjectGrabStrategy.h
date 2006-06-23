@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005-2006
+
 #ifndef _INF_MULTI_OBJECT_GRAB_STRATEGY_H_
 #define _INF_MULTI_OBJECT_GRAB_STRATEGY_H_
 

@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005-2006
+
 #include <IOV/Config.h>
 
 #include <boost/bind.hpp>
