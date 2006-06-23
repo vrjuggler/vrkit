@@ -54,8 +54,9 @@ namespace inf
 
 MultiObjectGrabStrategy::MultiObjectGrabStrategy()
    : GrabStrategy()
-   , mGrabText("Grab")
-   , mReleaseText("Release")
+   , mChooseText("Choose object to grab")
+   , mGrabText("Grab object(s)")
+   , mReleaseText("Release object(s)")
    , mGrabbing(false)
 {
    /* Do nothing. */ ;
@@ -116,6 +117,22 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
 
       if ( status_panel_data->mStatusPanelPlugin )
       {
+         // If choose button(s) is/are configured, we will update the status
+         // panel to include that information.
+         if ( mChooseBtn.isConfigured() )
+         {
+            inf::StatusPanel& panel =
+               status_panel_data->mStatusPanelPlugin->getPanel();
+            if ( ! panel.hasControlText(mChooseBtn.getButtons(), mChooseText) )
+            {
+               // The button numbers in mChooseBtn are zero-based, but we would
+               // like them to be one-based in the status panel display.
+               panel.addControlText(
+                  transformButtonVec(mChooseBtn.getButtons()), mChooseText
+               );
+            }
+         }
+
          // If grab button(s) is/are configured, we will update the status
          // panel to include that information.
          if ( mGrabBtn.isConfigured() )
@@ -130,6 +147,7 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
                                     mGrabText);
             }
          }
+
          // If release button(s) is/are configured, we will update the status
          // panel to include that information.
          if ( mReleaseBtn.isConfigured() )
@@ -157,6 +175,11 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
       {
          inf::StatusPanel& panel =
             status_panel_data->mStatusPanelPlugin->getPanel();
+
+         // The button numbers in mChooseBtn are zero-based, but we would like
+         // them to be one-based in the status panel display.
+         panel.removeControlText(transformButtonVec(mChooseBtn.getButtons()),
+                                 mChooseText);
 
          // The button numbers in mGrabBtn are zero-based, but we would like
          // them to be one-based in the status panel display.
@@ -192,18 +215,36 @@ void MultiObjectGrabStrategy::update(ViewerPtr viewer,
             );
 
          // Use the intersection point of the most recently chosen object.
-         // XXX: This isn't exactly right...
          mIntersectPoint = mCurIntersectPoint;
       }
       // The user has requested to grab all the selected objects (those in
       // mChosenObjects).
-      else if ( ! mChosenObjects.empty() &&
-                mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      else if ( mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
       {
-         mGrabbing = true;
-         mGrabbedObjects = mChosenObjects;
-         mChosenObjects.clear();
-         grabCallback(mGrabbedObjects, mIntersectPoint);
+         // If mChosenObjects is not empty, those objects are the ones that
+         // we will grab.
+         if ( ! mChosenObjects.empty() )
+         {
+            mGrabbedObjects = mChosenObjects;
+            mChosenObjects.clear();
+            mGrabbing = true;
+         }
+         // If mChosenObjects is empty but we are intersecting an object,
+         // then that will be the one that we grab.
+         else if ( mCurIsectObject )
+         {
+            mGrabbedObjects.resize(1);
+            mGrabbedObjects[0] = mCurIsectObject;
+            mGrabbing = true;
+         }
+
+         // If mGrabbing is false at this point, then there is nothing to
+         // grab. Otherwise, invoke grabCallback to indicate that one or more
+         // objects are now grabbed.
+         if ( mGrabbing )
+         {
+            grabCallback(mGrabbedObjects, mIntersectPoint);
+         }
       }
    }
    // If we are grabbing an object and the release button has just been
