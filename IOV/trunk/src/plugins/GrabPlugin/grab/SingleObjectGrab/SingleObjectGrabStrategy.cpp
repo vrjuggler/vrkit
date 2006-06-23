@@ -71,18 +71,18 @@ SingleObjectGrabStrategy::~SingleObjectGrabStrategy()
 
 GrabStrategyPtr SingleObjectGrabStrategy::init(ViewerPtr viewer)
 {
-   mEventData = viewer->getSceneObj()->getSceneData<EventData>();
+   EventDataPtr event_data = viewer->getSceneObj()->getSceneData<EventData>();
 
    // Connect the intersection signal to our slot.
    mIsectConnection =
-      mEventData->mObjectIntersectedSignal.connect(
+      event_data->mObjectIntersectedSignal.connect(
          0, boost::bind(&SingleObjectGrabStrategy::objectIntersected, this,
                         _1, _2, _3, viewer)
       );
 
    // Connect the de-intersection signal to our slot.
    mDeIsectConnection =
-      mEventData->mObjectDeintersectedSignal.connect(
+      event_data->mObjectDeintersectedSignal.connect(
          0, boost::bind(&SingleObjectGrabStrategy::objectDeintersected,
                         this, _1)
       );
