@@ -70,11 +70,11 @@ MultiObjectGrabStrategy::~MultiObjectGrabStrategy()
 
 GrabStrategyPtr MultiObjectGrabStrategy::init(ViewerPtr viewer)
 {
-   mEventData = viewer->getSceneObj()->getSceneData<EventData>();
+   EventDataPtr event_data = viewer->getSceneObj()->getSceneData<EventData>();
 
    // Connect the intersection signal to our slot.
    mIsectConnections.push_back(
-      mEventData->mObjectIntersectedSignal.connect(
+      event_data->mObjectIntersectedSignal.connect(
          0, boost::bind(&MultiObjectGrabStrategy::objectIntersected, this,
                         _1, _2, _3, viewer)
       )
@@ -82,7 +82,7 @@ GrabStrategyPtr MultiObjectGrabStrategy::init(ViewerPtr viewer)
 
    // Connect the de-intersection signal to our slot.
    mIsectConnections.push_back(
-      mEventData->mObjectDeintersectedSignal.connect(
+      event_data->mObjectDeintersectedSignal.connect(
          0, boost::bind(&MultiObjectGrabStrategy::objectDeintersected,
                         this, _1)
       )

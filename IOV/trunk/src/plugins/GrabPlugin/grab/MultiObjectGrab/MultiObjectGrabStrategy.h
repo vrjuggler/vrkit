@@ -13,7 +13,6 @@
 
 #include <jccl/Config/ConfigElementPtr.h>
 
-#include <IOV/EventDataPtr.h>
 #include <IOV/SceneObjectPtr.h>
 #include <IOV/Grab/GrabStrategy.h>
 #include <IOV/Util/DigitalCommand.h>
@@ -108,8 +107,6 @@ private:
     * @see releaseGrabbedObject()
     */
    void grabbableObjStateChanged(inf::SceneObjectPtr obj);
-
-   EventDataPtr mEventData;
 
    WandInterfacePtr mWandInterface;
 
