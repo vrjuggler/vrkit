@@ -100,11 +100,11 @@ private:
    void releaseGrabbedObject();
 
    /**
-    * Responds to the signal emitted when an object is removed from
-    * inf::GrabData. If \p obj is the object that is currently grabbed, then
-    * the grabbed object is released.
+    * Responds to the signal emitted when the grabbable state of a scene object
+    * changes. If \p obj is the object that is currently grabbed, then it is
+    * released.
     *
-    * @param obj The scene object that was removed from inf::GrabData.
+    * @param obj The scene object whose grabbable state has changed.
     *
     * @see releaseGrabbedObject()
     */

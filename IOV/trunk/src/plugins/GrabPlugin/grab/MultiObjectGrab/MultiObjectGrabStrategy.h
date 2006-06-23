@@ -96,13 +96,16 @@ private:
    inf::Event::ResultType objectDeintersected(inf::SceneObjectPtr obj);
 
    /**
-    * Responds to the signal emitted when an object is removed from
-    * inf::GrabData. If \p obj is the object that is currently grabbed, then
-    * the grabbed object is released.
+    * Responds to the signal emitted when the grabbable state of a scene
+    * object changes. If \p obj is no longer grabbable, we may have to update
+    * our state to reflect that fact.
+    *
+    * @post If \p obj is in \c mChosenObjects or \c mGrabbedObjects, then it
+    *       is removed. Either way, this slot is disconnected from the
+    *       object's grabbable state change signal no that we are no longer
+    *       interested in it.
     *
     * @param obj The scene object that was removed from inf::GrabData.
-    *
-    * @see releaseGrabbedObject()
     */
    void grabbableObjStateChanged(inf::SceneObjectPtr obj);
 
