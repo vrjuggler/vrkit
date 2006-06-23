@@ -83,12 +83,10 @@ private:
     * @param obj       The object associated with the intersection signal.
     * @param parentObj The top-most ancestor of \p obj.
     * @param pnt       The intersection point.
-    * @param viewer    The VR Juggler application object.
     */
    inf::Event::ResultType objectIntersected(inf::SceneObjectPtr obj,
                                             inf::SceneObjectPtr parentObj,
-                                            const gmtl::Point3f& pnt,
-                                            inf::ViewerPtr viewer);
+                                            const gmtl::Point3f& pnt);
 
    /**
     * Responds to object de-intersection signals.
