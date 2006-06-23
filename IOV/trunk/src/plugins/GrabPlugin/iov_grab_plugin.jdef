@@ -281,7 +281,8 @@
          <value label="Grab Strategy" defaultvalue="Single Object Grab" />
          <enumeration editable="true">
             <enum label="Single Object Grab" value="SingleObjectGrab"/>
-            <enum label="Multi Object Grab" value="MultiObjectGrab"/>
+            <enum label="Multi-Object Grab" value="MultiObjectGrab"/>
+            <enum label="Signal-Based Grab" value="SignalGrab"/>
          </enumeration>
       </property>
       <property valuetype="string" variable="true" name="move_strategy">

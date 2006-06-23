@@ -1,5 +1,10 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-23 patrick  Added a signal-based grab strategy that leaves the
+                    decisions about choosing objects and grabbing & releasing
+                    them up to external code. External code hooks up to this
+                    strategy plug-in through inf::GrabSignalData.
+                    -- VERSION -- 0.30.3
 2006-06-22 patrick  Added DLL memory clean-up bits to inf::MoveStrategy and
                     inf::IntersectionStrategy.
                     -- VERSION -- 0.30.2
