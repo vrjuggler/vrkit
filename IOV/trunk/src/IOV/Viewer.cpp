@@ -227,8 +227,6 @@ void Viewer::preFrame()
          if ( mIntersectedObj != NULL &&
               mIntersectedObj->getRoot() != OSG::NullFC)
          {
-            //mIntersectSound.trigger();
-
             vprDEBUG(infDBG_VIEWER, vprDBG_VERB_LVL)
                << "Intersected: "
                << inf::getName(mIntersectedObj->getRoot().get()) << std::endl
