@@ -210,11 +210,12 @@ void Viewer::preFrame()
          if ( mIntersectedObj != NULL &&
               mIntersectedObj->getRoot() != OSG::NullFC )
          {
-            OSG::FieldContainerPtr fcp = mIntersectedObj->getRoot().get();
-            mEventData->mObjectDeintersectedSignal(mIntersectedObj);
             vprDEBUG(infDBG_VIEWER, vprDBG_VERB_LVL)
-               << "Deintersected: " << inf::getName(fcp) << std::endl
+               << "De-intersected: "
+               << inf::getName(mIntersectedObj->getRoot()) << std::endl
                << vprDEBUG_FLUSH;
+
+            mEventData->mObjectDeintersectedSignal(mIntersectedObj);
          }
 
          // Change the intersected object to the one we found above.
@@ -228,11 +229,13 @@ void Viewer::preFrame()
          {
             //mIntersectSound.trigger();
 
-            OSG::FieldContainerPtr fcp = mIntersectedObj->getRoot().get();
-            mEventData->mObjectIntersectedSignal(mIntersectedObj, parent_obj, intersect_point);
             vprDEBUG(infDBG_VIEWER, vprDBG_VERB_LVL)
-               << "Intersected: " << inf::getName(fcp) << std::endl
+               << "Intersected: "
+               << inf::getName(mIntersectedObj->getRoot().get()) << std::endl
                << vprDEBUG_FLUSH;
+
+            mEventData->mObjectIntersectedSignal(mIntersectedObj, parent_obj,
+                                                 intersect_point);
          }
       }
    }
