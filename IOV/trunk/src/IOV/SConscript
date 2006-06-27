@@ -21,6 +21,9 @@ for path, dirs, files in sca_util.WalkBuildFromSource('.',env):
    header_files += [pj(path,f) for f in files if f.endswith('.h')]
    def_files += [pj(path,f) for f in files if f.endswith('.jdef')]
 
+if GetPlatform() == 'mac':
+   env.Append(LINKFLAGS = ['-install_name', 'libiov.dylib'])
+
 iov_lib = env.SharedLibrary('iov', src_files)
 
 # Install the library, headers, and definitions
