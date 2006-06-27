@@ -155,10 +155,7 @@ private:
    unsigned int mGrabHighlightID;
    //@}
 
-   boost::signals::connection mIsectConnection;
-   boost::signals::connection mDeIsectConnection;
-   boost::signals::connection mSelectConnection;
-   boost::signals::connection mDeselectConnection;
+   std::vector<boost::signals::connection> mConnections;
 
    std::vector<inf::SceneObjectPtr> mIntersectedObjs;
    std::vector<inf::SceneObjectPtr> mGrabbedObjs;

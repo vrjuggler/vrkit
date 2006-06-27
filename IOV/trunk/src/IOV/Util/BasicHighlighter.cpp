@@ -29,10 +29,8 @@ namespace inf
 
 BasicHighlighter::~BasicHighlighter()
 {
-   mIsectConnection.disconnect();
-   mDeIsectConnection.disconnect();
-   mSelectConnection.disconnect();
-   mDeselectConnection.disconnect();
+   std::for_each(mConnections.begin(), mConnections.end(),
+                 boost::bind(&boost::signals::connection::disconnect, _1));
 }
 
 BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
@@ -137,12 +135,20 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
       viewer->getSceneObj()->getSceneData<inf::EventData>();
 
    // Connect the intersection signal to our slot.
-   mIsectConnection = event_data->mObjectIntersectedSignal.connect(100,
-      boost::bind(&BasicHighlighter::objectIntersected, this, _1, _2, _3));
+   mConnections.push_back(
+      event_data->mObjectIntersectedSignal.connect(
+         100,
+         boost::bind(&BasicHighlighter::objectIntersected, this, _1, _2, _3)
+      )
+   );
 
    // Connect the de-intersection signal to our slot.
-   mDeIsectConnection = event_data->mObjectDeintersectedSignal.connect(100,
-      boost::bind(&BasicHighlighter::objectDeintersected, this, _1));
+   mConnections.push_back(
+      event_data->mObjectDeintersectedSignal.connect(
+         100,
+         boost::bind(&BasicHighlighter::objectDeintersected, this, _1)
+      )
+   );
 
    // NOTE: The boost::function<T> cast in the following statements is to deal
    //       with a baffling compile error when using GCC 4.1.
@@ -152,34 +158,38 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
       multi_obj_func_t;
 
    // Connect the selection signal to our slot.
-   mSelectConnection =
+   mConnections.push_back(
       event_data->mObjectsSelectedSignal.connect(
          100,
          (multi_obj_func_t) boost::bind(&BasicHighlighter::objectsSelected,
                                         this, _1, true)
-      );
+      )
+   );
 
    // Connect the de-selection signal to our slot.
-   mDeselectConnection =
+   mConnections.push_back(
       event_data->mObjectsDeselectedSignal.connect(
          100,
          (multi_obj_func_t) boost::bind(&BasicHighlighter::objectsSelected,
                                         this, _1, false)
-      );
+      )
+   );
 
    // Connect the selection signal to our slot.
-   mSelectConnection =
+   mConnections.push_back(
       event_data->mObjectPickedSignal.connect(
          100, (single_obj_func_t) boost::bind(&BasicHighlighter::objectPicked,
                                               this, _1, true)
-      );
+      )
+   );;
 
    // Connect the de-selection signal to our slot.
-   mDeselectConnection =
+   mConnections.push_back(
       event_data->mObjectUnpickedSignal.connect(
          100, (single_obj_func_t) boost::bind(&BasicHighlighter::objectPicked,
                                               this, _1, false)
-      );
+      )
+   );
 
    return shared_from_this();
 }
