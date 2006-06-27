@@ -1,6 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
 #include <iostream>
+#include <algorithm>
 #include <boost/bind.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/exception.hpp>
@@ -145,37 +146,39 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
 
    // NOTE: The boost::function<T> cast in the following statements is to deal
    //       with a baffling compile error when using GCC 4.1.
+   typedef boost::function<inf::Event::ResultType(inf::SceneObjectPtr)>
+      single_obj_func_t;
+   typedef boost::function<inf::Event::ResultType(const std::vector<inf::SceneObjectPtr>&)>
+      multi_obj_func_t;
 
    // Connect the selection signal to our slot.
    mSelectConnection =
       event_data->mObjectsSelectedSignal.connect(
          100,
-         (boost::function<inf::Event::ResultType(const std::vector<inf::SceneObjectPtr>&)>)
-            boost::bind(&BasicHighlighter::objectsSelected, this, _1, true)
+         (multi_obj_func_t) boost::bind(&BasicHighlighter::objectsSelected,
+                                        this, _1, true)
       );
 
    // Connect the de-selection signal to our slot.
    mDeselectConnection =
       event_data->mObjectsDeselectedSignal.connect(
          100,
-         (boost::function<inf::Event::ResultType(const std::vector<inf::SceneObjectPtr>&)>)
-            boost::bind(&BasicHighlighter::objectsSelected, this, _1, false)
+         (multi_obj_func_t) boost::bind(&BasicHighlighter::objectsSelected,
+                                        this, _1, false)
       );
 
    // Connect the selection signal to our slot.
    mSelectConnection =
       event_data->mObjectPickedSignal.connect(
-         100,
-         (boost::function<inf::Event::ResultType(inf::SceneObjectPtr)>)
-            boost::bind(&BasicHighlighter::objectPicked, this, _1, true)
+         100, (single_obj_func_t) boost::bind(&BasicHighlighter::objectPicked,
+                                              this, _1, true)
       );
 
    // Connect the de-selection signal to our slot.
    mDeselectConnection =
       event_data->mObjectUnpickedSignal.connect(
-         100,
-         (boost::function<inf::Event::ResultType(inf::SceneObjectPtr)>)
-            boost::bind(&BasicHighlighter::objectPicked, this, _1, false)
+         100, (single_obj_func_t) boost::bind(&BasicHighlighter::objectPicked,
+                                              this, _1, false)
       );
 
    return shared_from_this();
@@ -186,8 +189,14 @@ BasicHighlighter::objectIntersected(inf::SceneObjectPtr obj,
                                     inf::SceneObjectPtr,
                                     gmtl::Point3f)
 {
-   mGeomTraverser.addHighlightMaterial(obj->getRoot().get(),
-                                       mIsectHighlightID);
+   // Only apply the intersection highlight if obj is not currently
+   // intersected or grabbed.
+   if ( ! isIntersected(obj) && ! isGrabbed(obj) )
+   {
+      mGeomTraverser.addHighlightMaterial(obj->getRoot().get(),
+                                          mIsectHighlightID);
+      mIntersectedObjs.push_back(obj);
+   }
 
    return inf::Event::CONTINUE;
 }
@@ -195,39 +204,74 @@ BasicHighlighter::objectIntersected(inf::SceneObjectPtr obj,
 inf::Event::ResultType
 BasicHighlighter::objectDeintersected(inf::SceneObjectPtr obj)
 {
-   mGeomTraverser.removeHighlightMaterial(obj->getRoot().get(),
-                                          mIsectHighlightID);
+   // If obj is not grabbed but is intersected, then we need to remove the
+   // intersection highlight. Otherwise, if obj was deintersected while being
+   // grabbed, we do not want to make any highlight changes.
+   if ( ! isGrabbed(obj) && isIntersected(obj) )
+   {
+      mIntersectedObjs.erase(std::remove(mIntersectedObjs.begin(),
+                                         mIntersectedObjs.end(), obj),
+                             mIntersectedObjs.end());
+
+      mGeomTraverser.removeHighlightMaterial(obj->getRoot().get(),
+                                             mIsectHighlightID);
+   }
 
    return inf::Event::CONTINUE;
 }
-
-
 
 inf::Event::ResultType BasicHighlighter::
 objectsSelected(const std::vector<inf::SceneObjectPtr>& objs,
                 const bool selected)
 {
-   unsigned int old_id;
-   unsigned int new_id;
-
-   // Switch from the intersection highlight to the grab highlight.
-   if ( selected )
-   {
-      old_id = mIsectHighlightID;
-      new_id = mGrabHighlightID;
-   }
-   // Switch from the grab highlight to the intersection highlight.
-   else
-   {
-      old_id = mGrabHighlightID;
-      new_id = mIsectHighlightID;
-   }
-
+   // When objects are selected (selected is true) we remove the intersection
+   // or choose highlight and add the grab highlight. When objects are released
+   // (selected is false), we change the highlight to what makes sense based
+   // on the current intersection state.
    std::vector<inf::SceneObjectPtr>::const_iterator o;
    for ( o = objs.begin(); o != objs.end(); ++o )
    {
-      mGeomTraverser.swapHighlightMaterial((*o)->getRoot().get(), old_id,
-                                           new_id);
+      OSG::NodePtr root = (*o)->getRoot().get();
+
+      // The given objects have been grabbed.
+      if ( selected )
+      {
+         mGrabbedObjs.push_back(*o);
+
+         // Switch from the intersection highlight to the grab highlight.
+         if ( isIntersected(*o) )
+         {
+            mGeomTraverser.swapHighlightMaterial(root, mIsectHighlightID,
+                                                 mGrabHighlightID);
+         }
+         // The intersection highlight is not applied to root, so we just add
+         // the grab highlight.
+         else
+         {
+            mGeomTraverser.addHighlightMaterial(root, mGrabHighlightID);
+         }
+      }
+      // The given objects have been released.
+      else
+      {
+         mGrabbedObjs.erase(std::remove(mGrabbedObjs.begin(),
+                                        mGrabbedObjs.end(), *o),
+                            mGrabbedObjs.end());
+
+         // The current object is intersected, so we replace the grab highlight
+         // with the intersection highlight.
+         if ( isIntersected(*o) )
+         {
+            mGeomTraverser.swapHighlightMaterial(root, mGrabHighlightID,
+                                                 mIsectHighlightID);
+         }
+         // The current object is not intersected, so we just remove the grab
+         // highlight.
+         else
+         {
+            mGeomTraverser.removeHighlightMaterial(root, mGrabHighlightID);
+         }
+      }
    }
 
    return inf::Event::CONTINUE;
@@ -269,6 +313,16 @@ BasicHighlighter::BasicHighlighter()
    , mGrabHighlightID(inf::GeometryHighlightTraverser::HIGHLIGHT1)
 {
    /* Do nothing. */ ;
+}
+
+bool BasicHighlighter::isIntersected(inf::SceneObjectPtr obj)
+{
+   return std::find(mIntersectedObjs.begin(), mIntersectedObjs.end(), obj) != mIntersectedObjs.end();
+}
+
+bool BasicHighlighter::isGrabbed(inf::SceneObjectPtr obj)
+{
+   return std::find(mGrabbedObjs.begin(), mGrabbedObjs.end(), obj) != mGrabbedObjs.end();
 }
 
 void BasicHighlighter::configure(jccl::ConfigElementPtr cfgElt)

@@ -122,6 +122,10 @@ private:
       return "basic_highlighter";
    }
 
+   bool isIntersected(inf::SceneObjectPtr obj);
+
+   bool isGrabbed(inf::SceneObjectPtr obj);
+
    /**
     * @throw inf::Exception is thrown if configuration fails.
     */
@@ -155,6 +159,9 @@ private:
    boost::signals::connection mDeIsectConnection;
    boost::signals::connection mSelectConnection;
    boost::signals::connection mDeselectConnection;
+
+   std::vector<inf::SceneObjectPtr> mIntersectedObjs;
+   std::vector<inf::SceneObjectPtr> mGrabbedObjs;
 };
 
 }
