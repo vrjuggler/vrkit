@@ -163,7 +163,8 @@ void Viewer::preFrame()
       // performed for an object that the intersection strategy identifies as
       // being intersected.
       gmtl::Point3f cur_ip;
-      SceneObjectPtr cur_obj = mIsectStrategy->findIntersection(myself, mObjects, cur_ip);
+      SceneObjectPtr cur_obj =
+         mIsectStrategy->findIntersection(myself, mObjects, cur_ip);
 
       // Save results from calling intersect on grabbable objects.
       SceneObjectPtr intersect_obj;
@@ -288,8 +289,9 @@ void Viewer::latePreFrame()
       }
    }
 
-   // We are using writeable change lists, so we need to clear them out
-   // We do this here because it should be after anything else that the user may want to do
+   // We are using writeable change lists, so we need to clear them out.
+   // We do this here because it should be after anything else that the user
+   // may want to do.
    OSG::Thread::getCurrentChangeList()->clearAll();
 }
 
@@ -392,8 +394,10 @@ void Viewer::deallocate()
       (*p).reset();
    }
 #else
-   std::for_each(mPlugins.begin(), mPlugins.end(),
-                 boost::bind((void (inf::PluginPtr::*)()) &inf::PluginPtr::reset, _1));
+   std::for_each(
+      mPlugins.begin(), mPlugins.end(),
+      boost::bind((void (inf::PluginPtr::*)()) &inf::PluginPtr::reset, _1)
+   );
 #endif
 
    mUser.reset();
@@ -415,7 +419,7 @@ void Viewer::deallocate()
    OSG::FieldContainerFactory::TypeMapIterator i;
    for ( i = fact->beginTypes(); i != fact->endTypes(); ++i )
    {
-      if( ((*i).second != NULL) && ((*i).second)->getPrototype() != OSG::NullFC)
+      if ( (*i).second != NULL && (*i).second->getPrototype() != OSG::NullFC )
       {
          unsigned int type_proto_ptr_id =
             ((*i).second)->getPrototype().getFieldContainerId();
@@ -585,17 +589,17 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
 
       if ( fs::exists(def_strategy_path) )
       {
-         std::string def_search_path =
+         const std::string def_search_path =
             def_strategy_path.native_directory_string();
-         std::cout << "Setting default IOV intersection strategy plug-in path: " << def_search_path
-                   << std::endl;
+         std::cout << "Setting default IOV intersection strategy plug-in "
+                   << "to '" << def_search_path << "'" << std::endl;
          search_path.push_back(def_search_path);
       }
       else
       {
-         std::cerr << "Default IOV intersection strategy plug-in path does not exist: "
+         std::cerr << "Default IOV intersection strategy plug-in path ("
                    << def_strategy_path.native_directory_string()
-                   << std::endl;
+                   << ") does not exist!" << std::endl;
       }
    }
 
@@ -610,10 +614,12 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
    }
 
    // Add paths from the application configuration.
-   const unsigned int num_plugin_paths(appCfg->getNum(strategy_plugin_path_prop));
+   const unsigned int num_plugin_paths =
+      appCfg->getNum(strategy_plugin_path_prop);
    for ( unsigned int i = 0; i < num_plugin_paths; ++i )
    {
-      std::string dir = appCfg->getProperty<std::string>(strategy_plugin_path_prop, i);
+      const std::string dir =
+         appCfg->getProperty<std::string>(strategy_plugin_path_prop, i);
       search_path.push_back(vpr::replaceEnvVars(dir));
    }
 
