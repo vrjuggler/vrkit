@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-27 patrick  Added signals to inf::EventData that are emitted when a
+                    multi-object grab strategy adds and removes scene objects
+                    from its collection of objects to be grabbed.
+                    -- VERSION -- 0.30.4
 2006-06-23 patrick  Added a signal-based grab strategy that leaves the
                     decisions about choosing objects and grabbing & releasing
                     them up to external code. External code hooks up to this

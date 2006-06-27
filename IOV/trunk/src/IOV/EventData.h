@@ -118,6 +118,24 @@ public:
     */
    multi_obj_action_t mObjectsDeselectedSignal;
 
+   /**
+    * Signal emitted when one or more objects are chosen to be grabbed later.
+    * This may be emitted multiple times before mObjectsSelectedSignal is
+    * emitted.
+    *
+    * @since 0.30.4
+    */
+   multi_obj_action_t mSelectionListExpandedSignal;
+
+   /**
+    * Signal emitted when one or more objects are removed from the collection
+    * of objects chosen to be grabbed later. This may be emitted multiple
+    * times before mObjectsSelectedSignal is emitted.
+    *
+    * @since 0.30.4
+    */
+   multi_obj_action_t mSelectionListReducedSignal;
+
    basic_action_t mObjectPickedSignal;
    basic_action_t mObjectUnpickedSignal;
    //@}

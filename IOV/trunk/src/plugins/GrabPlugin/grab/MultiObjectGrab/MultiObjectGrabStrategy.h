@@ -14,6 +14,7 @@
 #include <jccl/Config/ConfigElementPtr.h>
 
 #include <IOV/SceneObjectPtr.h>
+#include <IOV/EventDataPtr.h>
 #include <IOV/Grab/GrabStrategy.h>
 #include <IOV/Util/DigitalCommand.h>
 
@@ -110,6 +111,8 @@ private:
    void grabbableObjStateChanged(inf::SceneObjectPtr obj);
 
    WandInterfacePtr mWandInterface;
+
+   EventDataPtr mEventData;
 
    /** @name Button(s) for adding objects to selection. */
    //@{

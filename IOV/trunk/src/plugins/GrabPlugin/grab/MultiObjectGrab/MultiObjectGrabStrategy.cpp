@@ -70,11 +70,11 @@ MultiObjectGrabStrategy::~MultiObjectGrabStrategy()
 
 GrabStrategyPtr MultiObjectGrabStrategy::init(ViewerPtr viewer)
 {
-   EventDataPtr event_data = viewer->getSceneObj()->getSceneData<EventData>();
+   mEventData = viewer->getSceneObj()->getSceneData<EventData>();
 
    // Connect the intersection signal to our slot.
    mIsectConnections.push_back(
-      event_data->mObjectIntersectedSignal.connect(
+      mEventData->mObjectIntersectedSignal.connect(
          0, boost::bind(&MultiObjectGrabStrategy::objectIntersected, this,
                         _1, _2, _3)
       )
@@ -82,7 +82,7 @@ GrabStrategyPtr MultiObjectGrabStrategy::init(ViewerPtr viewer)
 
    // Connect the de-intersection signal to our slot.
    mIsectConnections.push_back(
-      event_data->mObjectDeintersectedSignal.connect(
+      mEventData->mObjectDeintersectedSignal.connect(
          0, boost::bind(&MultiObjectGrabStrategy::objectDeintersected,
                         this, _1)
       )
@@ -223,6 +223,9 @@ void MultiObjectGrabStrategy::update(ViewerPtr viewer,
                      this, _1
                   )
                );
+
+            std::vector<SceneObjectPtr> objs(1, mCurIsectObject);
+            mEventData->mSelectionListExpandedSignal(objs);
 
             // Use the intersection point of the most recently chosen object.
             mIntersectPoint = mCurIntersectPoint;
@@ -369,6 +372,10 @@ void MultiObjectGrabStrategy::grabbableObjStateChanged(inf::SceneObjectPtr obj)
       {
          mObjConnections[*o].disconnect();
          mObjConnections.erase(*o);
+
+         std::vector<SceneObjectPtr> objs(1, *o);
+         mEventData->mSelectionListReducedSignal(objs);
+
          mChosenObjects.erase(o);
       }
    }
