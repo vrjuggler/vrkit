@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-06-27 patrick  Extended inf::BasicHighlighter to handle changes to the
+                    list of objects selected for later grabbing by
+                    multi-object grabber strategies.
+                    -- VERSION -- 0.30.5
 2006-06-27 patrick  Added signals to inf::EventData that are emitted when a
                     multi-object grab strategy adds and removes scene objects
                     from its collection of objects to be grabbed.

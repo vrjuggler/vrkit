@@ -92,19 +92,40 @@ protected:
    inf::Event::ResultType objectDeintersected(inf::SceneObjectPtr obj);
 
    /**
-    * Responds to object selection signals. If \p obj is newly selected, then
-    * our selection highlight is applied to it. Otherwise, our selection
-    * highlihght is removed and replaced by our intersection highlight.
+    * Responds to signals indicating changes in the list of objects selected
+    * for later grabbing. If the given objects are newly added, then our
+    * "choose" highlight is applied to them. Otherwise, our choose highlight
+    * is removed. If any of the removed objects are intersected, then the
+    * intersection highlight is reapplied to them.
     *
-    * @pre \p obj has been intersected and objectIntersected() has been called
-    *      accordingly.
-    * @post If \p selected is true, then our selection highlight is applied to
-    *       \p obj. Otherwise, \p our selection highlight is replaced by our
-    *       intersection highlight.
+    * @post If \p added is true, then our "choose" highlight is applied to
+    *       the given objects. Otherwise, the "choose" highlight is removed
+    *       and replaced by the intersection highlight where appropriate.
+    *
+    * @param objs  The objects associated with the selection list change
+    *              signal.
+    * @param added Indicates whether the given objects are new addition to the
+    *              object selection list or if they have just been removed.
+    */
+   inf::Event::ResultType
+      objectChoiceChanged(const std::vector<inf::SceneObjectPtr>& objs,
+                          const bool added);
+
+   /**
+    * Responds to object selection/grab signals. If the given objects are
+    * newly selected/grabbed, then our selection/grab highlight is applied to
+    * them. Otherwise, our selection/grab highlight is removed and replaced
+    * by our intersection highlight for those objects that are currently
+    * intersected.
+    *
+    * @post If \p selected is true, then our selection/grab highlight is
+    *       applied to the givne objects. Otherwise, our selection/grab
+    *       highlight is removed and repalced by the intersection highlight
+    *       where appropriate.
     *
     * @param objs     The objects associated with the selection signal.
-    * @param selected Indicates whether \p obj is newly selected or was
-    *                 selected and is no longer.
+    * @param selected Indicates whether the given objects are newly
+    *                 selected/grabbed or were selected and are no longer.
     */
    inf::Event::ResultType
       objectsSelected(const std::vector<inf::SceneObjectPtr>& objs,
@@ -124,12 +145,17 @@ private:
 
    bool isIntersected(inf::SceneObjectPtr obj);
 
+   bool isChosen(inf::SceneObjectPtr obj);
+
    bool isGrabbed(inf::SceneObjectPtr obj);
 
    /**
     * @throw inf::Exception is thrown if configuration fails.
     */
    void configure(jccl::ConfigElementPtr cfgElt);
+
+   void setColor(jccl::ConfigElementPtr cfgElt, const std::string& propName,
+                 OSG::Color3f& color);
 
    std::vector<boost::filesystem::path> mShaderSearchPath;
 
@@ -141,6 +167,13 @@ private:
    OSG::Color3f mIntersectColor;
    float        mIsectUniformScale;
    float        mIsectUniformExponent;
+
+   std::string  mChooseVertexShaderFile;
+   std::string  mChooseFragmentShaderFile;
+   OSG::Color3f mChooseColor;
+   float        mChooseUniformScale;
+   float        mChooseUniformExponent;
+
    std::string  mGrabVertexShaderFile;
    std::string  mGrabFragmentShaderFile;
    OSG::Color3f mGrabColor;
@@ -152,12 +185,14 @@ private:
    //@{
    inf::GeometryHighlightTraverser mGeomTraverser;
    unsigned int mIsectHighlightID;
+   unsigned int mChooseHighlightID;
    unsigned int mGrabHighlightID;
    //@}
 
    std::vector<boost::signals::connection> mConnections;
 
    std::vector<inf::SceneObjectPtr> mIntersectedObjs;
+   std::vector<inf::SceneObjectPtr> mChosenObjs;
    std::vector<inf::SceneObjectPtr> mGrabbedObjs;
 };
 

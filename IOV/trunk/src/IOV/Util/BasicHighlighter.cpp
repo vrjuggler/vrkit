@@ -93,6 +93,17 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
                                              mIsectFragmentShaderFile,
                                              chunks, isect_uniform_params);
 
+         OSG::Vec3f choose_color_vec(mChooseColor[0], mChooseColor[1],
+                                   mChooseColor[2]);
+         inf::GeometryHighlightTraverser::uniform_map_t choose_uniform_params;
+         choose_uniform_params["color"]    = choose_color_vec;
+         choose_uniform_params["scale"]    = mChooseUniformScale;
+         choose_uniform_params["exponent"] = mChooseUniformExponent;
+         mChooseHighlightID =
+            mGeomTraverser.createSHLMaterial(mChooseVertexShaderFile,
+                                             mChooseFragmentShaderFile,
+                                             chunks, choose_uniform_params);
+
          OSG::Vec3f grab_color_vec(mGrabColor[0], mGrabColor[1],
                                    mGrabColor[2]);
          inf::GeometryHighlightTraverser::uniform_map_t grab_uniform_params;
@@ -156,6 +167,24 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
       single_obj_func_t;
    typedef boost::function<inf::Event::ResultType(const std::vector<inf::SceneObjectPtr>&)>
       multi_obj_func_t;
+
+   // Connect the selection list expansion signal to our slot.
+   mConnections.push_back(
+      event_data->mSelectionListExpandedSignal.connect(
+         100,
+         (multi_obj_func_t) boost::bind(&BasicHighlighter::objectChoiceChanged,
+                                        this, _1, true)
+      )
+   );
+
+   // Connect the selection list reduction signal to our slot.
+   mConnections.push_back(
+      event_data->mSelectionListReducedSignal.connect(
+         100,
+         (multi_obj_func_t) boost::bind(&BasicHighlighter::objectChoiceChanged,
+                                        this, _1, false)
+      )
+   );
 
    // Connect the selection signal to our slot.
    mConnections.push_back(
@@ -231,6 +260,66 @@ BasicHighlighter::objectDeintersected(inf::SceneObjectPtr obj)
 }
 
 inf::Event::ResultType BasicHighlighter::
+objectChoiceChanged(const std::vector<inf::SceneObjectPtr>& objs,
+                    const bool added)
+{
+   // When objects are added (added is true) we remove the intersection
+   // highlight highlight and add the choose highlight. When objects are
+   // removed (added is false), we change the highlight to what makes sense
+   // based on the current intersection state.
+   std::vector<inf::SceneObjectPtr>::const_iterator o;
+   for ( o = objs.begin(); o != objs.end(); ++o )
+   {
+      OSG::NodePtr root = (*o)->getRoot().get();
+
+      // The given objects have been added to the object selection list. We
+      // just swap the intersection highlight for the choose highlight.
+      if ( added )
+      {
+         mChosenObjs.push_back(*o);
+
+         // The current object is intersected, so we replace the intersection
+         // highlight with the choose highlight.
+         if ( isIntersected(*o) )
+         {
+            mGeomTraverser.swapHighlightMaterial(root, mIsectHighlightID,
+                                                 mChooseHighlightID);
+         }
+         // The current object is not intersected, so we just add the choose
+         // highlight.
+         else
+         {
+            mGeomTraverser.addHighlightMaterial(root, mChooseHighlightID);
+         }
+      }
+      // The given objects have been removed from the object selection list.
+      else
+      {
+         mChosenObjs.erase(
+            std::remove(mChosenObjs.begin(), mChosenObjs.end(), *o),
+            mChosenObjs.end()
+         );
+
+         // The current object is intersected, so we replace the choose
+         // highlight with the intersection highlight.
+         if ( isIntersected(*o) )
+         {
+            mGeomTraverser.swapHighlightMaterial(root, mChooseHighlightID,
+                                                 mIsectHighlightID);
+         }
+         // The current object is not intersected, so we just remove the
+         // choose highlight.
+         else
+         {
+            mGeomTraverser.removeHighlightMaterial(root, mChooseHighlightID);
+         }
+      }
+   }
+
+   return inf::Event::CONTINUE;
+}
+
+inf::Event::ResultType BasicHighlighter::
 objectsSelected(const std::vector<inf::SceneObjectPtr>& objs,
                 const bool selected)
 {
@@ -248,14 +337,20 @@ objectsSelected(const std::vector<inf::SceneObjectPtr>& objs,
       {
          mGrabbedObjs.push_back(*o);
 
+         // Switch from the choose highlight to the grab highlight.
+         if ( isChosen(*o) )
+         {
+            mGeomTraverser.swapHighlightMaterial(root, mChooseHighlightID,
+                                                 mGrabHighlightID);
+         }
          // Switch from the intersection highlight to the grab highlight.
-         if ( isIntersected(*o) )
+         else if ( isIntersected(*o) )
          {
             mGeomTraverser.swapHighlightMaterial(root, mIsectHighlightID,
                                                  mGrabHighlightID);
          }
-         // The intersection highlight is not applied to root, so we just add
-         // the grab highlight.
+         // Neither the choose nor the intersection highlights are applied
+         // to root, so we just add the grab highlight.
          else
          {
             mGeomTraverser.addHighlightMaterial(root, mGrabHighlightID);
@@ -282,6 +377,11 @@ objectsSelected(const std::vector<inf::SceneObjectPtr>& objs,
             mGeomTraverser.removeHighlightMaterial(root, mGrabHighlightID);
          }
       }
+   }
+
+   if ( selected )
+   {
+      mChosenObjs.clear();
    }
 
    return inf::Event::CONTINUE;
@@ -314,12 +414,18 @@ BasicHighlighter::BasicHighlighter()
    , mIntersectColor(1.0f, 1.0f, 0.0f)
    , mIsectUniformScale(1.0f)
    , mIsectUniformExponent(1.0f)
+   , mChooseVertexShaderFile("highlight.vs")
+   , mChooseFragmentShaderFile("highlight.fs")
+   , mChooseColor(0.0f, 1.0f, 1.0f)
+   , mChooseUniformScale(1.0f)
+   , mChooseUniformExponent(1.0f)
    , mGrabVertexShaderFile("highlight.vs")
    , mGrabFragmentShaderFile("highlight.fs")
    , mGrabColor(1.0f, 0.0f, 1.0f)
    , mGrabUniformScale(1.0f)
    , mGrabUniformExponent(1.0f)
    , mIsectHighlightID(inf::GeometryHighlightTraverser::HIGHLIGHT0)
+   , mChooseHighlightID(inf::GeometryHighlightTraverser::HIGHLIGHT1)
    , mGrabHighlightID(inf::GeometryHighlightTraverser::HIGHLIGHT1)
 {
    /* Do nothing. */ ;
@@ -328,6 +434,11 @@ BasicHighlighter::BasicHighlighter()
 bool BasicHighlighter::isIntersected(inf::SceneObjectPtr obj)
 {
    return std::find(mIntersectedObjs.begin(), mIntersectedObjs.end(), obj) != mIntersectedObjs.end();
+}
+
+bool BasicHighlighter::isChosen(inf::SceneObjectPtr obj)
+{
+   return std::find(mChosenObjs.begin(), mChosenObjs.end(), obj) != mChosenObjs.end();
 }
 
 bool BasicHighlighter::isGrabbed(inf::SceneObjectPtr obj)
@@ -339,7 +450,7 @@ void BasicHighlighter::configure(jccl::ConfigElementPtr cfgElt)
 {
    vprASSERT(cfgElt->getID() == getElementType());
 
-   const unsigned int req_cfg_version(1);
+   const unsigned int req_cfg_version(2);
 
    // Check for correct version of plugin configuration.
    if ( cfgElt->getVersion() < req_cfg_version )
@@ -352,51 +463,21 @@ void BasicHighlighter::configure(jccl::ConfigElementPtr cfgElt)
    }
 
    const std::string isect_prop("intersect_color");
+   const std::string choose_prop("choose_color");
    const std::string grab_prop("grab_color");
    const std::string isect_shader_prop("intersect_shader");
    const std::string isect_scale_prop("intersect_shader_scale");
    const std::string isect_exp_prop("intersect_shader_exponent");
+   const std::string choose_shader_prop("choose_shader");
+   const std::string choose_scale_prop("choose_shader_scale");
+   const std::string choose_exp_prop("choose_shader_exponent");
    const std::string grab_shader_prop("grab_shader");
    const std::string grab_scale_prop("grab_shader_scale");
    const std::string grab_exp_prop("grab_shader_exponent");
 
-   float isect_color[3];
-   float grab_color[3];
-
-   isect_color[0] = cfgElt->getProperty<float>(isect_prop, 0);
-   isect_color[1] = cfgElt->getProperty<float>(isect_prop, 1);
-   isect_color[2] = cfgElt->getProperty<float>(isect_prop, 2);
-
-   if ( isect_color[0] >= 0.0f && isect_color[0] <= 1.0f &&
-        isect_color[1] >= 0.0f && isect_color[1] <= 1.0f &&
-        isect_color[2] >= 0.0f && isect_color[2] <= 1.0f )
-   {
-      mIntersectColor.setValuesRGB(isect_color[0], isect_color[1],
-                                   isect_color[2]);
-   }
-   else
-   {
-      std::cerr << "WARNING: Ignoring invalid inersection highlight color <"
-                << isect_color[0] << "," << isect_color[1] << ","
-                << isect_color[2] << ">" << std::endl;
-   }
-
-   grab_color[0] = cfgElt->getProperty<float>(grab_prop, 0);
-   grab_color[1] = cfgElt->getProperty<float>(grab_prop, 1);
-   grab_color[2] = cfgElt->getProperty<float>(grab_prop, 2);
-
-   if ( grab_color[0] >= 0.0f && grab_color[0] <= 1.0f &&
-        grab_color[1] >= 0.0f && grab_color[1] <= 1.0f &&
-        grab_color[2] >= 0.0f && grab_color[2] <= 1.0f )
-   {
-      mGrabColor.setValuesRGB(grab_color[0], grab_color[1], grab_color[2]);
-   }
-   else
-   {
-      std::cerr << "WARNING: Ignoring invalid grab highlight color <"
-                << grab_color[0] << "," << grab_color[1] << ","
-                << grab_color[2] << ">" << std::endl;
-   }
+   setColor(cfgElt, isect_prop, mIntersectColor);
+   setColor(cfgElt, choose_prop, mChooseColor);
+   setColor(cfgElt, grab_prop, mGrabColor);
 
    const unsigned int num_paths = cfgElt->getNum("shader_search_path");
    for ( unsigned int i = 0; i < num_paths; ++i )
@@ -425,6 +506,15 @@ void BasicHighlighter::configure(jccl::ConfigElementPtr cfgElt)
    mIsectUniformScale    = cfgElt->getProperty<float>(isect_scale_prop, 0);
    mIsectUniformExponent = cfgElt->getProperty<float>(isect_exp_prop, 0);
 
+   mChooseVertexShaderFile = vpr::replaceEnvVars(
+      cfgElt->getProperty<std::string>(choose_shader_prop, 0)
+   );
+   mChooseFragmentShaderFile = vpr::replaceEnvVars(
+      cfgElt->getProperty<std::string>(choose_shader_prop, 1)
+   );
+   mChooseUniformScale    = cfgElt->getProperty<float>(choose_scale_prop, 0);
+   mChooseUniformExponent = cfgElt->getProperty<float>(choose_exp_prop, 0);
+
    mGrabVertexShaderFile = vpr::replaceEnvVars(
       cfgElt->getProperty<std::string>(grab_shader_prop, 0)
    );
@@ -433,6 +523,31 @@ void BasicHighlighter::configure(jccl::ConfigElementPtr cfgElt)
    );
    mGrabUniformScale    = cfgElt->getProperty<float>(grab_scale_prop, 0);
    mGrabUniformExponent = cfgElt->getProperty<float>(grab_exp_prop, 0);
+}
+
+void BasicHighlighter::setColor(jccl::ConfigElementPtr cfgElt,
+                                const std::string& propName,
+                                OSG::Color3f& color)
+{
+   float color_vals[3];
+
+   color_vals[0] = cfgElt->getProperty<float>(propName, 0);
+   color_vals[1] = cfgElt->getProperty<float>(propName, 1);
+   color_vals[2] = cfgElt->getProperty<float>(propName, 2);
+
+   if ( color_vals[0] >= 0.0f && color_vals[0] <= 1.0f &&
+        color_vals[1] >= 0.0f && color_vals[1] <= 1.0f &&
+        color_vals[2] >= 0.0f && color_vals[2] <= 1.0f )
+   {
+      color.setValuesRGB(color_vals[0], color_vals[1], color_vals[2]);
+   }
+   else
+   {
+      std::cerr << "WARNING: Ignoring invalid highlight color <"
+                << color_vals[0] << "," << color_vals[1] << ","
+                << color_vals[2] << "> from property " << propName
+                << std::endl;
+   }
 }
 
 }
