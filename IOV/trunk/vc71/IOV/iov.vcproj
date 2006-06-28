@@ -163,6 +163,9 @@
 				RelativePath="..\..\src\Iov\GeometryHighlightTraverser.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\Iov\GrabSignalData.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\Iov\Grab\GrabStrategy.cpp">
 			</File>
 			<File
@@ -312,6 +315,12 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\GeometryHighlightTraverser.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\GrabSignalData.h">
+			</File>
+			<File
+				RelativePath="..\..\src\Iov\GrabSignalDataPtr.h">
 			</File>
 			<File
 				RelativePath="..\..\src\Iov\Grab\GrabStrategy.h">

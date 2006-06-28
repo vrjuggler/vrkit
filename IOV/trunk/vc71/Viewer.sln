@@ -117,6 +117,24 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Volume Drawing Plug-in", "V
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Single Object Grab Strategy Plug-in", "GrabPlugin\SingleObjectGrabStrategy\SingleObjectGrabStrategy.vcproj", "{B288BC63-0CC9-45BF-AFEC-FF2F7DC3C2B6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A0218102-78F5-48BB-A6C6-F81B3759ED60} = {A0218102-78F5-48BB-A6C6-F81B3759ED60}
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Multi-Object Grab Strategy Plug-in", "GrabPlugin\MultiObjectGrabStrategy\MultiObjectGrabStrategy.vcproj", "{D6310A24-0C0E-498C-B13B-6E767C19F194}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A0218102-78F5-48BB-A6C6-F81B3759ED60} = {A0218102-78F5-48BB-A6C6-F81B3759ED60}
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Signal-Based Grab Strategy Plug-in", "GrabPlugin\SignalGrabStrategy\SignalGrabStrategy.vcproj", "{1401E53A-ECF8-43E0-ABE9-3ECB1A5A73C1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A0218102-78F5-48BB-A6C6-F81B3759ED60} = {A0218102-78F5-48BB-A6C6-F81B3759ED60}
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		DebugDLL = DebugDLL
@@ -215,6 +233,18 @@ Global
 		{D6F482D1-8E91-4A3F-B3A4-F2187CABD222}.DebugDLL.Build.0 = DebugDLL|Win32
 		{D6F482D1-8E91-4A3F-B3A4-F2187CABD222}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
 		{D6F482D1-8E91-4A3F-B3A4-F2187CABD222}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
+		{B288BC63-0CC9-45BF-AFEC-FF2F7DC3C2B6}.DebugDLL.ActiveCfg = DebugDLL|Win32
+		{B288BC63-0CC9-45BF-AFEC-FF2F7DC3C2B6}.DebugDLL.Build.0 = DebugDLL|Win32
+		{B288BC63-0CC9-45BF-AFEC-FF2F7DC3C2B6}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
+		{B288BC63-0CC9-45BF-AFEC-FF2F7DC3C2B6}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
+		{D6310A24-0C0E-498C-B13B-6E767C19F194}.DebugDLL.ActiveCfg = DebugDLL|Win32
+		{D6310A24-0C0E-498C-B13B-6E767C19F194}.DebugDLL.Build.0 = DebugDLL|Win32
+		{D6310A24-0C0E-498C-B13B-6E767C19F194}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
+		{D6310A24-0C0E-498C-B13B-6E767C19F194}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
+		{1401E53A-ECF8-43E0-ABE9-3ECB1A5A73C1}.DebugDLL.ActiveCfg = DebugDLL|Win32
+		{1401E53A-ECF8-43E0-ABE9-3ECB1A5A73C1}.DebugDLL.Build.0 = DebugDLL|Win32
+		{1401E53A-ECF8-43E0-ABE9-3ECB1A5A73C1}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
+		{1401E53A-ECF8-43E0-ABE9-3ECB1A5A73C1}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
