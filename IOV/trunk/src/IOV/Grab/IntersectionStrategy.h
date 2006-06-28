@@ -123,7 +123,8 @@ public:
    {
       if ( NULL != p )
       {
-         GrabStrategy* strategy_ptr = static_cast<GrabStrategy*>(p);
+         IntersectionStrategy* strategy_ptr =
+            static_cast<IntersectionStrategy*>(p);
          strategy_ptr->destroy();
       }
    }

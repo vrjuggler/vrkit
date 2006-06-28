@@ -150,7 +150,7 @@ public:
    {
       if ( NULL != p )
       {
-         GrabStrategy* strategy_ptr = static_cast<GrabStrategy*>(p);
+         MoveStrategy* strategy_ptr = static_cast<MoveStrategy*>(p);
          strategy_ptr->destroy();
       }
    }
