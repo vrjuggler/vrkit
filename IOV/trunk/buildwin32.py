@@ -205,7 +205,7 @@ def makeTree(prefix):
    mkinstalldirs(os.path.join(prefix, 'share'))
 
 def installDir(startDir, destDir, allowedExts = None, disallowedExts = None,
-               disallowedFiles = None):
+               disallowedFiles = None, flat = False):
    cwd = os.getcwd()
 
    if not os.path.isabs(destDir):
@@ -236,9 +236,14 @@ def installDir(startDir, destDir, allowedExts = None, disallowedExts = None,
             continue
 
          start_dir = os.path.join(startDir, f)
-         dest_dir  = os.path.join(destDir, f)
+
+         if flat:
+            dest_dir = destDir
+         else:
+            dest_dir  = os.path.join(destDir, f)
+
          installDir(start_dir, dest_dir, allowedExts, disallowedExts,
-                    disallowedFiles)
+                    disallowedFiles, flat)
       else:
          (root, f_ext) = os.path.splitext(f)
          if allowedExts is None:
@@ -279,7 +284,7 @@ def installIOV(prefix, platform, vcDir):
 
    destdir = os.path.join(share_root, 'definitions')
    srcdir  = os.path.join(gProjectDir, 'src', 'IOV')
-   installDir(srcdir, destdir, ['.jdef'])
+   installDir(srcdir, destdir, ['.jdef'], flat = True)
    jdef_destdir = destdir
 
    installPlugins(prefix, platform, share_root, jdef_destdir, vcDir)
@@ -321,13 +326,8 @@ def installPlugins(prefix, platform, shareRoot, jdefDir, vcDir):
    plugin_build_dir = os.path.join(gProjectDir, vcDir, platform, 'plugins')
    installDir(plugin_build_dir, destdir, ['.dll'])
 
-   plugin_src_glob = os.path.join(gProjectDir, 'src', 'plugins', '*Plugin')
-   plugin_src_dirs = glob.glob(plugin_src_glob)
-
-   destdir = jdefDir
-
-   for p in plugin_src_dirs:
-      installDir(p, destdir, ['.jdef'])
+   plugin_src_dir = os.path.join(gProjectDir, 'src', 'plugins')
+   installDir(plugin_src_dir, jdefDir, ['.jdef'], flat = True)
 
 def getVSCmd():
    devenv_cmd = None
