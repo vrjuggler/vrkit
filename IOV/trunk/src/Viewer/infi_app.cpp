@@ -441,7 +441,7 @@ int main(int argc, char* argv[])
          ("help", "produce help message")
          ;
 
-      std::string jdef_dir;
+      std::vector<std::string> jdef_dirs;
 
       po::options_description config("Configuration");
       config.add_options()
@@ -449,7 +449,7 @@ int main(int argc, char* argv[])
           "VR Juggler config file")
          ("app,a", po::value< std::vector<std::string> >()->composing(),
           "Viewer configuration file")
-         ("defs,d", po::value<std::string>(&jdef_dir),
+         ("defs,d", po::value< std::vector<std::string> >(&jdef_dirs),
           "Path to custom config definition (.jdef) files")
          ("file,f",
           po::value<std::string>()->default_value("data/scenes/test_scene.osb"),
@@ -489,20 +489,40 @@ int main(int argc, char* argv[])
             std::cerr << "WARNING: Environment variable IOV_BASE_DIR is not\n"
                       << "         set or is set to an empty value.  Expect\n"
                       << "         problems later." << std::endl;
-            jdef_dir = ".";
+            jdef_dirs.push_back(".");
          }
          else
          {
-            jdef_dir =
-               iov_base_dir + std::string("/share/IOV/definitions") + ":.";
+            jdef_dirs.push_back(iov_base_dir +
+                                   std::string("/share/IOV/definitions"));
+            jdef_dirs.push_back(".");
          }
       }
-      IOV_STATUS << "Using jdef path: " << jdef_dir << std::endl;
 
-      if ( ! jdef_dir.empty() )
+      IOV_STATUS << "Using jdef path: ";
+
+      for ( std::vector<std::string>::iterator i = jdef_dirs.begin();
+            i != jdef_dirs.end();
+            ++i )
+      {
+         IOV_STATUS << *i << " ";
+      }
+
+      IOV_STATUS << std::endl;
+
+      if ( ! jdef_dirs.empty() )
       {
          IOV_STATUS << "Scanning for definitions." << std::endl;
-         kernel->scanForConfigDefinitions(jdef_dir);
+
+         if ( ! jdef_dirs.empty() )
+         {
+            for ( std::vector<std::string>::iterator i = jdef_dirs.begin();
+                  i != jdef_dirs.end();
+                  ++i )
+            {
+               kernel->scanForConfigDefinitions(*i);
+            }
+         }
       }
 
       if ( vm.count("jconf") == 0 )
