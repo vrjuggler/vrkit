@@ -35,12 +35,14 @@ public:
 
    virtual ~SignalGrabStrategy();
 
-   virtual GrabStrategyPtr init(ViewerPtr viewer);
+   virtual GrabStrategyPtr init(ViewerPtr viewer, grab_callback_t grabCallback,
+                                release_callback_t releaseCallback);
 
    virtual void setFocus(ViewerPtr viewer, const bool focused);
 
-   virtual void update(ViewerPtr viweer, grab_callback_t grabCallback,
-                       release_callback_t releaseCallback);
+   virtual void update(ViewerPtr viweer);
+
+   virtual std::vector<SceneObjectPtr> getGrabbedObjects();
 
    /**
     * Invokes the global scope delete operator.  This is required for proper
@@ -69,15 +71,34 @@ private:
 
    void configure(jccl::ConfigElementPtr elt);
 
-   void grab(grab_callback_t grabCallback);
+   void grab();
 
-   void release(release_callback_t releaseCallback);
+   void release();
+
+   /** @name inf::GrabSignalData Slots */
+   //@{
+   /**
+    * Receives "asynchronous" object release signals in order to maintain
+    * internal state correctly.
+    *
+    * @param objs The scene objects that were released asynchronously.
+    *
+    * @see inf::GrabSignalData::asyncRelease
+    */
+   void objectsReleased(const std::vector<SceneObjectPtr>& objs);
+   //@}
 
    std::vector<int> transformButtonVec(const std::vector<int>& btns);
 
    GrabSignalDataPtr mGrabSignalData;
 
    WandInterfacePtr mWandInterface;
+
+   /** @name Grab/Release Callbacks */
+   //@{
+   grab_callback_t    mGrabCallback;
+   release_callback_t mReleaseCallback;
+   //@}
 
    /** @name Button(s) for choosing objects to grab. */
    //@{
@@ -97,8 +118,19 @@ private:
    std::string mReleaseText;
    //@}
 
+   /**
+    * Indicates whether the grab and release operation should behave as a
+    * toggled state.
+    */
    bool mGrabReleaseToggle;
+
+   /** @name Grab State */
+   //@{
    bool mGrabbing;
+   std::vector<SceneObjectPtr> mGrabbedObjects;
+   //@}
+
+   std::vector<boost::signals::connection> mConnections;
 };
 
 }

@@ -40,12 +40,14 @@ public:
 
    virtual ~SingleObjectGrabStrategy();
 
-   virtual GrabStrategyPtr init(ViewerPtr viewer);
+   virtual GrabStrategyPtr init(ViewerPtr viewer, grab_callback_t grabCallback,
+                                release_callback_t releaseCallback);
 
    virtual void setFocus(ViewerPtr viewer, const bool focused);
 
-   virtual void update(ViewerPtr viewer, grab_callback_t grabCallback,
-                       release_callback_t releaseCallback);
+   virtual void update(ViewerPtr viewer);
+
+   virtual std::vector<SceneObjectPtr> getGrabbedObjects();
 
    /**
     * Invokes the global scope delete operator.  This is required for proper
@@ -111,6 +113,12 @@ private:
    void grabbableObjStateChanged(inf::SceneObjectPtr obj);
 
    WandInterfacePtr mWandInterface;
+
+   /** @name Grab/Release Callbacks */
+   //@{
+   grab_callback_t    mGrabCallback;
+   release_callback_t mReleaseCallback;
+   //@}
 
    /** @name Button(s) for grabbing objects. */
    //@{

@@ -82,7 +82,6 @@ private:
    }
 
    void objectsGrabbed(inf::ViewerPtr viewer,
-                       const gmtl::Matrix44f& vp_M_wand_xform,
                        const std::vector<SceneObjectPtr>& objs,
                        const gmtl::Point3f& isectPoint);
 
@@ -118,9 +117,6 @@ private:
 
    /** @name Move Strategies */
    //@{
-   std::vector<SceneObjectPtr> mGrabbedObjs;
-   typedef std::map<SceneObjectPtr, boost::signals::connection> grab_conn_map_t;
-   grab_conn_map_t mGrabbedObjConnections;
    std::map<SceneObjectPtr, gmtl::Matrix44f> mGrabbed_pobj_M_obj_map;
    std::vector<MoveStrategyPtr> mMoveStrategies;
    std::vector<std::string> mMoveStrategyNames;

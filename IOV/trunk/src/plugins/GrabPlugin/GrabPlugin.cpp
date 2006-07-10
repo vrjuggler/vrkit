@@ -28,6 +28,7 @@
 #include <IOV/Grab/GrabStrategy.h>
 #include <IOV/Grab/MoveStrategy.h>
 #include <IOV/Util/Exceptions.h>
+#include <IOV/Util/OpenSGHelpers.h>
 
 #include "GrabPlugin.h"
 
@@ -62,11 +63,7 @@ namespace inf
 
 GrabPlugin::~GrabPlugin()
 {
-   std::for_each(
-      mGrabbedObjConnections.begin(), mGrabbedObjConnections.end(),
-      boost::bind(&boost::signals::connection::disconnect,
-                  boost::bind(&grab_conn_map_t::value_type::second, _1))
-   );
+   /* Do nothing. */ ;
 }
 
 PluginPtr GrabPlugin::init(ViewerPtr viewer)
@@ -105,7 +102,11 @@ PluginPtr GrabPlugin::init(ViewerPtr viewer)
       if ( NULL != creator )
       {
          GrabStrategyPtr grab_strategy = creator->createPlugin();
-         grab_strategy->init(viewer);
+         grab_strategy->init(viewer,
+                             boost::bind(&GrabPlugin::objectsGrabbed, this,
+                                         viewer, _1, _2),
+                             boost::bind(&GrabPlugin::objectsReleased, this,
+                                         viewer, _1));
          mGrabStrategy = grab_strategy;
          IOV_STATUS << "[OK]" << std::endl;
       }
@@ -157,47 +158,48 @@ PluginPtr GrabPlugin::init(ViewerPtr viewer)
 
 void GrabPlugin::update(ViewerPtr viewer)
 {
-   // Get the wand transformation in virtual platform coordinates.
-   const gmtl::Matrix44f vp_M_wand_xform(
-      mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
-   );
-
    if ( isFocused() && mGrabStrategy )
    {
       std::vector<SceneObjectPtr> new_grabbed_objs;
       gmtl::Point3f isect_point;
-      mGrabStrategy->update(
-         viewer,
-         boost::bind(&GrabPlugin::objectsGrabbed, this, viewer,
-                     boost::cref(vp_M_wand_xform), _1, _2),
-         boost::bind(&GrabPlugin::objectsReleased, this, viewer, _1)
-      );
+      mGrabStrategy->update(viewer);
    }
 
-   // Move the grabbed objects.
-   if ( ! mGrabbedObjs.empty() && ! mMoveStrategies.empty() )
+   if ( mGrabStrategy )
    {
-      std::vector< std::pair<SceneObjectPtr, gmtl::Matrix44f> > move_data;
+      // Get the wand transformation in virtual platform coordinates.
+      const gmtl::Matrix44f vp_M_wand_xform(
+         mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
+      );
 
-      std::vector<SceneObjectPtr>::iterator o;
-      for ( o = mGrabbedObjs.begin(); o != mGrabbedObjs.end(); ++o )
+      const std::vector<SceneObjectPtr> objs =
+         mGrabStrategy->getGrabbedObjects();
+
+      // Move the grabbed objects.
+      if ( ! objs.empty() && ! mMoveStrategies.empty() )
       {
-         gmtl::Matrix44f new_obj_mat = mGrabbed_pobj_M_obj_map[*o];
+         std::vector< std::pair<SceneObjectPtr, gmtl::Matrix44f> > move_data;
 
-         std::vector<MoveStrategyPtr>::iterator s;
-         for ( s = mMoveStrategies.begin(); s != mMoveStrategies.end(); ++s )
+         std::vector<SceneObjectPtr>::const_iterator o;
+         for ( o = objs.begin(); o != objs.end(); ++o )
          {
-            // new_obj_mat is guaranteed to place the object into pobj
-            // space.
-            new_obj_mat = (*s)->computeMove(viewer, *o, vp_M_wand_xform,
-                                            new_obj_mat);
+            gmtl::Matrix44f new_obj_mat = mGrabbed_pobj_M_obj_map[*o];
+
+            std::vector<MoveStrategyPtr>::iterator s;
+            for ( s = mMoveStrategies.begin(); s != mMoveStrategies.end(); ++s )
+            {
+               // new_obj_mat is guaranteed to place the object into pobj
+               // space.
+               new_obj_mat = (*s)->computeMove(viewer, *o, vp_M_wand_xform,
+                                               new_obj_mat);
+            }
+
+            move_data.push_back(std::make_pair(*o, new_obj_mat));
          }
 
-         move_data.push_back(std::make_pair(*o, new_obj_mat));
+         // Send a move event.
+         mEventData->mObjectsMovedSignal(move_data);
       }
-
-      // Send a move event.
-      mEventData->mObjectsMovedSignal(move_data);
    }
 }
 
@@ -295,24 +297,19 @@ void GrabPlugin::focusChanged(inf::ViewerPtr viewer)
 }
 
 void GrabPlugin::objectsGrabbed(inf::ViewerPtr viewer,
-                                const gmtl::Matrix44f& vp_M_wand_xform,
                                 const std::vector<SceneObjectPtr>& objs,
                                 const gmtl::Point3f& isectPoint)
 {
-   mGrabbedObjs = objs;
-
    std::vector<SceneObjectPtr>::const_iterator o;
    for ( o = objs.begin(); o != objs.end(); ++o )
    {
       gmtl::set(mGrabbed_pobj_M_obj_map[*o], (*o)->getPos());
-
-      // Connect the grabbable object state change signal to our slot.
-      mGrabbedObjConnections[*o] =
-         (*o)->grabbableStateChanged().connect(
-            boost::bind(&GrabPlugin::grabbableObjStateChanged, this, _1,
-                        viewer)
-         );
    }
+
+   // Get the wand transformation in virtual platform coordinates.
+   const gmtl::Matrix44f vp_M_wand_xform(
+      mWandInterface->getWandPos()->getData(viewer->getDrawScaleFactor())
+   );
 
    std::for_each(mMoveStrategies.begin(), mMoveStrategies.end(),
                  boost::bind(&MoveStrategy::objectsGrabbed, _1, viewer, objs,
@@ -328,20 +325,6 @@ void GrabPlugin::objectsReleased(inf::ViewerPtr viewer,
    std::vector<SceneObjectPtr>::const_iterator o;
    for ( o = objs.begin(); o != objs.end(); ++o )
    {
-      // Remove the released object from mGrabbedObjs.
-      std::vector<SceneObjectPtr>::iterator i =
-         std::find(mGrabbedObjs.begin(), mGrabbedObjs.end(), *o);
-      vprASSERT(i != mGrabbedObjs.end());
-      mGrabbedObjs.erase(i);
-
-      // Disconnect our connection to the current object's grabbable state
-      // change signal so that any state changes to it do not propagate back
-      // to us. We are no longer interested in changes since we have released
-      // the object.
-      vprASSERT(mGrabbedObjConnections.count(*o) != 0);
-      mGrabbedObjConnections[*o].disconnect();
-      mGrabbedObjConnections.erase(*o);
-
       mGrabbed_pobj_M_obj_map.erase(*o);
    }
 
@@ -351,21 +334,6 @@ void GrabPlugin::objectsReleased(inf::ViewerPtr viewer,
 
    // Emit the de-select event for all the objects that were released.
    mEventData->mObjectsDeselectedSignal(objs);
-}
-
-void GrabPlugin::grabbableObjStateChanged(inf::SceneObjectPtr obj,
-                                          inf::ViewerPtr viewer)
-{
-   std::vector<SceneObjectPtr>::iterator o =
-      std::find(mGrabbedObjs.begin(), mGrabbedObjs.end(), obj);
-
-   // If we are currently grabbing obj and its grabbable state has changed so
-   // that it is no longer grabbable, we must release it.
-   if ( o != mGrabbedObjs.end() && ! obj->isGrabbable() )
-   {
-      std::vector<SceneObjectPtr> objs(1, obj);
-      objectsReleased(viewer, objs);
-   }
 }
 
 }

@@ -12,9 +12,11 @@
 #include <IOV/WandInterface.h>
 #include <IOV/User.h>
 #include <IOV/Scene.h>
+#include <IOV/SceneObject.h>
 #include <IOV/Viewer.h>
 #include <IOV/StatusPanel.h>
 #include <IOV/StatusPanelPlugin.h>
+#include <IOV/Util/OpenSGHelpers.h>
 
 #include "SignalGrabStrategy.h"
 
@@ -59,12 +61,24 @@ SignalGrabStrategy::SignalGrabStrategy()
 
 SignalGrabStrategy::~SignalGrabStrategy()
 {
-   /* Do nothing. */ ;
+   std::for_each(mConnections.begin(), mConnections.end(),
+                 boost::bind(&boost::signals::connection::disconnect, _1));
 }
 
-GrabStrategyPtr SignalGrabStrategy::init(ViewerPtr viewer)
+GrabStrategyPtr SignalGrabStrategy::init(ViewerPtr viewer,
+                                         grab_callback_t grabCallback,
+                                         release_callback_t releaseCallback)
 {
+   mGrabCallback    = grabCallback;
+   mReleaseCallback = releaseCallback;
+
    mGrabSignalData = viewer->getSceneObj()->getSceneData<GrabSignalData>();
+
+   mConnections.push_back(
+      mGrabSignalData->asyncRelease.connect(
+         boost::bind(&SignalGrabStrategy::objectsReleased, this, _1)
+      )
+   );
 
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
@@ -170,8 +184,7 @@ void SignalGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
    }
 }
 
-void SignalGrabStrategy::update(ViewerPtr viewer, grab_callback_t grabCallback,
-                                release_callback_t releaseCallback)
+void SignalGrabStrategy::update(ViewerPtr viewer)
 {
    // The user wants to choose an object for later grabbing.
    if ( mChooseBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
@@ -194,13 +207,13 @@ void SignalGrabStrategy::update(ViewerPtr viewer, grab_callback_t grabCallback,
          // operation.
          if ( ! mGrabbing )
          {
-            grab(grabCallback);
+            grab();
          }
          // If we are currently grabbing something, then this is a release
          // operation.
          else
          {
-            release(releaseCallback);
+            release();
          }
       }
    }
@@ -209,14 +222,19 @@ void SignalGrabStrategy::update(ViewerPtr viewer, grab_callback_t grabCallback,
       // The user has requested to grab the currently selected objects.
       if ( mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
       {
-         grab(grabCallback);
+         grab();
       }
       // The user has requested to release grabbed objects.
       else if ( mReleaseBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
       {
-         release(releaseCallback);
+         release();
       }
    }
+}
+
+std::vector<SceneObjectPtr> SignalGrabStrategy::getGrabbedObjects()
+{
+   return mGrabbedObjects;
 }
 
 void SignalGrabStrategy::configure(jccl::ConfigElementPtr elt)
@@ -263,7 +281,7 @@ void SignalGrabStrategy::configure(jccl::ConfigElementPtr elt)
    }
 }
 
-void SignalGrabStrategy::grab(grab_callback_t grabCallback)
+void SignalGrabStrategy::grab()
 {
    // Emit the grab signal and get the collection of grabbed objects and
    // the intersection point.
@@ -274,11 +292,13 @@ void SignalGrabStrategy::grab(grab_callback_t grabCallback)
    if ( ! grabbed_objs.empty() )
    {
       mGrabbing = true;
-      grabCallback(grabbed_objs, isect_pnt);
+      mGrabbedObjects.insert(mGrabbedObjects.end(), grabbed_objs.begin(),
+                             grabbed_objs.end());
+      mGrabCallback(grabbed_objs, isect_pnt);
    }
 }
 
-void SignalGrabStrategy::release(release_callback_t releaseCallback)
+void SignalGrabStrategy::release()
 {
    // Emit the grab signal and get the collection of released objects.
    std::vector<SceneObjectPtr> released_objs;
@@ -286,9 +306,32 @@ void SignalGrabStrategy::release(release_callback_t releaseCallback)
 
    if ( ! released_objs.empty() )
    {
-      mGrabbing = false;
-      releaseCallback(released_objs);
+      std::vector<SceneObjectPtr>::iterator o;
+      for ( o = released_objs.begin(); o != released_objs.end(); ++o )
+      {
+         mGrabbedObjects.erase(std::remove(mGrabbedObjects.begin(),
+                                        mGrabbedObjects.end(), *o),
+                               mGrabbedObjects.end());
+      }
+
+      mGrabbing = ! mGrabbedObjects.empty();
+      mReleaseCallback(released_objs);
    }
+}
+
+void SignalGrabStrategy::
+objectsReleased(const std::vector<SceneObjectPtr>& objs)
+{
+   std::vector<SceneObjectPtr>::const_iterator o;
+   for ( o = objs.begin(); o != objs.end(); ++o )
+   {
+      mGrabbedObjects.erase(std::remove(mGrabbedObjects.begin(),
+                                        mGrabbedObjects.end(), *o),
+                            mGrabbedObjects.end());
+   }
+
+   mGrabbing = ! mGrabbedObjects.empty();
+   mReleaseCallback(objs);
 }
 
 struct IncValue

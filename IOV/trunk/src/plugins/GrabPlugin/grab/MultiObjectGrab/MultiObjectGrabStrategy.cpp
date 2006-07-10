@@ -64,13 +64,23 @@ MultiObjectGrabStrategy::MultiObjectGrabStrategy()
 
 MultiObjectGrabStrategy::~MultiObjectGrabStrategy()
 {
+   std::for_each(
+      mObjConnections.begin(), mObjConnections.end(),
+      boost::bind(&boost::signals::connection::disconnect,
+                  boost::bind(&obj_conn_map_t::value_type::second, _1))
+   );
    std::for_each(mIsectConnections.begin(), mIsectConnections.end(),
                  boost::bind(&boost::signals::connection::disconnect, _1));
 }
 
-GrabStrategyPtr MultiObjectGrabStrategy::init(ViewerPtr viewer)
+GrabStrategyPtr MultiObjectGrabStrategy::
+init(ViewerPtr viewer, grab_callback_t grabCallback,
+     release_callback_t releaseCallback)
 {
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
+
+   mGrabCallback    = grabCallback;
+   mReleaseCallback = releaseCallback;
 
    // Connect the intersection signal to our slot.
    mIsectConnections.push_back(
@@ -194,9 +204,7 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
    }
 }
 
-void MultiObjectGrabStrategy::update(ViewerPtr viewer,
-                                     grab_callback_t grabCallback,
-                                     release_callback_t releaseCallback)
+void MultiObjectGrabStrategy::update(ViewerPtr viewer)
 {
    if ( ! mGrabbing )
    {
@@ -253,11 +261,11 @@ void MultiObjectGrabStrategy::update(ViewerPtr viewer,
          }
 
          // If mGrabbing is false at this point, then there is nothing to
-         // grab. Otherwise, invoke grabCallback to indicate that one or more
+         // grab. Otherwise, invoke mGrabCallback to indicate that one or more
          // objects are now grabbed.
          if ( mGrabbing )
          {
-            grabCallback(mGrabbedObjects, mIntersectPoint);
+            mGrabCallback(mGrabbedObjects, mIntersectPoint);
          }
       }
    }
@@ -276,9 +284,14 @@ void MultiObjectGrabStrategy::update(ViewerPtr viewer,
 
       // Update our state to reflect that we are no longer grabbing an object.
       mGrabbing = false;
-      releaseCallback(mGrabbedObjects);
+      mReleaseCallback(mGrabbedObjects);
       mGrabbedObjects.clear();
    }
+}
+
+std::vector<SceneObjectPtr> MultiObjectGrabStrategy::getGrabbedObjects()
+{
+   return mGrabbedObjects;
 }
 
 void MultiObjectGrabStrategy::configure(jccl::ConfigElementPtr elt)
@@ -379,19 +392,28 @@ void MultiObjectGrabStrategy::grabbableObjStateChanged(inf::SceneObjectPtr obj)
          mChosenObjects.erase(o);
       }
    }
-   // If mGrabbedObjects is not empty, then have grabbed objects, and obj may
-   // be in that collection. If obj is no longer grabbable, it must be
+   // If mGrabbedObjects is not empty, then we have grabbed objects, and obj
+   // may be in that collection. If obj is no longer grabbable, it must be
    // removed from mGrabbedObjects.
    else if ( ! mGrabbedObjects.empty() )
    {
       std::vector<SceneObjectPtr>::iterator o =
-         std::find(mChosenObjects.begin(), mChosenObjects.end(), obj);
+         std::find(mGrabbedObjects.begin(), mGrabbedObjects.end(), obj);
 
-      if ( o != mChosenObjects.end() && ! (*o)->isGrabbable() )
+      if ( o != mGrabbedObjects.end() && ! (*o)->isGrabbable() )
       {
          mObjConnections[*o].disconnect();
          mObjConnections.erase(*o);
+
+         // Inform the code that is using us that we have released a grabbed
+         // object.
+         mReleaseCallback(std::vector<SceneObjectPtr>(1, *o));
+
          mGrabbedObjects.erase(o);
+
+         // Keep the grabbing state up to date now that mGrabbedObjects has
+         // changed.
+         mGrabbing = ! mGrabbedObjects.empty();
       }
    }
 }

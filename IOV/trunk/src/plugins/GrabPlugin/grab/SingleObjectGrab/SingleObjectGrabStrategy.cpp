@@ -69,8 +69,13 @@ SingleObjectGrabStrategy::~SingleObjectGrabStrategy()
    mGrabbedObjConnection.disconnect();
 }
 
-GrabStrategyPtr SingleObjectGrabStrategy::init(ViewerPtr viewer)
+GrabStrategyPtr SingleObjectGrabStrategy::
+init(ViewerPtr viewer, grab_callback_t grabCallback,
+     release_callback_t releaseCallback)
 {
+   mGrabCallback    = grabCallback;
+   mReleaseCallback = releaseCallback;
+
    EventDataPtr event_data = viewer->getSceneObj()->getSceneData<EventData>();
 
    // Connect the intersection signal to our slot.
@@ -171,9 +176,7 @@ void SingleObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
    }
 }
 
-void SingleObjectGrabStrategy::update(ViewerPtr viewer,
-                                      grab_callback_t grabCallback,
-                                      release_callback_t releaseCallback)
+void SingleObjectGrabStrategy::update(ViewerPtr viewer)
 {
    // If we are intersecting an object but not grabbing it, the grab
    // button has just been pressed, and the intersected object is grabbable,
@@ -192,17 +195,27 @@ void SingleObjectGrabStrategy::update(ViewerPtr viewer,
          );
 
       std::vector<SceneObjectPtr> objs(1, mGrabbedObj);
-      grabCallback(objs, mIntersectPoint);
+      mGrabCallback(objs, mIntersectPoint);
    }
    // If we are grabbing an object and the release button has just been
    // pressed, then release the grabbed object.
    else if ( mGrabbing &&
              mReleaseBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
    {
-      std::vector<SceneObjectPtr> objs(1, mGrabbedObj);
       releaseGrabbedObject();
-      releaseCallback(objs);
    }
+}
+
+std::vector<SceneObjectPtr> SingleObjectGrabStrategy::getGrabbedObjects()
+{
+   std::vector<SceneObjectPtr> objs;
+
+   if ( mGrabbedObj )
+   {
+      objs.push_back(mGrabbedObj);
+   }
+
+   return objs;
 }
 
 void SingleObjectGrabStrategy::configure(jccl::ConfigElementPtr elt)
@@ -292,9 +305,13 @@ void SingleObjectGrabStrategy::releaseGrabbedObject()
    // changes since we have released the object.
    mGrabbedObjConnection.disconnect();
 
+   std::vector<SceneObjectPtr> objs(1, mGrabbedObj);
+
    // Finish off the object release operation by clearing our reference to
    // the formerly grabbed object.
    mGrabbedObj = SceneObjectPtr();
+
+   mReleaseCallback(objs);
 }
 
 void SingleObjectGrabStrategy::

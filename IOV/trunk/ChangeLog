@@ -1,5 +1,11 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-07-10 patrick  Refactored inf::GrabPlugin and inf::GrabStrategy so that
+                    inf::GrabPlugin now relies upon its grab strategy to keep
+                    track of which objects are currently grabbed. Added an
+                    "asynchronous" release signal to inf::GrabSignalData.
+                    -- VERSION -- 0.31.0
+                    -- inf::GrabStrategy API VERSION -- 1.1
 2006-06-27 patrick  Extended inf::BasicHighlighter to handle changes to the
                     list of objects selected for later grabbing by
                     multi-object grabber strategies.

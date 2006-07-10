@@ -19,7 +19,7 @@
 #include <IOV/Grab/GrabStrategyPtr.h>
 
 #define INF_GRAB_STRATEGY_PLUGIN_API_MAJOR 1
-#define INF_GRAB_STRATEGY_PLUGIN_API_MINOR 0
+#define INF_GRAB_STRATEGY_PLUGIN_API_MINOR 1
 
 
 namespace inf
@@ -64,29 +64,36 @@ public:
 
    virtual ~GrabStrategy();
 
-   /**
-    * Initializes this grab strategy.
-    *
-    * @post This grab strategy is initialized and ready to be used.
-    *
-    * @param viewer The VR Juggler application object.
-    *
-    * @return This object is returned as a shared pointer.
-    */
-   virtual GrabStrategyPtr init(ViewerPtr viewer) = 0;
-
-   /**
-    * Indicates to this strategy that it has focus. This is a good place to
-    * update displayed information about how object grabbing can be achieved.
-    */
-   virtual void setFocus(ViewerPtr viewer, const bool focused) = 0;
-
    typedef boost::function<void (const std::vector<SceneObjectPtr>&,
                                  const gmtl::Point3f&)>
       grab_callback_t;
 
    typedef boost::function<void (const std::vector<SceneObjectPtr>&)>
       release_callback_t;
+
+   /**
+    * Initializes this grab strategy.
+    *
+    * @post This grab strategy is initialized and ready to be used.
+    *
+    * @param viewer          The VR Juggler application object.
+    * @param grabCallback    A callback into code using this grab strategy
+    *                        to be invoked when one or more grabbed objects
+    *                        are grabbed.
+    * @param releaseCallback A callback into code using this grab strategy
+    *                        to be invoked when one or more grabbed objects
+    *                        are released.
+    *
+    * @return This object is returned as a shared pointer.
+    */
+   virtual GrabStrategyPtr init(ViewerPtr viewer, grab_callback_t grabCallback,
+                                release_callback_t releaseCallback) = 0;
+
+   /**
+    * Indicates to this strategy that it has focus. This is a good place to
+    * update displayed information about how object grabbing can be achieved.
+    */
+   virtual void setFocus(ViewerPtr viewer, const bool focused) = 0;
 
    /**
     * Checks for state changes based on input that could result in new objects
@@ -96,10 +103,16 @@ public:
     * @pre This strategy is focused (setFocus() was invoked with a value of
     *      true).
     *
-    * @param viewer         The VR Juggler application object.
+    * @param viewer The VR Juggler application object.
     */
-   virtual void update(ViewerPtr viewer, grab_callback_t grabCallback,
-                       release_callback_t releaseCallback) = 0;
+   virtual void update(ViewerPtr viewer) = 0;
+
+   /**
+    * Returns the current collection of grabbed objects.
+    *
+    * @pre update() has been invoked and has returned.
+    */
+   virtual std::vector<SceneObjectPtr> getGrabbedObjects() = 0;
 
 #if defined(WIN32) || defined(WIN64)
    /**
