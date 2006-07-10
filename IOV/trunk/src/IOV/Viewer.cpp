@@ -4,6 +4,7 @@
 #include <boost/bind.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/exception.hpp>
 
 #include <OpenSG/OSGRemoteAspect.h>
 #include <OpenSG/OSGGroupConnection.h>
@@ -567,39 +568,49 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
    std::string iov_base_dir;
    if ( vpr::System::getenv(iov_base_dir_tkn, iov_base_dir).success() )
    {
-      fs::path iov_base_path(iov_base_dir, fs::native);
-      fs::path def_iov_plugin_path = iov_base_path / "lib/IOV/plugins";
-
-      if ( fs::exists(def_iov_plugin_path) )
+      try
       {
-         std::string def_search_path =
-            def_iov_plugin_path.native_directory_string();
-         std::cout << "Setting default IOV plug-in path: " << def_search_path
+         fs::path iov_base_path(iov_base_dir, fs::native);
+         fs::path def_iov_plugin_path = iov_base_path / "lib/IOV/plugins";
+
+         if ( fs::exists(def_iov_plugin_path) )
+         {
+            std::string def_search_path =
+               def_iov_plugin_path.native_directory_string();
+            std::cout << "Setting default IOV plug-in path: " << def_search_path
+                     << std::endl;
+            search_path.push_back(def_search_path);
+         }
+         else
+         {
+            std::cerr << "Default IOV plug-in path does not exist: "
+                     << def_iov_plugin_path.native_directory_string()
+                     << std::endl;
+         }
+
+         fs::path def_strategy_path = iov_base_path / "lib/IOV/plugins/grab";
+
+         if ( fs::exists(def_strategy_path) )
+         {
+            const std::string def_search_path =
+               def_strategy_path.native_directory_string();
+            std::cout << "Setting default IOV intersection strategy plug-in "
+                     << "to '" << def_search_path << "'" << std::endl;
+            search_path.push_back(def_search_path);
+         }
+         else
+         {
+            std::cerr << "Default IOV intersection strategy plug-in path ("
+                     << def_strategy_path.native_directory_string()
+                     << ") does not exist!" << std::endl;
+         }
+      }
+      catch (fs::filesystem_error& ex)
+      {
+         std::cerr << "ERROR: Failed to extend plug-in search path:\n"
+                   << ex.what() << std::endl
+                   << "ERROR: The default IOV plug-ins may not be found!"
                    << std::endl;
-         search_path.push_back(def_search_path);
-      }
-      else
-      {
-         std::cerr << "Default IOV plug-in path does not exist: "
-                   << def_iov_plugin_path.native_directory_string()
-                   << std::endl;
-      }
-
-      fs::path def_strategy_path = iov_base_path / "lib/IOV/plugins/grab";
-
-      if ( fs::exists(def_strategy_path) )
-      {
-         const std::string def_search_path =
-            def_strategy_path.native_directory_string();
-         std::cout << "Setting default IOV intersection strategy plug-in "
-                   << "to '" << def_search_path << "'" << std::endl;
-         search_path.push_back(def_search_path);
-      }
-      else
-      {
-         std::cerr << "Default IOV intersection strategy plug-in path ("
-                   << def_strategy_path.native_directory_string()
-                   << ") does not exist!" << std::endl;
       }
    }
 
