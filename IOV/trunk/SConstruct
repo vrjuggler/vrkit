@@ -155,14 +155,14 @@ if not SConsAddons.Util.hasHelpFlag():
 
    # Setup the build environment
    # Add local directory to path and the "root" directory for this project
-   vrj_options.updateEnv(baseEnv)
-   opensg_options.updateEnv(baseEnv)
+   vrj_options.apply(baseEnv)
+   opensg_options.apply(baseEnv)
 
    # Incorporate the Boost options into baseEnv if Boost is available.  This
    # accounts for the case when a Boost installation is not available through
    # the output returned by 'vrjuggler-config --cxxflags'.
    if boost_options.isAvailable():
-      boost_options.updateEnv(baseEnv)
+      boost_options.apply(baseEnv)
    else:
       print "WARNING: Cannot build IOV without Boost.Signals"
 

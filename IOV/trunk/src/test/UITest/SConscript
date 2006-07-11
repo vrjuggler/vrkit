@@ -12,7 +12,7 @@ if GetPlatform() == 'mac':
    opensg_options.found_cflags = mac_cflags.strip().split(" ")
 
 ui_env = baseEnv.Copy()
-opensg_options.updateEnv(ui_env, lib='glut')
+opensg_options.apply(ui_env, lib='glut')
 
 ui_env.Prepend(CPPPATH = inst_paths['include'],
                LIBPATH = inst_paths['lib'],
