@@ -73,6 +73,7 @@ protected:
 
    enum NavState
    {
+      NONE,
       RESET,
       TRANSLATE,
       ROTATE

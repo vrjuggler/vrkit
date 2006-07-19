@@ -299,7 +299,7 @@ void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
 
 void WandNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
 {
-   NavState nav_state(RESET);
+   NavState nav_state(NONE);
 
    if ( isFocused() )
    {
@@ -350,6 +350,7 @@ void WandNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
       // Swap the navigation mode if the mode switching button was toggled on.
       if ( mModeBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
       {
+         nav_state = NONE;
          mNavMode = (mNavMode == WALK ? FLY : WALK);
          IOV_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
                    << std::endl;
@@ -395,6 +396,10 @@ void WandNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
 
       switch ( nav_state )
       {
+         // Do nothing if so directed.
+         case NONE:
+            break;
+         // Handle reset.
          case RESET:
             mVelocity = 0.0f;
             gmtl::identity(cur_pos);
