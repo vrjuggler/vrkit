@@ -159,39 +159,15 @@ void Viewer::preFrame()
    {
       mIsectStrategy->update(myself);
 
-      // Get the intersected object using a breadth-first search. Beginning
-      // at the most shallow level of the object hierarchy, a scan is
-      // performed for an object that the intersection strategy identifies as
-      // being intersected.
-      gmtl::Point3f cur_ip;
-      SceneObjectPtr cur_obj =
-         mIsectStrategy->findIntersection(myself, mObjects, cur_ip);
+      inf::WandInterfacePtr wand =
+         getUser()->getInterfaceTrader().getWandInterface();
+      const gmtl::Matrix44f vp_M_wand(
+         wand->getWandPos()->getData(getDrawScaleFactor())
+      );
 
-      // Save results from calling intersect on grabbable objects.
-      SceneObjectPtr intersect_obj;
-      SceneObjectPtr parent_obj;
       gmtl::Point3f intersect_point;
-      intersect_obj = cur_obj;
-      parent_obj = cur_obj;
-      intersect_point = cur_ip;
-
-      // If intersected_obj has children, then we continue the breadth-first
-      // search in its children. We want to find the deepest intersected
-      // object.
-      std::vector<SceneObjectPtr> objs;
-      while ( NULL != cur_obj.get() && intersect_obj->hasChildren() )
-      {
-         objs = cur_obj->getChildren();
-         cur_ip.set(0.0f, 0.0f, 0.0f);
-         cur_obj = mIsectStrategy->findIntersection(myself, objs, cur_ip);
-
-         // If we intersected a child, save results
-         if ( NULL != cur_obj.get() )
-         {
-            intersect_obj = cur_obj;
-            intersect_point = cur_ip;
-         }
-      }
+      SceneObjectPtr intersect_obj =
+         mIsectStrategy->findIntersection(myself, mObjects, intersect_point);
 
       // If we have an intersected object, make sure that the intersection is
       // valid. Yes, this is an afterthought that ought to be in the algorithm
@@ -234,8 +210,7 @@ void Viewer::preFrame()
                << inf::getName(mIntersectedObj->getRoot().get()) << std::endl
                << vprDEBUG_FLUSH;
 
-            mEventData->mObjectIntersectedSignal(mIntersectedObj, parent_obj,
-                                                 intersect_point);
+            mEventData->mObjectIntersectedSignal(mIntersectedObj, intersect_point);
          }
       }
    }

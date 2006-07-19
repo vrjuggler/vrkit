@@ -93,7 +93,6 @@ private:
     * @param pnt         The intersection point.
     */
    inf::Event::ResultType objectIntersected(inf::SceneObjectPtr obj,
-                                            inf::SceneObjectPtr parentObj,
                                             gmtl::Point3f pnt);
 
    /**

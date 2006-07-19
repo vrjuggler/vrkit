@@ -149,7 +149,7 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
    mConnections.push_back(
       event_data->mObjectIntersectedSignal.connect(
          100,
-         boost::bind(&BasicHighlighter::objectIntersected, this, _1, _2, _3)
+         boost::bind(&BasicHighlighter::objectIntersected, this, _1, _2)
       )
    );
 
@@ -225,7 +225,6 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
 
 inf::Event::ResultType
 BasicHighlighter::objectIntersected(inf::SceneObjectPtr obj,
-                                    inf::SceneObjectPtr,
                                     gmtl::Point3f)
 {
    // Only apply the intersection highlight if obj is not currently

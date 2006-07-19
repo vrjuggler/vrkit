@@ -82,7 +82,7 @@ init(ViewerPtr viewer, grab_callback_t grabCallback,
    mIsectConnection =
       event_data->mObjectIntersectedSignal.connect(
          0, boost::bind(&SingleObjectGrabStrategy::objectIntersected, this,
-                        _1, _2, _3)
+                        _1, _2)
       );
 
    // Connect the de-intersection signal to our slot.
@@ -260,8 +260,7 @@ transformButtonVec(const std::vector<int>& btns)
 }
 
 inf::Event::ResultType SingleObjectGrabStrategy::
-objectIntersected(SceneObjectPtr obj, SceneObjectPtr parentObj,
-                  const gmtl::Point3f& pnt)
+objectIntersected(SceneObjectPtr obj, const gmtl::Point3f& pnt)
 {
    if ( ! mGrabbing )
    {

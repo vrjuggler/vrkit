@@ -21,6 +21,7 @@
 #include <IOV/ViewerPtr.h>
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Grab/IntersectionStrategy.h>
+#include <IOV/Util/SceneObjectTraverser.h>
 
 
 namespace inf
@@ -85,6 +86,12 @@ private:
       return "ray_intersection_strategy";
    }
 
+   /** @name Intersection Traversal Methods */
+   //@{
+   SceneObjectTraverser::Result enterFunc(SceneObjectPtr obj);
+   void setHit(float enterVal, SceneObjectPtr obj, const OSG::Pnt3f&  point);
+   //@}
+
    /**
     * Configures this intersection strategy.
     *
@@ -113,6 +120,14 @@ private:
    OSG::Color4f mRayDiffuse;
    OSG::Color4f mRayAmbient;
    OSG::Real32  mRayWidth;
+   //@}
+
+   /** @name Intersection Traversal Properties */
+   //@{
+   float                mMinDist;
+   SceneObjectPtr       mIntersectObj;
+   OSG::Pnt3f           mIntersectPoint;
+   gmtl::Matrix44f      m_vp_M_wand;
    //@}
 
    bool mTriangleIsect;

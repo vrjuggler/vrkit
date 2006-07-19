@@ -86,7 +86,7 @@ init(ViewerPtr viewer, grab_callback_t grabCallback,
    mIsectConnections.push_back(
       mEventData->mObjectIntersectedSignal.connect(
          0, boost::bind(&MultiObjectGrabStrategy::objectIntersected, this,
-                        _1, _2, _3)
+                        _1, _2)
       )
    );
 
@@ -338,7 +338,7 @@ transformButtonVec(const std::vector<int>& btns)
 }
 
 inf::Event::ResultType MultiObjectGrabStrategy::
-objectIntersected(SceneObjectPtr obj, SceneObjectPtr parentObj,
+objectIntersected(SceneObjectPtr obj,
                   const gmtl::Point3f& pnt)
 {
    if ( ! mGrabbing )

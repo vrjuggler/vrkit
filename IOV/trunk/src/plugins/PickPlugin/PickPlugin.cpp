@@ -64,7 +64,7 @@ PluginPtr PickPlugin::init(ViewerPtr viewer)
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
 
    // Connect the intersection signal to our slot.
-   mIsectConnection = mEventData->mObjectIntersectedSignal.connect(0, boost::bind(&PickPlugin::objectIntersected, this, _1, _2, _3));
+   mIsectConnection = mEventData->mObjectIntersectedSignal.connect(0, boost::bind(&PickPlugin::objectIntersected, this, _1, _2));
 
    // Connect the de-intersection signal to our slot.
    mDeIsectConnection = mEventData->mObjectDeintersectedSignal.connect(0, boost::bind(&PickPlugin::objectDeintersected, this, _1));
@@ -91,7 +91,6 @@ PluginPtr PickPlugin::init(ViewerPtr viewer)
 
 inf::Event::ResultType
 PickPlugin::objectIntersected(inf::SceneObjectPtr obj,
-                              inf::SceneObjectPtr parentObj,
                               gmtl::Point3f pnt)
 {
    // If we intersected a grabbable object.

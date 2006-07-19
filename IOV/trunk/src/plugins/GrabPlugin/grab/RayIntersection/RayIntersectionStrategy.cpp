@@ -1,6 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
 #include <limits>
+#include <boost/bind.hpp>
 #include <boost/cast.hpp>
 
 #include <OpenSG/OSGChunkMaterial.h>
@@ -252,99 +253,123 @@ findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
       wand->getWandPos()->getData(viewer->getDrawScaleFactor())
    );
 
-   SceneObjectPtr intersect_obj;
+   // Reset the intersection test data.
+   m_vp_M_wand = vp_M_wand;
+   mMinDist = std::numeric_limits<float>::max();
+   mIntersectObj = SceneObjectPtr();
+   mIntersectPoint = OSG::Pnt3f();
 
-   float min_dist = std::numeric_limits<float>::max();   // Set to a max
-   OSG::Pnt3f osg_intersect_point;
+   // Traverse scene objects to find closest intersection.
+   SceneObjectTraverser::enter_func_t enter = boost::bind(&RayIntersectionStrategy::enterFunc, this, _1);
+   SceneObjectTraverser::traverse(objs, enter);
 
-   std::vector<SceneObjectPtr>::const_iterator o;
-   for ( o = objs.begin(); o != objs.end(); ++o)
+   intersectPoint.set(mIntersectPoint.getValues());
+   return mIntersectObj;
+}
+
+SceneObjectTraverser::Result RayIntersectionStrategy::enterFunc(SceneObjectPtr obj)
+{
+   OSG::Matrix world_xform;
+
+   vprASSERT((obj)->getRoot() != OSG::NullFC);
+
+   // If we have no parent then we want to use the identity.
+   if ((obj)->getRoot()->getParent() != OSG::NullFC)
    {
-      OSG::Matrix world_xform;
+      (obj)->getRoot()->getParent()->getToWorld(world_xform);
+   }
 
-      vprASSERT((*o)->getRoot() != OSG::NullFC);
+   gmtl::Matrix44f obj_M_vp;
+   gmtl::set(obj_M_vp, world_xform);
+   gmtl::invert(obj_M_vp);
 
-      // If we have no parent then we want to use the identity.
-      if ((*o)->getRoot()->getParent() != OSG::NullFC)
+   // Get the wand transformation in virtual world coordinates,
+   // including any transformations in the scene graph below the
+   // transformation root.
+   const gmtl::Matrix44f obj_M_wand = obj_M_vp * m_vp_M_wand;
+   gmtl::Rayf pick_ray(gmtl::Vec3f(0,0,0), gmtl::Vec3f(0,0,-1));
+   gmtl::xform(pick_ray, obj_M_wand, pick_ray);
+
+   OSG::NodeRefPtr root = obj->getRoot();
+
+   OSG::Pnt3f vol_min, vol_max;
+   root->getVolume().getBounds(vol_min, vol_max);
+
+   gmtl::AABoxf bbox(gmtl::Point3f(vol_min[0], vol_min[1], vol_min[2]),
+                     gmtl::Point3f(vol_max[0], vol_max[1], vol_max[2]));
+   unsigned int num_hits;
+   float enter_val, exit_val;
+
+   SceneObjectTraverser::Result result = SceneObjectTraverser::Skip;
+
+   // Use a GMTL shell intersection test rather than the OpenSG volume
+   // intersection test. Using the shell intersection provides better
+   // results when, for example, the origin of the pick ray is inside a
+   // large volume that contains smaller volumes.
+   if ( gmtl::intersect(bbox, pick_ray, num_hits, enter_val, exit_val) )
+   {
+      // Intersected bounding volume so we must continue into children.
+      result = SceneObjectTraverser::Continue;
+
+      const OSG::Line osg_pick_ray(
+         OSG::Pnt3f(pick_ray.mOrigin.getData()),
+         OSG::Vec3f(pick_ray.mDir.getData())
+      );
+
+      // If we are doing triangle-level intersection, then we create an
+      // intersect action and apply it to the intersected object.
+      // Earlier, a callback was registered for handling geometry cores
+      // to perform the triangle intersection test.
+      if ( mTriangleIsect )
       {
-         (*o)->getRoot()->getParent()->getToWorld(world_xform);
-      }
+         // Temporarily allow intersection traversal into current scene object.
+         OSG::UInt32 trav_mask = obj->getRoot()->getTravMask();
+         obj->getRoot()->setTravMask(trav_mask | 128);
 
-      gmtl::Matrix44f obj_M_vp;
-      gmtl::set(obj_M_vp, world_xform);
-      gmtl::invert(obj_M_vp);
+         OSG::IntersectAction* action(OSG::IntersectAction::create());
+         action->setTravMask(128);
 
-      // Get the wand transformation in virtual world coordinates,
-      // including any transformations in the scene graph below the
-      // transformation root.
-      const gmtl::Matrix44f obj_M_wand = obj_M_vp * vp_M_wand;
-      gmtl::Rayf pick_ray(gmtl::Vec3f(0,0,0), gmtl::Vec3f(0,0,-1));
-      gmtl::xform(pick_ray, obj_M_wand, pick_ray);
+         action->setLine(osg_pick_ray);
+         action->apply(root);
 
-      OSG::NodeRefPtr root = (*o)->getRoot();
-
-      OSG::Pnt3f vol_min, vol_max;
-      root->getVolume().getBounds(vol_min, vol_max);
-
-      gmtl::AABoxf bbox(gmtl::Point3f(vol_min[0], vol_min[1], vol_min[2]),
-                        gmtl::Point3f(vol_max[0], vol_max[1], vol_max[2]));
-      unsigned int num_hits;
-      float enter_val, exit_val;
-
-      // Use a GMTL shell intersection test rather than the OpenSG volume
-      // intersection test. Using the shell intersection provides better
-      // results when, for example, the origin of the pick ray is inside a
-      // large volume that contains smaller volumes.
-      if ( gmtl::intersect(bbox, pick_ray, num_hits, enter_val, exit_val) )
-      {
-         // If enter_val is less than min_dist, then our ray has intersected
-         // an object that is closer than the last intersected object.
-         if ( enter_val < min_dist )
+         // If we got a hit, then we update the state of our
+         // intersection test.
+         if ( action->didHit() )
          {
-            const OSG::Line osg_pick_ray(
-               OSG::Pnt3f(pick_ray.mOrigin.getData()),
-               OSG::Vec3f(pick_ray.mDir.getData())
-            );
-
-            // If we are doing triangle-level intersection, then we create an
-            // intersect action and apply it to the intersected object.
-            // Earlier, a callback was registered for handling geometry cores
-            // to perform the triangle intersection test.
-            if ( mTriangleIsect )
-            {
-               OSG::IntersectAction* action(OSG::IntersectAction::create());
-
-               action->setLine(osg_pick_ray);
-               action->apply(root);
-
-               // If we got a hit, then we update the state of our
-               // intersection test.
-               if ( action->didHit() )
-               {
-                  intersect_obj = *o;
-                  min_dist = enter_val;
-                  osg_intersect_point = action->getHitPoint();
-               }
-
-               delete action;
-            }
-            // If we are not doing triangle-level intersection, then
-            // intersecting with the bounding volume is sufficient to have
-            // an object intersection.
-            else
-            {
-               intersect_obj = *o;
-               min_dist = enter_val;
-               osg_intersect_point = osg_pick_ray.getPosition() +
-                                        min_dist * osg_pick_ray.getDirection();
-            }
+            enter_val = action->getHitT();
+            setHit(enter_val, obj, action->getHitPoint());
          }
+
+         // Disable intersection traversal into current scene object.
+         trav_mask = obj->getRoot()->getTravMask();
+         obj->getRoot()->setTravMask(trav_mask & ~128);
+
+         delete action;
+      }
+      // If enter_val is less than mMinDist, then our ray has intersected
+      // an object that is closer than the last intersected object.
+      else
+      {
+         // If we are not doing triangle-level intersection, then
+         // intersecting with the bounding volume is sufficient to have
+         // an object intersection.
+         OSG::Pnt3f intersect_point = osg_pick_ray.getPosition() +
+            enter_val * osg_pick_ray.getDirection();
+         setHit(enter_val, obj, intersect_point);
       }
    }
 
-   intersectPoint.set(osg_intersect_point.getValues());
+   return result;
+}
 
-   return intersect_obj;
+void RayIntersectionStrategy::setHit(float enterVal, SceneObjectPtr obj, const OSG::Pnt3f&  point)
+{
+   if (enterVal < mMinDist)
+   {
+      mMinDist = enterVal;
+      mIntersectObj = obj;
+      mIntersectPoint = point;
+   }
 }
 
 void RayIntersectionStrategy::configure(jccl::ConfigElementPtr cfgElt)

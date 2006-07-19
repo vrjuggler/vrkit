@@ -90,8 +90,7 @@ public:
     *
     * @since 0.19.0
     */
-   boost::signal<Event::ResultType (SceneObjectPtr, SceneObjectPtr,
-                                    const gmtl::Point3f&),
+   boost::signal<Event::ResultType (SceneObjectPtr, const gmtl::Point3f&),
                  Event::ResultOperator> mObjectIntersectedSignal;
 
    /**

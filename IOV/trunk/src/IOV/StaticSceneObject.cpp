@@ -16,6 +16,9 @@ StaticSceneObject::~StaticSceneObject()
 StaticSceneObjectPtr StaticSceneObject::init(OSG::TransformNodePtr node)
 {
    mTransformNode = node;
+   OSG::UInt32 trav_mask = mTransformNode.node()->getTravMask();
+   trav_mask = (trav_mask & ~128);
+   mTransformNode.node()->setTravMask(trav_mask);
    return boost::dynamic_pointer_cast<StaticSceneObject>(shared_from_this());
 }
 

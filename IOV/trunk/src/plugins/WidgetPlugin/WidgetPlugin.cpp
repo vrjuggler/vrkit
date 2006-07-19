@@ -64,7 +64,7 @@ PluginPtr WidgetPlugin::init(inf::ViewerPtr viewer)
    mMovedConnection.block();
 
    // Connect the intersection signal to our slot.
-   mIsectConnection = event_data->mObjectIntersectedSignal.connect(0, boost::bind(&WidgetPlugin::objectIntersected, this, _1, _2, _3));
+   mIsectConnection = event_data->mObjectIntersectedSignal.connect(0, boost::bind(&WidgetPlugin::objectIntersected, this, _1, _2));
 
    // Connect the de-intersection signal to our slot.
    mDeIsectConnection = event_data->mObjectDeintersectedSignal.connect(0, boost::bind(&WidgetPlugin::objectDeintersected, this, _1));
@@ -96,25 +96,32 @@ PluginPtr WidgetPlugin::init(inf::ViewerPtr viewer)
 
 inf::Event::ResultType
 WidgetPlugin::objectIntersected(inf::SceneObjectPtr obj,
-                                inf::SceneObjectPtr parentObj,
                                 const gmtl::Point3f& pnt)
 {
    const std::vector<SceneObjectPtr>& objs = mWidgetData->getWidgets();
 
-   // If we intersected a grabbable object.
-   if ( std::find(objs.begin(), objs.end(), parentObj) != objs.end() )
+   if (!isFocused())
    {
-      if (isFocused())
+      return inf::Event::CONTINUE;
+   }
+
+   // Ensure that we intersected a widget and not a model etc.
+   inf::SceneObjectPtr parent = obj->getParent();
+   while (NULL != parent)
+   {
+      if ( std::find(objs.begin(), objs.end(), parent) != objs.end() )
       {
          mIntersectedObj = obj;
          mIntersectPoint = pnt;
          //mIntersectSound.trigger();
          mIntersecting = true;
          mIntersectedObj->wandEntered();
+
+         // Don't allow anyone else to process this event since it is only
+         // for widgets. (ex. BasicHighlighter)
+         return inf::Event::DONE;
       }
-      // Don't allow anyone else to process this event since it is only
-      // for widgets. (ex. BasicHighlighter)
-      return inf::Event::DONE;
+      parent = parent->getParent();
    }
 
    return inf::Event::CONTINUE;

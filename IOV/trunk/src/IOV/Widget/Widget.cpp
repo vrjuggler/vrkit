@@ -55,6 +55,10 @@ WidgetPtr Widget::init(const float metersToAppUnits)
    mWidgetGeomNode = OSG::GeometryNodePtr::create();
    mWidgetGeomNode = mBuilder.createGeomGeo();
 
+   OSG::UInt32 trav_mask = mRootWidgetNode.node()->getTravMask();
+   trav_mask = (trav_mask & ~128);
+   mRootWidgetNode.node()->setTravMask(trav_mask);
+
    OSG::setName(mRootWidgetNode.node(), "RootWidgetNode");
    OSG::setName(mWidgetGeomNode.node(), "WidgetGeomNode");
    OSG::setName(mWidgetGeomNode.core(), "WidgetGeomCore");
