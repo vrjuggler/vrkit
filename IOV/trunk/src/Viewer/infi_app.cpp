@@ -11,6 +11,7 @@
 #include <OpenSG/OSGMatrix.h>
 #include <OpenSG/OSGMaterialPool.h>
 #include <OpenSG/OSGSimpleGeometry.h>
+#include <OpenSG/OSGSimpleAttachments.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGDirectionalLight.h>
 #include <OpenSG/OSGSceneFileHandler.h>
@@ -244,6 +245,7 @@ void OpenSgViewer::init()
    OSG::endEditCP(model_xform_core, OSG::Transform::MatrixFieldMask);
 
    OSG::TransformNodePtr model_xform = OSG::TransformNodePtr(model_xform_core);
+   OSG::setName(model_xform.node(), "Model Xform");
 
    OSG::beginEditCP(model_xform);
       model_xform.node()->addChild(model_root);
@@ -283,7 +285,7 @@ void OpenSgViewer::init()
       light_core->setDiffuse   (0.6, 0.6, 0.6, 1);
       light_core->setSpecular  (1, 1, 1, 1);
       light_core->setDirection (0, 0, 1);
-      light_core->setBeacon    (light_node);
+      light_core->setBeacon    (light_beacon);
    OSG::endEditCP(light_core);
 
    // --- Setup Scene -- //
