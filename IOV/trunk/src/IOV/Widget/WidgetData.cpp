@@ -1,7 +1,6 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
 #include <IOV/Widget/WidgetData.h>
-#include <IOV/SceneObject.h>
 #include <algorithm>
 
 namespace inf

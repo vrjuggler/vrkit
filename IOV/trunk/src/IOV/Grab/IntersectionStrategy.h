@@ -6,7 +6,6 @@
 #include <IOV/Config.h>
 
 #include <boost/noncopyable.hpp>
-#include <OpenSG/OSGTransform.h>
 #include <vpr/DynLoad/Library.h>
 #include <gmtl/Point.h>
 
