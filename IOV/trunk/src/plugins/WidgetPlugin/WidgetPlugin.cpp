@@ -107,7 +107,7 @@ WidgetPlugin::objectIntersected(inf::SceneObjectPtr obj,
 
    // Ensure that we intersected a widget and not a model etc.
    inf::SceneObjectPtr parent = obj->getParent();
-   while (NULL != parent)
+   while ( NULL != parent.get() )
    {
       if ( std::find(objs.begin(), objs.end(), parent) != objs.end() )
       {
