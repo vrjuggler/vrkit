@@ -2,13 +2,14 @@
 
 #include <IOV/Config.h>
 
-#include <vpr/Util/Assert.h>
 #include <gmtl/MatrixOps.h>
 #include <gmtl/External/OpenSGConvert.h>
 
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/SceneObject.h>
+
+#include <vpr/Util/Assert.h>
 
 #include "CenterPointMoveStrategy.h"
 

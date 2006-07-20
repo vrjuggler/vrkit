@@ -6,6 +6,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/bind.hpp>
 
+#include <OpenSG/OSGConfig.h>
+
 #include <vpr/vpr.h>
 #include <vpr/System.h>
 #include <vpr/Sync/Guard.h>

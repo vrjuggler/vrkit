@@ -4,6 +4,8 @@
 
 #include <boost/bind.hpp>
 
+#include <OpenSG/OSGConfig.h>
+
 #include <jccl/Config/ConfigElement.h>
 
 #include <IOV/EventData.h>

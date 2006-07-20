@@ -1,5 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
+#include <OpenSG/OSGConfig.h>
+
 #include <IOV/PluginCreator.h>
 #include <IOV/Viewer.h>
 

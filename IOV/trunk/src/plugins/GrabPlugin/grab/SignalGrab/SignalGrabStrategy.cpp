@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <boost/bind.hpp>
 
+#include <OpenSG/OSGConfig.h>
+
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/GrabSignalData.h>
