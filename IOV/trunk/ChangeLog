@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-07-19 aronb    Refactored the use of intersection strategies.
+                    -- VERSION -- 0.32.0
 2006-07-10 patrick  Refactored inf::GrabPlugin and inf::GrabStrategy so that
                     inf::GrabPlugin now relies upon its grab strategy to keep
                     track of which objects are currently grabbed. Added an

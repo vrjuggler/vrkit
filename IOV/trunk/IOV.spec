@@ -1,6 +1,6 @@
 # Spec file for IOV.
 %define name    IOV
-%define version	0.30.2
+%define version	0.32.0
 %define release	1
 
 %define vrj_version    %(vrjuggler-config --version)
