@@ -57,7 +57,9 @@ WidgetPtr Widget::init(const float metersToAppUnits)
 
    OSG::UInt32 trav_mask = mRootWidgetNode.node()->getTravMask();
    trav_mask = (trav_mask & ~128);
-   mRootWidgetNode.node()->setTravMask(trav_mask);
+   OSG::beginEditCP(mRootWidgetNode.node(), OSG::Node::TravMaskFieldMask);
+      mRootWidgetNode.node()->setTravMask(trav_mask);
+   OSG::endEditCP(mRootWidgetNode.node(), OSG::Node::TravMaskFieldMask);
 
    OSG::setName(mRootWidgetNode.node(), "RootWidgetNode");
    OSG::setName(mWidgetGeomNode.node(), "WidgetGeomNode");

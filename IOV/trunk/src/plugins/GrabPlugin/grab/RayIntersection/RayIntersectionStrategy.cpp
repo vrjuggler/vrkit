@@ -324,7 +324,9 @@ SceneObjectTraverser::Result RayIntersectionStrategy::enterFunc(SceneObjectPtr o
       {
          // Temporarily allow intersection traversal into current scene object.
          OSG::UInt32 trav_mask = obj->getRoot()->getTravMask();
-         obj->getRoot()->setTravMask(trav_mask | 128);
+         OSG::beginEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
+            obj->getRoot()->setTravMask(trav_mask | 128);
+         OSG::endEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
 
          OSG::IntersectAction* action(OSG::IntersectAction::create());
          action->setTravMask(128);
@@ -342,7 +344,9 @@ SceneObjectTraverser::Result RayIntersectionStrategy::enterFunc(SceneObjectPtr o
 
          // Disable intersection traversal into current scene object.
          trav_mask = obj->getRoot()->getTravMask();
-         obj->getRoot()->setTravMask(trav_mask & ~128);
+         OSG::beginEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
+            obj->getRoot()->setTravMask(trav_mask & ~128);
+         OSG::endEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
 
          delete action;
       }
