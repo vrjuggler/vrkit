@@ -20,7 +20,7 @@ if boost_options.isAvailable():
    if GetPlatform() == 'mac':
       viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
-   po_lib = boost_options.buildFullLibName('program_options')
+   po_lib = boost_options.buildFullLibName('program_options', viewerEnv)
    viewerEnv.Prepend(LIBS = [po_lib])
 
    jdef_files = ['iov_app.jdef',]
