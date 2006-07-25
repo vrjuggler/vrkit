@@ -86,7 +86,7 @@ Export('optimize')
 help_text = "\n---- Build system ----\n";
 if GetPlatform() == 'linux' or GetPlatform() == 'freebsd':
    baseEnv = BuildLinuxEnvironment()
-elif GetPlatform() == 'mac':
+elif GetPlatform() == 'darwin':
    baseEnv = BuildDarwinEnvironment()
 
 # Export symbols for use by SConscript files in subdirectories.
@@ -149,7 +149,7 @@ if not SConsAddons.Util.hasHelpFlag():
    # XXX: Hack around SConsAddons.Options.OpenSG.OpenSG not letting us provide
    # extra arguments to osg-config.  (Of course, if osg-config wasn't totally
    # braindead on Mac OS X, this wouldn't be such a problem.)
-   if GetPlatform() == 'mac':
+   if GetPlatform() == 'darwin':
       mac_opts = os.popen(opensg_options.osgconfig_cmd + " --cflags System").read()
       opensg_options.found_cflags = mac_opts.strip().split(" ")
 

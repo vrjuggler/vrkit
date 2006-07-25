@@ -7,7 +7,7 @@ GetPlatform = SConsAddons.Util.GetPlatform;
 
 Import('*')
 
-if GetPlatform() == 'mac':
+if GetPlatform() == 'darwin':
    mac_cflags = os.popen(opensg_options.osgconfig_cmd + " --cflags GLUT").read()
    opensg_options.found_cflags = mac_cflags.strip().split(" ")
 
@@ -18,7 +18,7 @@ ui_env.Prepend(CPPPATH = inst_paths['include'],
                LIBPATH = inst_paths['lib'],
                LIBS = 'iov')
 
-if GetPlatform() == 'mac':
+if GetPlatform() == 'darwin':
    ui_env.Append(LINKFLAGS = ['-framework', 'Cocoa',
                               '-framework', 'GLUT',
                               '-framework', 'OpenGL'])

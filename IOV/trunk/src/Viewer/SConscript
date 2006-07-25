@@ -17,7 +17,7 @@ if boost_options.isAvailable():
                      LIBS = 'iov')
 
    # XXX: There has to be a better way to do this Mac-specific stuff.
-   if GetPlatform() == 'mac':
+   if GetPlatform() == 'darwin':
       viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
    po_lib = boost_options.buildFullLibName('program_options', viewerEnv)
