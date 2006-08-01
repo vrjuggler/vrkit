@@ -6,6 +6,7 @@
 #include <IOV/Config.h>
 
 #include <stdexcept>
+#include <string>
 
 //#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
