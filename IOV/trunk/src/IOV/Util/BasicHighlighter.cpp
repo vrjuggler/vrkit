@@ -21,6 +21,15 @@
 
 #include <IOV/Util/BasicHighlighter.h>
 
+// For GCC 4.1 and newer, require Boost 1.34 or newer.
+#if defined(__GNUC__) && \
+    ((__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || __GNUC__ > 4)
+#  include <boost/version.hpp>
+#  if BOOST_VERSION < 103400
+#     error "Boost 1.34 or newer is required when using GCC 4.1 or newer"
+#  endif
+#endif
+
 
 namespace fs = boost::filesystem;
 
@@ -148,32 +157,22 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
    // Connect the intersection signal to our slot.
    mConnections.push_back(
       event_data->mObjectIntersectedSignal.connect(
-         100,
-         boost::bind(&BasicHighlighter::objectIntersected, this, _1, _2)
+         100, boost::bind(&BasicHighlighter::objectIntersected, this, _1, _2)
       )
    );
 
    // Connect the de-intersection signal to our slot.
    mConnections.push_back(
       event_data->mObjectDeintersectedSignal.connect(
-         100,
-         boost::bind(&BasicHighlighter::objectDeintersected, this, _1)
+         100, boost::bind(&BasicHighlighter::objectDeintersected, this, _1)
       )
    );
-
-   // NOTE: The boost::function<T> cast in the following statements is to deal
-   //       with a baffling compile error when using GCC 4.1.
-   typedef boost::function<inf::Event::ResultType(inf::SceneObjectPtr)>
-      single_obj_func_t;
-   typedef boost::function<inf::Event::ResultType(const std::vector<inf::SceneObjectPtr>&)>
-      multi_obj_func_t;
 
    // Connect the selection list expansion signal to our slot.
    mConnections.push_back(
       event_data->mSelectionListExpandedSignal.connect(
          100,
-         (multi_obj_func_t) boost::bind(&BasicHighlighter::objectChoiceChanged,
-                                        this, _1, true)
+         boost::bind(&BasicHighlighter::objectChoiceChanged, this, _1, true)
       )
    );
 
@@ -181,42 +180,35 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
    mConnections.push_back(
       event_data->mSelectionListReducedSignal.connect(
          100,
-         (multi_obj_func_t) boost::bind(&BasicHighlighter::objectChoiceChanged,
-                                        this, _1, false)
+         boost::bind(&BasicHighlighter::objectChoiceChanged, this, _1, false)
       )
    );
 
    // Connect the selection signal to our slot.
    mConnections.push_back(
       event_data->mObjectsSelectedSignal.connect(
-         100,
-         (multi_obj_func_t) boost::bind(&BasicHighlighter::objectsSelected,
-                                        this, _1, true)
+         100, boost::bind(&BasicHighlighter::objectsSelected, this, _1, true)
       )
    );
 
    // Connect the de-selection signal to our slot.
    mConnections.push_back(
       event_data->mObjectsDeselectedSignal.connect(
-         100,
-         (multi_obj_func_t) boost::bind(&BasicHighlighter::objectsSelected,
-                                        this, _1, false)
+         100, boost::bind(&BasicHighlighter::objectsSelected, this, _1, false)
       )
    );
 
    // Connect the selection signal to our slot.
    mConnections.push_back(
       event_data->mObjectPickedSignal.connect(
-         100, (single_obj_func_t) boost::bind(&BasicHighlighter::objectPicked,
-                                              this, _1, true)
+         100, boost::bind(&BasicHighlighter::objectPicked, this, _1, true)
       )
    );;
 
    // Connect the de-selection signal to our slot.
    mConnections.push_back(
       event_data->mObjectUnpickedSignal.connect(
-         100, (single_obj_func_t) boost::bind(&BasicHighlighter::objectPicked,
-                                              this, _1, false)
+         100, boost::bind(&BasicHighlighter::objectPicked, this, _1, false)
       )
    );
 
