@@ -1,7 +1,9 @@
 #!python
 import os
 import glob
+import SCons.Util
 import SConsAddons.Util as sca_util
+
 pj = os.path.join
 
 Import('*')
@@ -43,5 +45,8 @@ plugin_env = baseEnv.Copy()
 plugin_env.Append(CPPPATH = inst_paths['include'],
                   LIBPATH = inst_paths['lib'])
 plugin_env.Prepend(LIBS = ['iov'])
+
+if GetPlatform() == 'darwin':
+   plugin_env['SHLINKFLAGS'] = SCons.Util.CLVar('$LINKFLAGS -bundle')
 
 makePlugins(src_dir, inst_paths['lib_plugin'])
