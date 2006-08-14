@@ -100,8 +100,18 @@ boost_options = SConsAddons.Options.Boost.Boost("boost", "1.33.0",
                                                 libs = ['signals'],
                                                 required = False,
                                                 useVersion = True)
-vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("vrjuggler", "1.1.169", 
-                                                    required=True, useCppPath=True);
+
+# XXX: This is not very robust. A user could have vrjuggler-config from
+# VR Juggler 2.0 in his path but have specified the use of VR Juggler 2.1
+# on the scons command line.
+vrjuggler_config = WhereIs('vrjuggler-config')
+
+if vrjuggler_config != None:
+   vrj_opt_type = SConsAddons.Options.VRJuggler.VRJ.VRJ_config
+else:
+   vrj_opt_type = SConsAddons.Options.VRJuggler.VRJ.VRJ
+
+vrj_options = vrj_opt_type("vrjuggler", "2.0.1")
 opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.6.0",
                                                    required = True, useCppPath=True)
 
