@@ -106,12 +106,6 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
       const std::string& name((*i).name);
       const std::string& signal_id((*i).signalID);
 
-      // Ensure that signal_id is a known signal.
-      if ( ! signal_data->hasSignal(signal_id) )
-      {
-         signal_data->addSignal(signal_id);
-      }
-
       // Determine whether a component has already been registered to respond
       // to signal_id.
       std::vector<std::string>::iterator ei =
@@ -154,6 +148,12 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
                        << component->getDescription() << "'\n"
                        << "               (from " << name << ") to signal '"
                        << signal_id << "'" << std::endl;
+
+            // Ensure that signal_id is a known signal.
+            if ( ! signal_data->hasSignal(signal_id) )
+            {
+               signal_data->addSignal(signal_id);
+            }
 
             // Connect the newly instantiated component with its signal.
             mConnections.push_back(
