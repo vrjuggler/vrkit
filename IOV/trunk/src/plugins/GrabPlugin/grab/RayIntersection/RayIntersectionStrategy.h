@@ -36,7 +36,9 @@ protected:
 
 public:
    virtual ~RayIntersectionStrategy()
-   {;}
+   {
+      /* Do nothing. */ ;
+   }
 
    static std::string getId()
    {
@@ -57,7 +59,7 @@ public:
                        const std::vector<SceneObjectPtr>& objs,
                        gmtl::Point3f& intersectPoint);
 
-   void setVisible(bool visible);
+   void setVisible(const bool visible);
 
    void initGeom();
 
@@ -134,4 +136,6 @@ private:
 };
 
 }
-#endif /*_INF_POINT_INTERSECTION_STRATEGY_H_*/
+
+
+#endif /*_INF_RAY_INTERSECTION_STRATEGY_H_*/

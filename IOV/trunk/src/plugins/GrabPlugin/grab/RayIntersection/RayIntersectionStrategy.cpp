@@ -129,7 +129,8 @@ inf::IntersectionStrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
 
    initGeom();
 
-   OSG::GroupNodePtr decorator_root = viewer->getSceneObj()->getDecoratorRoot();
+   OSG::GroupNodePtr decorator_root =
+      viewer->getSceneObj()->getDecoratorRoot();
    OSG::beginEditCP(decorator_root.node());
       decorator_root.node()->addChild(mSwitchNode);
    OSG::endEditCP(decorator_root.node());
@@ -140,12 +141,14 @@ inf::IntersectionStrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
 
 void RayIntersectionStrategy::update(ViewerPtr viewer)
 {
-   WandInterfacePtr wand = viewer->getUser()->getInterfaceTrader().getWandInterface();
+   WandInterfacePtr wand =
+      viewer->getUser()->getInterfaceTrader().getWandInterface();
    const gmtl::Matrix44f vp_M_wand(
       wand->getWandPos()->getData(viewer->getDrawScaleFactor())
    );
 
-   gmtl::Rayf wand_ray(gmtl::Vec3f(0,0,0), gmtl::Vec3f(0,0,-1));
+   gmtl::Rayf wand_ray(gmtl::Vec3f(0.0f, 0.0f, 0.0f),
+                       gmtl::Vec3f(0.0f, 0.0f, -1.0f));
    gmtl::xform(wand_ray, vp_M_wand, wand_ray);
 
    mSelectionRay.setValue(OSG::Pnt3f(wand_ray.mOrigin.getData()),
@@ -161,10 +164,10 @@ void RayIntersectionStrategy::update(ViewerPtr viewer)
    OSG::endEditCP(mGeomPts);
 }
 
-void RayIntersectionStrategy::setVisible(bool visible)
+void RayIntersectionStrategy::setVisible(const bool visible)
 {
    OSG::beginEditCP(mSwitchNode);
-   if(visible)
+   if ( visible )
    {
       mSwitchNode->setChoice(OSG::Switch::ALL);
    }
@@ -196,44 +199,34 @@ void RayIntersectionStrategy::initGeom()
 
    mGeomPts = OSG::GeoPositions3f::create();
    OSG::beginEditCP(mGeomPts);
-   {
-     mGeomPts->addValue(OSG::Pnt3f(0,0,0));
-     mGeomPts->addValue(OSG::Pnt3f(0,0,0));
-   }
+     mGeomPts->addValue(OSG::Pnt3f(0.0f, 0.0f, 0.0f));
+     mGeomPts->addValue(OSG::Pnt3f(0.0f, 0.0f, 0.0f));
    OSG::endEditCP(mGeomPts);
 
    OSG::GeoIndicesUI32Ptr index = OSG::GeoIndicesUI32::create();
    OSG::beginEditCP(index);
-   {
      index->addValue(0);
      index->addValue(1);
-   }
    OSG::endEditCP(index);
 
    OSG::GeoPLengthsUI32Ptr lens = OSG::GeoPLengthsUI32::create();
    OSG::beginEditCP(lens);
-   {
      lens->addValue(2);
-   }
    OSG::endEditCP(lens);
 
    OSG::GeoPTypesUI8Ptr type = OSG::GeoPTypesUI8::create();
    OSG::beginEditCP(type);
-   {
      type->addValue(GL_LINES);
-   }
    OSG::endEditCP(type);
 
    mGeomNode = OSG::GeometryNodePtr::create();
 
    OSG::beginEditCP(mGeomNode);
-   {
      mGeomNode->setPositions(mGeomPts);
      mGeomNode->setIndices(index);
      mGeomNode->setLengths(lens);
      mGeomNode->setTypes(type);
      mGeomNode->setMaterial(chunk_mat);
-   }
    OSG::endEditCP(mGeomNode);
 
    mSwitchNode = OSG::SwitchNodePtr::create();
@@ -260,34 +253,36 @@ findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
    mIntersectPoint = OSG::Pnt3f();
 
    // Traverse scene objects to find closest intersection.
-   SceneObjectTraverser::enter_func_t enter = boost::bind(&RayIntersectionStrategy::enterFunc, this, _1);
+   SceneObjectTraverser::enter_func_t enter =
+      boost::bind(&RayIntersectionStrategy::enterFunc, this, _1);
    SceneObjectTraverser::traverse(objs, enter);
 
    intersectPoint.set(mIntersectPoint.getValues());
    return mIntersectObj;
 }
 
-SceneObjectTraverser::Result RayIntersectionStrategy::enterFunc(SceneObjectPtr obj)
+SceneObjectTraverser::Result RayIntersectionStrategy::
+enterFunc(SceneObjectPtr obj)
 {
    OSG::Matrix world_xform;
 
-   vprASSERT((obj)->getRoot() != OSG::NullFC);
+   vprASSERT(obj->getRoot() != OSG::NullFC);
 
    // If we have no parent then we want to use the identity.
-   if ((obj)->getRoot()->getParent() != OSG::NullFC)
+   if ( obj->getRoot()->getParent() != OSG::NullFC )
    {
-      (obj)->getRoot()->getParent()->getToWorld(world_xform);
+      obj->getRoot()->getParent()->getToWorld(world_xform);
    }
 
    gmtl::Matrix44f obj_M_vp;
    gmtl::set(obj_M_vp, world_xform);
    gmtl::invert(obj_M_vp);
 
-   // Get the wand transformation in virtual world coordinates,
-   // including any transformations in the scene graph below the
-   // transformation root.
+   // Get the wand transformation in virtual world coordinates, including any
+   // transformations in the scene graph below the transformation root.
    const gmtl::Matrix44f obj_M_wand = obj_M_vp * m_vp_M_wand;
-   gmtl::Rayf pick_ray(gmtl::Vec3f(0,0,0), gmtl::Vec3f(0,0,-1));
+   gmtl::Rayf pick_ray(gmtl::Vec3f(0.0f, 0.0f, 0.0f),
+                       gmtl::Vec3f(0.0f, 0.0f, -1.0f));
    gmtl::xform(pick_ray, obj_M_wand, pick_ray);
 
    OSG::NodeRefPtr root = obj->getRoot();
@@ -303,9 +298,9 @@ SceneObjectTraverser::Result RayIntersectionStrategy::enterFunc(SceneObjectPtr o
    SceneObjectTraverser::Result result = SceneObjectTraverser::Skip;
 
    // Use a GMTL shell intersection test rather than the OpenSG volume
-   // intersection test. Using the shell intersection provides better
-   // results when, for example, the origin of the pick ray is inside a
-   // large volume that contains smaller volumes.
+   // intersection test. Using the shell intersection provides better results
+   // when, for example, the origin of the pick ray is inside a large volume
+   // that contains smaller volumes.
    if ( gmtl::intersect(bbox, pick_ray, num_hits, enter_val, exit_val) )
    {
       // Intersected bounding volume so we must continue into children.
@@ -317,12 +312,13 @@ SceneObjectTraverser::Result RayIntersectionStrategy::enterFunc(SceneObjectPtr o
       );
 
       // If we are doing triangle-level intersection, then we create an
-      // intersect action and apply it to the intersected object.
-      // Earlier, a callback was registered for handling geometry cores
-      // to perform the triangle intersection test.
+      // intersect action and apply it to the intersected object. Earlier, a
+      // callback was registered for handling geometry cores to perform the
+      // triangle intersection test.
       if ( mTriangleIsect )
       {
-         // Temporarily allow intersection traversal into current scene object.
+         // Temporarily allow intersection traversal into current scene
+         // object.
          OSG::UInt32 trav_mask = obj->getRoot()->getTravMask();
          OSG::beginEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
             obj->getRoot()->setTravMask(trav_mask | 128);
@@ -334,8 +330,8 @@ SceneObjectTraverser::Result RayIntersectionStrategy::enterFunc(SceneObjectPtr o
          action->setLine(osg_pick_ray);
          action->apply(root);
 
-         // If we got a hit, then we update the state of our
-         // intersection test.
+         // If we got a hit, then we update the state of our intersection
+         // test.
          if ( action->didHit() )
          {
             enter_val = action->getHitT();
@@ -350,13 +346,13 @@ SceneObjectTraverser::Result RayIntersectionStrategy::enterFunc(SceneObjectPtr o
 
          delete action;
       }
-      // If enter_val is less than mMinDist, then our ray has intersected
-      // an object that is closer than the last intersected object.
+      // If enter_val is less than mMinDist, then our ray has intersected an
+      // object that is closer than the last intersected object.
       else
       {
-         // If we are not doing triangle-level intersection, then
-         // intersecting with the bounding volume is sufficient to have
-         // an object intersection.
+         // If we are not doing triangle-level intersection, then intersecting
+         // with the bounding volume is sufficient to have an object
+         // intersection.
          OSG::Pnt3f intersect_point = osg_pick_ray.getPosition() +
             enter_val * osg_pick_ray.getDirection();
          setHit(enter_val, obj, intersect_point);
@@ -366,9 +362,10 @@ SceneObjectTraverser::Result RayIntersectionStrategy::enterFunc(SceneObjectPtr o
    return result;
 }
 
-void RayIntersectionStrategy::setHit(float enterVal, SceneObjectPtr obj, const OSG::Pnt3f&  point)
+void RayIntersectionStrategy::setHit(float enterVal, SceneObjectPtr obj,
+                                     const OSG::Pnt3f& point)
 {
-   if (enterVal < mMinDist)
+   if ( enterVal < mMinDist )
    {
       mMinDist = enterVal;
       mIntersectObj = obj;
