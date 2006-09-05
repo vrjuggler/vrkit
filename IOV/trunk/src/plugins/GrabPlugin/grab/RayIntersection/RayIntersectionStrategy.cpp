@@ -264,6 +264,11 @@ findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
 SceneObjectTraverser::Result RayIntersectionStrategy::
 enterFunc(SceneObjectPtr obj)
 {
+   if ( ! obj->canIntersect() )
+   {
+      return SceneObjectTraverser::Continue;
+   }
+
    OSG::Matrix world_xform;
 
    vprASSERT(obj->getRoot() != OSG::NullFC);

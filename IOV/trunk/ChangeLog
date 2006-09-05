@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-09-05 patrick  Made the Ray Intersection Strategy more reliable.
+                    -- VERSION -- 0.32.3
 2006-08-15 patrick  Signals are not added to the signal repository by the Mode
                     Harness Plug-in until a component is available to be
                     activated by emitting the signal.

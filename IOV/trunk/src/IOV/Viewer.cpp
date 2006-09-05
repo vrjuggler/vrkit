@@ -169,15 +169,6 @@ void Viewer::preFrame()
       SceneObjectPtr intersect_obj =
          mIsectStrategy->findIntersection(myself, mObjects, intersect_point);
 
-      // If we have an intersected object, make sure that the intersection is
-      // valid. Yes, this is an afterthought that ought to be in the algorithm
-      // above. As a breadth-first search, however, it is not clear how to
-      // factor in the allowed intersection state.
-      while ( NULL != intersect_obj.get() && ! intersect_obj->canIntersect() )
-      {
-         intersect_obj = intersect_obj->getParent();
-      }
-
       // If the intersected object is different than the one with which the
       // wand intersected during the last frame, we need to make updates to
       // the application and scene state.
