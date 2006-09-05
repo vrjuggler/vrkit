@@ -1,5 +1,8 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
+#include <boost/bind.hpp>
+#include <boost/ref.hpp>
+
 #include <gmtl/Matrix.h>
 #include <gmtl/External/OpenSGConvert.h>
 
@@ -10,6 +13,7 @@
 #include <IOV/Viewer.h>
 #include <IOV/WandInterface.h>
 #include <IOV/SceneObject.h>
+#include <IOV/Util/OpenSGHelpers.h>
 
 #include "PointIntersectionStrategy.h"
 
@@ -51,28 +55,48 @@ SceneObjectPtr PointIntersectionStrategy::
 findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
                  gmtl::Point3f& intersectPoint)
 {
-   intersectPoint.set(0.0f, 0.0f, 0.0f);
-
    WandInterfacePtr wand =
       viewer->getUser()->getInterfaceTrader().getWandInterface();
    const gmtl::Matrix44f vp_M_wand_xform(
       wand->getWandPos()->getData(viewer->getDrawScaleFactor())
    );
 
-   SceneObjectPtr intersect_obj;
+   // Reset the intersection test data.
+   mIntersectObj   = SceneObjectPtr();
+   mIntersectPoint = OSG::Pnt3f();
 
-   // Find the first object in objs with which the wand intersects.
-   std::vector<SceneObjectPtr>::const_iterator o;
-   for ( o = objs.begin(); o != objs.end(); ++o )
+   // Traverse all the given scene objects to find the first intersection.
+   SceneObjectTraverser::traverse(
+      objs, boost::bind(&PointIntersectionStrategy::enter, this, _1,
+                        boost::cref(vp_M_wand_xform))
+   );
+
+   // If there was an intersection, this updates intersectPoint to the point
+   // of intersection. Otherwise, it accurately sets it to be a zeroed-out
+   // point.
+   intersectPoint.set(mIntersectPoint.getValues());
+
+   return mIntersectObj;
+}
+
+SceneObjectTraverser::Result PointIntersectionStrategy::
+enter(SceneObjectPtr obj, const gmtl::Matrix44f& vp_M_wand)
+{
+   // The default behavior is to continue with the traversal. If obj cannot
+   // be intersected, one or more of its children may allow intersection.
+   SceneObjectTraverser::Result result(SceneObjectTraverser::Continue);
+
+   if ( obj->canIntersect() )
    {
       OSG::Matrix world_xform;
 
-      vprASSERT((*o)->getRoot() != OSG::NullFC);
+      vprASSERT(obj->getRoot() != OSG::NullFC);
+      OSG::NodeRefPtr root(obj->getRoot());
 
       // If we have no parent then we want to use the identity.
-      if ((*o)->getRoot()->getParent() != OSG::NullFC)
+      if ( root->getParent() != OSG::NullFC )
       {
-         (*o)->getRoot()->getParent()->getToWorld(world_xform);
+         root->getParent()->getToWorld(world_xform);
       }
 
       gmtl::Matrix44f obj_M_vp;
@@ -81,24 +105,35 @@ findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
 
       // Get the wand transformation in virtual world coordinates, including
       // any transformations in the scene graph below the transformation root.
-      const gmtl::Matrix44f obj_M_wand_xform = obj_M_vp * vp_M_wand_xform;
+      const gmtl::Matrix44f obj_M_wand_xform = obj_M_vp * vp_M_wand;
       const gmtl::Vec3f wand_pos_vw(
          gmtl::makeTrans<gmtl::Vec3f>(obj_M_wand_xform)
       );
       const OSG::Pnt3f wand_point(wand_pos_vw[0], wand_pos_vw[1],
                                   wand_pos_vw[2]);
 
-      const OSG::DynamicVolume& bbox = (*o)->getRoot()->getVolume();
-
-      if ( bbox.intersect(wand_point) )
+      if ( root->getVolume().intersect(wand_point) )
       {
-         intersect_obj = *o;
-         intersectPoint.set(wand_point.getValues());
-         break;
+         mIntersectObj = obj;
+         mIntersectPoint.setValue(wand_point.getValues());
+
+         // If obj has no children, then we have found the object that will
+         // be intersected.
+         if ( ! obj->hasChildren() )
+         {
+            result = SceneObjectTraverser::Stop;
+         }
+      }
+      // If there is no intersection with obj, then we do not need to search
+      // its children since they would be included with encompassing bounding
+      // box.
+      else
+      {
+         result = SceneObjectTraverser::Skip;
       }
    }
 
-   return intersect_obj;
+   return result;
 }
 
 }

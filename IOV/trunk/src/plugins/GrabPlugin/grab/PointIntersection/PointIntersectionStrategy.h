@@ -5,9 +5,14 @@
 
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
+
 #include <gmtl/Point.h>
+#include <gmtl/Matrix.h>
+
 #include <IOV/ViewerPtr.h>
+#include <IOV/Util/SceneObjectTraverser.h>
 #include <IOV/Grab/IntersectionStrategy.h>
+
 
 namespace inf
 {
@@ -58,6 +63,16 @@ protected:
    {
       delete this;
    }
+
+private:
+   SceneObjectTraverser::Result enter(SceneObjectPtr obj,
+                                      const gmtl::Matrix44f& vp_M_wand);
+
+   /** @name Intersection Traversal Properties */
+   //@{
+   SceneObjectPtr mIntersectObj;
+   OSG::Pnt3f     mIntersectPoint;
+   //@}
 };
 
 }
