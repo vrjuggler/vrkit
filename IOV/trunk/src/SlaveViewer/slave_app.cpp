@@ -2,11 +2,14 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <stdlib.h>
 #include <exception>
+#include <typeinfo>
 #include <string>
 #include <vector>
 #include <boost/program_options.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <vrj/Kernel/Kernel.h>
 
@@ -20,10 +23,28 @@
 
 namespace po = boost::program_options;
 
+template<typename T>
+T fromString(const std::string& str, std::ios_base& (*f)(std::ios_base&))
+{
+   std::istringstream stream(str);
+   T result;
+
+   if ( (stream >> f >> result).fail() )
+   {
+      std::ostringstream msg_stream;
+      msg_stream << "Failed to convert '" << str << "' to type "
+                 << typeid(T).name() << std::endl;
+      throw std::runtime_error(msg_stream.str());
+   }
+
+   return result;
+}
+
 int main(int argc, char* argv[])
 {
    std::string master_addr;
    std::string root_name;
+   std::string mask_str;
 
    po::options_description generic("Generic options");
    generic.add_options()
@@ -40,6 +61,9 @@ int main(int argc, char* argv[])
       ("root,r",
        po::value<std::string>(&root_name)->default_value("RootNode"),
        "Name of the root node being shared by the master")
+      ("mask,m",
+       po::value<std::string>(&mask_str)->default_value("0xffffffff"),
+       "Render action traversal mask in base-8, base-10, or base-16 form")
       ;
 
    po::options_description cmdline_options;
@@ -101,7 +125,42 @@ int main(int argc, char* argv[])
          }
       }
 
-      inf::SlaveViewer* app = new inf::SlaveViewer(master_addr, root_name);
+      OSG::UInt32 trav_mask(0xffffffff);
+
+      if ( ! mask_str.empty() )
+      {
+         try
+         {
+            std::ios_base& (*formatter)(std::ios_base&);
+
+            // The mask was given as a hexadecimal value.
+            if ( boost::istarts_with(mask_str, "0x") )
+            {
+               formatter = std::hex;
+            }
+            // The mask was given as an octal value.
+            else if ( mask_str != std::string("0") &&
+                      boost::starts_with(mask_str, "0") )
+            {
+               formatter = std::oct;
+            }
+            // The mask was given as a decimal value.
+            else
+            {
+               formatter = std::dec;
+            }
+
+            trav_mask = fromString<OSG::UInt32>(mask_str, formatter);
+         }
+         catch (std::exception& ex)
+         {
+            std::cerr << "Could not set traversal mask from user input:\n"
+                      << ex.what() << std::endl;
+         }
+      }
+
+      inf::SlaveViewer* app = new inf::SlaveViewer(master_addr, root_name,
+                                                   trav_mask);
 
       kernel->start();
       kernel->setApplication(app);

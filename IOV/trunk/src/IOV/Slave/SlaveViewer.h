@@ -30,8 +30,28 @@ namespace inf
 class IOV_CLASS_API SlaveViewer : public vrj::OpenSGApp
 {
 public:
+   /**
+    * Constructs a new slave viewer application object instance.
+    *
+    * @param masterAddr   The address of the master node in the cluster in
+    *                     the form "address:port" where "address" can be
+    *                     either an IP address or a host name.
+    * @param rootNodeName The name of the root node of the shared scene graph.
+    *                     This parameter is optional, and it defaults to
+    *                     "RootNode" if not specified. This must match
+    *                     whatever the master inf::Viewer instance was
+    *                     configured to use for its shared root node name.
+    * @param travMask     The traversal mask to be applied to all OpenSG
+    *                     viewport render actions associated with this
+    *                     application object instance. This parameter is
+    *                     optional and defaults to 0xffffffff if not
+    *                     specified.
+    *
+    * @see inf::Viewer
+    */
    SlaveViewer(const std::string& masterAddr,
-               const std::string& rootNodeName = "RootNode");
+               const std::string& rootNodeName = "RootNode",
+               const OSG::UInt32 travMask = 0xffffffff);
 
    virtual ~SlaveViewer();
 
@@ -54,10 +74,13 @@ public:
    virtual void exit();
 
 public:
-   /** @name Cluster app data methods.
-    * These methods are used to communicate data over an OpenSG network connection
-    * with the master node.
-    * It is called as part of the cluster communication protocol in latePreFrame.
+   /**
+    * @name Cluster app data methods.
+    *
+    * These methods are used to communicate data over an OpenSG network
+    * connection with the master node. It is called as part of the cluster
+    * communication protocol in latePreFrame().
+    *
     * @note Derived classes must call up to parent class methods.
     */
    //@{
@@ -81,6 +104,7 @@ private:
 
    std::string mMasterAddr;
    std::string mRootNodeName;
+   OSG::UInt32 mTravMask;       /**< Viewport render action traversal mask */
 
    OSG::GroupNodePtr mSceneRoot;
 

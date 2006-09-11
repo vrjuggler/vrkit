@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-09-11 patrick  Extended inf::SlaveViewer and the slaveViewer exectuable
+                    to allow the render action traversal mask to be set.
+                    -- VERSION -- 0.32.4
 2006-09-05 patrick  Made the Ray Intersection Strategy more reliable.
                     -- VERSION -- 0.32.3
 2006-08-15 patrick  Signals are not added to the signal repository by the Mode

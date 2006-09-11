@@ -150,11 +150,13 @@ namespace inf
 {
 
 SlaveViewer::SlaveViewer(const std::string& masterAddr,
-                         const std::string& rootNodeName)
+                         const std::string& rootNodeName,
+                         const OSG::UInt32 travMask)
    : vrj::OpenSGApp()
    , mDrawScaleFactor(gadget::PositionUnitConversion::ConvertToFeet)
    , mMasterAddr(masterAddr)
    , mRootNodeName(rootNodeName)
+   , mTravMask(travMask)
    , mAspect(new OSG::RemoteAspect())
    , mConnection(NULL)
 #ifdef _DEBUG
@@ -292,6 +294,10 @@ void SlaveViewer::initScene()
 void SlaveViewer::contextInit()
 {
    vrj::OpenSGApp::contextInit();
+   std::cout << "Changing render action traversal mask from "
+             << std::hex << mContextData->mRenderAction->getTravMask()
+             << " to " << mTravMask << std::dec << std::endl;
+   mContextData->mRenderAction->setTravMask(mTravMask);
    initGl();
 }
 
