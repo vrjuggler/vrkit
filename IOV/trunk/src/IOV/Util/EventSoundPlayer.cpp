@@ -52,11 +52,11 @@ inf::EventSoundPlayerPtr EventSoundPlayer::init(inf::ViewerPtr viewer)
 
    mIntersectSlotConnection =
       event_data->mObjectIntersectedSignal.connect(
-         boost::bind(&EventSoundPlayer::objectIntersected, this, _1)
+         boost::bind(&EventSoundPlayer::objectIntersected, this)
       );
    mSelectSlotConnection =
       event_data->mObjectsSelectedSignal.connect(
-         boost::bind(&EventSoundPlayer::objectsSelected, this, _1)
+         boost::bind(&EventSoundPlayer::objectsSelected, this)
       );
 
    return shared_from_this();
@@ -92,14 +92,13 @@ void EventSoundPlayer::configure(jccl::ConfigElementPtr cfgElt)
    mSelectSoundName    = cfgElt->getProperty<std::string>(select_name_prop);
 }
 
-inf::Event::ResultType EventSoundPlayer::objectIntersected(inf::SceneObjectPtr)
+inf::Event::ResultType EventSoundPlayer::objectIntersected()
 {
    mIntersectSound.trigger();
    return inf::Event::CONTINUE;
 }
 
-inf::Event::ResultType EventSoundPlayer::
-objectsSelected(const std::vector<inf::SceneObjectPtr>&)
+inf::Event::ResultType EventSoundPlayer::objectsSelected()
 {
    mSelectSound.trigger();
    return inf::Event::CONTINUE;

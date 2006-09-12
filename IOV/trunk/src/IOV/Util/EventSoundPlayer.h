@@ -74,11 +74,9 @@ private:
    /**
     * Object intersection slot; triggers \c mIntersectSound when invoked.
     *
-    * @param sceneObj The intersected scene object. This parameter is ignored.
-    *
     * @return inf::Event::CONTINUE is returned.
     */
-   inf::Event::ResultType objectIntersected(inf::SceneObjectPtr sceneObj);
+   inf::Event::ResultType objectIntersected();
 
    std::string                mIntersectSoundName;
    snx::SoundHandle           mIntersectSound;
@@ -90,12 +88,9 @@ private:
    /**
     * Object select slot; triggers \c mSelectSound when invoked.
     *
-    * @param sceneObjs The selected scene objects. This parameter is ignored.
-    *
     * @return inf::Event::CONTINUE is returned.
     */
-   inf::Event::ResultType
-      objectsSelected(const std::vector<inf::SceneObjectPtr>& sceneObjs);
+   inf::Event::ResultType objectsSelected();
 
    std::string                mSelectSoundName;
    snx::SoundHandle           mSelectSound;
