@@ -15,6 +15,13 @@ class CenterPointMoveStrategy
    : public inf::MoveStrategy
    , public boost::enable_shared_from_this<CenterPointMoveStrategy>
 {
+protected:
+   CenterPointMoveStrategy()
+      : inf::MoveStrategy()
+   {
+      /* Do nothing. */ ;
+   }
+
 public:
    static std::string getId()
    {
@@ -63,12 +70,6 @@ protected:
    virtual void destroy()
    {
       delete this;
-   }
-
-   CenterPointMoveStrategy()
-      : inf::MoveStrategy()
-   {
-      /* Do nothing. */ ;
    }
 };
 

@@ -28,6 +28,9 @@ typedef boost::weak_ptr<StatusPanelPlugin> StatusPanelPluginWeakPtr;
 class IOV_CLASS_API StatusPanelPlugin
    : public inf::Plugin, public boost::enable_shared_from_this<StatusPanelPlugin>
 {
+protected:
+   StatusPanelPlugin();
+
 public:
    static inf::PluginPtr create();
 
@@ -59,9 +62,6 @@ public:
 protected:
    StatusPanel*            mStatusPanel;     /**< The status panel we are using. */
    OSG::TransformNodePtr   mPanelXformNode;  /**< Root node of panel. */
-
-protected:
-   StatusPanelPlugin();
 
    virtual void destroy();
 };

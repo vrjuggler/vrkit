@@ -51,6 +51,9 @@ class ModeHarnessPlugin
    : public inf::Plugin
    , public boost::enable_shared_from_this<ModeHarnessPlugin>
 {
+protected:
+   ModeHarnessPlugin();
+
 public:
    static inf::PluginPtr create()
    {
@@ -117,8 +120,6 @@ protected:
    {
       delete this;
    }
-
-   ModeHarnessPlugin();
 
 private:
    static std::string getElementType()

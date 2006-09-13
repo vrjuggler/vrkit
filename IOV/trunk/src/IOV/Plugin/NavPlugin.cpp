@@ -9,6 +9,11 @@
 namespace inf
 {
 
+NavPlugin::NavPlugin()
+{
+   /* Do nothing. */ ;
+}
+
 NavPlugin::~NavPlugin()
 {
    /* Do nothing. */ ;
@@ -17,11 +22,6 @@ NavPlugin::~NavPlugin()
 void NavPlugin::update(inf::ViewerPtr viewer)
 {
    updateNav(viewer, viewer->getUser()->getViewPlatform());
-}
-
-NavPlugin::NavPlugin()
-{
-   /* Do nothing. */ ;
 }
 
 }

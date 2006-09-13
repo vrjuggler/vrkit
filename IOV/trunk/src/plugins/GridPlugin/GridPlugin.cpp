@@ -44,6 +44,19 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
+GridPlugin::GridPlugin()
+   : mSelectedGridIndex(-1)
+   , mGridsVisible(false)
+   , mAnalogNum(-1)
+   , mForwardVal(1.0f)
+   , mActivateText("Activate/Deactivate Grids")
+   , mCycleText("Cycle Grid Selection")
+   , mHideText("Show/Hide Selected Grid")
+   , mResetText("Reset Selected Grid Position")
+{
+   /* Do nothing. */ ;
+}
+
 PluginPtr GridPlugin::init(inf::ViewerPtr viewer)
 {
    mWandInterface = viewer->getUser()->getInterfaceTrader().getWandInterface();
@@ -206,19 +219,6 @@ void GridPlugin::update(inf::ViewerPtr viewer)
          }
       }
    }
-}
-
-GridPlugin::GridPlugin()
-   : mSelectedGridIndex(-1)
-   , mGridsVisible(false)
-   , mAnalogNum(-1)
-   , mForwardVal(1.0f)
-   , mActivateText("Activate/Deactivate Grids")
-   , mCycleText("Cycle Grid Selection")
-   , mHideText("Show/Hide Selected Grid")
-   , mResetText("Reset Selected Grid Position")
-{
-   /* Do nothing. */ ;
 }
 
 void GridPlugin::focusChanged(inf::ViewerPtr viewer)

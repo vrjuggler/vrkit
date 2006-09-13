@@ -27,14 +27,6 @@ namespace fs = boost::filesystem;
 namespace inf
 {
 
-RemoteAspectFilter::~RemoteAspectFilter()
-{
-   mChangedCallbacks.clear();
-   mCreatedCallbacks.clear();
-   mDestroyedCallbacks.clear();
-}
-
-
 RemoteAspectFilter::RemoteAspectFilter()
    : mRemoteAspect(NULL)
    , mNodes(0)
@@ -43,6 +35,13 @@ RemoteAspectFilter::RemoteAspectFilter()
    , mMaterials(0)
 {
    /* Do nothing. */
+}
+
+RemoteAspectFilter::~RemoteAspectFilter()
+{
+   mChangedCallbacks.clear();
+   mCreatedCallbacks.clear();
+   mDestroyedCallbacks.clear();
 }
 
 RemoteAspectFilterPtr RemoteAspectFilter::init(OSG::RemoteAspect* remoteAspect)

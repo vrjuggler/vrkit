@@ -18,6 +18,13 @@
 namespace inf
 {
 
+EventSoundPlayer::EventSoundPlayer()
+   : mIntersectSoundName("intersect")
+   , mSelectSoundName("select")
+{
+   /* Do nothing. */ ;
+}
+
 EventSoundPlayer::~EventSoundPlayer()
 {
    mIntersectSlotConnection.disconnect();
@@ -60,13 +67,6 @@ inf::EventSoundPlayerPtr EventSoundPlayer::init(inf::ViewerPtr viewer)
       );
 
    return shared_from_this();
-}
-
-EventSoundPlayer::EventSoundPlayer()
-   : mIntersectSoundName("intersect")
-   , mSelectSoundName("select")
-{
-   /* Do nothing. */ ;
 }
 
 void EventSoundPlayer::configure(jccl::ConfigElementPtr cfgElt)

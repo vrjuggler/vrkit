@@ -30,6 +30,12 @@ namespace inf
 class IOV_CLASS_API PluginFactory
    : public boost::enable_shared_from_this<PluginFactory>
 {
+protected:
+   PluginFactory()
+   {
+      /* Do nothing. */ ;
+   }
+
 public:
    static PluginFactoryPtr create()
    {
@@ -134,12 +140,6 @@ public:
     */
    void registerCreator(inf::PluginCreatorBase* creator,
                         const std::string& name);
-
-protected:
-   PluginFactory()
-   {
-      /* Do nothing. */ ;
-   }
 
 private:
    /**

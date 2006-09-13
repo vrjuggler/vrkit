@@ -21,6 +21,9 @@ class SlideMoveStrategy
    : public inf::MoveStrategy
    , public boost::enable_shared_from_this<SlideMoveStrategy>
 {
+protected:
+   SlideMoveStrategy();
+
 public:
    static std::string getId()
    {
@@ -71,8 +74,6 @@ protected:
    {
       delete this;
    }
-
-   SlideMoveStrategy();
 
 private:
    static std::string getElementType()

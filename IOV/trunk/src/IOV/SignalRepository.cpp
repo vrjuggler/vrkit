@@ -12,6 +12,11 @@ const vpr::GUID SignalRepository::type_guid(
    "1912103d-f3c8-4129-8555-ea3d58f69c1f"
 );
 
+SignalRepository::SignalRepository()
+{
+   /* Do nothing. */ ;
+}
+
 SignalRepository::~SignalRepository()
 {
    /* Do nothing. */ ;
@@ -63,11 +68,6 @@ void SignalRepository::emit(const std::string& id)
    }
 
    (*mSignals[id])(id);
-}
-
-SignalRepository::SignalRepository()
-{
-   /* Do nothing. */ ;
 }
 
 }

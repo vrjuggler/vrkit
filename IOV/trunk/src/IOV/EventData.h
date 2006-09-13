@@ -30,6 +30,9 @@ namespace inf
  */
 class IOV_CLASS_API EventData : public inf::SceneData
 {
+protected:
+   EventData();
+
 public:
    /**
     * The unique type identifier for scene data used by plug-ins that manage
@@ -138,9 +141,6 @@ public:
    basic_action_t mObjectPickedSignal;
    basic_action_t mObjectUnpickedSignal;
    //@}
-
-protected:
-   EventData();
 };
 
 }

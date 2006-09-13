@@ -44,6 +44,16 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getMoveStrategyCreator()
 namespace inf
 {
 
+SlideMoveStrategy::SlideMoveStrategy()
+   : inf::MoveStrategy()
+   , mTransValue(0.0f)
+   , mAnalogNum(0)
+   , mForwardValue(1.0f)
+   , mSlideEpsilon(0.1f)
+{
+   /* Do nothing. */ ;
+}
+
 inf::MoveStrategyPtr SlideMoveStrategy::init(inf::ViewerPtr viewer)
 {
    jccl::ConfigElementPtr cfg_elt =
@@ -174,16 +184,6 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
       return pobj_M_wand * delta_trans_mat * wand_M_pobj * curObjPos;
    }
    return curObjPos;
-}
-
-SlideMoveStrategy::SlideMoveStrategy()
-   : inf::MoveStrategy()
-   , mTransValue(0.0f)
-   , mAnalogNum(0)
-   , mForwardValue(1.0f)
-   , mSlideEpsilon(0.1f)
-{
-   /* Do nothing. */ ;
 }
 
 void SlideMoveStrategy::configure(jccl::ConfigElementPtr cfgElt)

@@ -27,6 +27,9 @@ class GridPlugin
    : public inf::Plugin
    , public boost::enable_shared_from_this<GridPlugin>
 {
+protected:
+   GridPlugin();
+
 public:
    static inf::PluginPtr create()
    {
@@ -73,8 +76,6 @@ protected:
    {
       delete this;
    }
-
-   GridPlugin();
 
    /**
     * Updates the state of the status panel (if it is in use) based on the

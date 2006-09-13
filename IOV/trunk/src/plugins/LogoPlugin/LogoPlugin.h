@@ -22,6 +22,10 @@ namespace inf
 class LogoPlugin
    : public inf::Plugin, public boost::enable_shared_from_this<LogoPlugin>
 {
+protected:
+   LogoPlugin()
+   {;}
+
 public:
    static PluginPtr create();
 
@@ -55,9 +59,6 @@ protected:
    {
       delete this;
    }
-
-   LogoPlugin()
-   {;}
 
 protected:
    struct Logo

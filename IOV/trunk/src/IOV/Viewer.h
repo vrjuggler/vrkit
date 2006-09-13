@@ -53,6 +53,9 @@ class IOV_CLASS_API Viewer
    : public vrj::OpenSGApp
    , public boost::enable_shared_from_this<Viewer>
 {
+protected:
+   Viewer();
+
 public:
    static ViewerPtr create()
    {
@@ -227,8 +230,6 @@ public:
    //@}
 
 protected:
-   Viewer();
-
    /**
     * Override this method to deallocate OpenSG resources when the
     * application is being removed from the VR Juggler kernel.  The

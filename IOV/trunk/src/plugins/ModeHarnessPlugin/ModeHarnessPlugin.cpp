@@ -54,6 +54,11 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
+ModeHarnessPlugin::ModeHarnessPlugin()
+{
+   /* Do nothing. */ ;
+}
+
 ModeHarnessPlugin::~ModeHarnessPlugin()
 {
    // Disconnect all slots before we shut down the components. This is just
@@ -277,11 +282,6 @@ void ModeHarnessPlugin::update(inf::ViewerPtr viewer)
    {
       mCurComponent->update(viewer);
    }
-}
-
-ModeHarnessPlugin::ModeHarnessPlugin()
-{
-   /* Do nothing. */ ;
 }
 
 void ModeHarnessPlugin::configure(jccl::ConfigElementPtr elt)

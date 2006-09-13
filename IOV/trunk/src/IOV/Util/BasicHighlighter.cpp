@@ -36,6 +36,30 @@ namespace fs = boost::filesystem;
 namespace inf
 {
 
+BasicHighlighter::BasicHighlighter()
+   : mEnableShaders(false)
+   , mIsectVertexShaderFile("highlight.vs")
+   , mIsectFragmentShaderFile("highlight.fs")
+   , mIntersectColor(1.0f, 1.0f, 0.0f)
+   , mIsectUniformScale(1.0f)
+   , mIsectUniformExponent(1.0f)
+   , mChooseVertexShaderFile("highlight.vs")
+   , mChooseFragmentShaderFile("highlight.fs")
+   , mChooseColor(0.0f, 1.0f, 1.0f)
+   , mChooseUniformScale(1.0f)
+   , mChooseUniformExponent(1.0f)
+   , mGrabVertexShaderFile("highlight.vs")
+   , mGrabFragmentShaderFile("highlight.fs")
+   , mGrabColor(1.0f, 0.0f, 1.0f)
+   , mGrabUniformScale(1.0f)
+   , mGrabUniformExponent(1.0f)
+   , mIsectHighlightID(inf::GeometryHighlightTraverser::HIGHLIGHT0)
+   , mChooseHighlightID(inf::GeometryHighlightTraverser::HIGHLIGHT1)
+   , mGrabHighlightID(inf::GeometryHighlightTraverser::HIGHLIGHT1)
+{
+   /* Do nothing. */ ;
+}
+
 BasicHighlighter::~BasicHighlighter()
 {
    std::for_each(mConnections.begin(), mConnections.end(),
@@ -396,30 +420,6 @@ BasicHighlighter::objectPicked(inf::SceneObjectPtr obj, const bool picked)
    }
 
    return inf::Event::CONTINUE;
-}
-
-BasicHighlighter::BasicHighlighter()
-   : mEnableShaders(false)
-   , mIsectVertexShaderFile("highlight.vs")
-   , mIsectFragmentShaderFile("highlight.fs")
-   , mIntersectColor(1.0f, 1.0f, 0.0f)
-   , mIsectUniformScale(1.0f)
-   , mIsectUniformExponent(1.0f)
-   , mChooseVertexShaderFile("highlight.vs")
-   , mChooseFragmentShaderFile("highlight.fs")
-   , mChooseColor(0.0f, 1.0f, 1.0f)
-   , mChooseUniformScale(1.0f)
-   , mChooseUniformExponent(1.0f)
-   , mGrabVertexShaderFile("highlight.vs")
-   , mGrabFragmentShaderFile("highlight.fs")
-   , mGrabColor(1.0f, 0.0f, 1.0f)
-   , mGrabUniformScale(1.0f)
-   , mGrabUniformExponent(1.0f)
-   , mIsectHighlightID(inf::GeometryHighlightTraverser::HIGHLIGHT0)
-   , mChooseHighlightID(inf::GeometryHighlightTraverser::HIGHLIGHT1)
-   , mGrabHighlightID(inf::GeometryHighlightTraverser::HIGHLIGHT1)
-{
-   /* Do nothing. */ ;
 }
 
 bool BasicHighlighter::isIntersected(inf::SceneObjectPtr obj)

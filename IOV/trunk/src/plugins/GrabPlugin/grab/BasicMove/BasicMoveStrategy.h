@@ -16,6 +16,13 @@ class BasicMoveStrategy
    : public inf::MoveStrategy
    , public boost::enable_shared_from_this<BasicMoveStrategy>
 {
+protected:
+   BasicMoveStrategy()
+      : inf::MoveStrategy()
+   {
+      /* Do nothing. */ ;
+   }
+
 public:
    static std::string getId()
    {
@@ -64,12 +71,6 @@ protected:
    virtual void destroy()
    {
       delete this;
-   }
-
-   BasicMoveStrategy()
-      : inf::MoveStrategy()
-   {
-      /* Do nothing. */ ;
    }
 
 private:

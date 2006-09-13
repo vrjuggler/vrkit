@@ -21,6 +21,12 @@ class ModelSwapPlugin
    : public inf::Plugin
    , public boost::enable_shared_from_this<ModelSwapPlugin>
 {
+protected:
+   ModelSwapPlugin()
+   {
+      /* Do nothing. */ ;
+   }
+
 public:
    static inf::PluginPtr create();
    
@@ -56,13 +62,7 @@ protected:
    {
       delete this;
    }
-   
-   ModelSwapPlugin()
-   {
-      /* Do nothing. */ ;
-   }
 
-protected:
    WandInterfacePtr        mWandInterface;      /**< Ptr to the wand interface to use. */
    inf::DigitalCommand     mSwapButton;       /**< Ptr to the digital button. */
    OSG::NodeRefPtr            mSwitchNode;

@@ -33,6 +33,9 @@ class WidgetPlugin
    : public inf::Plugin
    , public boost::enable_shared_from_this<WidgetPlugin>
 {
+protected:
+   WidgetPlugin();
+
 public:
    static inf::PluginPtr create()
    {
@@ -79,8 +82,6 @@ protected:
    {
       delete this;
    }
-
-   WidgetPlugin();
 
    /**
     * Updates the state of the status panel (if it is in use) based on the

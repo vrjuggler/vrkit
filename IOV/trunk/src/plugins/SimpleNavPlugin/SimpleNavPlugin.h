@@ -19,6 +19,9 @@ class SimpleNavPlugin
    : public NavPlugin
    , public boost::enable_shared_from_this<SimpleNavPlugin>
 {
+protected:
+   SimpleNavPlugin();
+
 public:
    static inf::PluginPtr create()
    {
@@ -70,8 +73,6 @@ protected:
       WALK,     /**< Walk (drive) mode */
       FLY       /**< Fly mode */
    };
-
-   SimpleNavPlugin();
 
    virtual void focusChanged(inf::ViewerPtr viewer);
 

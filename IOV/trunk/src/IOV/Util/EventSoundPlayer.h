@@ -30,6 +30,9 @@ namespace inf
 class IOV_CLASS_API EventSoundPlayer
    : public boost::enable_shared_from_this<EventSoundPlayer>
 {
+protected:
+   EventSoundPlayer();
+
 public:
    static inf::EventSoundPlayerPtr create()
    {
@@ -53,9 +56,6 @@ public:
     *               will be used.
     */
    inf::EventSoundPlayerPtr init(inf::ViewerPtr viewer);
-
-protected:
-   EventSoundPlayer();
 
 private:
    static std::string getElementType()

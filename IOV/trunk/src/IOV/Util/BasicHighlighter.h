@@ -37,6 +37,9 @@ namespace inf
 class IOV_CLASS_API BasicHighlighter
    : public boost::enable_shared_from_this<BasicHighlighter>
 {
+protected:
+   BasicHighlighter();
+
 public:
    static BasicHighlighterPtr create()
    {
@@ -133,8 +136,6 @@ protected:
    inf::Event::ResultType objectPicked(inf::SceneObjectPtr obj,
                                        const bool picked);
    //@}
-
-   BasicHighlighter();
 
 private:
    static std::string getElementType()

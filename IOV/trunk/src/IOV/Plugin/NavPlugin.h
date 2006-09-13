@@ -15,14 +15,15 @@ namespace inf
 class IOV_CLASS_API NavPlugin
    : public inf::Plugin
 {
+protected:
+   NavPlugin();
+
 public:
    virtual ~NavPlugin();
 
    void update(inf::ViewerPtr viewer);
 
 protected:
-   NavPlugin();
-
    /**
     * Template method pattern interface used for navigation strategies to
     * update themselves.

@@ -6,12 +6,12 @@ namespace inf
 {
 const vpr::GUID EventData::type_guid("b72a43c0-3001-4841-8bfb-5d775f01cc16");
 
-EventData::~EventData()
+EventData::EventData()
 {
    /* Do nothing. */ ;
 }
 
-EventData::EventData()
+EventData::~EventData()
 {
    /* Do nothing. */ ;
 }

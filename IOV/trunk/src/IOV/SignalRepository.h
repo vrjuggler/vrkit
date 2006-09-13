@@ -30,6 +30,9 @@ namespace inf
  */
 class IOV_CLASS_API SignalRepository : public inf::SceneData
 {
+protected:
+   SignalRepository();
+
 public:
    /**
     * The unique type identifier for scene data used by plug-ins that manage
@@ -113,9 +116,6 @@ public:
     *        signal.
     */
    void emit(const std::string& id);
-
-protected:
-   SignalRepository();
 
 private:
    std::map<std::string, boost::shared_ptr<signal_t> > mSignals;

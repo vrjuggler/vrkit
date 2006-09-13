@@ -22,6 +22,12 @@ namespace inf
 class ViewpointsPlugin
    : public inf::Plugin, public boost::enable_shared_from_this<ViewpointsPlugin>
 {
+protected:
+   ViewpointsPlugin()
+      : mControlBtnNum(-1)
+      , mNextViewpoint(0)
+   {;}
+
 public:
    static PluginPtr create();
 
@@ -55,11 +61,6 @@ protected:
    {
       delete this;
    }
-
-   ViewpointsPlugin()
-      : mControlBtnNum(-1)
-      , mNextViewpoint(0)
-   {;}
 
 protected:
    struct Viewpoint

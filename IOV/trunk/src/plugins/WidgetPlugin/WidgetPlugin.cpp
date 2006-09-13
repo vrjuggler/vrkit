@@ -48,6 +48,15 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
+WidgetPlugin::WidgetPlugin()
+   : mSelectText("Activate/Deactivate Widgets")
+//   , SelectedWidget(-1)
+   , mWidgetPressed(false)
+   , mSelectedObject()
+{
+   /* Do nothing. */ ;
+}
+
 PluginPtr WidgetPlugin::init(inf::ViewerPtr viewer)
 {
    mWandInterface = viewer->getUser()->getInterfaceTrader().getWandInterface();
@@ -215,15 +224,6 @@ void WidgetPlugin::update(inf::ViewerPtr viewer)
          //(*g)->setVisible(mGridsVisible);
       }
    }
-}
-
-WidgetPlugin::WidgetPlugin()
-   : mSelectText("Activate/Deactivate Widgets")
-     //,SelectedWidget(-1)
-     ,mWidgetPressed(false)
-     ,mSelectedObject()
-{
-   /* Do nothing. */ ;
 }
 
 inf::Event::ResultType WidgetPlugin::

@@ -21,6 +21,9 @@ class WandNavPlugin
    : public NavPlugin
    , public boost::enable_shared_from_this<WandNavPlugin>
 {
+protected:
+   WandNavPlugin();
+
 public:
    static inf::PluginPtr create()
    {
@@ -85,8 +88,6 @@ protected:
       WALK = 0,     /**< Walk (drive) mode */
       FLY  = 1      /**< Fly mode */
    };
-
-   WandNavPlugin();
 
    virtual void focusChanged(inf::ViewerPtr viewer);
 

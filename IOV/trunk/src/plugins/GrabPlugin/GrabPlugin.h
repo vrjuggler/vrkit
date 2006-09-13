@@ -30,6 +30,9 @@ class GrabPlugin
    : public inf::Plugin
    , public boost::enable_shared_from_this<GrabPlugin>
 {
+protected:
+   GrabPlugin();
+
 public:
    static inf::PluginPtr create()
    {
@@ -67,8 +70,6 @@ protected:
    {
       delete this;
    }
-
-   GrabPlugin();
 
    void focusChanged(inf::ViewerPtr viewer);
 

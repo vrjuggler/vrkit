@@ -19,6 +19,13 @@ class ObjectSpaceMoveStrategy
    : public inf::MoveStrategy
    , public boost::enable_shared_from_this<ObjectSpaceMoveStrategy>
 {
+protected:
+   ObjectSpaceMoveStrategy()
+      : inf::MoveStrategy()
+   {
+      /* Do nothing. */ ;
+   }
+
 public:
    static std::string getId()
    {
@@ -67,12 +74,6 @@ protected:
    virtual void destroy()
    {
       delete this;
-   }
-
-   ObjectSpaceMoveStrategy()
-      : inf::MoveStrategy()
-   {
-      /* Do nothing. */ ;
    }
 
 private:

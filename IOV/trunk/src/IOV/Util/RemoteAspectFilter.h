@@ -31,6 +31,9 @@ namespace inf
 class RemoteAspectFilter
    : public boost::enable_shared_from_this<RemoteAspectFilter>
 {
+protected:
+   RemoteAspectFilter();
+
 public:
    static RemoteAspectFilterPtr create()
    {
@@ -57,7 +60,6 @@ public:
    bool changedFunction(OSG::FieldContainerPtr &fcp, OSG::RemoteAspect *);
    //@}
 protected:
-   RemoteAspectFilter();
    OSG::RemoteAspect* mRemoteAspect;
 
    //typedef std::hash_multimap<OSG::FieldContainerPtr, boost::function< void (const vpr::GUID&) >, vpr::GUID::hash> change_callback_map_t;

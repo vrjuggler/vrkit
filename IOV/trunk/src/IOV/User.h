@@ -25,6 +25,10 @@ namespace inf
  */
 class User : public boost::enable_shared_from_this<User>
 {
+protected:
+   User()
+   {;}
+
 public:
    static UserPtr create();
 
@@ -50,10 +54,6 @@ public:
    {
       return mViewPlatform;
    }
-
-protected:
-   User()
-   {;}
 
 private:
    void platformMoved(ViewerPtr viewer);

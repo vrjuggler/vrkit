@@ -29,6 +29,13 @@ class ModeSwitchPlugin
    : public inf::Plugin
    , public boost::enable_shared_from_this<ModeSwitchPlugin>
 {
+protected:
+   ModeSwitchPlugin()
+      : mCurrentMode(0)
+   {
+      /* Do nothing. */ ;
+   }
+
 public:
    static inf::PluginPtr create()
    {
@@ -83,12 +90,6 @@ protected:
    virtual void destroy()
    {
       delete this;
-   }
-
-   ModeSwitchPlugin()
-      : mCurrentMode(0)
-   {
-      /* Do nothing. */ ;
    }
 
    static std::string getElementType()

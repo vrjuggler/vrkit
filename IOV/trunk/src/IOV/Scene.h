@@ -44,6 +44,10 @@ namespace inf
  */
 class IOV_CLASS_API Scene : public boost::enable_shared_from_this<Scene>
 {
+protected:
+   Scene()
+   {;}
+
 public:
    /** Factory method for scenes. */
    static ScenePtr create();
@@ -190,10 +194,6 @@ public:
     */
    inf::SceneDataPtr removeSceneData(const vpr::GUID& key);
    //@}
-
-protected:
-   Scene()
-   {;}
 
 protected:
    //                  SceneRoot::Group

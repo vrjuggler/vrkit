@@ -31,6 +31,17 @@ class SignalData
                              , SignalEnd>
    , public inf::SceneData
 {
+protected:
+   SignalData()
+       : inf::SignalEmitter<SlotSignature
+                          , SignalListContainer
+                          , SignalBegin
+                          , SignalEnd>()
+       , inf::SceneData()
+   {
+      /* Do nothing. */ ;
+   }
+
 public:
    typedef SignalData<SlotSignature
                     , SignalListContainer
@@ -48,17 +59,6 @@ public:
    }
 
    ~SignalData()
-   {
-      /* Do nothing. */ ;
-   }
-
-protected:
-   SignalData()
-       : inf::SignalEmitter<SlotSignature
-                          , SignalListContainer
-                          , SignalBegin
-                          , SignalEnd>()
-       , inf::SceneData()
    {
       /* Do nothing. */ ;
    }

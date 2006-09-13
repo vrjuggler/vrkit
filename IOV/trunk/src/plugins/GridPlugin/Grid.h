@@ -24,6 +24,12 @@ namespace inf
 
 class Grid : public boost::enable_shared_from_this<Grid>
 {
+protected:
+   Grid()
+   {
+      /* Do nothing. */ ;
+   }
+
 public:
    static GridPtr create()
    {
@@ -107,12 +113,6 @@ public:
     * Retrieves the current transformation for this grid.
     */
    OSG::Matrix getCurrentXform();
-
-protected:
-   Grid()
-   {
-      /* Do nothing. */ ;
-   }
 
 private:
    enum Corner

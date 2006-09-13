@@ -59,6 +59,14 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
+PickPlugin::PickPlugin()
+   : mPickText("Select/Deselect Toggle")
+   , mIntersecting(false)
+   , mPicking(false)
+{
+   ;
+}
+
 PluginPtr PickPlugin::init(ViewerPtr viewer)
 {
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
@@ -181,14 +189,6 @@ bool PickPlugin::config(jccl::ConfigElementPtr elt)
    mPickBtn.configButtons(elt->getProperty<std::string>(pick_btn_prop));
 
    return true;
-}
-
-PickPlugin::PickPlugin()
-   : mPickText("Select/Deselect Toggle")
-   , mIntersecting(false)
-   , mPicking(false)
-{
-   ;
 }
 
 struct IncValue

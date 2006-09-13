@@ -61,6 +61,11 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
+GrabPlugin::GrabPlugin()
+{
+   /* Do nothing. */ ;
+}
+
 GrabPlugin::~GrabPlugin()
 {
    /* Do nothing. */ ;
@@ -281,11 +286,6 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
    }
 
    return true;
-}
-
-GrabPlugin::GrabPlugin()
-{
-   /* Do nothing. */ ;
 }
 
 void GrabPlugin::focusChanged(inf::ViewerPtr viewer)

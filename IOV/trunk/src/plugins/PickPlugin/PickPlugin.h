@@ -30,6 +30,9 @@ class PickPlugin
    : public inf::Plugin
    , public boost::enable_shared_from_this<PickPlugin>
 {
+protected:
+   PickPlugin();
+
 public:
    static inf::PluginPtr create()
    {
@@ -70,8 +73,6 @@ protected:
    {
       delete this;
    }
-
-   PickPlugin();
 
    void focusChanged(inf::ViewerPtr viewer);
 
