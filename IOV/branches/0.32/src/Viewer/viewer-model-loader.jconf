@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings configuration.version="3.0"?>
+<configuration xmlns="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" name="/home/patrick/src/pro/Assembly/src/external/common/OpenSG/VRJ/Viewer/viewer.jconf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.0/configuration http://www.vrjuggler.org/jccl/xsd/3.0/configuration.xsd">
+   <elements>
+      <infiscape_opensg_viewer name="Viewer" version="4">
+         <root_name>RootNode</root_name>
+         <plugin>ModelLoaderPlugin</plugin>
+         <isect_strategy>PointIntersection</isect_strategy>
+      </infiscape_opensg_viewer>
+      <model_loader_plugin name="Model Loader Plugin" version="1">
+         <units_to_meters>Meters</units_to_meters>
+         <models>
+            <model name="Diabolo" version="1">
+               <path>/home/jalane/vred/examples/geo/Diabolo.wrl</path>
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+            </model>
+         </models>
+         <models>
+            <model name="Mercedes" version="1">
+               <path>/home/jalane/vred/examples/geo/MercedesC-Klasse.wrl</path>
+               <position>30.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+            </model>
+         </models>
+         <models>
+            <model name="Golf" version="1">
+               <path>/home/jalane/vred/examples/geo/Golf2.wrl</path>
+               <position>-15.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+            </model>
+         </models>
+      </model_loader_plugin>
+   </elements>
+</configuration>

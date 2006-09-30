@@ -1,0 +1,34 @@
+#!python
+#
+import SConsAddons.Util       # Get the utils
+import sys, os, re, string, glob
+pj = os.path.join
+GetPlatform = SConsAddons.Util.GetPlatform;
+
+Import('*')
+
+viewerEnv = baseEnv.Copy()
+
+boost_options.apply(viewerEnv)
+
+if boost_options.isAvailable():
+   viewerEnv.Prepend(CPPPATH = inst_paths['include'],
+                     LIBPATH = inst_paths['lib'],
+                     LIBS = 'iov')
+
+   # XXX: There has to be a better way to do this Mac-specific stuff.
+   if GetPlatform() == 'darwin':
+      viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
+
+   po_lib = boost_options.buildFullLibName('program_options', viewerEnv)
+   viewerEnv.Prepend(LIBS = [po_lib])
+
+   jdef_files = ['iov_app.jdef',]
+   jconf_files = ['viewer-nav.jconf', 'viewer-vp.jconf']
+   infi_app_prog = viewerEnv.Program('infi_app', ['infi_app.cpp',])
+   viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), infi_app_prog)
+   viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jconf_files)
+   viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jdef_files)
+else:
+   print "WARNING: Cannot build infi_app without Boost.program_options"
+

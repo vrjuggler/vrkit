@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="iov_mode_harness_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="IOV Mode Harness Plug-In (Infiscape)">
+      <abstract>false</abstract>
+      <help>The Mode Harness Plug-in allows swapping of "mode components" based on signals being raised from within the application. Each mode component can be activated by multiple signals, but only one component can be activated by any one signal.</help>
+      <parent />
+      <category>/Infiscape/</category>
+      <property valuetype="string" variable="true" name="component_path">
+         <help>Each value adds to the path where dynamically loadable mode component plug-ins can be found. The path may make use of environment variables. For example: &lt;tt&gt;${HOME}/inf-plugins&lt;/tt&gt;. If no values are set for this property, the default search path will be &lt;tt&gt;${VJ_BASE_DIR}/lib{,32,64}/infiscape/viewer/plugins/mode&lt;/tt&gt; depending on the compile-time application binary interface (ABI).</help>
+         <value label="Component Plug-In Path" defaultvalue=""/>
+      </property>
+      <property valuetype="string" variable="false" name="default_component">
+         <help>The name of the default mode component. This will be the component that is activated at application startup. If no mode component is named here, then no component will be activated until a signal is raised by the application that initiates the activation process.</help>
+         <value label="Default Mode Component" defaultvalue="" />
+      </property>
+      <property valuetype="configelement" variable="true" name="component">
+         <help>The list of mode components and their activation signal mapping. The same component can associated with multiple activation signals by listing it more than once here. Activation signals cannot be repeated, however.</help>
+         <value label="Component/Signal Mapping" defaultvalue="" />
+         <allowed_type>mode_component</allowed_type>
+      </property>
+      <upgrade_transform/>
+   </definition_version>
+</definition>
+

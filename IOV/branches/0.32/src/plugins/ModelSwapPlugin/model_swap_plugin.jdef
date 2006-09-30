@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="model_swap_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="Model Swap Plugin">
+      <abstract>false</abstract>
+      <help />
+      <category>/Infiscape/</category>
+      <property valuetype="string" variable="false" name="control_button_num">
+         <help>Select the number(s) of the button that should activate model swapping. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
+         <value label="Control Button" defaultvalue="0" />
+      </property>
+      <property valuetype="float" variable="false" name="units_to_meters">
+         <help>The units the viewpoint data is using. This is the scale factor to convert from the units entered to meters.</help>
+         <value label="Units:" defaultvalue="1.0" />
+         <enumeration>
+            <enum label="Centimeters" value="0.01" />
+            <enum label="Feet" value="0.30487" />
+            <enum label="Inches" value="0.0254" />
+            <enum label="Meters" value="1.0" />
+            <enum label="Millimeters" value="0.001" />
+         </enumeration>
+      </property>
+      <property valuetype="float" variable="false" name="position">
+         <help>Model position in units from units_to_meters.</help>
+         <value label="X" defaultvalue="0.0"/>
+         <value label="Y" defaultvalue="0.0"/>
+         <value label="Z" defaultvalue="0.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="rotation">
+         <help>Model rotation in degrees.</help>
+         <value label="X Rot" defaultvalue="0.0"/>
+         <value label="Y Rot" defaultvalue="0.0"/>
+         <value label="Z Rot" defaultvalue="0.0"/>
+      </property>
+      <property valuetype="string" variable="true" name="model">
+         <help>A model to be loaded.</help>
+         <value label="Model" defaultvalue=""/>
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>

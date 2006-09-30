@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings configuration.version="3.0"?>
+<configuration xmlns="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" name="/home/patrick/src/pro/Assembly/src/external/common/OpenSG/VRJ/Viewer/viewer.jconf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.0/configuration http://www.vrjuggler.org/jccl/xsd/3.0/configuration.xsd">
+   <elements>
+      <infiscape_opensg_viewer name="Viewer" version="4">
+         <root_name>RootNode</root_name>
+         <plugin>WandNavPlugin</plugin>
+         <isect_strategy>PointIntersection</isect_strategy>
+      </infiscape_opensg_viewer>
+      <wand_nav_plugin name="Viewer Wand Nav" version="3">
+         <max_velocity>5.0</max_velocity>
+         <acceleration>0.05</acceleration>
+         <enable_deceleration>true</enable_deceleration>
+         <deceleration>0.0527</deceleration>
+         <rotation_sensitivity>0.5</rotation_sensitivity>
+         <forward_button_nums>1</forward_button_nums>
+         <reverse_button_nums>-1</reverse_button_nums>
+         <rotate_button_nums>2</rotate_button_nums>
+         <nav_mode_button_nums>1,2</nav_mode_button_nums>
+         <reset_button_nums>0,1</reset_button_nums>
+         <initial_mode>Fly</initial_mode>
+      </wand_nav_plugin>
+   </elements>
+</configuration>

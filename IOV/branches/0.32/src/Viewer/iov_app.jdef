@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="iov_app" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="IOV Basic Application">
+      <abstract>false</abstract>
+      <help />
+      <category>/Infiscape/</category>
+      <property valuetype="boolean" variable="false" name="enable_grabbing">
+         <help>Enable/disable grabbing scene objects.</help>
+         <value label="Enable Grabbing?" defaultvalue="true"/>
+      </property>
+      <property valuetype="string" variable="false" name="scene_object_type">
+         <help>The type of scene object to use for storing the loaded model.</help>
+         <value label="Scene Object Type" defaultvalue="StaticSceneObject"/>
+         <enumeration editable="false">
+            <enum label="Static" value="StaticSceneObject" />
+            <enum label="Dynamic" value="DynamicSceneObject" />
+         </enumeration>
+      </property>
+      <property valuetype="boolean" variable="false" name="use_material_chooser">
+         <help>Enable/disable the use of the material chooser frame.</help>
+         <value label="Use Material Chooser?" defaultvalue="false"/>
+      </property>
+      <property valuetype="float" variable="false" name="chooser_initial_size">
+         <help>Initial size of the material chooser panel in feet.</help>
+         <value label="Width (Feet)" defaultvalue="2.0"/>
+         <value label="Height (Feet)" defaultvalue="3.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="chooser_initial_position">
+         <help>Initial position of the lower left corner of the material chooser panel.</help>
+         <value label="X (Feet)" defaultvalue="0.0"/>
+         <value label="Y (Feet)" defaultvalue="0.0"/>
+         <value label="Z (Feet)" defaultvalue="0.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="chooser_initial_rotation">
+         <help>Initial rotation of the material chooser panel.</help>
+         <value label="X Rotation" defaultvalue="0.0"/>
+         <value label="Y Rotation" defaultvalue="0.0"/>
+         <value label="Z Rotation" defaultvalue="0.0"/>
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>
+

@@ -1,0 +1,28 @@
+#!python
+#
+import SConsAddons.Util       # Get the utils
+import sys, os, re, string, glob
+pj = os.path.join
+GetPlatform = SConsAddons.Util.GetPlatform;
+
+Import('*')
+
+if GetPlatform() == 'darwin':
+   mac_cflags = os.popen(opensg_options.osgconfig_cmd + " --cflags GLUT").read()
+   opensg_options.found_cflags = mac_cflags.strip().split(" ")
+
+ui_env = baseEnv.Copy()
+opensg_options.apply(ui_env, lib='glut')
+
+ui_env.Prepend(CPPPATH = inst_paths['include'],
+               LIBPATH = inst_paths['lib'],
+               LIBS = 'iov')
+
+if GetPlatform() == 'darwin':
+   ui_env.Append(LINKFLAGS = ['-framework', 'Cocoa',
+                              '-framework', 'GLUT',
+                              '-framework', 'OpenGL'])
+
+uitest_prog = ui_env.Program('ui_test', ['ui_test.cpp',])
+ui_env.Install(pj(inst_paths['test_base'],'UITest'), uitest_prog)
+
