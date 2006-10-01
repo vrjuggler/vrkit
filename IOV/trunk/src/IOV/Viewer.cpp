@@ -532,7 +532,9 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
    search_path.push_back("plugins/grab");
 
    std::string iov_base_dir;
-   if ( vpr::System::getenv(iov_base_dir_tkn, iov_base_dir).success() )
+   vpr::System::getenv(iov_base_dir_tkn, iov_base_dir);
+
+   if ( ! iov_base_dir.empty() )
    {
       try
       {
