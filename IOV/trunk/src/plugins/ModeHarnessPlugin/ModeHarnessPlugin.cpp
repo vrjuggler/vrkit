@@ -300,7 +300,9 @@ void ModeHarnessPlugin::configure(jccl::ConfigElementPtr elt)
    mComponentPath.push_back("plugins/mode");
 
    std::string iov_base_dir;
-   if ( vpr::System::getenv("IOV_BASE_DIR", iov_base_dir).success() )
+   vpr::System::getenv("IOV_BASE_DIR", iov_base_dir);
+
+   if ( ! iov_base_dir.empty() )
    {
       fs::path iov_base_path(iov_base_dir, fs::native);
       fs::path def_component_path = iov_base_path / "lib/IOV/plugins/mode";
