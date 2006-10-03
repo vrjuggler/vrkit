@@ -13,8 +13,6 @@
 #include <vpr/vpr.h>
 #include <vpr/Util/GUID.h>
 
-#include <IOV/SceneData.h>
-
 
 namespace inf
 {
@@ -64,28 +62,6 @@ protected:
    OSG::TransformNodePtr   mPanelXformNode;  /**< Root node of panel. */
 
    virtual void destroy();
-};
-
-
-class StatusPanelPluginData;
-typedef boost::shared_ptr<StatusPanelPluginData> StatusPanelPluginDataPtr;
-
-class IOV_CLASS_API StatusPanelPluginData : public inf::SceneData
-{
-public:
-   static const vpr::GUID type_guid;
-
-   static StatusPanelPluginDataPtr create()
-   {
-      return StatusPanelPluginDataPtr(new StatusPanelPluginData);
-   }
-
-   StatusPanelPluginData();
-
-   virtual ~StatusPanelPluginData();
-
-public:
-   StatusPanelPluginPtr    mStatusPanelPlugin;  /**< Pointer to the plugin (if registered). */
 };
 
 }

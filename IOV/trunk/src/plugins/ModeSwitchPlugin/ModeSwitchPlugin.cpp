@@ -24,6 +24,7 @@
 #include <IOV/Status.h>
 #include <IOV/StatusPanel.h>
 #include <IOV/StatusPanelPlugin.h>
+#include <IOV/StatusPanelData.h>
 
 #include "ModeSwitchPlugin.h"
 
@@ -318,8 +319,8 @@ void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
 
    IOV_STATUS << "Switching to mode: " << mModeNames[modeNum] << std::endl;
 
-   StatusPanelPluginDataPtr status_panel_data =
-      viewer->getSceneObj()->getSceneData<StatusPanelPluginData>();
+   StatusPanelDataPtr status_panel_data =
+      viewer->getSceneObj()->getSceneData<StatusPanelData>();
    if(status_panel_data->mStatusPanelPlugin)
    {
       inf::StatusPanel& panel = status_panel_data->mStatusPanelPlugin->getPanel();

@@ -18,6 +18,7 @@
 #include <IOV/Viewer.h>
 #include <IOV/StatusPanel.h>
 #include <IOV/StatusPanelPlugin.h>
+#include <IOV/StatusPanelData.h>
 #include <IOV/Util/OpenSGHelpers.h>
 
 #include "SignalGrabStrategy.h"
@@ -105,8 +106,8 @@ void SignalGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
    if ( focused )
    {
       inf::ScenePtr scene = viewer->getSceneObj();
-      StatusPanelPluginDataPtr status_panel_data =
-         scene->getSceneData<StatusPanelPluginData>();
+      StatusPanelDataPtr status_panel_data =
+         scene->getSceneData<StatusPanelData>();
 
       if ( status_panel_data->mStatusPanelPlugin )
       {
@@ -160,8 +161,8 @@ void SignalGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
    else
    {
       inf::ScenePtr scene = viewer->getSceneObj();
-      StatusPanelPluginDataPtr status_panel_data =
-         scene->getSceneData<StatusPanelPluginData>();
+      StatusPanelDataPtr status_panel_data =
+         scene->getSceneData<StatusPanelData>();
 
       if ( status_panel_data->mStatusPanelPlugin )
       {

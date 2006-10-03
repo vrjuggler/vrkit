@@ -29,6 +29,7 @@
 #include <IOV/Status.h>
 #include <IOV/StatusPanel.h>
 #include <IOV/StatusPanelPlugin.h>
+#include <IOV/StatusPanelData.h>
 
 #include "WandNavPlugin.h"
 
@@ -186,8 +187,8 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
 void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
 {
    inf::ScenePtr scene = viewer->getSceneObj();
-   StatusPanelPluginDataPtr status_panel_data =
-      scene->getSceneData<StatusPanelPluginData>();
+   StatusPanelDataPtr status_panel_data =
+      scene->getSceneData<StatusPanelData>();
 
    // We can only navigate when we have focus.
    mCanNavigate = isFocused();

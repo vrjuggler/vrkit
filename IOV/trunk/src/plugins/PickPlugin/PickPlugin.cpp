@@ -26,6 +26,7 @@
 #include <IOV/Status.h>
 #include <IOV/StatusPanel.h>
 #include <IOV/StatusPanelPlugin.h>
+#include <IOV/StatusPanelData.h>
 #include <IOV/Util/Exceptions.h>
 
 #include "PickPlugin.h"
@@ -206,8 +207,8 @@ void PickPlugin::focusChanged(inf::ViewerPtr viewer)
    if ( isFocused() && mPickBtn.isConfigured() )
    {
       inf::ScenePtr scene = viewer->getSceneObj();
-      StatusPanelPluginDataPtr status_panel_data =
-         scene->getSceneData<StatusPanelPluginData>();
+      StatusPanelDataPtr status_panel_data =
+         scene->getSceneData<StatusPanelData>();
 
       if ( status_panel_data->mStatusPanelPlugin )
       {
@@ -229,8 +230,8 @@ void PickPlugin::focusChanged(inf::ViewerPtr viewer)
    else if ( ! isFocused() )
    {
       inf::ScenePtr scene = viewer->getSceneObj();
-      StatusPanelPluginDataPtr status_panel_data =
-         scene->getSceneData<StatusPanelPluginData>();
+      StatusPanelDataPtr status_panel_data =
+         scene->getSceneData<StatusPanelData>();
 
       if ( status_panel_data->mStatusPanelPlugin )
       {

@@ -10,6 +10,7 @@
 #include <IOV/Viewer.h>
 #include <IOV/StatusPanel.h>
 #include <IOV/StatusPanelPlugin.h>
+#include <IOV/StatusPanelData.h>
 
 
 namespace
@@ -138,8 +139,8 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    inf::Status::instance()->addOutputter(status_outputter);
 
    // Register with scene data
-   StatusPanelPluginDataPtr status_panel_data =
-      scene_obj->getSceneData<StatusPanelPluginData>();
+   StatusPanelDataPtr status_panel_data =
+      scene_obj->getSceneData<StatusPanelData>();
    status_panel_data->mStatusPanelPlugin = shared_from_this();
 
    return shared_from_this();
@@ -153,18 +154,6 @@ void StatusPanelPlugin::update(inf::ViewerPtr)
 void StatusPanelPlugin::destroy()
 {
    delete this;
-}
-
-const vpr::GUID StatusPanelPluginData::type_guid("758a1730-7f05-4c99-ae5d-46502479882d");
-
-StatusPanelPluginData::StatusPanelPluginData()
-{
-   ;
-}
-
-StatusPanelPluginData::~StatusPanelPluginData()
-{
-   ;
 }
 
 } // namespace inf

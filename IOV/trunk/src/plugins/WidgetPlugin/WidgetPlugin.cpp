@@ -12,6 +12,7 @@
 #include <IOV/PluginCreator.h>
 #include <IOV/StatusPanel.h>
 #include <IOV/StatusPanelPlugin.h>
+#include <IOV/StatusPanelData.h>
 #include <IOV/Status.h>
 #include <IOV/User.h>
 #include <IOV/Viewer.h>
@@ -250,8 +251,8 @@ objectsMovedSlot(const EventData::moved_obj_list_t&)
 void WidgetPlugin::focusChanged(inf::ViewerPtr viewer)
 {
    inf::ScenePtr scene = viewer->getSceneObj();
-   StatusPanelPluginDataPtr status_panel_data =
-      scene->getSceneData<StatusPanelPluginData>();
+   StatusPanelDataPtr status_panel_data =
+      scene->getSceneData<StatusPanelData>();
 
    if (isFocused())
    {
