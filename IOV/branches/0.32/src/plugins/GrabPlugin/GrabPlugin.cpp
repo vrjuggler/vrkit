@@ -248,7 +248,9 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
    mStrategyPluginPath.push_back("plugins/grab");
 
    std::string iov_base_dir;
-   if ( vpr::System::getenv("IOV_BASE_DIR", iov_base_dir).success() )
+   vpr::System::getenv("IOV_BASE_DIR", iov_base_dir);
+   
+   if ( ! iov_base_dir.empty() )
    {
       fs::path iov_base_path(iov_base_dir, fs::native);
       fs::path def_strategy_path = iov_base_path / "lib/IOV/plugins/grab";
