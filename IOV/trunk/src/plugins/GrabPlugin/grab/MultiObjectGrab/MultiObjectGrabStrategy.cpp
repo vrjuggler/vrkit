@@ -19,9 +19,9 @@
 #include <IOV/InterfaceTrader.h>
 #include <IOV/WandInterface.h>
 #include <IOV/SceneObject.h>
-#include <IOV/StatusPanel.h>
-#include <IOV/StatusPanelPlugin.h>
 #include <IOV/StatusPanelData.h>
+#include <IOV/Util/Exceptions.h>
+#include <IOV/Config.h>
 
 #include "MultiObjectGrabStrategy.h"
 

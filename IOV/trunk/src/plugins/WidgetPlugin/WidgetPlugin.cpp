@@ -10,8 +10,6 @@
 
 #include <IOV/EventData.h>
 #include <IOV/PluginCreator.h>
-#include <IOV/StatusPanel.h>
-#include <IOV/StatusPanelPlugin.h>
 #include <IOV/StatusPanelData.h>
 #include <IOV/Status.h>
 #include <IOV/User.h>

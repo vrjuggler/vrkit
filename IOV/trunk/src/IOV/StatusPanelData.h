@@ -1,7 +1,6 @@
 #include <IOV/StatusPanelDataPtr.h>
 
 #include <IOV/SceneData.h>
-#include <IOV/StatusPanelPlugin.h>
 
 #include <vpr/vpr.h>
 #include <vpr/Util/GUID.h>
