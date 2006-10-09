@@ -120,36 +120,33 @@ void SingleObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
-      if ( status_panel_data->mStatusPanelPlugin )
+      // If grab button(s) is/are configured, we will update the status
+      // panel to include that information.
+      if ( mGrabBtn.isConfigured() )
       {
-         // If grab button(s) is/are configured, we will update the status
-         // panel to include that information.
-         if ( mGrabBtn.isConfigured() )
+         bool has = false;
+         status_panel_data->mHasControlTexts(mGrabBtn.getButtons(), mGrabText, has);
+         if ( ! has )
          {
-            inf::StatusPanel& panel =
-               status_panel_data->mStatusPanelPlugin->getPanel();
-            if ( ! panel.hasControlText(mGrabBtn.getButtons(), mGrabText) )
-            {
-               // The button numbers in mGrabBtn are zero-based, but we would
-               // like them to be one-based in the status panel display.
-               panel.addControlText(transformButtonVec(mGrabBtn.getButtons()),
-                                    mGrabText);
-            }
+            // The button numbers in mGrabBtn are zero-based, but we would
+            // like them to be one-based in the status panel display.
+            status_panel_data->mAddControlTexts(transformButtonVec(mGrabBtn.getButtons()),
+                                 mGrabText, 1);
          }
-         // If release button(s) is/are configured, we will update the status
-         // panel to include that information.
-         if ( mReleaseBtn.isConfigured() )
+      }
+      // If release button(s) is/are configured, we will update the status
+      // panel to include that information.
+      if ( mReleaseBtn.isConfigured() )
+      {
+         bool has = false;
+         status_panel_data->mHasControlTexts(mReleaseBtn.getButtons(), mReleaseText, has);
+         if ( ! has )
          {
-            inf::StatusPanel& panel =
-               status_panel_data->mStatusPanelPlugin->getPanel();
-            if ( ! panel.hasControlText(mReleaseBtn.getButtons(), mReleaseText) )
-            {
-               // The button numbers in mReleaseBtn are zero-based, but we
-               // would like them to be one-based in the status panel display.
-               panel.addControlText(
-                  transformButtonVec(mReleaseBtn.getButtons()), mReleaseText
-               );
-            }
+            // The button numbers in mReleaseBtn are zero-based, but we
+            // would like them to be one-based in the status panel display.
+            status_panel_data->mAddControlTexts(
+               transformButtonVec(mReleaseBtn.getButtons()), mReleaseText, 1
+            );
          }
       }
    }
@@ -159,21 +156,15 @@ void SingleObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
-      if ( status_panel_data->mStatusPanelPlugin )
-      {
-         inf::StatusPanel& panel =
-            status_panel_data->mStatusPanelPlugin->getPanel();
+      // The button numbers in mGrabBtn are zero-based, but we would like
+      // them to be one-based in the status panel display.
+      status_panel_data->mRemoveControlTexts(transformButtonVec(mGrabBtn.getButtons()),
+                              mGrabText);
 
-         // The button numbers in mGrabBtn are zero-based, but we would like
-         // them to be one-based in the status panel display.
-         panel.removeControlText(transformButtonVec(mGrabBtn.getButtons()),
-                                 mGrabText);
-
-         // The button numbers in mReleaseBtn are zero-based, but we would like
-         // them to be one-based in the status panel display.
-         panel.removeControlText(transformButtonVec(mReleaseBtn.getButtons()),
-                                 mReleaseText);
-      }
+      // The button numbers in mReleaseBtn are zero-based, but we would like
+      // them to be one-based in the status panel display.
+      status_panel_data->mRemoveControlTexts(transformButtonVec(mReleaseBtn.getButtons()),
+                              mReleaseText);
    }
 }
 

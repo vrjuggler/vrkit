@@ -210,21 +210,18 @@ void PickPlugin::focusChanged(inf::ViewerPtr viewer)
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
-      if ( status_panel_data->mStatusPanelPlugin )
+      bool has = false;
+      status_panel_data->mHasControlTexts(mPickBtn.getButtons(), mPickText, has);
+      if ( ! has )
       {
-         inf::StatusPanel& panel =
-            status_panel_data->mStatusPanelPlugin->getPanel();
-         if ( ! panel.hasControlText(mPickBtn.getButtons(), mPickText) )
-         {
-            // The button numbers in mPickBtn are zero-based, but we would like
-            // them to be one-based in the status panel display.
-            std::vector<int> btns(mPickBtn.getButtons().size());
-            IncValue inc;
-            std::transform(mPickBtn.getButtons().begin(),
-                           mPickBtn.getButtons().end(), btns.begin(), inc);
+         // The button numbers in mPickBtn are zero-based, but we would like
+         // them to be one-based in the status panel display.
+         std::vector<int> btns(mPickBtn.getButtons().size());
+         IncValue inc;
+         std::transform(mPickBtn.getButtons().begin(),
+                        mPickBtn.getButtons().end(), btns.begin(), inc);
 
-            panel.addControlText(btns, mPickText);
-         }
+         status_panel_data->mAddControlTexts(btns, mPickText, 1);
       }
    }
    else if ( ! isFocused() )
@@ -233,20 +230,14 @@ void PickPlugin::focusChanged(inf::ViewerPtr viewer)
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
-      if ( status_panel_data->mStatusPanelPlugin )
-      {
-         inf::StatusPanel& panel =
-            status_panel_data->mStatusPanelPlugin->getPanel();
+      // The button numbers in mPickBtn are zero-based, but we would like
+      // them to be one-based in the status panel display.
+      std::vector<int> btns(mPickBtn.getButtons().size());
+      IncValue inc;
+      std::transform(mPickBtn.getButtons().begin(),
+                     mPickBtn.getButtons().end(), btns.begin(), inc);
 
-         // The button numbers in mPickBtn are zero-based, but we would like
-         // them to be one-based in the status panel display.
-         std::vector<int> btns(mPickBtn.getButtons().size());
-         IncValue inc;
-         std::transform(mPickBtn.getButtons().begin(),
-                        mPickBtn.getButtons().end(), btns.begin(), inc);
-
-         panel.removeControlText(btns, mPickText);
-      }
+      status_panel_data->mRemoveControlTexts(btns, mPickText);
    }
 }
 

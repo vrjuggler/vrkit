@@ -185,114 +185,116 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
 }
 
 void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
-{
+{   
    inf::ScenePtr scene = viewer->getSceneObj();
    StatusPanelDataPtr status_panel_data =
       scene->getSceneData<StatusPanelData>();
 
    // We can only navigate when we have focus.
    mCanNavigate = isFocused();
+   
+   status_panel_data->mSetHeaderTitle("test");
 
    if ( ! mCanNavigate )
-   {
+   {      
       mVelocity = 0.0f;
-
-      if ( status_panel_data->mStatusPanelPlugin )
+      
+      if ( mForwardBtn.isConfigured() )
       {
-         inf::StatusPanel& panel =
-            status_panel_data->mStatusPanelPlugin->getPanel();
+         // The button numbers in mForwardBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(transformButtonVec(mForwardBtn.getButtons()));
+         status_panel_data->mRemoveControlTexts(btns, mForwardText);
+      }
 
-         if ( mForwardBtn.isConfigured() )
-         {
-            // The button numbers in mForwardBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(transformButtonVec(mForwardBtn.getButtons()));
-            panel.removeControlText(btns, mForwardText);
-         }
+      if ( mReverseBtn.isConfigured() )
+      {
+         // The button numbers in mReverseBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(transformButtonVec(mReverseBtn.getButtons()));
+         status_panel_data->mRemoveControlTexts(btns, mReverseText);
+      }
 
-         if ( mReverseBtn.isConfigured() )
-         {
-            // The button numbers in mReverseBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(transformButtonVec(mReverseBtn.getButtons()));
-            panel.removeControlText(btns, mReverseText);
-         }
+      if ( mRotateBtn.isConfigured() )
+      {
+         // The button numbers in mRotateBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(transformButtonVec(mRotateBtn.getButtons()));
+         status_panel_data->mRemoveControlTexts(btns, mRotateText);
+      }
 
-         if ( mRotateBtn.isConfigured() )
-         {
-            // The button numbers in mRotateBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(transformButtonVec(mRotateBtn.getButtons()));
-            panel.removeControlText(btns, mRotateText);
-         }
+      if ( mModeBtn.isConfigured() )
+      {
+         // The button numbers in mModeBtn are zero-based, but we would like
+         // them to be one-based in the status panel display.
+         std::vector<int> btns(transformButtonVec(mModeBtn.getButtons()));
+         status_panel_data->mRemoveControlTexts(btns, mModeText);
+      }
 
-         if ( mModeBtn.isConfigured() )
-         {
-            // The button numbers in mModeBtn are zero-based, but we would like
-            // them to be one-based in the status panel display.
-            std::vector<int> btns(transformButtonVec(mModeBtn.getButtons()));
-            panel.removeControlText(btns, mModeText);
-         }
-
-         if ( mResetBtn.isConfigured() )
-         {
-            // The button numbers in mResetBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
-            panel.removeControlText(btns, mResetText);
-         }
+      if ( mResetBtn.isConfigured() )
+      {
+         // The button numbers in mResetBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
+         status_panel_data->mRemoveControlTexts(btns, mResetText);
       }
    }
    else
    {
-      if ( status_panel_data->mStatusPanelPlugin )
+      
+      if ( mForwardBtn.isConfigured() )
+      {         
+         std::vector<int> btns(transformButtonVec(mForwardBtn.getButtons()));
+         
+         bool has = false;
+         status_panel_data->mHasControlTexts(btns, mForwardText, has);
+         if ( ! has )
+         {            
+            status_panel_data->mAddControlTexts(btns, mForwardText, 1);
+         }
+      }
+
+      if ( mReverseBtn.isConfigured() )
+      {         
+         std::vector<int> btns(transformButtonVec(mReverseBtn.getButtons()));
+         bool has = false;
+         status_panel_data->mHasControlTexts(btns, mReverseText, has);
+         if ( ! has )
+         {
+            status_panel_data->mAddControlTexts(btns, mReverseText, 1);
+         }
+      }
+
+      if ( mRotateBtn.isConfigured() )
+      {         
+         std::vector<int> btns(transformButtonVec(mRotateBtn.getButtons()));
+         bool has = false;
+         status_panel_data->mHasControlTexts(btns, mRotateText, has);
+         if ( ! has )
+         {
+            status_panel_data->mAddControlTexts(btns, mRotateText, 1);
+         }
+      }
+
+      if ( mModeBtn.isConfigured() )
+      {         
+         std::vector<int> btns(transformButtonVec(mModeBtn.getButtons()));
+         bool has = false;
+         status_panel_data->mHasControlTexts(btns, mModeText, has);
+         if ( ! has )
+         {
+            status_panel_data->mAddControlTexts(btns, mModeText, 1);
+         }
+      }
+
+      if ( mResetBtn.isConfigured() )
       {
-         inf::StatusPanel& panel =
-            status_panel_data->mStatusPanelPlugin->getPanel();
-
-         if ( mForwardBtn.isConfigured() )
+         std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
+         bool has = false;
+         status_panel_data->mHasControlTexts(btns, mResetText, has);
+         if ( ! has )
          {
-            std::vector<int> btns(transformButtonVec(mForwardBtn.getButtons()));
-            if ( ! panel.hasControlText(btns, mForwardText) )
-            {
-               panel.addControlText(btns, mForwardText);
-            }
-         }
-
-         if ( mReverseBtn.isConfigured() )
-         {
-            std::vector<int> btns(transformButtonVec(mReverseBtn.getButtons()));
-            if ( ! panel.hasControlText(btns, mReverseText) )
-            {
-               panel.addControlText(btns, mReverseText);
-            }
-         }
-
-         if ( mRotateBtn.isConfigured() )
-         {
-            std::vector<int> btns(transformButtonVec(mRotateBtn.getButtons()));
-            if ( ! panel.hasControlText(btns, mRotateText) )
-            {
-               panel.addControlText(btns, mRotateText);
-            }
-         }
-
-         if ( mModeBtn.isConfigured() )
-         {
-            std::vector<int> btns(transformButtonVec(mModeBtn.getButtons()));
-            if ( ! panel.hasControlText(btns, mModeText) )
-            {
-               panel.addControlText(btns, mModeText);
-            }
-         }
-
-         if ( mResetBtn.isConfigured() )
-         {
-            std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
-            if ( ! panel.hasControlText(btns, mResetText) )
-            {
-               panel.addControlText(btns, mResetText);
-            }
+            status_panel_data->mAddControlTexts(btns, mResetText, 1);
          }
       }
    }

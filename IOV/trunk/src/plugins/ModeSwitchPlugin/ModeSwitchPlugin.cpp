@@ -321,27 +321,24 @@ void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
 
    StatusPanelDataPtr status_panel_data =
       viewer->getSceneObj()->getSceneData<StatusPanelData>();
-   if(status_panel_data->mStatusPanelPlugin)
-   {
-      inf::StatusPanel& panel = status_panel_data->mStatusPanelPlugin->getPanel();
-      panel.setHeaderTitle("Mode");
-      panel.setCenterTitle("Controls");
-      std::ostringstream stream;
-      stream << mModeNames[modeNum];
-      panel.setHeaderText(stream.str());
+   
+   status_panel_data->mSetHeaderTitle("Mode");
+   status_panel_data->mSetCenterTitle("Controls");
+   std::ostringstream stream;
+   stream << mModeNames[modeNum];
+   status_panel_data->mSetHeaderText(stream.str());
+   
+   // The button numbers in mSwitchButton are zero-based, but we would like
+   // them to be one-based in the status panel display.
+   std::vector<int> btns(mSwitchButton.getButtons().size());
+   std::transform(mSwitchButton.getButtons().begin(),
+                  mSwitchButton.getButtons().end(), btns.begin(),
+                  IncValue());
 
-      // The button numbers in mSwitchButton are zero-based, but we would like
-      // them to be one-based in the status panel display.
-      std::vector<int> btns(mSwitchButton.getButtons().size());
-      std::transform(mSwitchButton.getButtons().begin(),
-                     mSwitchButton.getButtons().end(), btns.begin(),
-                     IncValue());
-
-      panel.setControlText(btns, "Switch Mode");
-   }
-
+   status_panel_data->mSetControlTexts(btns, "Switch Mode");
+   
    for ( unsigned int i = 0; i < mPlugins.size(); ++i )
-   {
+   {      
       PluginData plugin = mPlugins[i];
 
       // If found mode in active modes

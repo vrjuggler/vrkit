@@ -239,102 +239,97 @@ void GridPlugin::focusChanged(inf::ViewerPtr viewer)
          mGrids[mSelectedGridIndex]->setSelected(false);
          mSelectedGridIndex = -1;
       }
-
-      if ( status_panel_data->mStatusPanelPlugin )
+      
+      if ( mActivateBtn.isConfigured() )
       {
-         inf::StatusPanel& panel =
-            status_panel_data->mStatusPanelPlugin->getPanel();
+         // The button numbers in mActivateBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(
+            transformButtonVec(mActivateBtn.getButtons())
+         );
+         status_panel_data->mRemoveControlTexts(btns, mActivateText);
+      }
 
-         if ( mActivateBtn.isConfigured() )
-         {
-            // The button numbers in mActivateBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(
-               transformButtonVec(mActivateBtn.getButtons())
-            );
-            panel.removeControlText(btns, mActivateText);
-         }
+      if ( mCycleBtn.isConfigured() )
+      {
+         // The button numbers in mCycleBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(transformButtonVec(mCycleBtn.getButtons()));
+         status_panel_data->mRemoveControlTexts(btns, mCycleText);
+      }
 
-         if ( mCycleBtn.isConfigured() )
-         {
-            // The button numbers in mCycleBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(transformButtonVec(mCycleBtn.getButtons()));
-            panel.removeControlText(btns, mCycleText);
-         }
+      if ( mHideBtn.isConfigured() )
+      {
+         // The button numbers in mHideBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(transformButtonVec(mHideBtn.getButtons()));
+         status_panel_data->mRemoveControlTexts(btns, mHideText);
+      }
 
-         if ( mHideBtn.isConfigured() )
-         {
-            // The button numbers in mHideBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(transformButtonVec(mHideBtn.getButtons()));
-            panel.removeControlText(btns, mHideText);
-         }
-
-         if ( mResetBtn.isConfigured() )
-         {
-            // The button numbers in mResetBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
-            panel.removeControlText(btns, mResetText);
-         }
+      if ( mResetBtn.isConfigured() )
+      {
+         // The button numbers in mResetBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
+         status_panel_data->mRemoveControlTexts(btns, mResetText);
       }
    }
    else
    {
-      if ( status_panel_data->mStatusPanelPlugin )
+      if ( mActivateBtn.isConfigured() )
       {
-         inf::StatusPanel& panel =
-            status_panel_data->mStatusPanelPlugin->getPanel();
-
-         if ( mActivateBtn.isConfigured() )
+         // The button numbers in mActivateBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(
+            transformButtonVec(mActivateBtn.getButtons())
+         );
+         bool has = false;
+         status_panel_data->mHasControlTexts(btns, mActivateText, has);
+         if ( ! has )
          {
-            // The button numbers in mActivateBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(
-               transformButtonVec(mActivateBtn.getButtons())
-            );
-
-            if ( ! panel.hasControlText(btns, mActivateText) )
-            {
-               panel.addControlText(btns, mActivateText);
-            }
+            status_panel_data->mAddControlTexts(btns, mActivateText, 1);
          }
+      }
 
-         if ( mCycleBtn.isConfigured() )
+      if ( mCycleBtn.isConfigured() )
+      {
+         // The button numbers in mCycleBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(transformButtonVec(mCycleBtn.getButtons()));
+
+         bool has = false;
+         status_panel_data->mHasControlTexts(btns, mCycleText, has);
+         if ( ! has )
          {
-            // The button numbers in mCycleBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(transformButtonVec(mCycleBtn.getButtons()));
-
-            if ( ! panel.hasControlText(btns, mCycleText) )
-            {
-               panel.addControlText(btns, mCycleText);
-            }
+            status_panel_data->mAddControlTexts(btns, mCycleText, 1);
          }
+      }
 
-         if ( mHideBtn.isConfigured() )
+      if ( mHideBtn.isConfigured() )
+      {
+         // The button numbers in mHideBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(transformButtonVec(mHideBtn.getButtons()));
+
+         bool has = false;
+         status_panel_data->mHasControlTexts(btns, mHideText, has);
+         if ( ! has )
          {
-            // The button numbers in mHideBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(transformButtonVec(mHideBtn.getButtons()));
-
-            if ( ! panel.hasControlText(btns, mHideText) )
-            {
-               panel.addControlText(btns, mHideText);
-            }
+            status_panel_data->mAddControlTexts(btns, mHideText, 1);
          }
+      }
 
-         if ( mResetBtn.isConfigured() )
+      if ( mResetBtn.isConfigured() )
+      {
+         // The button numbers in mResetBtn are zero-based, but we would
+         // like them to be one-based in the status panel display.
+         std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
+
+         bool has = false;
+         status_panel_data->mHasControlTexts(btns, mResetText, has);
+         if ( ! has )
          {
-            // The button numbers in mResetBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
-
-            if ( ! panel.hasControlText(btns, mResetText) )
-            {
-               panel.addControlText(btns, mResetText);
-            }
+            status_panel_data->mAddControlTexts(btns, mResetText, 1);
          }
       }
    }

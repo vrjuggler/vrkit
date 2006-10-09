@@ -24,10 +24,10 @@ namespace inf
 class IOV_CLASS_API StatusPanel
 {
 public:
-   StatusPanel(const float metersToAppUnits);
+   StatusPanel();
 
    /** Initialize scene graph, fonts and everything else that is used. */
-   void initialize();
+   void initialize(const float metersToAppUnits);
 
    OSG::NodeRefPtr getPanelRoot()
    { return mRootPanelNode; }
@@ -49,7 +49,7 @@ public:
    void setControlText(const int cmd, const std::string& desc)
    {
       std::vector<int> cmds(1, cmd);
-      setControlText(cmds, desc);
+      setControlTexts(cmds, desc);
    }
 
    /**
@@ -59,7 +59,7 @@ public:
     *
     * @since 0.10.0
     */
-   void setControlText(const std::vector<int>& cmds, const std::string& desc);
+   void setControlTexts(const std::vector<int>& cmds, const std::string& desc);
 
    /**
     * Adds the given text description ifor the command identified by \p cmd
@@ -71,7 +71,7 @@ public:
                        const unsigned int priority = 1)
    {
       std::vector<int> cmds(1, cmd);
-      addControlText(cmds, desc, priority);
+      addControlTexts(cmds, desc, priority);
    }
 
    /**
@@ -80,7 +80,7 @@ public:
     *
     * @since 0.10.0
     */
-   void addControlText(const std::vector<int>& cmds, const std::string& desc,
+   void addControlTexts(const std::vector<int>& cmds, const std::string& desc,
                        const unsigned int priority = 1);
 
    /**
@@ -93,7 +93,7 @@ public:
    void removeControlText(const int cmd, const std::string& desc)
    {
       std::vector<int> cmds(1, cmd);
-      removeControlText(cmds, desc);
+      removeControlTexts(cmds, desc);
    }
 
    /**
@@ -103,7 +103,7 @@ public:
     *
     * @since 0.10.0
     */
-   void removeControlText(const std::vector<int>& cmds,
+   void removeControlTexts(const std::vector<int>& cmds,
                           const std::string& desc);
 
    /**
@@ -111,10 +111,10 @@ public:
     *
     * @since 0.10.0
     */
-   bool hasControlText(const int cmd, const std::string& desc)
+   void hasControlText(const int cmd, const std::string& desc, bool& flag)
    {
       std::vector<int> cmds(1, cmd);
-      return hasControlText(cmds, desc);
+      hasControlTexts(cmds, desc, flag);
    }
 
    /**
@@ -122,17 +122,15 @@ public:
     *
     * @since 0.10.0
     */
-   bool hasControlText(const std::vector<int>& cmds, const std::string& desc)
+   void hasControlTexts(const std::vector<int>& cmds, const std::string& desc, bool& flag)
    {
-      bool result(false);
+      flag = false;
 
       if ( mCenterText.count(cmds) != 0 )
       {
          std::vector<std::string>& vec = mCenterText[cmds];
-         result = std::find(vec.begin(), vec.end(), desc) != vec.end();
+         flag = std::find(vec.begin(), vec.end(), desc) != vec.end();
       }
-
-      return result;
    }
 
    /** Add another message to the status panel. */

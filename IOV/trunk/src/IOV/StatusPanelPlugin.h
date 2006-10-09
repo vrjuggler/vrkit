@@ -13,11 +13,11 @@
 #include <vpr/vpr.h>
 #include <vpr/Util/GUID.h>
 
+#include <IOV/StatusPanel.h>
+
 
 namespace inf
 {
-
-class StatusPanel;
 
 class StatusPanelPlugin;
 typedef boost::shared_ptr<StatusPanelPlugin> StatusPanelPluginPtr;
@@ -58,7 +58,7 @@ public:
    }
 
 protected:
-   StatusPanel*            mStatusPanel;     /**< The status panel we are using. */
+   StatusPanel            mStatusPanel;     /**< The status panel we are using. */
    OSG::TransformNodePtr   mPanelXformNode;  /**< Root node of panel. */
 
    virtual void destroy();

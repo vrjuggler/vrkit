@@ -1,6 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
 #include <boost/weak_ptr.hpp>
+#include <boost/bind.hpp>
 
 #include <gmtl/gmtl.h>
 #include <gmtl/External/OpenSGConvert.h>
@@ -8,7 +9,6 @@
 #include <IOV/Status.h>
 #include <IOV/Scene.h>
 #include <IOV/Viewer.h>
-#include <IOV/StatusPanel.h>
 #include <IOV/StatusPanelPlugin.h>
 #include <IOV/StatusPanelData.h>
 
@@ -44,17 +44,13 @@ namespace inf
 {
 
 StatusPanelPlugin::StatusPanelPlugin()
-   : mStatusPanel(NULL)
 {
+   /* Do nothing. */;
 }
 
 StatusPanelPlugin::~StatusPanelPlugin()
 {
-   if ( NULL != mStatusPanel )
-   {
-      delete mStatusPanel;
-      mStatusPanel = NULL;
-   }
+   /* Do nothing. */;
 }
 
 inf::PluginPtr StatusPanelPlugin::create()
@@ -69,17 +65,15 @@ std::string StatusPanelPlugin::getDescription()
 
 StatusPanel& StatusPanelPlugin::getPanel()
 {
-   return *mStatusPanel;
+   return mStatusPanel;
 }
 
 inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
 {
    IOV_STATUS << "StatusPanelPlugin::init: Initializing plugin." << std::endl;
 
-   mStatusPanel = new StatusPanel(viewer->getDrawScaleFactor());
-
    // Initialize panel
-   mStatusPanel->initialize();
+   mStatusPanel.initialize(viewer->getDrawScaleFactor());
 
    mPanelXformNode = OSG::TransformNodePtr::create();
 
@@ -95,7 +89,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
       float w,h;
       w = elt->getProperty<float>(initial_size_prop,0);
       h = elt->getProperty<float>(initial_size_prop,1);
-      mStatusPanel->setWidthHeight(w * feet_to_app_units,
+      mStatusPanel.setWidthHeight(w * feet_to_app_units,
                                    h * feet_to_app_units);
 
       float xt = elt->getProperty<float>(initial_pos_prop, 0);
@@ -127,7 +121,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    OSG::GroupNodePtr dec_root = scene_obj->getDecoratorRoot();
 
    OSG::beginEditCP(mPanelXformNode);
-      mPanelXformNode.node()->addChild(mStatusPanel->getPanelRoot());
+      mPanelXformNode.node()->addChild(mStatusPanel.getPanelRoot());
    OSG::endEditCP(mPanelXformNode);
 
    OSG::beginEditCP(dec_root);
@@ -138,17 +132,78 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    StatusOutputter status_outputter(shared_from_this());
    inf::Status::instance()->addOutputter(status_outputter);
 
-   // Register with scene data
+   // Connect StatusPanel methods to StatusPanelData signals
    StatusPanelDataPtr status_panel_data =
       scene_obj->getSceneData<StatusPanelData>();
-   status_panel_data->mStatusPanelPlugin = shared_from_this();
+   
+   status_panel_data->mSetHeaderTitle.connect(
+      boost::bind(&StatusPanel::setHeaderTitle, &mStatusPanel, _1));
+   
+   status_panel_data->mSetCenterTitle.connect(
+      boost::bind(&StatusPanel::setCenterTitle, &mStatusPanel, _1));
+   
+   status_panel_data->mSetBottomTitle.connect(
+      boost::bind(&StatusPanel::setBottomTitle, &mStatusPanel, _1));
+
+   status_panel_data->mSetHeaderText.connect(
+      boost::bind(&StatusPanel::setHeaderText, &mStatusPanel, _1));
+
+   status_panel_data->mSetControlText.connect(
+      boost::bind(
+         &StatusPanel::setControlText, &mStatusPanel, _1, _2)
+      );
+   
+   status_panel_data->mSetControlTexts.connect(
+      boost::bind(
+         &StatusPanel::setControlTexts, &mStatusPanel, _1, _2)
+      );
+
+   status_panel_data->mAddControlText.connect(
+      boost::bind(
+      &StatusPanel::addControlText, &mStatusPanel, _1, _2, _3)
+      );
+   
+   status_panel_data->mAddControlTexts.connect(
+      boost::bind(
+         &StatusPanel::addControlTexts, &mStatusPanel, _1, _2, _3)
+      );
+      
+   status_panel_data->mRemoveControlText.connect(
+      boost::bind(
+         &StatusPanel::removeControlText, &mStatusPanel, _1, _2)
+      );
+   
+   status_panel_data->mRemoveControlTexts.connect(
+      boost::bind(
+         &StatusPanel::removeControlTexts, &mStatusPanel, _1, _2)
+      );
+
+   status_panel_data->mHasControlText.connect(
+      boost::bind(
+         &StatusPanel::hasControlText, &mStatusPanel, _1, _2, _3)
+      );
+   
+   status_panel_data->mHasControlTexts.connect(
+      boost::bind(
+         &StatusPanel::hasControlTexts, &mStatusPanel, _1, _2, _3)
+      );
+
+   status_panel_data->mAddStatusMessage.connect(
+      boost::bind(&StatusPanel::addStatusMessage, &mStatusPanel, _1));
+      
+   status_panel_data->mSetWidthHeight.connect(
+      boost::bind(&StatusPanel::setWidthHeight, &mStatusPanel, _1, _2, _3));
+
+   status_panel_data->mSetStatusHistorySize.connect(
+      boost::bind(&StatusPanel::setStatusHistorySize, &mStatusPanel, _1));
+   
 
    return shared_from_this();
 }
 
 void StatusPanelPlugin::update(inf::ViewerPtr)
 {
-   mStatusPanel->update();        // Do any updates that we need from this frame
+   mStatusPanel.update();        // Do any updates that we need from this frame
 }
 
 void StatusPanelPlugin::destroy()

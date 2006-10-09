@@ -18,18 +18,10 @@
 namespace inf
 {
 
-StatusPanel::StatusPanel(const float metersToAppUnits)
-   : mMetersToAppUnits(metersToAppUnits)
+StatusPanel::StatusPanel()
 {
    mIsDirty = true;
    mFont = NULL;
-
-   const float feet_to_app_units(0.3048f * mMetersToAppUnits);
-
-   mPanWidth = 10.0f * feet_to_app_units;
-   mPanHeight = 15.0f * feet_to_app_units;
-   mBorderWidth = 0.4f * feet_to_app_units;
-   mBorderDepth = 0.2f * feet_to_app_units;
 
    mTitleHeight = 0.08f;
    mStatusHeight = 0.375f;
@@ -52,9 +44,17 @@ StatusPanel::StatusPanel(const float metersToAppUnits)
    mDrawDebug = false;
 }
 
-void StatusPanel::initialize()
+void StatusPanel::initialize(const float metersToAppUnits)
 {
+   mMetersToAppUnits = metersToAppUnits;
+   
+   const float feet_to_app_units(0.3048f * mMetersToAppUnits);
 
+   mPanWidth = 10.0f * feet_to_app_units;
+   mPanHeight = 15.0f * feet_to_app_units;
+   mBorderWidth = 0.4f * feet_to_app_units;
+   mBorderDepth = 0.2f * feet_to_app_units;
+   
    mRootPanelNode = OSG::Node::create();
    mPanelGeomNode = OSG::Node::create();
    mPanelGeomCore = mBuilder.createGeomGeo();
@@ -133,7 +133,7 @@ void StatusPanel::setHeaderText(const std::string& header)
    setDirty();
 }
 
-void StatusPanel::setControlText(const std::vector<int>& cmds,
+void StatusPanel::setControlTexts(const std::vector<int>& cmds,
                                  const std::string& desc)
 {
    mCenterText[cmds].clear();
@@ -141,7 +141,7 @@ void StatusPanel::setControlText(const std::vector<int>& cmds,
    setDirty();
 }
 
-void StatusPanel::addControlText(const std::vector<int>& cmds,
+void StatusPanel::addControlTexts(const std::vector<int>& cmds,
                                  const std::string& desc,
                                  const unsigned int priority)
 {
@@ -152,7 +152,7 @@ void StatusPanel::addControlText(const std::vector<int>& cmds,
    setDirty();
 }
 
-void StatusPanel::removeControlText(const std::vector<int>& cmds,
+void StatusPanel::removeControlTexts(const std::vector<int>& cmds,
                                     const std::string& desc)
 {
    std::vector<std::string>::iterator i;

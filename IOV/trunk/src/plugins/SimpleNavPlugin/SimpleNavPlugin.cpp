@@ -128,70 +128,66 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
    if ( ! mCanNavigate )
    {
       mVelocity = 0.0f;
-
-      if ( status_panel_data->mStatusPanelPlugin )
+      
+      if ( mForBtn != -1 )
       {
-         inf::StatusPanel& panel =
-            status_panel_data->mStatusPanelPlugin->getPanel();
+         status_panel_data->mRemoveControlText(mForBtn + 1, mForwardText);
+      }
 
-         if ( mForBtn != -1 )
-         {
-            panel.removeControlText(mForBtn + 1, mForwardText);
-         }
+      if ( mRevBtn != -1 )
+      {
+         status_panel_data->mRemoveControlText(mRevBtn + 1, mReverseText);
+      }
 
-         if ( mRevBtn != -1 )
-         {
-            panel.removeControlText(mRevBtn + 1, mReverseText);
-         }
+      if ( mRotateBtn != -1 )
+      {
+         status_panel_data->mRemoveControlText(mRotateBtn + 1, mRotateText);
+      }
 
-         if ( mRotateBtn != -1 )
-         {
-            panel.removeControlText(mRotateBtn + 1, mRotateText);
-         }
-
-         if ( mModeBtn != -1 )
-         {
-            panel.removeControlText(mModeBtn + 1, mModeText);
-         }
+      if ( mModeBtn != -1 )
+      {
+         status_panel_data->mRemoveControlText(mModeBtn + 1, mModeText);
       }
    }
    else
    {
-      if ( status_panel_data->mStatusPanelPlugin )
+      if ( mForBtn != -1 )
       {
-         inf::StatusPanel& panel =
-            status_panel_data->mStatusPanelPlugin->getPanel();
-
-         if ( mForBtn != -1 )
+         bool has = false;
+         status_panel_data->mHasControlText(mForBtn + 1, mForwardText, has);
+         if ( ! has )
          {
-            if ( ! panel.hasControlText(mForBtn + 1, mForwardText) )
-            {
-               panel.addControlText(mForBtn + 1, mForwardText);
-            }
+            status_panel_data->mAddControlText(mForBtn + 1, mForwardText, 1);
          }
+      }
 
-         if ( mRevBtn != -1 )
+      if ( mRevBtn != -1 )
+      {
+         bool has = false;
+         status_panel_data->mHasControlText(mRevBtn + 1, mReverseText, has);
+         if ( ! has )
          {
-            if ( ! panel.hasControlText(mRevBtn + 1, mReverseText) )
-            {
-               panel.addControlText(mRevBtn + 1, mReverseText);
-            }
+            status_panel_data->mAddControlText(mRevBtn + 1, mReverseText, 1);
          }
+      }
 
-         if ( mRotateBtn != -1 )
+      if ( mRotateBtn != -1 )
+      {
+         bool has = false;
+         status_panel_data->mHasControlText(mRotateBtn + 1, mRotateText, has);
+         if ( ! has )
          {
-            if ( ! panel.hasControlText(mRotateBtn + 1, mRotateText) )
-            {
-               panel.addControlText(mRotateBtn + 1, mRotateText);
-            }
+            status_panel_data->mAddControlText(mRotateBtn + 1, mRotateText, 1);
          }
+      }
 
-         if ( mModeBtn != -1 )
+      if ( mModeBtn != -1 )
+      {
+         bool has = false;
+         status_panel_data->mHasControlText(mModeBtn + 1, mModeText, has);
+         if ( ! has )
          {
-            if ( ! panel.hasControlText(mModeBtn + 1, mModeText) )
-            {
-               panel.addControlText(mModeBtn + 1, mModeText);
-            }
+            status_panel_data->mAddControlText(mModeBtn + 1, mModeText, 1);
          }
       }
    }
