@@ -29,8 +29,6 @@
 #include <IOV/Util/OpenSGHelpers.h>
 #include <IOV/Util/Debug.h>
 
-// Embedded plugins
-#include <IOV/StatusPanelPlugin.h>
 
 namespace fs = boost::filesystem;
 
@@ -76,12 +74,6 @@ void Viewer::init()
 
    mEventData = mScene->getSceneData<EventData>();
 
-   // Load plugins embedded in library
-   getPluginFactory()->registerCreator(
-      new inf::PluginCreator<inf::Plugin>(&inf::StatusPanelPlugin::create,
-                                          "StatusPanelPlugin"),
-      "StatusPanelPlugin"
-   );
 
    // Load the app configuration and then...
    // - Setup scene root for networking
