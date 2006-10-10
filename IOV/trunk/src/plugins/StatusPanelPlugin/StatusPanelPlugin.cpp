@@ -96,7 +96,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    IOV_STATUS << "StatusPanelPlugin::init: Initializing plugin." << std::endl;
 
    // Initialize panel
-   mStatusPanel.initialize(viewer->getDrawScaleFactor());
+   mStatusPanelView.initialize(viewer->getDrawScaleFactor(), &mStatusPanel);
 
    mPanelXformNode = OSG::TransformNodePtr::create();
 
@@ -112,7 +112,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
       float w,h;
       w = elt->getProperty<float>(initial_size_prop,0);
       h = elt->getProperty<float>(initial_size_prop,1);
-      mStatusPanel.setWidthHeight(w * feet_to_app_units,
+      mStatusPanelView.setWidthHeight(w * feet_to_app_units,
                                    h * feet_to_app_units);
 
       float xt = elt->getProperty<float>(initial_pos_prop, 0);
@@ -144,7 +144,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    OSG::GroupNodePtr dec_root = scene_obj->getDecoratorRoot();
 
    OSG::beginEditCP(mPanelXformNode);
-      mPanelXformNode.node()->addChild(mStatusPanel.getPanelRoot());
+      mPanelXformNode.node()->addChild(mStatusPanelView.getPanelRoot());
    OSG::endEditCP(mPanelXformNode);
 
    OSG::beginEditCP(dec_root);
@@ -215,7 +215,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
       boost::bind(&StatusPanel::addStatusMessage, &mStatusPanel, _1));
       
    status_panel_data->mSetWidthHeight.connect(
-      boost::bind(&StatusPanel::setWidthHeight, &mStatusPanel, _1, _2, _3));
+      boost::bind(&StatusPanelView::setWidthHeight, &mStatusPanelView, _1, _2, _3));
 
    status_panel_data->mSetStatusHistorySize.connect(
       boost::bind(&StatusPanel::setStatusHistorySize, &mStatusPanel, _1));
@@ -226,7 +226,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
 
 void StatusPanelPlugin::update(inf::ViewerPtr)
 {
-   mStatusPanel.update();        // Do any updates that we need from this frame
+   mStatusPanelView.update();        // Do any updates that we need from this frame
 }
 
 void StatusPanelPlugin::destroy()
