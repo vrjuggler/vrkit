@@ -1,4 +1,4 @@
-#include <IOV/StatusPanelView.h>
+#include <IOV/StatusPanelViewOriginal.h>
 
 #include <OpenSG/OSGGroup.h>
 #include <OpenSG/OSGChunkMaterial.h>
@@ -14,7 +14,7 @@
 namespace inf
 {
 
-StatusPanelView::StatusPanelView()
+StatusPanelViewOriginal::StatusPanelViewOriginal()
 {
    mIsDirty = true;
    mFont = NULL;
@@ -33,12 +33,12 @@ StatusPanelView::StatusPanelView()
    mDrawDebug = false;
 }
 
-void StatusPanelView::initialize(const float metersToAppUnits, StatusPanel* const panel)
+void StatusPanelViewOriginal::initialize(const float metersToAppUnits, StatusPanel* const panel)
 {
    mStatusPanel = panel;
    
    mStatusPanel->statusPanelChanged().connect(
-         boost::bind(&StatusPanelView::setDirty, this));
+         boost::bind(&StatusPanelViewOriginal::setDirty, this));
    
    mMetersToAppUnits = metersToAppUnits;
    
@@ -102,13 +102,13 @@ void StatusPanelView::initialize(const float metersToAppUnits, StatusPanel* cons
    setDirty();
 }
 
-void StatusPanelView::setDirty()
+void StatusPanelViewOriginal::setDirty()
 {
    mIsDirty = true;
 }
 
 
-void StatusPanelView::update()
+void StatusPanelViewOriginal::update()
 {
    if(mIsDirty)
    {
@@ -117,7 +117,7 @@ void StatusPanelView::update()
    }
 }
 
-void StatusPanelView::setWidthHeight(const float w, const float h, const float borderWidth)
+void StatusPanelViewOriginal::setWidthHeight(const float w, const float h, const float borderWidth)
 {
    mPanWidth = w;
    mPanHeight = h;
@@ -132,7 +132,7 @@ void StatusPanelView::setWidthHeight(const float w, const float h, const float b
    setDirty();
 }
 
-void StatusPanelView::updatePanelScene()
+void StatusPanelViewOriginal::updatePanelScene()
 {
    mBuilder.resetGeomGeo(mPanelGeomCore);
 

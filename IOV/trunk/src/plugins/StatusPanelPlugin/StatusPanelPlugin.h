@@ -15,7 +15,7 @@
 #include <vpr/Util/GUID.h>
 
 #include <IOV/StatusPanel.h>
-#include <IOV/StatusPanelView.h>
+#include <IOV/StatusPanelViewOriginal.h>
 
 
 namespace inf
@@ -61,7 +61,7 @@ public:
 
 protected:
    StatusPanel             mStatusPanel;     /**< The status panel we are using. */
-   StatusPanelView         mStatusPanelView;
+   StatusPanelViewOriginal         mStatusPanelView;
    OSG::TransformNodePtr   mPanelXformNode;  /**< Root node of panel. */
 
    virtual void destroy();

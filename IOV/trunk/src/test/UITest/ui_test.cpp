@@ -33,6 +33,7 @@
 
 #include <IOV/UiBuilder.h>
 #include <IOV/StatusPanel.h>
+#include <IOV/StatusPanelViewOriginal.h>
 
 #include <vpr/vprConfig.h>
 #include <vpr/Util/Assert.h>
@@ -538,8 +539,9 @@ int main(int argc, char* argv[])
     // Status panel
    ///*
     // Use feet as the unit.
-    inf::StatusPanel status_panel(3.28f);
-    status_panel.initialize();
+    inf::StatusPanel status_panel;
+    inf::StatusPanelViewOriginal status_panel_view;
+    status_panel_view.initialize(3.28f, &status_panel);
 
 
     std::stringstream status_stream;
@@ -567,9 +569,9 @@ int main(int argc, char* argv[])
     status_panel.addStatusMessage(status_stream.str());
     status_stream.str("");
 
-    status_panel.update();
+    status_panel_view.update();
 
-    scene->addChild(status_panel.getPanelRoot());
+    scene->addChild(status_panel_view.getPanelRoot());
     //*/
 
 

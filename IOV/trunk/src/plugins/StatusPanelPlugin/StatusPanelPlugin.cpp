@@ -215,7 +215,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
       boost::bind(&StatusPanel::addStatusMessage, &mStatusPanel, _1));
       
    status_panel_data->mSetWidthHeight.connect(
-      boost::bind(&StatusPanelView::setWidthHeight, &mStatusPanelView, _1, _2, _3));
+      boost::bind(&StatusPanelViewOriginal::setWidthHeight, &mStatusPanelView, _1, _2, _3));
 
    status_panel_data->mSetStatusHistorySize.connect(
       boost::bind(&StatusPanel::setStatusHistorySize, &mStatusPanel, _1));

@@ -19,11 +19,11 @@
 namespace inf
 {
    
-class IOV_CLASS_API StatusPanelView
+class IOV_CLASS_API StatusPanelViewOriginal
 {   
 public:
    
-   StatusPanelView();
+   StatusPanelViewOriginal();
    
    typedef std::map<std::vector<int>, std::vector<std::string> > center_text_t;
    
