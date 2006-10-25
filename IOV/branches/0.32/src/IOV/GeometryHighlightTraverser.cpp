@@ -212,6 +212,36 @@ void removeHighlight(CorePtr core, OSG::MaterialRefPtr oldMaterial)
 namespace inf
 {
 
+void HighlightCoreFinder::traverse(OSG::NodePtr node, callback_t callback)
+{
+   reset();
+   mCallback = callback;
+   OSG::traverse(node,
+                 OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
+                    OSG::Action::ResultE, HighlightCoreFinder, OSG::NodePtr
+                 >(this, &HighlightCoreFinder::enter));
+}
+
+void HighlightCoreFinder::reset()
+{
+   mCores.clear();
+}
+
+OSG::Action::ResultE HighlightCoreFinder::enter(OSG::NodePtr& node)
+{
+   OSG::NodeCorePtr core = node->getCore();
+   OSG::FieldContainerType& core_fct = core->getType();
+
+   if ( core_fct.isDerivedFrom(OSG::Geometry::getClassType()) ||
+        core_fct.isDerivedFrom(OSG::MaterialGroup::getClassType()) )
+   {
+      mCores.push_back(OSG::NodeCoreRefPtr(core));
+      mCallback(OSG::NodeRefPtr(node));
+   }
+
+   return OSG::Action::Continue;
+}
+
 GeometryHighlightTraverser::GeometryHighlightTraverser()
 {
    createDefaultMaterials();
@@ -219,7 +249,7 @@ GeometryHighlightTraverser::GeometryHighlightTraverser()
 
 GeometryHighlightTraverser::~GeometryHighlightTraverser()
 {
-   reset();
+   /* Do nothing. */ ;
 }
 
 void GeometryHighlightTraverser::
@@ -384,28 +414,47 @@ bool GeometryHighlightTraverser::hasHighlight(OSG::MaterialRefPtr mat) const
 void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
                                                       const unsigned int id)
 {
-   validateMaterialID(id);
+   HighlightCoreFinder finder;
+   finder.traverse(node);
+   addHighlightMaterial(finder.getCores(), id);
+}
 
-   traverse(node);
+void GeometryHighlightTraverser::
+addHighlightMaterial(const std::vector<OSG::NodeCoreRefPtr>& cores,
+                     const unsigned int id)
+{
+   validateMaterialID(id);
 
    OSG::MaterialRefPtr material(mMaterials[id]);
 
-   std::vector<OSG::GeometryRefPtr>::iterator gc;
-   for ( gc = mGeomCores.begin(); gc != mGeomCores.end(); ++gc )
+   typedef std::vector<OSG::NodeCoreRefPtr>::const_iterator iter_type;
+   for ( iter_type c = cores.begin(); c != cores.end(); ++c )
    {
-      addHighlight((*gc).get(), material);
-   }
+      OSG::FieldContainerType& core_fct = (*c)->getType();
 
-   std::vector<OSG::MaterialGroupRefPtr>::iterator mgc;
-   for ( mgc = mMatGroupCores.begin(); mgc != mMatGroupCores.end(); ++mgc )
-   {
-      addHighlight((*mgc).get(), material);
+      if ( core_fct.isDerivedFrom(OSG::Geometry::getClassType()) )
+      {
+         addHighlight(OSG::GeometryPtr::dcast((*c).get()), material);
+      }
+      else if ( core_fct.isDerivedFrom(OSG::MaterialGroup::getClassType()) )
+      {
+         addHighlight(OSG::MaterialGroupPtr::dcast((*c).get()), material);
+      }
    }
 }
 
 void GeometryHighlightTraverser::swapHighlightMaterial(OSG::NodePtr node,
                                                        const unsigned int oldID,
                                                        const unsigned int newID)
+{
+   HighlightCoreFinder finder;
+   finder.traverse(node);
+   swapHighlightMaterial(finder.getCores(), oldID, newID);
+}
+
+void GeometryHighlightTraverser::
+swapHighlightMaterial(const std::vector<OSG::NodeCoreRefPtr>& cores,
+                      const unsigned int oldID, const unsigned int newID)
 {
    validateMaterialID(oldID);
    validateMaterialID(newID);
@@ -420,30 +469,23 @@ void GeometryHighlightTraverser::swapHighlightMaterial(OSG::NodePtr node,
       return;
    }
 
-   // Traverse node to populate mGeomCores and mMatGroupCores.
-   traverse(node);
-
-   std::vector<OSG::GeometryRefPtr>::iterator gc;
-   for ( gc = mGeomCores.begin(); gc != mGeomCores.end(); ++gc )
+   typedef std::vector<OSG::NodeCoreRefPtr>::const_iterator iter_type;
+   for ( iter_type c = cores.begin(); c != cores.end(); ++c )
    {
+      OSG::FieldContainerType& core_fct = (*c)->getType();
+
       try
       {
-         swapHighlight(*gc, old_mat, new_mat);
-      }
-      catch (inf::Exception& ex)
-      {
-         IOV_STATUS
-            << "[inf::GeometryHighlightTraverser::swapHighlightMaterial()] "
-            << "WARNING:\n" << ex.what() << std::endl;
-      }
-   }
-
-   std::vector<OSG::MaterialGroupRefPtr>::iterator mgc;
-   for ( mgc = mMatGroupCores.begin(); mgc != mMatGroupCores.end(); ++mgc )
-   {
-      try
-      {
-         swapHighlight(*mgc, old_mat, new_mat);
+         if ( core_fct.isDerivedFrom(OSG::Geometry::getClassType()) )
+         {
+            swapHighlight(OSG::GeometryPtr::dcast((*c).get()), old_mat,
+                          new_mat);
+         }
+         else if ( core_fct.isDerivedFrom(OSG::MaterialGroup::getClassType()) )
+         {
+            swapHighlight(OSG::MaterialGroupPtr::dcast((*c).get()), old_mat,
+                          new_mat);
+         }
       }
       catch (inf::Exception& ex)
       {
@@ -457,22 +499,32 @@ void GeometryHighlightTraverser::swapHighlightMaterial(OSG::NodePtr node,
 void GeometryHighlightTraverser::removeHighlightMaterial(OSG::NodePtr node,
                                                          const unsigned int id)
 {
-   validateMaterialID(id);
+   HighlightCoreFinder finder;
+   finder.traverse(node);
+   removeHighlightMaterial(finder.getCores(), id);
+}
 
-   traverse(node);
+void GeometryHighlightTraverser::
+removeHighlightMaterial(const std::vector<OSG::NodeCoreRefPtr>& cores,
+                        const unsigned int id)
+{
+   validateMaterialID(id);
 
    OSG::MaterialRefPtr old_mat(mMaterials[id]);
 
-   std::vector<OSG::GeometryRefPtr>::iterator gc;
-   for ( gc = mGeomCores.begin(); gc != mGeomCores.end(); ++gc )
+   typedef std::vector<OSG::NodeCoreRefPtr>::const_iterator iter_type;
+   for ( iter_type c = cores.begin(); c != cores.end(); ++c )
    {
-      removeHighlight(*gc, old_mat);
-   }
+      OSG::FieldContainerType& core_fct = (*c)->getType();
 
-   std::vector<OSG::MaterialGroupRefPtr>::iterator mgc;
-   for ( mgc = mMatGroupCores.begin(); mgc != mMatGroupCores.end(); ++mgc )
-   {
-      removeHighlight(*mgc, old_mat);
+      if ( core_fct.isDerivedFrom(OSG::Geometry::getClassType()) )
+      {
+         removeHighlight(OSG::GeometryPtr::dcast((*c).get()), old_mat);
+      }
+      else if ( core_fct.isDerivedFrom(OSG::MaterialGroup::getClassType()) )
+      {
+         removeHighlight(OSG::MaterialGroupPtr::dcast((*c).get()), old_mat);
+      }
    }
 }
 
@@ -517,41 +569,6 @@ void GeometryHighlightTraverser::createDefaultMaterials()
 
    mMaterials[HIGHLIGHT0] = highlight0_mat;
    mMaterials[HIGHLIGHT1] = highlight1_mat;
-}
-
-void GeometryHighlightTraverser::reset()
-{
-   mGeomCores.clear();
-   mMatGroupCores.clear();
-}
-
-void GeometryHighlightTraverser::traverse(OSG::NodePtr node)
-{
-   reset();
-   OSG::traverse(node,
-                 OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
-                    OSG::Action::ResultE, GeometryHighlightTraverser,
-                    OSG::NodePtr
-                 >(this, &GeometryHighlightTraverser::enter));
-}
-
-OSG::Action::ResultE GeometryHighlightTraverser::enter(OSG::NodePtr& node)
-{
-   OSG::NodeCorePtr core = node->getCore();
-   OSG::FieldContainerType& core_fct = core->getType();
-
-   if ( core_fct.isDerivedFrom(OSG::Geometry::getClassType()) )
-   {
-      OSG::GeometryPtr geom = OSG::GeometryPtr::dcast(core);
-      mGeomCores.push_back(OSG::GeometryRefPtr(geom));
-   }
-   else if ( core_fct.isDerivedFrom(OSG::MaterialGroup::getClassType()) )
-   {
-      OSG::MaterialGroupPtr mat_grp = OSG::MaterialGroupPtr::dcast(core);
-      mMatGroupCores.push_back(OSG::MaterialGroupRefPtr(mat_grp));
-   }
-
-   return OSG::Action::Continue;
 }
 
 fs::path GeometryHighlightTraverser::

@@ -8,6 +8,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/function.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/variant.hpp>
 
@@ -24,6 +25,98 @@
 
 namespace inf
 {
+
+/**
+ * Helper class used by inf::GeometryHighlightTraverser to find node cores
+ * that support the use of materials. Instances of this class can be used by
+ * external code to pre-traverse a sub-tree of the scene graph in order to
+ * find such node cores so that inf::GeometryHighlightTraverser does not have
+ * to do so itself. For scene graph nodes with a static structure, this can
+ * avoid making repeated (unnecessary) traversals.
+ *
+ * The current set node core types that are found by this traverser is as
+ * follows:
+ *    - OSG::Geometry
+ *    - OSG::MaterialGroup
+ *
+ * @note Instances of this class retain a list of node core pointers after
+ *       traversal. Care must be taken to ensure that traversal state is
+ *       managed correctly if instances of this class are retained.
+ *
+ * @see inf::GeometryHighlightTraverser
+ *
+ * @since 0.32.5
+ */
+class IOV_CLASS_API HighlightCoreFinder
+{
+public:
+   typedef boost::function<void (OSG::NodeRefPtr)> callback_t;
+
+   /**
+    * Performs a new traversal rooted at the given node and stores the
+    * necessary information for later use with material applications. Prior
+    * to performing the traversalof \p node, the current state of this object
+    * is reset so that previous traversals do not interfere with the new run.
+    *
+    * @post \c mCores contains pointers to those node cores discovered for
+    *       nodes under and including \p node that can handle materials.
+    *
+    * @param node     The root of the scene graph sub-tree to be traversed.
+    * @param callback A callback invoked after a node supporting materials is
+    *                 discovered. This is invoked after the node's core is
+    *                 added to \c mCores. This parameter is optional and
+    *                 defaults to a dummy function that does nothing if not
+    *                 specified.
+    *
+    * @see GeometryHighlightTraverser::addHighlightMaterial()
+    * @see GeometryHighlightTraverser::changeHighlightMaterial()
+    * @see GeometryHighlightTraverser::removeHighlightMaterial()
+    */
+   void traverse(OSG::NodePtr node, callback_t callback = defaultCallback);
+
+   /**
+    * Clears the internal list of node cores.
+    *
+    * @post \c mCores is empty.
+    */
+   void reset();
+
+   /**
+    * Returns the vector of node cores found during traversal that support
+    * highlighting. If traverse() has not yet been called, then this method
+    * returns an empty vector.
+    */
+   const std::vector<OSG::NodeCoreRefPtr>& getCores() const
+   {
+      return mCores;
+   }
+
+private:
+   /**
+    * Dummy callback used when traverse() is invoked without a user-supplied
+    * callback.
+    *
+    * @see traverse()
+    * @see enter()
+    */
+   static void defaultCallback(OSG::NodeRefPtr)
+   {
+      /* Do nothing. */ ;
+   }
+
+   /**
+    * Traversal enter method. This is invoked from the OpenSG traverser to
+    * build a list of all OSG::MaterialGroup and OSG::Geometry cores.
+    *
+    * @param node The current node being visited by the traverser.
+    */
+   OSG::Action::ResultE enter(OSG::NodePtr& node);
+
+   callback_t mCallback;        /**< The callback invoked by enter() */
+
+   /** Cores that support highlighting. */
+   std::vector<OSG::NodeCoreRefPtr> mCores;
+};
 
 /**
  * Allows sub-trees to have highlight materials applied to them.
@@ -220,7 +313,7 @@ public:
    /**
     * Adds the specified highlight material to the sub-tree rooted at the
     * given node.
-    * 
+    *
     * @param node The root of the sub-tree to which the identified material
     *             will be added.
     * @param id   The ID of the highlight material to be added to the
@@ -231,9 +324,26 @@ public:
    void addHighlightMaterial(OSG::NodePtr node, const unsigned int id);
 
    /**
+    * Adds the specified highlight material to node cores in the given
+    * collection that support materials.
+    *
+    * @param cores The collection of node cores to be modified.
+    * @param id    The ID of the highlight material to be added to the given
+    *              node cores.
+    *
+    * @throw inf::Exception is thrown if \p id is not a valid material ID.
+    *
+    * @see inf::HighlightCoreFinder
+    *
+    * @since 0.32.5
+    */
+   void addHighlightMaterial(const std::vector<OSG::NodeCoreRefPtr>& cores,
+                             const unsigned int id);
+
+   /**
     * Swaps one highlight material (the "old" highlight) for another (the
     * "new" highlight) for the sub-tree rooted at \p node.
-    * 
+    *
     * @param node  The root of the sub-tree whose highlight material will be
     *              replaced.
     * @param oldId The identifier for the highlight material to be removed.
@@ -244,6 +354,25 @@ public:
     *        material ID.
     */
    void swapHighlightMaterial(OSG::NodePtr node, const unsigned int oldId,
+                              const unsigned int newId);
+
+   /**
+    * Swaps one highlight material (the "old" highlight) for another (the
+    * "new" highlight) for node cores that support materials in the given
+    * collection.
+    *
+    * @param cores The collection of node cores to be modified.
+    * @param oldId The identifier for the highlight material to be removed.
+    * @param newId The identifier for the highlight material that will replace
+    *              the highlight identified by \p oldId.
+    *
+    * @throw inf::Exception is thrown if \p oldId or \p newId is not a valid
+    *        material ID.
+    *
+    * @since 0.32.5
+    */
+   void swapHighlightMaterial(const std::vector<OSG::NodeCoreRefPtr>& cores,
+                              const unsigned int oldId,
                               const unsigned int newId);
 
    /**
@@ -259,34 +388,28 @@ public:
     */
    void removeHighlightMaterial(OSG::NodePtr node, const unsigned int id);
 
+   /**
+    * Removes the specified highlight material from the node cores in the
+    * given collection that support materials.
+    *
+    * @param cores The collection of node cores to be modified.
+    * @param id    The ID of the highlight material to be removed from the
+    *              given node cores.
+    *
+    * @throw inf::Exception is thrown if \p id is not a valid material ID.
+    *
+    * @see inf::HighlightCoreFinder
+    *
+    * @since 0.32.5
+    */
+   void removeHighlightMaterial(const std::vector<OSG::NodeCoreRefPtr>& cores,
+                                const unsigned int id);
+
 private:
    /**
     * Creates default scribing materials with different diffuse colors.
     */
    void createDefaultMaterials();
-
-   /**
-    * Clears the internal list of OSG::MaterialGroup and OSG::Geometry cores.
-    */
-   void reset();
-
-   /**
-    * Performs a new traversal rooted at the given node and stores the
-    * necessary information for later use with material applications.
-    *
-    * @see addHighlightMaterial()
-    * @see changeHighlightMaterial()
-    * @see removeHighlightMaterial()
-    */
-   void traverse(OSG::NodePtr node);
-
-   /**
-    * Traversal enter method. This is invoked from the OpenSG traverser to
-    * build a list of all OSG::MaterialGroup and OSG::Geometry cores.
-    *
-    * @param node The current node being visited by the traverser.
-    */
-   OSG::Action::ResultE enter(OSG::NodePtr& node);
 
    /**
     * Returns the absolute path to the specified shader file.
@@ -305,9 +428,6 @@ private:
     * @throw inf::Exception is thrown if \p id is an invalid material ID.
     */
    void validateMaterialID(const unsigned int id);
-
-   std::vector<OSG::MaterialGroupRefPtr> mMatGroupCores;   /**< MaterialGroups to change. */
-   std::vector<OSG::GeometryRefPtr> mGeomCores;            /**< Geometry cores to change. */
 
    std::vector<boost::filesystem::path> mShaderSearchPath; /**< Path used to find named shader. */
    std::vector<OSG::MaterialRefPtr> mMaterials;            /**< Highlight materials that can be assigned. */
