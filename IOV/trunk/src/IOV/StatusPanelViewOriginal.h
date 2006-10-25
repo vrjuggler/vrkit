@@ -77,17 +77,17 @@ protected:
    float    mHeaderHeight;          /**< Size of the header section (percentage). */
    float    mStatusHeight;          /**< Size of the status section (percentage). */
 
-   float    mStatusTextHeight;     /**< Fixed height (in OpenSG coords) of status text. */
+   float    mStatusTextHeight;      /**< Fixed height (in OpenSG coords) of status text. */
 
 
    // Colors/theming
-   OSG::Color3f   mBgColor;      /**< Color of the background. */
-   float          mBgAlpha;
-   OSG::Color3f   mBorderColor;
-   OSG::Color3f   mTitleColor;
-   OSG::Color3f   mTextColor;
+   OSG::Color3f   mBgColor;         /**< Color of the background. */
+   float          mBgAlpha;         /**< Alpha of the background */
+   OSG::Color3f   mBorderColor;     /**< Color of the border */
+   OSG::Color3f   mTitleColor;      /**< Color of the title */
+   OSG::Color3f   mTextColor;       /**< Color of the text */
 
-   bool           mDrawDebug;    /**< If true, draw debug geometry. */
+   bool           mDrawDebug;       /**< If true, draw debug geometry. */
 
    OSG::ClipPlaneChunkPtr mClipRight;
    OSG::ClipPlaneChunkPtr mClipBottom;

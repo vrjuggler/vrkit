@@ -60,9 +60,9 @@ public:
    }
 
 protected:
-   StatusPanel             mStatusPanel;     /**< The status panel we are using. */
-   StatusPanelViewOriginal         mStatusPanelView;
-   OSG::TransformNodePtr   mPanelXformNode;  /**< Root node of panel. */
+   StatusPanel                mStatusPanel;        /**< The status panel we are using. */
+   StatusPanelViewOriginal    mStatusPanelView;    /**< The status panel view that we are using. */
+   OSG::TransformNodePtr      mPanelXformNode;     /**< Root node of panel. */
 
    virtual void destroy();
 };
