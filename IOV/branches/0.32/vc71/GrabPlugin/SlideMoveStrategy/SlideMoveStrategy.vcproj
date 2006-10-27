@@ -36,13 +36,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iov_d.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBaseD.lib OSGSystemD.lib opengl32.lib glu32.lib $(NOINHERIT)"
-				OutputFile="$(OutDir)/BasicMove_d.dll"
+				OutputFile="$(OutDir)/SlideMove_d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;..\..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;;&quot;$(BOOST_ROOT)\lib&quot;"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/BasicMove_d.pdb"
+				ProgramDatabaseFile="$(OutDir)/SlideMove_d.pdb"
 				SubSystem="1"
-				ImportLibrary="$(OutDir)/BasicMove_d.lib"
+				ImportLibrary="$(OutDir)/SlideMove_d.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -93,14 +93,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="iov.lib libnspr4.lib libplc4.lib comctl32.lib ws2_32.lib OSGBase.lib OSGSystem.lib opengl32.lib glu32.lib $(NOINHERIT)"
-				OutputFile="$(OutDir)/BasicMove.dll"
+				OutputFile="$(OutDir)/SlideMove.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;..\..\IOV\$(IntDir)&quot;;&quot;$(OSGROOT)\lib&quot;;&quot;$(VJ_DEPS_DIR)\lib&quot;;&quot;$(VJ_BASE_DIR)\lib&quot;;&quot;$(BOOST_ROOT)\lib&quot;"
 				GenerateDebugInformation="FALSE"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/BasicMove.lib"
+				ImportLibrary="$(OutDir)/SlideMove.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -131,14 +131,14 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
-				RelativePath="..\..\..\src\plugins\GrabPlugin\grab\BasicMove\BasicMoveStrategy.cpp">
+				RelativePath="..\..\..\src\plugins\GrabPlugin\grab\SlideMove\SlideMoveStrategy.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
 			<File
-				RelativePath="..\..\..\src\plugins\GrabPlugin\grab\BasicMove\BasicMoveStrategy.h">
+				RelativePath="..\..\..\src\plugins\GrabPlugin\grab\SlideMove\SlideMoveStrategy.h">
 			</File>
 		</Filter>
 		<Filter
