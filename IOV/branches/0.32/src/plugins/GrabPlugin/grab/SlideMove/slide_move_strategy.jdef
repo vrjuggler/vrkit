@@ -52,7 +52,7 @@
          </enumeration>
       </property>
       <property valuetype="float" variable="false" name="slide_epsilon">
-         <help>The threshold for determining when object sliding should occur. This is measured in feet, meaning that the object must be able to slide at least this many feet for sliding to occur at all.</help>
+         <help>The threshold for determining when object sliding should occur. The meaning of this setting depends on the analog input device being used. The value returned by that device must be greater than the threshold set in this property in order for sliding to happen. The value set must be greater than 0 and less than 1.</help>
          <value label="Slide Epsilon" defaultvalue="0.1"/>
       </property>
       <upgrade_transform>

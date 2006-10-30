@@ -103,16 +103,13 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
 
    if ( ! analog_dev->isStupefied() )
    {
-      const float to_meters(viewer->getDrawScaleFactor());
       const float analog_value(analog_dev->getData());
       //std::cout << "Analog Value: " << analog_value << std::endl;
 
       // Rescale [0,1] to [-1,1]
       float in_out_val = analog_value * 2.0 - 1.0f;
 
-      const float eps_limit(mSlideEpsilon * to_meters);
-
-      if ( gmtl::Math::abs(in_out_val) < eps_limit )
+      if ( gmtl::Math::abs(in_out_val) < mSlideEpsilon )
       {
          in_out_val = 0.0f;
       }
@@ -178,11 +175,12 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
       //gmtl::normalize(obj_dir);
 
       // Accumulate translation matrix.
-      gmtl::Matrix44f delta_trans_mat =
-         gmtl::makeTrans<gmtl::Matrix44f>(obj_dir*-mTransValue);
+      const gmtl::Matrix44f delta_trans_mat =
+         gmtl::makeTrans<gmtl::Matrix44f>(obj_dir * -mTransValue);
 
       return pobj_M_wand * delta_trans_mat * wand_M_pobj * curObjPos;
    }
+
    return curObjPos;
 }
 
