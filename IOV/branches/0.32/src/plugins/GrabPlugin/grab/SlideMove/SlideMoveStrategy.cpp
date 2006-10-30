@@ -13,6 +13,7 @@
 #include <IOV/User.h>
 #include <IOV/Viewer.h>
 #include <IOV/WandInterface.h>
+#include <IOV/Util/Exceptions.h>
 
 #include "SlideMoveStrategy.h"
 
