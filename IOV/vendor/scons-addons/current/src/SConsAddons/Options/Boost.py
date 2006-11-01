@@ -11,7 +11,7 @@ __revision__ = "__FILE__ __REVISION__ __DATE__ __DEVELOPER__"
 import SCons.Environment
 import SCons
 import SConsAddons.Options
-import SConsAddons.Util
+import SConsAddons.Util as sca_util
 import SCons.Util
 import distutils.sysconfig
 
@@ -30,7 +30,11 @@ Configure = SCons.SConf.SConf
 # Options
 # ##############################################
 class Boost(SConsAddons.Options.PackageOption):
-   def __init__(self, name, requiredVersion, useDebug=False, useMt=True, libs=[], required=True, useCppPath=False, toolset="gcc", useVersion=False):
+   def __init__(self, name, requiredVersion, 
+                useDebug=False, useMt=True, libs=[], 
+                required=True, useCppPath=False, 
+                toolset="auto", useVersion=False,
+                preferDynamic=True, autoLink = False):
       """
          name - The name to use for this option
          requiredVersion - The version of Boost required (ex: "1.30.0")
@@ -39,23 +43,33 @@ class Boost(SConsAddons.Options.PackageOption):
          libs - Boost libraries needed that are actually compiled (base library names. ex: python)
          required - Is the dependency required?  (if so we exit on errors)
          useCppPath - If true, then include path is added to CPPPATH if not, then added to CPPFLAGS directly
-	 toolset - The toolset name to use (ex: "gcc", "il")
+	 toolset - The toolset name to use (ex: "auto","gcc", "il")
+         preferDynamic - If true, prefer linking against a dynamic library.
+         autoLink - If true and using msvc, then attempt to use boost's autolinking capabilies.
       """
       help_text = ["Base directory for Boost. include, and lib should be under this directory.",
                    "Include directory for boost (if not under base)."]
       self.baseDirKey = "BoostBaseDir"
       self.incDirKey = "BoostIncludeDir"
       self.requiredVersion = requiredVersion
+      self.libVersionStr = None
       self.lib_names = libs
       self.required = required
       self.useCppPath = useCppPath
       self.toolset = toolset
-      SConsAddons.Options.PackageOption.__init__(self, name, [self.baseDirKey, self.incDirKey], help_text)
+      self.preferDynamic = preferDynamic
+      self.autoLink = autoLink
+      if sca_util.GetPlatform() != "win32":
+         self.autoLink = False
+      SConsAddons.Options.PackageOption.__init__(self, name, 
+                                                 [self.baseDirKey, self.incDirKey], 
+                                                 help_text)
       self.available = False            # Track availability
       
       self.found_incs = []
       self.found_incs_as_flags = ""     # The includes as flags to add on command line
       self.found_lib_paths = []
+      self.found_defines = []
 
       # configurable options
       self.baseDir = None
@@ -66,7 +80,7 @@ class Boost(SConsAddons.Options.PackageOption):
       self.use_mt = useMt
       self.use_debug = useDebug 
       self.use_ver = useVersion
-      print "Use debug set to:", self.use_debug
+      #print "Use debug set to:", self.use_debug
 
    def setToolset(self, toolset):
       self.toolset = toolset
@@ -78,12 +92,14 @@ class Boost(SConsAddons.Options.PackageOption):
       self.use_debug = bval
 
    def setUseVersion(self, useVersion = True):
-      self.use_ver = useVersion
+      self.use_ver = useVersion   
 
    def setupLibrarySettings(self):
+      " Setup some default settings and data that will be used on this platform. "
       # Map from library name to header to check for       
       self.headerMap = { 'program_options':'boost/program_options.hpp',
-                         'python':'boost/python.hpp',
+                         #'python':'boost/python.hpp',
+                         'python':'boost/python/enum.hpp',
                          'signals':'boost/signal.hpp',
                          'thread':'boost/thread.hpp',
                          'filesystem':'boost/filesystem/path.hpp' }
@@ -93,42 +109,67 @@ class Boost(SConsAddons.Options.PackageOption):
 
       # --- Build up settings using distutils.sysconfig to get Python build options --- #
       # distutils.sysconfig.get_config_vars()
-      #self.python_version = distutils.sysconfig.get_python_version()    # ex: '2.3'
-      self.python_version = distutils.sysconfig.get_config_var("VERSION")    # ex: '2.3'
+      try:
+         self.python_version = distutils.sysconfig.get_python_version()    # ex: '2.3'
+      except:
+         self.python_version = distutils.sysconfig.get_config_var("VERSION")    # ex: '2.3'
       self.python_inc_dir = distutils.sysconfig.get_python_inc()
-      #python_link_share_flags = distutils.sysconfig.get_config_var('LINKFORSHARED')
-      self.python_link_share_flags = "-Wl,-export-dynamic"
-      self.python_lib_path = distutils.sysconfig.get_python_lib(standard_lib=True) + "/config"
-      self.python_extra_libs = ["python"+self.python_version, "util", "pthread", "dl"]  # See SHLIBS
+      if sca_util.GetPlatform() == "win32":
+         self.python_embedded_link_flags = []
+         self.python_lib_path = [pj(sys.prefix,'libs'),]
+         self.python_static_lib_path = [""]                   # There is no static lib on win32
+         lib_python_fname = 'python' + self.python_version.replace('.','')
+         self.python_extra_libs = [lib_python_fname,]
+         #self.python_link_flags = ["/NODEFAULTLIB:"+lib_python_fname+"_d",]
+         self.python_link_flags = []
+         self.thread_extra_libs = []
+      else:
+         # Link flags that may be needed on unix for the embedded case
+         #self.python_embedded_link_flags = [distutils.sysconfig.get_config_var('LINKFORSHARED'),]
+         self.python_embedded_link_flags = ["-Wl,-export-dynamic"]
+         self.python_lib_path = [pj(sys.prefix,'lib'),]
+         self.python_static_lib_path = distutils.sysconfig.get_python_lib(standard_lib=True) + "/config"         
+         lib_python_fname = 'python' + self.python_version
+         self.python_extra_libs = [lib_python_fname, "util", "pthread", "dl"]  # See SHLIBS
+         self.python_link_flags = []
+         self.thread_extra_libs = ["pthread","dl"]
       
-      
-   def buildFullLibName(self, libname):
-      """ Returns the full name of the boost library"""
+   def buildFullLibName(self, libname, env, useDebug=None):
+      """ Returns the full name of the boost library.
+          TODO: Do a better job of finding the libraries naming convention
+          in the validate method above.
+      """
       fullname = "boost_" + libname
-      if SConsAddons.Util.GetPlatform() != 'mac':
+      debug_ext = "-d"
+      if sca_util.GetPlatform() == "win32":
+         debug_ext = "-gd"     # Hack for now assuming debug code and runtime
+      if sca_util.GetPlatform() != 'darwin':
          fullname = fullname + "-" + self.toolset
          if self.use_mt:
             fullname += "-mt"
-         if self.use_debug:
-            fullname += "-d"
+
+         if useDebug is None:
+            if self.use_debug:
+               fullname += debug_ext
+            elif env and env.has_key("variant") and env["variant"].has_key("type"):
+               var_type = env["variant"]["type"]
+               if "debug" == var_type:
+                  fullname += debug_ext
+         elif useDebug is True:
+            fullname += debug_ext
+
 
       if self.use_ver and self.libVersionStr is not None:
          fullname += "-" + self.libVersionStr
 
       return fullname
-      
-   def checkRequired(self, msg):
-      """ Called when there is config problem.  If required, then exit with error message """
-      print msg
-      if self.required:
-         sys.exit(0)
-
-   def isAvailable(self):
-      " If true, then validation passed and we should be able to use boost. "
-      return self.available
-
+         
+   def startProcess(self):
+      """ Called at beginning of processing.  Perform any intialization or notification here. """
+      print "Updating ", self.name
+       
    def setInitial(self, optDict):
-      " Set initial values from given dict "
+      " Set initial values from given options dictionary. "
       print "Loading initial settings for boost"
       if optDict.has_key(self.baseDirKey):
          self.baseDir = optDict[self.baseDirKey]
@@ -138,6 +179,9 @@ class Boost(SConsAddons.Options.PackageOption):
          print "   %s specified or cached. [%s]."% (self.incDirKey, self.incDir)
 
    def find(self, env):
+      """ If base dir was not specified, attempt to find boost
+          using some very basic searches.
+      """
       # Quick exit if nothing to find
       if self.baseDir != None:
          return
@@ -169,16 +213,8 @@ class Boost(SConsAddons.Options.PackageOption):
          else:
             print "   found at: ", self.baseDir
 
-   def convert(self):
-      pass
-
-   def set(self, env):
-      if self.baseDir:
-         env[self.baseDirKey] = self.baseDir
-      if self.incDir:
-         env[self.incDirKey] = self.incDir
-
    def validate(self, env):
+      " Check to make sure that the current settings work and are valid. """
       # Check that path exist
       # Check that an include file: boost/version.hpp  exists
       passed = True
@@ -191,24 +227,57 @@ class Boost(SConsAddons.Options.PackageOption):
       if not os.path.isdir(self.baseDir):    # If we don't have a directory
          self.checkRequired("Boost base dir is not a directory: %s" % self.baseDir)
          return
+      
+      # --- Determine toolset --- #
+      if self.toolset == "auto":
+         print "   Boost, autofinding toolset... ",
+         
+         if env["CC"] == "gcc":
+            if sca_util.GetPlatform() == 'darwin':
+               self.toolset = "darwin"
+            else:
+               self.toolset = "gcc"
+         elif env["CC"] == "cl" and env.has_key("MSVS"):
+            ver = env["MSVS"]["VERSION"]
+            if "7.1" == ver:
+               self.toolset = "vc71"
+            elif "7.0" == ver:
+               self.toolset = "vc7"
+         elif sca_util.GetPlatform() == 'darwin' and env['CC'] == 'cc':
+            self.toolset = "darwin"
+         else:
+            self.checkRequired("Could not auto determine boost toolset.")
+            return
+         
+         print " toolset: [%s]"%self.toolset
 
       # --- Find include path --- #
-      # If inc dir not set, try to find it
-      # - Try just include, if not, then try subdirs in reverse sorted order
+      # If inc dir not set, try to find it      
+      # - Try just include, try local, then try subdirs in reverse sorted order (to get most recent)
       if not self.incDir:
-         self.incDir = pj(self.baseDir, 'include')
-         if not os.path.isfile(pj(self.incDir, 'boost', 'version.hpp')):
-            print "Searching for correct boost include dir...",
-            potential_dirs = os.listdir(self.incDir)
-            potential_dirs = [d for d in potential_dirs if os.path.isfile(pj(self.incDir, d, 'boost', 'version.hpp'))]
-            potential_dirs.sort()
-            if 0 == len(potential_dirs):
-               print "none found."
-            else:
-               self.incDir = pj(self.incDir, potential_dirs[-1])
-               print "found: ", self.incDir
+         print "   Searching for correct boost include dir...",
+         base_include_dir = pj(self.baseDir, 'include')
+         potential_dirs = [base_include_dir, self.baseDir]
+         if os.path.isdir(base_include_dir):
+            inc_dirs = [pj(base_include_dir,d) for d in os.listdir(base_include_dir)]
+            inc_dirs.sort()
+            inc_dirs.reverse()
+            potential_dirs.extend(inc_dirs)
          
-      if self.incDir and (not os.path.isdir(pj(self.incDir,'boost'))):
+         for d in potential_dirs:
+            if os.path.isfile(pj(d,'boost','version.hpp')):
+               self.incDir = d
+               break
+         
+         if self.incDir:
+            print "  found: ", self.incDir
+         else:
+            print "  not found."
+            self.checkRequired("Can not find boost include directory.")
+            return
+
+      # user specified, verify it is a directory
+      elif not os.path.isdir(pj(self.incDir,'boost')):
          self.checkRequired("Boost inc dir is not a valid directory: %s" % pj(self.incDir,'boost'))
          return
       
@@ -233,8 +302,7 @@ class Boost(SConsAddons.Options.PackageOption):
                                 ver_file_contents)
       if lib_ver_match:
          self.libVersionStr = lib_ver_match.group(1)
-      else:
-         print "WARNING: Could not determine library version string"
+      else:         
          print "WARNING: Could not determine library version string"
          self.libVersionStr = None
 
@@ -251,6 +319,13 @@ class Boost(SConsAddons.Options.PackageOption):
       self.found_incs = [self.incDir]
       self.found_incs_as_flags = [env["INCPREFIX"] + p for p in self.found_incs];
       self.found_lib_paths = [pj(self.baseDir, 'lib')]
+      self.found_defines = []
+      # Note: This doesn't work because the configure context uses the static
+      #       run-time and this makes boost error out.
+      #if self.preferDynamic:
+      #   self.found_defines.append("BOOST_ALL_DYN_LINK")      
+      #if not self.autoLink:
+      #   self.found_defines.append("BOOST_ALL_NO_LIB")
 
       ######## BUILD CHECKS ###########  
       # --- Check building against libraries --- #   
@@ -258,7 +333,7 @@ class Boost(SConsAddons.Options.PackageOption):
       # For each library, find cononical lib name and associated header to check
       # default to checking lib with config.hpp
       for libname in self.lib_names:
-         full_libname = self.buildFullLibName(libname)
+         full_libname = self.buildFullLibName(libname,env)
          header_to_check = 'boost/config.hpp'
          if self.headerMap.has_key(libname):
             header_to_check = self.headerMap[libname]
@@ -266,21 +341,22 @@ class Boost(SConsAddons.Options.PackageOption):
          # Create config environment
          # - Need to extend the environment
          conf_env = env.Copy()
-         conf_env.Append(CXXFLAGS= self.found_incs_as_flags, LIBPATH = self.found_lib_paths)
+         conf_env.Append(CPPPATH= self.found_incs, 
+                         LIBPATH = self.found_lib_paths,
+                         CPPDEFINES = self.found_defines)
          if "python" == libname:
             conf_env.Append(CPPPATH = self.python_inc_dir,
                             LIBPATH = self.python_lib_path,
-                            LIBS = [full_libname,] + self.python_extra_libs + ["dl",])
+                            #LIBS = [full_libname,] + self.python_extra_libs
+                            LIBS = self.python_extra_libs
+                         )
          
-         # Thread library has different method of checking
+         # Thread library needs some additional libraries on Linux... (yuck)
          if "thread" == libname:
-            conf_env.Append(LIBS = [full_libname,] + ["pthread",] + ["dl",])
-            conf_ctxt = Configure(conf_env)
-#            result = conf_ctxt.CheckLib(full_libname, "join", header_to_check, "c++")
-            result = True
-         else:
-            conf_ctxt =Configure(conf_env)
-            result = conf_ctxt.CheckLibWithHeader(full_libname, header_to_check, "c++")
+            conf_env.Append(LIBS = [full_libname,] + self.thread_extra_libs)
+         
+         conf_ctxt = Configure(conf_env)
+         result = conf_ctxt.CheckLibWithHeader(full_libname, header_to_check, "c++")
            
          if not result:
             passed = False
@@ -298,64 +374,90 @@ class Boost(SConsAddons.Options.PackageOption):
             if edict.has_key(k):
                del edict[k]
          self.found_incs = None
-         self.found_lib_paths = None
+         self.found_lib_paths = []
+         self.found_defines = []
       else:
          self.available = True
 
-         
-   def updateEnv(self, env, libs=None, useCppPath=False):
-      """ Add environment options for building against Boost libraries """
+
+   def apply(self, env, libs=None, useCppPath=False, useDebug=None):
+      """ Add environment options for building against Boost libraries.
+          Apply the options and take into account any variant information
+          in the environment.
+      """
       if self.found_incs:
          if self.useCppPath or useCppPath:
-            env.Append(CPPPATH = self.found_incs)
+            env.AppendUnique(CPPPATH = self.found_incs)
          else:
-            env.Append(CXXFLAGS = self.found_incs_as_flags)
-      if self.found_lib_paths:
-         env.Append(LIBPATH = self.found_lib_paths)
-      for l in self.lib_names:
-         if 'python' != l:               # Don't add python by default
-            env.Append(LIBS = [self.buildFullLibName(l)])
+            env.AppendUnique(CXXFLAGS = self.found_incs_as_flags)
+      env.AppendUnique(CPPDEFINES = self.found_defines,
+                       LIBPATH = self.found_lib_paths)
+      if not self.autoLink:
+         full_libs = [self.buildFullLibName(l,env, useDebug) for l in self.lib_names if 'python' != l]         
+         env.AppendUnique(LIBS = full_libs)      
+
 
    def updatePythonEmbeddedEnv(self,env):
-      """ Update the environment for building python embedded """
-      self.updateEnv(env)
-      #print "Full python lib name:", self.buildFullLibName('python')
-      env.Append(LIBS = [self.buildFullLibName('python')])
-      env.Append(CPPPATH = [self.python_inc_dir,],
-                 LINKFLAGS = self.python_link_share_flags,
-                 LIBPATH = self.python_lib_path,
-                 LIBS = self.python_extra_libs)
+      self.applyPythonEmbeddedEnv(env)
 
-                  
-   def updatePythonModEnv(self, env):
+   def applyPythonEmbeddedEnv(self,env, useDebug=None):
+      """ Update the environment for building python embedded. 
+          XXX: may need python_static_lib_path.
+      """
+      self.apply(env)
+      #print "Full python lib name:", self.buildFullLibName('python')
+      env.AppendUnique(LIBS = [self.buildFullLibName('python',env, useDebug)])
+      env.AppendUnique(CPPPATH = [self.python_inc_dir,],
+                       LINKFLAGS = self.python_embedded_link_flags + self.python_link_flags,
+                       LIBPATH = self.python_lib_path,
+                       LIBS = self.python_extra_libs)
+
+   
+   def updatePythonModEnv(self, env, useDebug=None):
+      self.applyPythonModEnv(env, useDebug)
+   
+   def applyPythonModEnv(self, env, useDebug=None):
       """ Update the environment for building python modules """
       if not "python" in self.lib_names:
          print "Tried to updatePythonModEnv with boost option object not configured with python library.\n"
          sys.exit(0)
          
-      self.updateEnv(env)
-      env.Append(LIBS = self.buildFullLibName("python") )    # Add on the boost python library
-      env.Append(CPPPATH = [self.python_inc_dir,],
-                 LIBPATH = self.python_lib_path,
-                 LIBS = self.python_extra_libs)
+      self.apply(env)
+      env.AppendUnique(LIBS = [self.buildFullLibName("python",env, useDebug),] )    # Add on the boost python library
+      env.AppendUnique(CPPPATH = [self.python_inc_dir,],
+                       LINKFLAGS = self.python_link_flags,
+                       LIBPATH = self.python_lib_path,
+                       LIBS = self.python_extra_libs)
 
             
       env["SHLIBPREFIX"] = ""                    # Clear the library prefix settings
-      if(SConsAddons.Util.GetPlatform() == "linux"):
+      if sca_util.GetPlatform() == "win32":
+         env["SHLIBSUFFIX"] = ".pyd"
+         
+      if(sca_util.GetPlatform() == "linux"):
          env['CXXCOM'] += " ; objcopy --set-section-flags .debug_str=contents,debug $TARGET"
          env['SHCXXCOM'] += " ; objcopy -v --set-section-flags .debug_str=contents,debug $TARGET $TARGET"
+      
+      # Add visibility flags for gcc 4.0 and greater
+      if "g++" in env["CXX"]:
+         gcc_version = env["CXXVERSION"].split(".")
+         if int(gcc_version[0]) >= 4:         
+            env.AppendUnique(CXXFLAGS = ['-fvisibility=hidden', '-fvisibility-inlines-hidden'])
 
-
-   def dumpSettings(self):
+   def getSettings(self):
+      return [(self.baseDirKey, self.baseDir), (self.incDirKey, self.incDir)]
+   
+   def dumpSettings(self,env=None):
       "Write out the settings"
       print "BoostBaseDir:", self.baseDir
       print "BoostIncludeDir:", self.incDir
       print "CPPPATH (as flags):", self.found_incs_as_flags
+      print "CPPDEFINES:", self.found_defines
       print "LIBS:", self.lib_names
-      print "LIBS: (full):", [self.buildFullLibName(l) for l in self.lib_names]
-      print "LIBPATH:", self.found_lib_paths
+      print "LIBS: (full):", [self.buildFullLibName(l,env) for l in self.lib_names]
+      print "LIBPATH:", self.found_lib_paths      
       print "Python settings"
-      print "   inc:", self.python_inc_dir
-      print "   link:", self.python_link_share_flags
-      print "   lib:", self.python_extra_libs
-      print "   lib path:", self.python_lib_path
+      print "               inc:", self.python_inc_dir
+      print "     embedded link:", self.python_embedded_link_flags
+      print "               lib:", self.python_extra_libs
+      print "   static lib path:", self.python_static_lib_path

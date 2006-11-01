@@ -49,7 +49,7 @@ class PyJuggler(SConsAddons.Options.PackageOption):
       sys.stdout.write("checking for PyJuggler...")
       if optDict.has_key(self.baseDirKey):
          self.baseDir = optDict[self.baseDirKey]
-         sys.stdout.write("specified or cached. [%s].\n"% self.baseDir)
+         #sys.stdout.write("specified or cached. [%s].\n"% self.baseDir)
 
    def find(self, env):
       # quick exit if nothing to find
@@ -64,14 +64,7 @@ class PyJuggler(SConsAddons.Options.PackageOption):
       #else:
       #   print "   found at: ", self.baseDir
       
-
-   def convert(self):
-      pass
-
-   def set(self, env):
-      if self.baseDir:
-         env[self.baseDirKey] = self.baseDir
-
+   
    def validate(self, env):
       # check path existance
       # check include/pyjutil/InterpreterGuard.h existance
@@ -101,19 +94,23 @@ class PyJuggler(SConsAddons.Options.PackageOption):
          self.found_lib_paths = None
       else:
          self.available = True
+         print "[OK]"
 
-   def updateEnv(self, env):
-      """ Add environment options for building against plexus"""
+   def apply(self, env):
+      """ Add environment options for building against pyjuggler"""
       if self.found_incs:
          env.Append(CPPPATH = self.found_incs)
       if self.found_libs:
          env.Append(LIBS = self.found_libs)
       if self.found_lib_paths:
          env.Append(LIBPATH = self.found_lib_paths)
-         
+
+   def getSettings(self):
+      return [(self.baseDirKey, self.baseDir),]
+
    def dumpSettings(self):
       "Write out the settings"
-      print "GMTLBaseDir:", self.baseDir
+      print "PyJugglerBaseDir:", self.baseDir
       print "CPPPATH:", self.found_incs
       print "LIBS:", self.found_libs
       print "LIBPATH:", self.found_lib_paths

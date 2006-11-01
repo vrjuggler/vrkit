@@ -33,6 +33,15 @@ o------------------------------------------------------------------------------o
 | Installation
 o------------------------------------------------------------------------------o
 
+If scons-addons is not installed in a standard location for python files you 
+will need to set your PYTHONPATH variable to reflect where it is installed at.
+For example:
+
+(bash)
+export PYTHONPATH=/home/username/scons-addons/src
+
+(csh based shells)
+setenv PYTHONPATH /home/username/scons-addons/src
 
 o------------------------------------------------------------------------------o
 | Documentation

@@ -25,30 +25,26 @@ Defines option object for Pyste boost.python code generator.
 
 __revision__ = "__FILE__ __REVISION__ __DATE__ __DEVELOPER__"
 
-import SCons.Environment;   # Get the environment crap
-import SCons;
+import SCons.Environment   # Get the environment crap
+import SCons
 import SCons.Util
-import SConsAddons.Options;   # Get the modular options stuff
+import SConsAddons.Options   # Get the modular options stuff
 import SConsAddons.Util
-import sys;
-import os;
-import re;
-import string;
+import sys, os, re, string
 
 from SCons.Util import WhereIs
-pj = os.path.join;
+pj = os.path.join
 
 import SCons.Node.FS
 import SCons.Scanner
 
 #### SCANNER ######
-def PysteScan(fs = SCons.Node.FS.default_fs):    
+def PysteScan():    
     """Return a prototype Scanner instance for scanning IDL source files"""
     ps = SCons.Scanner.Classic("PysteScan",
                                [".pyste",".Pyste"],
                                "CPPPATH",
-                               """["'](\S*?\.h)["']""",
-                               fs = fs)
+                               """["'](\S*?\.h)["']""")
     return ps
     
 def PysteMainEmitter(target, source, env):
@@ -154,13 +150,6 @@ class Pyste(SConsAddons.Options.PackageOption):
       assert self.pysteScriptPath
       assert self.pysteScriptCommand
         
-   def convert(self):
-      pass;
-   
-   def set(self, env):
-      if self.pysteScriptPath:
-         env[self.pysteScriptKey] = self.pysteScriptPath;
-   
    def validate(self, env):
       # Check that file exists
       # Check version is correct
@@ -201,8 +190,7 @@ class Pyste(SConsAddons.Options.PackageOption):
        #                                clazz = SCons.Node.FS.Dir,
        #                                must_exist = 0))
        # XXX: This may not be right.  Need to find better description of the path scanner stuff
-       fs = SCons.Node.FS.default_fs
-       pf = SCons.Scanner.FindPathDirs('CPPPATH', fs)
+       pf = SCons.Scanner.FindPathDirs('CPPPATH')
        pyste_scanner = SCons.Scanner.Base(function=PysteRecursiveScanFunction, 
                                name="PysteRecursive",
                                skeys=[".pyste",".Pyste"],
@@ -225,7 +213,7 @@ class Pyste(SConsAddons.Options.PackageOption):
        env.Append(BUILDERS = {'PysteMainBuilder' : pyste_main_builder})
        env.Append(SCANNERS = pyste_scanner)
              
-   def updateEnv(self, env, cacheDir=None):
+   def apply(self, env, cacheDir=None):
       """ Add pyste environment options, builder, and scanner.
           cacheDir - If set, automatically set PYSTE_CACHE_DIR to use.
       """
@@ -234,7 +222,10 @@ class Pyste(SConsAddons.Options.PackageOption):
          self.AddPysteBuilder(env)
          if cacheDir:
             env["PYSTE_CACHE_DIR"] = cacheDir
-         
+
+   def getSettings(self):
+      return [(self.pysteScriptKey, self.pysteScriptPath),]
+
    def dumpSettings(self):
       "Write out the settings"
       print "Pyste option settings:"

@@ -25,18 +25,38 @@ Defines options for Vapor project
 
 __revision__ = "__FILE__ __REVISION__ __DATE__ __DEVELOPER__"
 
-import SCons.Environment;   # Get the environment crap
-import SCons;
-import SConsAddons.Options;   # Get the modular options stuff
+import SCons.Environment   # Get the environment crap
+import SCons
+import SConsAddons.Options   # Get the modular options stuff
+import SConsAddons.Options.FlagPollBasedOption as FlagPollBasedOption
 import JugglerCommon
 import SCons.Util
 import sys, os, re, string
 
 from SCons.Util import WhereIs
-pj = os.path.join;
+pj = os.path.join
 
 
-class Vapor(JugglerCommon.JugglerCommon):
+class Vapor(FlagPollBasedOption.FlagPollBasedOption):
+   """ 
+   Options object for capturing vapor options and dependencies.
+   """
+
+   def __init__(self, name, requiredVersion, required=True, useCppPath=True):
+      """
+         name - The name to use for this option
+         requiredVersion - The version of vapor required (ex: "0.16.7")
+         required - Is the dependency required?  (if so we exit on errors)
+         useCppPath - If true, put the include paths in cpppath else, put them in cxxflags.
+      """
+      help_text = """Base directory for vapor. bin, include, and lib should be under this directory""";
+      self.baseDirKey = "VprBaseDir"      
+      self.filesToCheckRelBase = [pj('include','vpr','vprConfig.h'),]
+      
+      FlagPollBasedOption.FlagPollBasedOption.__init__(self, name, 'vpr', requiredVersion, required, useCppPath, help_text);
+
+
+class Vapor_config(JugglerCommon.JugglerCommon):
    """ 
    Options object for capturing vapor options and dependencies.
    """

@@ -1,5 +1,11 @@
 DATE       AUTHOR       CHANGE
 ---------- ------------ -------------------------------------------------------
+2006-07-05 allenb       Significant refactoring of Options code.
+                        Options object interface is not simplified and more
+                        flexible for adding options to environments.
+                        Add ListOption, SeparatorOption.
+                        NEW VERSION: 0.1.0
+2006-07-02 allenb       Added BooleanOption.                        
 2005-08-18 allenb       Pyste Option: Added cache environment flag and param.
 2005-08-18 allenb       OpenSG Options:
                         - Minimize calls to osg-config

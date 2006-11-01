@@ -33,6 +33,7 @@ import sys
 import os
 import re
 import string
+import distutils.util
 
 from SCons.Util import WhereIs
 pj = os.path.join
@@ -78,7 +79,7 @@ class OSG(SConsAddons.Options.PackageOption):
       if self.required:
          sys.exit(1)
 
-   def startUpdate(self):
+   def startProcess(self):
       print "Checking for OSG...",
 
    def setInitial(self, optDict):
@@ -95,13 +96,6 @@ class OSG(SConsAddons.Options.PackageOption):
       # Quick exit if nothing to find
       if self.baseDir != None:
          return
-
-   def convert(self):
-      pass
-
-   def set(self, env):
-      if self.baseDir:
-         env[self.baseDirKey] = self.baseDir
 
    def validate(self, env):
       # Check that path exists
@@ -137,7 +131,7 @@ class OSG(SConsAddons.Options.PackageOption):
          self.available = True
          print "[OK]"
 
-   def updateEnv(self, env, optimize = False, useCppPath = False):
+   def apply(self, env, optimize = False, useCppPath = False):
       """
       Add environment options for building against vapor.
       optimize: If true use --opt option
@@ -151,8 +145,14 @@ class OSG(SConsAddons.Options.PackageOption):
          env.Append(CXXFLAGS = [inc_dir])
 
       env.Append(LIBPATH = [os.path.join(self.baseDir, 'lib')])
+      if distutils.util.get_platform().find('x86_64') != -1:
+         env.Append(LIBPATH = [os.path.join(self.baseDir, 'lib64')])
+
       env.Append(LIBS = ['osgText', 'osgProducer', 'Producer', 'osgText',
-                         'osgGA', 'osgDB', 'osgUtil', 'osg'])
+                         'osgGA', 'osgDB', 'osgUtil', 'osg', 'OpenThreads'])
+
+   def getSettings(self):
+      return [(self.baseDirKey, self.baseDir),]
 
    def dumpSettings(self):
       "Write out the settings"

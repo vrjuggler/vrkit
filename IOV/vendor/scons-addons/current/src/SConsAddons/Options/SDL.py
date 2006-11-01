@@ -12,7 +12,7 @@ import SCons.Util
 import SConsAddons.Util
 import sys,os,re,string
 
-if SConsAddons.Util.GetPlatform()=='mac':
+if SConsAddons.Util.GetPlatform()=='darwin':
    True = 1
    False = 0
 
@@ -81,15 +81,7 @@ class SDL(SConsAddons.Options.PackageOption):
             self.baseDir = None;
          else:
             print "   found at: ", self.baseDir
-
-
-   def convert(self):
-      pass
-
-   def set(self, env):
-      if self.baseDir:
-         env[self.baseDirKey] = self.baseDir
-
+   
    def validate(self, env):
       passed = True
       if not os.path.isdir(self.baseDir):
@@ -128,7 +120,7 @@ class SDL(SConsAddons.Options.PackageOption):
       else:
          self.available = True
 
-   def updateEnv(self, env):
+   def apply(self, env):
       """ Add environment options for building against sdl"""
       if self.found_incs:
          env.Append(CPPPATH = self.found_incs)
@@ -136,6 +128,9 @@ class SDL(SConsAddons.Options.PackageOption):
          env.Append(LIBS = self.found_libs)
       if self.found_lib_paths:
          env.Append(LIBPATH = self.found_lib_paths)
+
+   def getSettings(self):
+      return [(self.baseDirKey, self.baseDir),]
 
    def dumpSettings(self):
       "Write out the settings"

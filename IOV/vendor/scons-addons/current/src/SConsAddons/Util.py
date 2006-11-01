@@ -32,11 +32,84 @@ from __future__ import generators
 import os
 import sys
 import re
+import distutils.util
 import string
 import SCons.Environment
 import SCons
+import SCons.Platform
+from SCons.Util import WhereIs
 
 pj = os.path.join
+
+def GetPlatform():
+   "Get a platform string"
+   if string.find(sys.platform, 'irix') != -1:
+      return 'irix'
+   elif string.find(sys.platform, 'linux') != -1:
+      return 'linux'
+   elif string.find(sys.platform, 'freebsd') != -1:
+      return 'freebsd'
+   elif string.find(sys.platform, 'cygwin') != -1:
+      return 'win32'
+   elif string.find(sys.platform, 'sunos') != -1:
+      return 'sunos'
+   elif string.find(sys.platform, 'darwin' ) != -1:
+      return 'darwin'
+   elif os.name == 'os2':
+      return 'os2'
+   else:
+      return sys.platform   
+
+def GetArch():
+   """ Return identifier for CPU architecture. """
+   if not hasattr(os, 'uname'):
+      platform = distutils.util.get_platform()
+      arch = ""
+      if re.search(r'i.86', platform):
+         arch = 'ia32'
+      # x86_64 (aka, x64, EM64T)
+      elif re.search(r'x86_64', platform):
+         arch = 'x64'
+         # PowerPC
+      elif re.search(r'Power_Mac', platform):
+         arch = 'ppc'
+   else:
+      arch_str = os.uname()[4]
+      if re.search(r'i.86', arch_str):
+         arch = 'ia32'
+      # x86_64 (aka, x64, EM64T)
+      elif re.search(r'x86_64', arch_str):
+         arch = 'x64'
+      # PowerPC Macintosh
+      elif re.search(r'Power Macintosh', arch_str):
+         # XXX: Not sure if this actually works. -PH 7/24/2006
+         if re.search(r'64', arch_str):
+            arch = 'ppc64'
+         else:
+            arch = 'ppc'
+
+   return arch
+
+def GetCpuType():
+   """ Return the type of cpu found in the system. 
+       TODO: Extend this to support more OS's and CPUs
+   """
+   cpu_type = None
+
+   if os.path.exists('/proc/cpuinfo'):
+      cpu_info = file('/proc/cpuinfo').read().lower()
+      if (cpu_info.count("ia-64") > 0):
+         cpu_type = "itanium"
+      elif (cpu_info.count("athlon") > 0):
+         cpu_type = "athlon"
+
+   if not cpu_type:
+      platform = distutils.util.get_platform()
+      if re.search(r'i.86', platform):
+         cpu_type = 'i386'
+   
+   return cpu_type
+
 
 
 def hasHelpFlag():
@@ -47,6 +120,15 @@ def hasHelpFlag():
       has_help_flag = SCons.Script.options.help_msg
       
    return has_help_flag
+
+
+def symlinkInstallFunc(dest, source, env):
+    """Install a source file into a destination by sym linking it.
+       Ex:
+         common_env['INSTALL'] = symlinkInstallFunc         
+    """
+    os.symlink(pj(os.getcwd(), source), dest)
+    return 0
 
 
 # ----------------------------------
@@ -153,23 +235,72 @@ class ConfigCmdParser:
          return ""
       return os.popen(self.config_cmd + " " + arg).read().strip()
    
-def GetPlatform():
-   "Get a platform string"
-   if string.find(sys.platform, 'irix') != -1:
-      return 'irix'
-   elif string.find(sys.platform, 'linux') != -1:
-      return 'linux'
-   elif string.find(sys.platform, 'freebsd') != -1:
-      return 'freebsd'
-   elif string.find(sys.platform, 'cygwin') != -1:
-      return 'win32'
-   elif string.find(sys.platform, 'sun') != -1:
-      return 'sun'
-   elif string.find(sys.platform, 'darwin' ) != -1:
-      return 'mac'
-   else:
-      return sys.platform   
+class FlagPollParser:
+   """  
+   Helper class for calling flagpoll and extracting
+   various paths and other information from it.
+   """
    
+   def __init__(self, moduleName):
+      " moduleName: The config command to call "
+      self.moduleName = moduleName
+      self.valid = True
+      
+      self.flagpoll_cmd = WhereIs('flagpoll')
+      if None == self.flagpoll_cmd:
+         print "FlagPollParser: %s  Could not find flagpoll."
+         self.valid = False
+      else:
+         self.flagpoll_cmd += " %s"%self.moduleName      
+         self.callFlagPoll("--exists")         
+
+      # Initialize regular expressions
+      # Res that when matched against config output should match the options we want
+      # In future could try to use INCPREFIX and other platform neutral stuff
+      self.inc_re = re.compile(r'(?: |^)-I(\S*)', re.MULTILINE);
+      self.lib_re = re.compile(r'(?: |^)-l(\S*)', re.MULTILINE);
+      self.lib_path_re = re.compile(r'(?: |^)-L(\S*)', re.MULTILINE);
+      self.link_flag_re = re.compile(r'(?: |^)(-\S*)', re.MULTILINE);
+      
+   def findLibs(self, arg="--libs-only-l"):
+      if not self.valid:
+         return ""
+      return self.lib_re.findall(self.callFlagPoll(arg))
+   
+   def findLibPaths(self, arg="--libs-only-L"):
+      if not self.valid:
+         return ""
+      return self.lib_path_re.findall(self.callFlagPoll(arg))
+   
+   def findLinkFlags(self, arg="--libs-only-other"):
+      if not self.valid:
+         return ""
+      return self.link_flag_re.findall(self.callFlagPoll(arg))
+
+   def findIncludes(self, arg="--cflags-only-I"):
+      if not self.valid:
+         return ""
+      return self.inc_re.findall(self.callFlagPoll(arg))
+
+   def getVersion(self, arg="--modversion"):
+      if not self.valid:
+         return ""
+      return self.callFlagPoll(arg)
+   
+   def callFlagPoll(self, cmdFlags):
+      """ Return result of calling flagpoll.
+          Checks for error state and outputs error and returns ''
+      """
+      cur_cmd = "%s %s"%(self.flagpoll_cmd, cmdFlags)
+      print "Calling: ", cur_cmd
+      cmd_call = os.popen(cur_cmd)
+      cmd_str = cmd_call.read().strip()
+      if None != cmd_call.close():
+         self.valid = False 
+         print "FlagPollParser: call failed: %s"%cur_cmd
+      return cmd_str
+
+
    
 # -------------------- #
 # Path utils
@@ -178,7 +309,7 @@ def getFullSrcPath(env=SCons.Environment.Environment()):
    """ Return the full path to the local source directory we are in 
        (taking into account BuildDir) """
    # Get the local directory using Dir(.)
-   # Then return the string rep of it's src node
+   # Then return the string rep of its src node
    ldir_node = env.Dir('.')                                   # .
    ldir_srcnode = ldir_node.srcnode()                     # /home/.../XXX/src/plx
    return str(ldir_srcnode)

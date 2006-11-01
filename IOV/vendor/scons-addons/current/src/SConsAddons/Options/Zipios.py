@@ -1,6 +1,6 @@
-"""SConsAddons.Options.Cal3D
+"""SConsAddons.Options.Zipios
 
-Defines options for Cal3D project
+Defines options for zipios project
 """
 
 #
@@ -39,7 +39,7 @@ from SCons.Util import WhereIs
 pj = os.path.join
 
 
-class Cal3D(SConsAddons.Options.PackageOption):
+class Zipios(SConsAddons.Options.PackageOption):
    """ 
    Options object for capturing vapor options and dependencies.
    """
@@ -51,12 +51,12 @@ class Cal3D(SConsAddons.Options.PackageOption):
          required - Is the dependency required?  (if so we exit on errors)
          useCppPath - Should includes be put in cpp path environment
       """
-      help_text = """Base directory for Cal3D."""
-      self.baseDirKey = "Cal3DBaseDir";
+      help_text = """Base directory for zipios."""
+      self.baseDirKey = "ZipiosBaseDir";
       self.requiredVersion = requiredVersion;
       self.required = required;
       self.useCppPath = useCppPath
-      SConsAddons.Options.PackageOption.__init__(self, name, self.baseDirKey, help_text);
+      SConsAddons.Options.LocalUpdateOption.__init__(self, name, self.baseDirKey, help_text);
       
       # configurable options
       self.baseDir = None;
@@ -74,12 +74,12 @@ class Cal3D(SConsAddons.Options.PackageOption):
          sys.exit(1);
 
    def startProcess(self):
-      print "Checking for Cal3D...",
+      print "Checking for zipios...",
       
    def setInitial(self, optDict):
       " Set initial values from given dict "
       if self.verbose:
-         print "   Setting initial Cal3D settings."
+         print "   Setting initial zipios settings."
       if optDict.has_key(self.baseDirKey):
          self.baseDir = optDict[self.baseDirKey];
          if self.verbose:
@@ -92,22 +92,22 @@ class Cal3D(SConsAddons.Options.PackageOption):
 
       ver_header = None
 
-      # Find cal3d/cal3d.h
-      print "   searching for Cal3D..."
+      # Find zipios++/zipios-config.h
+      print "   searching for zipios..."
       if env.Dictionary().has_key('CPPPATH'):
          print "      Searching CPPPATH..."
-         ver_header = env.FindFile(pj('cal3d','cal3d.h'), env['CPPPATH'])
+         ver_header = env.FindFile(pj('zipios++','zipios-config.h'), env['CPPPATH'])
 
       if (None == ver_header) and env.Dictionary().has_key('CPLUS_INCLUDE_PATH'):
          print "      Searching CPLUS_INCLUDE_PATH..."
-         ver_header = SCons.Script.SConscript.FindFile(pj('cal3d', 'cal3d.h'),
+         ver_header = SCons.Script.SConscript.FindFile(pj('zipios++', 'zipios-config.h'),
                                     string.split(env['ENV']['CPLUS_INCLUDE_PATH'], os.pathsep))
          
       if None == ver_header:
-         self.checkRequired("   could not find cal3d.h.")
+         self.checkRequired("   could not find zipios-config.h.")
       else:
          ver_header = str(ver_header)
-         print "   found cal3d/cal3d.h.\n"
+         print "   found zipios++/zipios-config.h.\n"
 
          # find base dir
          self.baseDir = os.path.dirname(os.path.dirname(os.path.dirname(ver_header)))
@@ -123,31 +123,27 @@ class Cal3D(SConsAddons.Options.PackageOption):
       passed = True;
 
       if not self.baseDir:
-         self.checkRequired("Cal3D base dir not set")
+         self.checkRequired("zipios base dir not set")
          return
       if not os.path.isdir(self.baseDir):
-         self.checkRequired("Cal3D base dir does not exist:%s"%self.baseDir);
-         return
-      if not os.path.isfile(pj(self.baseDir, 'include', 'cal3d', 'cal3d.h')):
-         self.checkRequired("cal3d.h:%s"%self.baseDir);
+         self.checkRequired("zipios base dir does not exist:%s"%self.baseDir);
          return
 
       # Check the version header is there         
-      version_header = pj(self.baseDir, 'include', 'cal3d', 'global.h')
+      version_header = pj(self.baseDir, 'include', 'zipios++', 'zipios-config.h')
       if not os.path.isfile(version_header):
-         self.checkRequired("Cal3D global.h header does not exist:%s"%version_header)
+         self.checkRequired("zipios-config.h header does not exist:%s"%version_header)
          return
 
       # --- Check version requirement --- #
       ver_file = file(version_header)
-      ver_match = re.search("LIBRARY_VERSION\s=\s(\d*)", ver_file.read())
+      ver_match = re.search('#define\s*VERSION\s*\"(.*)\"', ver_file.read())
       if not ver_match:
-         self.checkRequired("   could not find LIBRARY_VERSION in file: %s"%version_header)
+         self.checkRequired("   could not find VERSION in file: %s"%version_header)
          return
 
 
-      found_ver_str = int(ver_match.group(1))
-      found_ver_str = str(found_ver_str / 100000) + '.' + str(found_ver_str / 100 % 1000) + '.' + str(found_ver_str % 100)
+      found_ver_str = ver_match.group(1)
       req_ver = [int(n) for n in self.requiredVersion.split('.')]
       found_ver = [int(n) for n in found_ver_str.split('.')]
       if found_ver < req_ver:
@@ -179,11 +175,13 @@ class Cal3D(SConsAddons.Options.PackageOption):
       else:
          env.Append(CXXFLAGS = include_path_as_flags)
       env.Append(LIBPATH = lib_path)
-      env.Append(LIBS = ['cal3d'])
-   
+      env.Append(LIBS = ['zipios'])
+
+
    def getSettings(self):
       return [(self.baseDirKey, self.baseDir),]
-   
+
+
    def dumpSettings(self):
       "Write out the settings"
-      print "Cal3DBaseDir:", self.baseDir;
+      print "ZipiosBaseDir:", self.baseDir;
