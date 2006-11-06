@@ -123,13 +123,13 @@ public:
     * @param obj       A scene object that is currently grabbed.
     * @param vp_M_wand The wand transformation in view platform coordiantes.
     * @param curObjPos The current transformation of \p obj relative to its
-    *                  parent. This could be retrieved by calling
+    *                  parent (pobj_M_obj). This could be retrieved by calling
     *                  \code obj->getMatrix() \endcode except that the
     *                  composition of multiple movement computations may not
     *                  yet have been applied to \p obj. Therefore, this matrix
     *                  should be used instead.
     *
-    * @return The new transformation for \p obj.
+    * @return The new transformation for \p obj (pobj_M_obj').
     *
     * @note Do not call \code obj->getMatrix() \endcode in the implementation
     *       of this method. Use \p curObjPos instead.
