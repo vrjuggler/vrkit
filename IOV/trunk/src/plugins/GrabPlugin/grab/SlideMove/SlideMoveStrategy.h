@@ -6,11 +6,8 @@
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/OSGColor.h>
-
 #include <jccl/Config/ConfigElementPtr.h>
 
-#include <IOV/Util/Exceptions.h>
 #include <IOV/Grab/MoveStrategy.h>
 
 
