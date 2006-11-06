@@ -292,6 +292,7 @@
             <enum label="Basic Move" value="BasicMove"/>
             <enum label="Center Point Move" value="CenterPointMove"/>
             <enum label="Object Space Move" value="ObjectSpaceMove"/>
+            <enum label="Simple Slide Move" value="SimpleSlideMove"/>
             <enum label="Slide Move" value="SlideMove"/>
          </enumeration>
       </property>

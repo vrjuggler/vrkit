@@ -135,10 +135,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Signal-Based Grab Strategy 
 		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Simple Slide Move Strategy Plug-in", "GrabPlugin\SimpleSlideMoveStrategy\SimpleSlideMoveStrategy.vcproj", "{E3E0F4FA-6175-4CEA-8CBD-27CAECF40A8D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A0218102-78F5-48BB-A6C6-F81B3759ED60} = {A0218102-78F5-48BB-A6C6-F81B3759ED60}
+		{624282D0-8169-423E-B330-0C7CBD4C9254} = {624282D0-8169-423E-B330-0C7CBD4C9254}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		DebugDLL = DebugDLL
 		ReleaseDLL = ReleaseDLL
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{C62950FE-F583-4C1F-83F4-4F106EFD52F4}.DebugDLL.ActiveCfg = DebugDLL|Win32
@@ -245,6 +253,10 @@ Global
 		{1401E53A-ECF8-43E0-ABE9-3ECB1A5A73C1}.DebugDLL.Build.0 = DebugDLL|Win32
 		{1401E53A-ECF8-43E0-ABE9-3ECB1A5A73C1}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
 		{1401E53A-ECF8-43E0-ABE9-3ECB1A5A73C1}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
+		{E3E0F4FA-6175-4CEA-8CBD-27CAECF40A8D}.DebugDLL.ActiveCfg = DebugDLL|Win32
+		{E3E0F4FA-6175-4CEA-8CBD-27CAECF40A8D}.DebugDLL.Build.0 = DebugDLL|Win32
+		{E3E0F4FA-6175-4CEA-8CBD-27CAECF40A8D}.ReleaseDLL.ActiveCfg = ReleaseDLL|Win32
+		{E3E0F4FA-6175-4CEA-8CBD-27CAECF40A8D}.ReleaseDLL.Build.0 = ReleaseDLL|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
