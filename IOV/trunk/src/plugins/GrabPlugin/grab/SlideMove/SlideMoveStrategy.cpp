@@ -133,24 +133,26 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
       const float trans_val(-in_out_val * in_out_scale);
       mTransValue += trans_val;
 
-      // If the object is at the wand then don't allow it to
-      // move any further back.
-      if (mTransValue >= 1.0)
+      // If the object is at the wand, then don't allow it to move any
+      // further back.
+      if ( mTransValue >= 1.0 )
       {
          mTransValue = 1.0;
       }
 
-      // pobj_M_vp is the inverse of the object in view platform space.
       OSG::Matrix world_xform;
 
       vprASSERT(obj->getRoot() != OSG::NullFC);
 
       // If we have no parent then we want to use the identity.
-      if (obj->getRoot()->getParent() != OSG::NullFC)
+      if ( obj->getRoot()->getParent() != OSG::NullFC )
       {
+         // Gets vp_M_pobj.
          obj->getRoot()->getParent()->getToWorld(world_xform);
       }
 
+      // pobj_M_vp is the inverse of the coordinate frame for obj in view
+      // platform space.
       gmtl::Matrix44f pobj_M_vp;
       gmtl::set(pobj_M_vp, world_xform);
       gmtl::invert(pobj_M_vp);
@@ -178,6 +180,9 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
       const gmtl::Matrix44f delta_trans_mat =
          gmtl::makeTrans<gmtl::Matrix44f>(obj_dir * -mTransValue);
 
+      // Compute the new pobj_M_obj (the new local transformation for the
+      // grabbed object) by factoring in the translation change in wand space.
+      // NOTE: curObjPos = pobj_M_obj.
       return pobj_M_wand * delta_trans_mat * wand_M_pobj * curObjPos;
    }
 
