@@ -95,6 +95,7 @@ BasicMoveStrategy::computeMove(inf::ViewerPtr, SceneObjectPtr obj,
 
    const gmtl::Matrix44f pobj_M_wand = pobj_M_vp * vp_M_wand;
 
+   // Returns pobj_M_obj = curObjMat'
    return pobj_M_wand * m_wand_M_pobj_map[obj] * curObjMat;
 }
 
