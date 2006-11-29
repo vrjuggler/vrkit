@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2006-11-29 patrick  Fixed forward/reverse inversion bug in the slide move
+                    strategies.
+                    -- VERSION -- 0.32.7
 2006-10-30 patrick  Introduced the Simple Slide Move Strategy as an alternative
                     to the (currently broken) Slide Move Strategy.
                     -- VERSION -- 0.32.6
