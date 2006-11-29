@@ -120,12 +120,6 @@ SimpleSlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
          in_out_val = -in_out_val;
       }
 
-      // If we don't have an analog configured, then set in-out to 0.
-      if ( -1 == mAnalogNum )
-      {
-         in_out_val = 0.0f;
-      }
-
       const float in_out_scale(mSlideMultiplier * viewer->getDrawScaleFactor());
       const float trans_val(in_out_val * in_out_scale);
       mTransValue += trans_val;
