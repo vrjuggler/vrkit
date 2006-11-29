@@ -121,7 +121,7 @@ SimpleSlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
       }
 
       const float in_out_scale(mSlideMultiplier * viewer->getDrawScaleFactor());
-      const float trans_val(in_out_val * in_out_scale);
+      const float trans_val(gmtl::Math::pow(in_out_val, 5) * in_out_scale);
       mTransValue += trans_val;
 
       OSG::Matrix world_xform;
