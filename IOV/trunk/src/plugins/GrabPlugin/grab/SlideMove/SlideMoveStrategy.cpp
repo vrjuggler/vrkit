@@ -131,7 +131,7 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
       //std::cout << "In out: " << in_out_val << std::endl;
 
       const float in_out_scale(0.20f);
-      const float trans_val(-in_out_val * in_out_scale);
+      const float trans_val(in_out_val * in_out_scale);
       mTransValue += trans_val;
 
       // If the object is at the wand, then don't allow it to move any
@@ -181,9 +181,9 @@ SlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
       const gmtl::Matrix44f delta_trans_mat =
          gmtl::makeTrans<gmtl::Matrix44f>(obj_dir * -mTransValue);
 
-      // Compute the new pobj_M_obj (the new local transformation for the
+      // Compute the new pobj_M_obj' (the new local transformation for the
       // grabbed object) by factoring in the translation change in wand space.
-      // NOTE: curObjPos = pobj_M_obj.
+      // NOTE: curObjPos == pobj_M_obj.
       return pobj_M_wand * delta_trans_mat * wand_M_pobj * curObjPos;
    }
 
