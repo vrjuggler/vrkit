@@ -106,7 +106,8 @@ class Boost(SConsAddons.Options.PackageOption):
       """ Returns the full name of the boost library"""
       fullname = "boost_" + libname
       if SConsAddons.Util.GetPlatform() != 'mac':
-         fullname = fullname + "-" + self.toolset
+         if self.toolset:
+            fullname += '-' + self.toolset
          if self.use_mt:
             fullname += "-mt"
          if self.use_debug:
