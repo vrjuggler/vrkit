@@ -131,6 +131,10 @@ private:
                                const gadget::Digital::State testState,
                                const bool accumState, const int btn);
 
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+   friend struct CallWrapper;
+#endif
+
    std::vector<int> mButtonVec;
 };
 
