@@ -163,9 +163,6 @@
 			<File
 				RelativePath="..\..\src\Viewer\infi_app.rc">
 			</File>
-			<File
-				RelativePath="..\..\src\version.rc">
-			</File>
 		</Filter>
 	</Files>
 	<Globals>

@@ -163,9 +163,6 @@
 			<File
 				RelativePath="..\..\src\SlaveViewer\slaveViewer.rc">
 			</File>
-			<File
-				RelativePath="..\..\src\version.rc">
-			</File>
 		</Filter>
 	</Files>
 	<Globals>
