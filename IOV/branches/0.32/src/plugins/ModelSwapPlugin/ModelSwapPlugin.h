@@ -1,4 +1,4 @@
-// Copyright (C) Infiscape Corporation 2005-2006
+// Copyright (C) Infiscape Corporation 2005-2007
 
 #ifndef _INF_MODEL_SWAP_PLUGIN_H_
 #define _INF_MODEL_SWAP_PLUGIN_H_

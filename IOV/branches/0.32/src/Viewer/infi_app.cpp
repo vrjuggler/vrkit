@@ -1,4 +1,4 @@
-// Copyright (C) Infiscape Corporation 2005-2006
+// Copyright (C) Infiscape Corporation 2005-2007
 
 #include <stdlib.h>
 #include <boost/program_options.hpp>
@@ -471,6 +471,7 @@ int main(int argc, char* argv[])
       std::ifstream cfg_file("viewer.cfg");
       store(parse_config_file(cfg_file, config_file_options), vm);
       notify(vm);
+
 
       if ( vm.count("help") > 0 )
       {
