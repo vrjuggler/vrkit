@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-02-05 patrick  Fixed Visual C++ 8.0 build and run-time problems.
+                    -- VERSION -- 0.32.8
 2006-11-29 patrick  Fixed forward/reverse inversion bug in the slide move
                     strategies.
                     -- VERSION -- 0.32.7
