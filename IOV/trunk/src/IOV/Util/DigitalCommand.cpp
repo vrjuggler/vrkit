@@ -43,7 +43,7 @@ void DigitalCommand::configButtons(std::string buttonString)
    mButtonVec.resize(btn_strings.size());
    std::transform(
       btn_strings.begin(), btn_strings.end(), mButtonVec.begin(),
-      boost::function<int (const std::string&)>(boost::lexical_cast<int, std::string>)
+      boost::bind(boost::lexical_cast<int, std::string>, _1)
    );
 }
 
