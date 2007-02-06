@@ -52,6 +52,26 @@ bool DigitalCommand::isConfigured() const
    return mButtonVec[0] != -1;
 }
 
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+struct CallWrapper
+{
+   CallWrapper(inf::WandInterfacePtr wandIf,
+               const gadget::Digital::State testState)
+      : mWandIf(wandIf)
+      , mTestState(testState)
+   {
+   }
+
+   bool operator()(const bool b, const int i)
+   {
+      return DigitalCommand::accumulateState(mWandIf, mTestState, b, i);
+   }
+
+   inf::WandInterfacePtr mWandIf;
+   const gadget::Digital::State mTestState;
+};
+#endif
+
 bool DigitalCommand::test(inf::WandInterfacePtr wandIf,
                           const gadget::Digital::State testState)
 {
@@ -61,9 +81,17 @@ bool DigitalCommand::test(inf::WandInterfacePtr wandIf,
    }
    else
    {
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+      // For some reason, the use of boost::bind() does not compile when
+      // building with Visual C++ 8.0--at least against Boost 1.33.1.
+      CallWrapper c(wandIf, testState);
+      return std::accumulate(mButtonVec.begin(), mButtonVec.end(), true,
+                             c);
+#else
       return std::accumulate(mButtonVec.begin(), mButtonVec.end(), true,
                              boost::bind(&DigitalCommand::accumulateState,
                                          wandIf, testState, _1, _2));
+#endif
    }
 }
 
