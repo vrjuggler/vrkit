@@ -27,8 +27,8 @@ Automatic distribution builder and packager for SCons.
 #
 # -----------------------------------------------------------------
 # File:          $RCSfile$
-# Date modified: $Date: 2004-11-18 22:19:16 -0600 (Thu, 18 Nov 2004) $
-# Version:       $Revision: 134 $
+# Date modified: $Date: 2006-11-30 10:56:55 -0600 (Thu, 30 Nov 2006) $
+# Version:       $Revision: 248 $
 # -----------------------------------------------------------------
 ############################################################## autodist-cpr end
 
@@ -732,7 +732,7 @@ class Package:
                self.extra_dist.append(file)
 
 
-   def build(self):
+   def build(self, install = True):
       """
       Sets up the build and install for this package. This will build all
       assemblies contained therein that have not already been built and set 
@@ -743,8 +743,9 @@ class Package:
             assembly.build()
 
       # Build the file bundles for this package
-      for fb in self.fileBundles:
-         fb.buildInstall(self.env, self.prefix)
+      if install:
+         for fb in self.fileBundles:
+            fb.buildInstall(self.env, self.prefix)
       #self.env.Alias('install', self.prefix)            
       
       # Setup all packagers

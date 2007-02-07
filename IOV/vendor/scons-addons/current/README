@@ -33,7 +33,11 @@ o------------------------------------------------------------------------------o
 | Installation
 o------------------------------------------------------------------------------o
 
-If scons-addons is not installed in a standard location for python files you 
+To install system-wide:
+cd scons-addons/src
+cp -r SconsAddons /path/to/python/lib/site-packages/
+
+If you do not want scons-addons installed in a standard location for python files you 
 will need to set your PYTHONPATH variable to reflect where it is installed at.
 For example:
 

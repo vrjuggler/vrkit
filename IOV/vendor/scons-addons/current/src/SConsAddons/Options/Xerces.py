@@ -1,6 +1,6 @@
-"""SConsAddons.Options.OSG
+"""SConsAddons.Options.Xerces
 
-Defines options for OSG project
+Defines options for Xerces project
 """
 
 #
@@ -39,21 +39,21 @@ from SCons.Util import WhereIs
 pj = os.path.join
 
 
-class OSG(SConsAddons.Options.PackageOption):
+class Xerces(SConsAddons.Options.PackageOption):
    """
    Options object for capturing vapor options and dependencies.
    """
 
    def __init__(self, name, requiredVersion, required=True,
-                useCppPath = False, libList = None):
+                useCppPath = False):
       """
          name - The name to use for this option
          requiredVersion - The version of vapor required (ex: "0.16.7")
          required - Is the dependency required?  (if so we exit on errors)
          useCppPath - Should includes be put in cpp path environment
       """
-      help_text = "Base directory for Open Scene Graph."
-      self.baseDirKey = "OsgBaseDir"
+      help_text = "Base directory for the Apache Xerces project."
+      self.baseDirKey = "XercesBaseDir"
       self.requiredVersion = requiredVersion
       self.required = required
       self.useCppPath = useCppPath
@@ -63,12 +63,7 @@ class OSG(SConsAddons.Options.PackageOption):
 
       # configurable options
       self.baseDir = None
-      if libList == None:
-         self.libList=['osgText', 'osgProducer', 'Producer', 'osgText',
-                         'osgGA', 'osgDB', 'osgUtil', 'osg', 'OpenThreads']
-      else:
-         self.libList=libList
-         
+
       # Settings to use
       self.found_libs = None
       self.found_cflags = None
@@ -85,18 +80,18 @@ class OSG(SConsAddons.Options.PackageOption):
          sys.exit(1)
 
    def startProcess(self):
-      print "Checking for OSG...",
+      print "Checking for Xerces...",
 
    def setInitial(self, optDict):
       " Set initial values from given dict "
       if self.verbose:
-         print "   Applying initial OSG settings."
+         print "   Applying initial Xerces settings."
       if optDict.has_key(self.baseDirKey):
          self.baseDir = optDict[self.baseDirKey]
          if self.verbose:
             print "   %s specified or cached. [%s]."% \
                      (self.baseDirKey, self.baseDir)
-
+                     
    def find(self, env):
       # Quick exit if nothing to find
       if self.baseDir != None:
@@ -110,16 +105,16 @@ class OSG(SConsAddons.Options.PackageOption):
       self.available = False
 
       if self.baseDir is None:
-         self.checkRequired("OSG base dir (OsgBaseDir) was not specified")
+         self.checkRequired("Xerces base dir (XercesBaseDir) was not specified")
          return
 
       if not os.path.isdir(self.baseDir):
-         self.checkRequired("OSG base dir %s does not exist" % self.baseDir)
+         self.checkRequired("Xerces base dir %s does not exist" % self.baseDir)
          return
-
-      osg_version_file = pj(self.baseDir, 'include', 'osg', 'Version')
-      if not os.path.isfile(osg_version_file):
-         self.checkRequired("%s not found" % osg_version_file)
+         
+      xerces_version_file = pj(self.baseDir,'include','xercesc','util','XercesVersion.hpp')
+      if not os.path.isfile(xerces_version_file):
+         self.checkRequired("%s not found" % xerces_version_file)
          return
       else:
          passed = True
@@ -146,27 +141,28 @@ class OSG(SConsAddons.Options.PackageOption):
       useCppPath: If true, then put the include paths into the CPPPATH
                   variable.
       """
-      inc_dir = os.path.join(self.baseDir, 'include')
+      inc_dir = os.path.join(self.baseDir, 'include' )
       if self.useCppPath or useCppPath:
          env.Append(CPPPATH = [inc_dir])
       else:
          env.Append(CXXFLAGS = [inc_dir])
 
+      #help improve the effeciency of the build by 
+      #doing foward declarations in VTK
       env.Append(LIBPATH = [os.path.join(self.baseDir, 'lib')])
-      if distutils.util.get_platform().find('x86_64') != -1:
-         env.Append(LIBPATH = [os.path.join(self.baseDir, 'lib64')])
 
-      env.Append(LIBS = self.libList)
+      env.Append(LIBS = ['xerces-c'])
 
    def getSettings(self):
       return [(self.baseDirKey, self.baseDir),]
 
    def dumpSettings(self):
       "Write out the settings"
-      print "OsgBaseDir:", self.baseDir
+      print "XercesBaseDir:", self.baseDir
       #print "CXXFLAGS:", self.found_cflags
       #if self.found_libs:
       #   for lib_name in self.found_libs.keys():
       #      print "LIBS (%s):"%lib_name, self.found_libs[lib_name]
       #      print "LIBPATH (%s):"%lib_name, self.found_lib_paths[lib_name]
       #print "DEFINES:", self.found_defines
+

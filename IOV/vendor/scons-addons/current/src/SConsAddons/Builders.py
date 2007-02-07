@@ -63,14 +63,20 @@ def CreateSubst(target, source, env):
       # Go through the substitution dictionary and modify the contents read in
       # from the source file
       for key, value in submap.items():
-         contents = re.sub(re.escape(key), value, contents)
+         contents = contents.replace(key, value);
 
       # Write out the target file with the new contents
-      open(targets[0], 'w').write(contents)
-      os.chmod(targets[0], 0755)
+      open(targets[i], 'w').write(contents)
+      os.chmod(targets[i], 0755)
 
 def generate_builder_str(target, source, env):
-   return "generating: %s"%target[0]
+   builderStr = "generating: ";
+   for i in range(len(target)):
+      if i > 0:
+         builderStr += ", " + str(target)
+      else:
+         builderStr += str(target);
+   return builderStr
 
 def registerSubstBuilder(env):
    env["BUILDERS"]["SubstBuilder"] = \
@@ -110,8 +116,8 @@ def CreateStringFormatBuilder(target, source, env):
       new_contents = contents % submap       
 
       # Write out the target file with the new contents
-      open(targets[0], 'w').write(new_contents)
-      os.chmod(targets[0], 0755)
+      open(targets[i], 'w').write(new_contents)
+      os.chmod(targets[i], 0755)
 
 def registerStringFormatBuilder(env):
    env["BUILDERS"]["StringFormatBuilder"] = \
@@ -172,13 +178,10 @@ def CreateDefineBuilder(target, source, env):
       content = "#ifndef %(guard)s\n#define %(guard)s\n\n%(content)s\n\n#endif\n"%vars()
       
       # Write out the target file with the new contents
-      open(targets[0], 'w').write(content)      
-
-def define_builder_str(target, source, env):
-   return "generating: %s"%target[0]
+      open(targets[i], 'w').write(content)      
 
 def registerDefineBuilder(env):
    env["BUILDERS"]["DefineBuilder"] = \
             SCons.Builder.Builder(action=SCons.Action.Action(CreateDefineBuilder,
-                                                             define_builder_str,
+                                                             generate_builder_str,
                                                              varlist=['definemap',]))

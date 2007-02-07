@@ -137,7 +137,7 @@ class Option:
             Ex: options.GetOption("my_opt").getValue()
         """ 
         return self.getSettings()[index][1]
-        
+
 
 class LocalUpdateOption(Option):
     """ Extends the base option to have another method that allows updating of environment locally """
@@ -171,7 +171,6 @@ class PackageOption(LocalUpdateOption):
             raise OptionError(self,"Check required failed: %s"%msg)
 
 
-        
 class StandardPackageOption(PackageOption):
     """ Simple package option that is meant for library and header checking with very
         little customization.  Just uses Configure.CheckXXX methods behind the scenes
@@ -215,9 +214,11 @@ class StandardPackageOption(PackageOption):
     def find(self,env):
         # Don't try to find it for now.  Just use configure tests
         if self.baseDir:
-            if os.path.exists(pj(self.baseDir,'include')):
+            # Only fall back on the base_dir/include if a specific
+            # include dir was not given.
+            if self.incDir is None and os.path.exists(pj(self.baseDir,'include')):
                 self.incDir = pj(self.baseDir,'include')
-            if os.path.exists(pj(self.baseDir,'lib')):
+            if self.libDir is None and os.path.exists(pj(self.baseDir,'lib')):
                 self.libDir = pj(self.baseDir,'lib')
     
     def validate(self, env):
@@ -225,7 +226,7 @@ class StandardPackageOption(PackageOption):
     
         conf_env = env.Copy()
         self.apply(conf_env)
-        
+
         conf_ctx = Configure(conf_env)
         if self.library and self.header:
             result = conf_ctx.CheckLibWithHeader(self.library, self.header, "C++")
@@ -233,7 +234,7 @@ class StandardPackageOption(PackageOption):
             result = conf_ctx.CheckLib(library=self.library, symbol=self.symbol, language="C++")
         elif self.header:
             result = conf_ctx.CheckCXXHeader(self.header)
-        
+
         if not result:
             passed = False
             self.checkRequired("Validation failed for option: %s"%self.name)
@@ -248,10 +249,18 @@ class StandardPackageOption(PackageOption):
 
     def apply(self, env):
         if self.incDir:
+            if self.verbose:
+                print "Appending inc_dir:", self.incDir
             env.Append(CPPPATH = self.incDir)
         if self.libDir:
+            if self.verbose:
+                print "Appending lib_dir:", self.libDir
             env.Append(LIBPATH = self.libDir)
-            
+        if self.library:
+            if self.verbose:
+                print "Adding lib:", self.library
+            env.Append(LIBS = [self.library])
+
     def getSettings(self):
         """ Return list sequence of ((key,value),(key,value),).
             dict.iteritems() should work.
@@ -735,6 +744,12 @@ class Options:
                         help_text += key_spacing
                         if isinstance(value,types.ListType):
                             help_text += '%s\n'%value
+                        elif isinstance(option, EnumOption):
+                            enum_text = str(value)
+                            for (k,v) in option.map.iteritems():
+                               if value == v:
+                                  enum_text = k
+                            help_text += '[%s]\n'%enum_text
                         else:
                             help_text += '[%s]\n'%value
                     
