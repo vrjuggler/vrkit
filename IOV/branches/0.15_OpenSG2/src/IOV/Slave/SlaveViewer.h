@@ -71,11 +71,11 @@ public:
 private:
    void initGl();
 
-   bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+   bool createdFunction(OSG::FieldContainerPtrConstArg fcp, OSG::RemoteAspect*);
 
-   bool changedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+   bool changedFunction(OSG::FieldContainerPtrConstArg fcp, OSG::RemoteAspect*);
 
-   bool destroyedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+   bool destroyedFunction(OSG::FieldContainerPtrConstArg fcp, OSG::RemoteAspect*);
 
    void shutdown();
 
