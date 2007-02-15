@@ -1,6 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2006
 
 #include <IOV/Scene.h>
+#include <IOV/OpenSG2Shim.h>
 
 namespace inf
 {
