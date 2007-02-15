@@ -311,11 +311,24 @@ void GeometryHighlightTraverser::removeHighlightMaterial(OSG::NodePtr node,
             OSG::endEditCP(mpass_mat,
                            OSG::MultiPassMaterial::MaterialsFieldMask);
 
+
             // If the number of materials remaining in mpass_mat is 1, then we
             // have reached the point where we need to restore the original
             // material.
-            OSG::MFMaterialPtr& materials(mpass_mat->getMaterials());
-            if ( materials.getSize() == 1 )
+            OSG::MFMaterialPtr materials(mpass_mat->getMaterials());
+
+	    OSG::MFMaterialPtr::iterator iter = materials.begin();
+	    OSG::MFMaterialPtr::iterator iterEnd = materials.end();
+
+	    OSG::UInt32 size = 1;
+
+	    while(iter != iterEnd)
+	    {
+	       ++size;
+	       ++iter;
+	    }
+
+            if ( 1 == size )
             {
                OSG::MaterialRefPtr orig_mat(mpass_mat->getMaterials(0));
 //               std::cout << "Restoring original material "
