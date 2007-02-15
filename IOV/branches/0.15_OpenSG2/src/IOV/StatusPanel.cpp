@@ -10,9 +10,12 @@
 #include <OpenSG/OSGGroup.h>
 #include <OpenSG/OSGChunkMaterial.h>
 #include <OpenSG/OSGClipPlaneChunk.h>
-#include <OpenSG/OSGSimpleAttachments.h>
+#include <OpenSG/OSGSimpleAttachment.h>
+#include <OpenSG/OSGNameAttachment.h>
 
 #include <vpr/Util/Assert.h>
+
+#include <IOV/OpenSG2Shim.h>
 
 
 namespace inf
