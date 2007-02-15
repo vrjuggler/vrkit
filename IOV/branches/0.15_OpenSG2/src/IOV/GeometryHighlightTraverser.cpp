@@ -394,14 +394,20 @@ void GeometryHighlightTraverser::reset()
 void GeometryHighlightTraverser::traverse(OSG::NodePtr node)
 {
    reset();
+#ifndef OPENSG2SHIM
    OSG::traverse(node,
                  OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
                     OSG::Action::ResultE, GeometryHighlightTraverser,
                     OSG::NodePtr
                  >(this, &GeometryHighlightTraverser::enter));
+#else
+   OSG::TraverseEnterFunctor f = boost::bind(&GeometryHighlightTraverser::enter,
+					     this, _1);
+   OSG::traverse(node, f);
+#endif
 }
 
-OSG::Action::ResultE GeometryHighlightTraverser::enter(OSG::NodePtr& node)
+OSG::Action::ResultE GeometryHighlightTraverser::enter(OSG::NodePtrConstArg node)
 {
    if ( node->getCore()->getType().isDerivedFrom(OSG::Geometry::getClassType()) )
    {
