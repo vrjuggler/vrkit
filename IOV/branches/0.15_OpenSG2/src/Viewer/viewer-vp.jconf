@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings configuration.version="3.0"?>
+<configuration xmlns="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" name="/home/patrick/src/pro/Assembly/src/external/common/OpenSG/VRJ/Viewer/viewer.jconf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.0/configuration http://www.vrjuggler.org/jccl/xsd/3.0/configuration.xsd">
+   <elements>
+      <infiscape_opensg_viewer name="Viewer" version="3">
+         <root_name>RootNode</root_name>
+         <plugin>ViewpointsPlugin</plugin>
+      </infiscape_opensg_viewer>
+      <mode_switch_plugin name="Mode Switcher" version="2">
+         <swap_button_nums>3</swap_button_nums>
+         <plugins>
+            <mode_plugin_def name="Wand Navigation Plug-in" version="1">
+               <plugin>WandNavPlugin</plugin>
+               <active_modes>0</active_modes>
+            </mode_plugin_def>
+         </plugins>
+         <plugins>
+            <mode_plugin_def name="Viewpoint Plug-in" version="1">
+               <plugin>ViewpointsPlugin</plugin>
+               <active_modes>1</active_modes>
+            </mode_plugin_def>
+         </plugins>
+         <mode_names>Navigation Mode</mode_names>
+         <mode_names>Viewpoint Mode</mode_names>
+      </mode_switch_plugin>
+      <wand_nav_plugin name="Viewer Wand Nav" version="2">
+         <max_velocity>5.0</max_velocity>
+         <acceleration>0.05</acceleration>
+         <rotation_sensitivity>0.5</rotation_sensitivity>
+         <forward_button_nums>0</forward_button_nums>
+         <reverse_button_nums>-1</reverse_button_nums>
+         <rotate_button_nums>1</rotate_button_nums>
+         <nav_mode_button_nums>2</nav_mode_button_nums>
+         <reset_button_nums>0,1</reset_button_nums>
+         <initial_mode>Walk</initial_mode>
+      </wand_nav_plugin>
+      <viewpoints_plugin name="ViewpointsPlugin" version="1">
+         <control_button_num>1</control_button_num>
+         <units_to_meters>1.0</units_to_meters>
+         <viewpoints>
+            <viewpoints_vp name="Position 1" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 2" version="1">
+               <position>20.0</position>
+               <position>0.0</position>
+               <position>-10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>-90.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 3" version="1">
+               <position>-20.0</position>
+               <position>0.0</position>
+               <position>-10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>90.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 4" version="1">
+               <position>10.0</position>
+               <position>0.0</position>
+               <position>10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>10.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 30" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>30.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 60" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>60.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 90" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>90.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 120" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>120.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 150" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>150.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 180" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>180.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+      </viewpoints_plugin>
+   </elements>
+</configuration>
+

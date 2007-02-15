@@ -1,0 +1,27 @@
+package id2zq9aeas8xdj4eas8zfx3;
+
+/**
+@version 2.0
+@physicalPackage
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:cpp#Class#inf::CenterPointGrabPlugin:oiref><oihard>
+@__modelType reference 
+*/
+class reference {
+}}/**
+@__tags
+@shapeType ClassDiagram 
+*/
+class __tags {
+}/**
+@__options 
+*/
+class __options {
+}/**
+@__positions <oigroup:<oiref:cpp#Class#inf::CenterPointGrabPlugin:oiref>=10,10,200,410,1:oigroup> 
+*/
+class __positions {
+}
