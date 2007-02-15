@@ -116,7 +116,7 @@ void CenterPointGrabPlugin::init(ViewerPtr viewer)
       geo->setPositions(mHighlightPoints);
       geo->setMaterial(mHighlightMaterial);
    OSG::endEditCP(geo);
-   OSG::addRefCP(geo);
+   OSG::addRef(geo);
 
    mCoredHighlightNode = OSG::GeometryNodePtr(geo);
 
@@ -364,8 +364,8 @@ void CenterPointGrabPlugin::updateHighlight(OSG::NodePtr highlightNode)
       mHighlightPoints->setValue(OSG::Pnt3f(max[0], max[1], max[2]), 7);
    OSG::endEditCP(mHighlightPoints);
 
-   OSG::beginEditCP(mCoredHighlightNode, OSG::Geometry::PositionsFieldMask);
-   OSG::endEditCP(mCoredHighlightNode, OSG::Geometry::PositionsFieldMask);
+   //OSG::beginEditCP(mCoredHighlightNode, OSG::Geometry::PositionsFieldMask);
+   //OSG::endEditCP(mCoredHighlightNode, OSG::Geometry::PositionsFieldMask);
 }
 
 }
