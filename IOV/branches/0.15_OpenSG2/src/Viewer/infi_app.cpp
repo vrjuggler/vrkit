@@ -21,7 +21,6 @@
 #include <vpr/vpr.h>
 #include <vpr/System.h>
 #include <vrj/Kernel/Kernel.h>
-#include <vrj/Draw/OpenSG/OpenSGApp.h>
 
 #include <IOV/Viewer.h>
 #include <IOV/User.h>
@@ -107,7 +106,7 @@ void OpenSgViewer::init()
    {
       std::cout << "Loading scene: " << mFileName << std::endl;
       model_root =
-         osg::SceneFileHandler::the().read((osg::Char8*)(mFileName.c_str()));
+         osg::SceneFileHandler::the()->read((osg::Char8*)(mFileName.c_str()));
    }
 
    OSG::TransformPtr model_xform_core = OSG::Transform::create();
@@ -145,7 +144,7 @@ void OpenSgViewer::init()
    OSG::endEditCP(light_beacon);
 
    // Setup light node
-   OSG::addRefCP(light_node);
+   OSG::addRef(light_node);
    OSG::beginEditCP(light_node);
       light_node->setCore(light_core);
       light_node->addChild(light_beacon);
