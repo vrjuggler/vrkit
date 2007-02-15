@@ -15,6 +15,7 @@
 #include <OpenSG/OSGSHLChunk.h>
 #include <OpenSG/OSGPolygonChunk.h>
 
+#include <IOV/OpenSG2Shim.h>
 #include <IOV/GeometryHighlightTraverser.h>
 
 
