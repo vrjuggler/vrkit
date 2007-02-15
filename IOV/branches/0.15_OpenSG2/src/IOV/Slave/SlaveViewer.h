@@ -14,6 +14,8 @@
 #include <OpenSG/OSGPointConnection.h>
 #include <OpenSG/OSGBinaryDataHandler.h>
 
+#include <IOV/OpenSG2Shim.h>
+
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
 
 
