@@ -10,6 +10,7 @@
 
 #include <OpenSG/OSGConnection.h>
 #include <OpenSG/OSGBinaryDataHandler.h>
+#include <IOV/OpenSG2Shim.h>
 
 #include <jccl/Config/ConfigElementPtr.h>
 #include <vrj/Draw/OpenSG/OpenSGApp.h>
