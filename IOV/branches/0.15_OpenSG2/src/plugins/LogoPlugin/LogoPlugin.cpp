@@ -169,7 +169,7 @@ void LogoPlugin::init(inf::ViewerPtr viewer)
       else if (!model_name.empty())
       {
          IOV_STATUS << "      Loading model: " << model_name << std::endl;
-         model_root = OSG::SceneFileHandler::the().read(model_name.c_str());
+         model_root = OSG::SceneFileHandler::the()->read(model_name.c_str());
       }
       else
       {
