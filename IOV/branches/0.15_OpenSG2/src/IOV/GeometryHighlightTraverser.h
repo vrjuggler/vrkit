@@ -214,7 +214,7 @@ private:
     */
    void traverse(OSG::NodePtr node);
 
-   OSG::Action::ResultE enter(OSG::NodePtr& node);
+   OSG::Action::ResultE enter(OSG::NodePtrConstArg node);
 
    boost::filesystem::path getCompleteShaderFile(const std::string& filename);
 
