@@ -8,12 +8,15 @@
 #include <OpenSG/OSGGroupConnection.h>
 #include <OpenSG/OSGConnectionFactory.h>
 #include <OpenSG/OSGSimpleAttachments.h>
+#include <OpenSG/OSGFieldContainerFactory.h>
+#include <OpenSG/OSGContainerFactoryMixins.h>
 
 #include <vpr/vpr.h>
 #include <vpr/System.h>
 #include <vpr/Util/FileUtils.h>
 #include <jccl/Config/Configuration.h>
 
+#include <IOV/OpenSG2Shim.h>
 #include <IOV/User.h>
 #include <IOV/Plugin.h>
 #include <IOV/PluginCreator.h>
@@ -240,17 +243,20 @@ void Viewer::deallocate()
    mPlugins.clear();
    mPluginFactory.reset();
 
+#if 0
+   // Turn this off for now XXX dshipton 2/14/07
+   
    // Output information about what is left over
    typedef std::vector<OSG::FieldContainerPtr> FieldContainerStore;
    typedef FieldContainerStore::const_iterator FieldContainerStoreConstIt;
 
-   OSG::FieldContainerFactory* fact = OSG::FieldContainerFactory::the();
-   const FieldContainerStore *pFCStore =fact->getFieldContainerStore();
-   unsigned int num_types = fact->getNumTypes();
+   const FieldContainerStore pFCStore = OSG::FieldContainerFactory::the()->getContainerStore();
+   unsigned int num_types = OSG::FieldContainerFactory::the()->getNumTypes();
 
    std::vector<unsigned int> type_ids;
    OSG::FieldContainerFactory::TypeMapIterator i;
-   for ( i = fact->beginTypes(); i != fact->endTypes(); ++i )
+   for ( i = OSG::FieldContainerFactory::the()->beginTypes(); 
+	 i != OSG::FieldContainerFactory::the()->endTypes(); ++i )
    {
       if( ((*i).second != NULL) && ((*i).second)->getPrototype() != OSG::NullFC)
       {
@@ -279,6 +285,7 @@ void Viewer::deallocate()
 
    std::cout << "Remaining non-null OpenSG objects (w/o types): "
              << (non_null_count-num_types) << std::endl;
+#endif
 
 // Enable this section when you want to see the names and types of the objects
 // that remain.
