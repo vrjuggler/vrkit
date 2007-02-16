@@ -196,7 +196,7 @@ void Viewer::latePreFrame()
 
    // We are using writeable change lists, so we need to clear them out
    // We do this here because it should be after anything else that the user may want to do
-   OSG::Thread::getCurrentChangeList()->clearAll();
+   OSG::Thread::getCurrentChangeList()->clear();
 }
 
 void Viewer::sendDataToSlaves(OSG::BinaryDataHandler& writer)
@@ -339,7 +339,7 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr clusterCfg)
    {
       std::cout << "Setting up remote slave network:" << std::endl;
       mAspect = new OSG::RemoteAspect();
-      mConnection = OSG::ConnectionFactory::the().createGroup("StreamSock");
+      mConnection = OSG::ConnectionFactory::the()->createGroup("StreamSock");
 
       // Construct the binding address to hand off to OpenSG.
       // At this point, listen_addr may be an empty string. This would give us
