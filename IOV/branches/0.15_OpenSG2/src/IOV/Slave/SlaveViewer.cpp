@@ -174,7 +174,7 @@ SlaveViewer::SlaveViewer(const std::string& masterAddr,
    , mGeometries(0)
 #endif
 {
-   mConnection = OSG::ConnectionFactory::the().createPoint("StreamSock");
+   mConnection = OSG::ConnectionFactory::the()->createPoint("StreamSock");
 }
 
 SlaveViewer::~SlaveViewer()
