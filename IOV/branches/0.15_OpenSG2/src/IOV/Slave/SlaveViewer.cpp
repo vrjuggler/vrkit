@@ -236,7 +236,7 @@ void SlaveViewer::initScene()
       mConnection->getValue(mDrawScaleFactor);
       mAspect->receiveSync(*mConnection);
 
-      OSG::Thread::getCurrentChangeList()->clearAll();
+      OSG::Thread::getCurrentChangeList()->clear();
       OSG::UInt8 finish(false);
       mConnection->getValue(finish);
 
@@ -329,7 +329,7 @@ void SlaveViewer::latePreFrame()
          //std::cout << "-------- Recv data: " << iter_num++ << " --------"
          //          << std::endl;
          mAspect->receiveSync(*mConnection);
-         OSG::Thread::getCurrentChangeList()->clearAll();
+         OSG::Thread::getCurrentChangeList()->clear();
          mConnection->getValue(finish);
          readDataFromMaster(*mConnection);
          sendDataToMaster(*mConnection);
