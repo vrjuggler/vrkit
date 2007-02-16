@@ -78,7 +78,7 @@ class travstate
 
     travstate( void ) : _indent(0) {}
 
-    OSG::Action::ResultE enter(OSG::NodePtr& node)
+    OSG::Action::ResultE enter(OSG::NodePtrConstArg node)
     {
         for(OSG::UInt16 i = 0; i < _indent; i++)
         { std::cout << "    "; }
@@ -108,7 +108,7 @@ class travstate
         return OSG::Action::Continue;
     }
 
-    OSG::Action::ResultE leave(OSG::NodePtr& node, OSG::Action::ResultE res)
+    OSG::Action::ResultE leave(OSG::NodePtrConstArg node, OSG::Action::ResultE res)
     {
         --_indent;
 
@@ -132,6 +132,7 @@ void printGraph(OSG::NodePtr node)
    travstate t;
    std::cout << "------- Scene: root: " << node << " ----------" << std::endl;
 
+#ifndef OPENSG2SHIM
    OSG::traverse(node,
              OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<OSG::Action::ResultE,
                                                  travstate,
@@ -144,6 +145,13 @@ void printGraph(OSG::NodePtr node)
                                                  OSG::Action::ResultE>(
                                                      &t,
                                                      &travstate::leave));
+#else
+   OSG::TraverseEnterFunctor f1 = boost::bind(&travstate::enter,
+					     &t, _1);
+   OSG::TraverseLeaveFunctor f2 = boost::bind(&travstate::leave,
+					     &t, _1, _2);
+   OSG::traverse(node, f1, f2);
+#endif
    std::cout << "--------------------------------------------" << std::endl;
 }
 
