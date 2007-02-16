@@ -184,6 +184,7 @@ SlaveViewer::~SlaveViewer()
 
 void SlaveViewer::initScene()
 {
+#ifndef OPENSG2SHIM
    OSG::RemoteAspect::Functor changed =
       OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
          bool, SlaveViewer, OSG::FieldContainerPtr, OSG::RemoteAspect*
@@ -198,6 +199,16 @@ void SlaveViewer::initScene()
       OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
          bool, SlaveViewer, OSG::FieldContainerPtr, OSG::RemoteAspect*
       >(this, &SlaveViewer::createdFunction);
+#else
+   OSG::RemoteAspect::Functor changed = boost::bind(&SlaveViewer::changedFunction,
+					     this, _1, _2);
+
+   OSG::RemoteAspect::Functor destroyed = boost::bind(&SlaveViewer::destroyedFunction,
+					     this, _1, _2);
+
+   OSG::RemoteAspect::Functor created = boost::bind(&SlaveViewer::createdFunction,
+					     this, _1, _2);
+#endif
 
    for ( OSG::UInt32 i = 0; i < OSG::TypeFactory::the()->getNumTypes(); ++i )
    {
