@@ -446,7 +446,7 @@ void SlaveViewer::initGl()
    glShadeModel(GL_SMOOTH);
 }
 
-bool SlaveViewer::createdFunction(OSG::FieldContainerPtr& fcp,
+bool SlaveViewer::createdFunction(OSG::FieldContainerPtrConstArg fcp,
                                   OSG::RemoteAspect*)
 {
 #ifdef _DEBUG
@@ -494,7 +494,7 @@ bool SlaveViewer::createdFunction(OSG::FieldContainerPtr& fcp,
    return true;
 }
 
-bool SlaveViewer::changedFunction(OSG::FieldContainerPtr& fcp,
+bool SlaveViewer::changedFunction(OSG::FieldContainerPtrConstArg fcp,
                                   OSG::RemoteAspect*)
 {
 #ifdef _DEBUG
@@ -526,7 +526,7 @@ bool SlaveViewer::changedFunction(OSG::FieldContainerPtr& fcp,
    return true;
 }
 
-bool SlaveViewer::destroyedFunction(OSG::FieldContainerPtr& fcp,
+bool SlaveViewer::destroyedFunction(OSG::FieldContainerPtrConstArg fcp,
                                     OSG::RemoteAspect*)
 {
 #ifdef _DEBUG
