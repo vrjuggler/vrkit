@@ -5,12 +5,15 @@
 
 #include <OpenSG/OSGAttachmentContainer.h>
 #include <OpenSG/OSGConnectionFactory.h>
+#include <OpenSG/OSGConnectionType.h>
 #include <OpenSG/OSGFieldContainerFactory.h>
+#include <OpenSG/OSGTypeFactory.h>
+#include <OpenSG/OSGContainerFactoryMixins.h>
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGThread.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGGeometry.h>
-#include <OpenSG/OSGSimpleAttachments.h>
+#include <OpenSG/OSGNameAttachment.h>
 #include <OpenSG/OSGSceneFileHandler.h>
 #include <OpenSG/OSGVerifyGraphOp.h>
 
