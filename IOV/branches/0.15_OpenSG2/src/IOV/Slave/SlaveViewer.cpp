@@ -263,12 +263,12 @@ void SlaveViewer::initScene()
       std::cout << "--- Searching for scene root (name is " << mRootNodeName
                 << ") ---" << std::endl;
 
-      const std::vector<OSG::FieldContainerPtr>* fcs =
-         OSG::FieldContainerFactory::the()->getFieldContainerStore();
+      const std::vector<OSG::FieldContainerPtr> fcs =
+         OSG::FieldContainerFactory::the()->getContainerStore();
 
-      for ( OSG::UInt32 i = 0; i < fcs->size(); ++i )
+      for ( OSG::UInt32 i = 0; i < fcs.size(); ++i )
       {
-         OSG::NodePtr node = OSG::NodePtr::dcast((*fcs)[i]);
+         OSG::NodePtr node = OSG::NodePtr::dcast((fcs)[i]);
 
          if ( OSG::NullFC != node )
          {
