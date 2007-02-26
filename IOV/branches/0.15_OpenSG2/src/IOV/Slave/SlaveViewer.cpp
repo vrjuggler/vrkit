@@ -96,8 +96,8 @@ class travstate
            std::cout << "name: " << node_name << "   ";
         }
 
-        std::cout << " type:" << node->getType().getName().str() << " fc_id:"
-             << node.getFieldContainerId() << "  ";
+        std::cout << " type:" << node->getType().getName().str()
+		  << " fc_id:" << node->getType().getId() << "  ";
 
         OSG::NodeCorePtr core = node->getCore();
         std::cout << "core: " << core << "  ";
@@ -464,7 +464,7 @@ bool SlaveViewer::createdFunction(OSG::FieldContainerPtrConstArg fcp,
    }
 
    vprDEBUG(infSLAVE_APP, SLAVE_DBG_LVL) << "Created: " << fcp->getType().getName().str() << " fc_id:"
-             << fcp.getFieldContainerId() << " " << vprDEBUG_FLUSH;
+             << fcp->getType().getId() << " " << vprDEBUG_FLUSH;
 #endif
 
    OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
@@ -500,7 +500,7 @@ bool SlaveViewer::changedFunction(OSG::FieldContainerPtrConstArg fcp,
 #ifdef _DEBUG
    vprDEBUG(infSLAVE_APP, SLAVE_DBG_LVL)
       << "Changed: " << fcp->getType().getName().str() << " fc_id:"
-             << fcp.getFieldContainerId() << " "<< vprDEBUG_FLUSH;
+             << fcp->getType().getId() << " "<< vprDEBUG_FLUSH;
 
    OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
 
@@ -532,7 +532,7 @@ bool SlaveViewer::destroyedFunction(OSG::FieldContainerPtrConstArg fcp,
 #ifdef _DEBUG
    vprDEBUG(infSLAVE_APP, SLAVE_DBG_LVL)
       << "Destroyed: " << fcp->getType().getName().str() << " fc_id:"
-             << fcp.getFieldContainerId() << " "<< vprDEBUG_FLUSH;
+             << fcp->getType().getId() << " "<< vprDEBUG_FLUSH;
 
    OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
 
