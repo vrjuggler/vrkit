@@ -8,7 +8,8 @@
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/OSGGeoPropPtrs.h>
+#include <OpenSG/OSGGeoProperties.h>
+#include <OpenSG/OSGTypedGeoIntegralProperty.h>
 #include <OpenSG/OSGSimpleGeometry.h>
 #include <OpenSG/OSGSimpleMaterial.h>
 

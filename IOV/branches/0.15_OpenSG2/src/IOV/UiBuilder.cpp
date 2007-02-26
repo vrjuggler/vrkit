@@ -6,11 +6,16 @@
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGSimpleMaterial.h>
 #include <OpenSG/OSGDepthChunk.h>
-#include <OpenSG/OSGTextureChunk.h>
+#include <OpenSG/OSGTextureObjChunk.h>
+#include <OpenSG/OSGTextureEnvChunk.h>
 #include <OpenSG/OSGChunkMaterial.h>
 #include <OpenSG/OSGMaterialChunk.h>
 #include <OpenSG/OSGBlendChunk.h>
 #include <OpenSG/OSGPolygonChunk.h>
+#include <OpenSG/OSGGeoProperties.h>
+#include <OpenSG/OSGTypedGeoIntegralProperty.h>
+
+#include <IOV/OpenSG2Shim.h>
 
 #include <vpr/Util/Assert.h>
 
@@ -486,7 +491,8 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
 {
    OSG::GeometryPtr        text_geom = OSG::Geometry::create();
    OSG::ChunkMaterialPtr   text_mat = OSG::ChunkMaterial::create();
-   OSG::TextureChunkPtr    texture_chunk = OSG::TextureChunk::create();
+   OSG::TextureObjChunkPtr    texture_chunk = OSG::TextureObjChunk::create();
+   OSG::TextureEnvChunkPtr    texture_envchunk = OSG::TextureEnvChunk::create();
    OSG::BlendChunkPtr      blend_chunk = OSG::BlendChunk::create();
 
    OSG::CPEditor tge(text_geom);
@@ -510,7 +516,7 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
    texture_chunk->setWrapT(GL_CLAMP);
    texture_chunk->setMagFilter(GL_LINEAR);
    texture_chunk->setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
-   texture_chunk->setEnvMode(GL_MODULATE);
+   texture_envchunk->setEnvMode(GL_MODULATE);
 
    OSG::MaterialChunkPtr mat_chunk = OSG::MaterialChunk::create();
    OSG::beginEditCP(mat_chunk);
@@ -536,6 +542,7 @@ OSG::GeometryPtr UiBuilder::createTextGeom()
    blend_chunk->setDestFactor(GL_ONE_MINUS_SRC_ALPHA);
 
    text_mat->addChunk(texture_chunk);
+   text_mat->addChunk(texture_envchunk);
    text_mat->addChunk(mat_chunk);
    //text_mat->addChunk(poly_chunk);
    text_mat->addChunk(blend_chunk);
@@ -583,8 +590,8 @@ void UiBuilder::buildText(OSG::GeometryPtr geom, UiBuilder::Font& font,
    OSG::ChunkMaterialPtr mat = OSG::ChunkMaterialPtr::dcast(geom->getMaterial());
    vprASSERT(OSG::NullFC != mat);
 
-   OSG::StateChunkPtr tex_state_chunk = mat->find(OSG::TextureChunk::getClassType());
-   OSG::TextureChunkPtr tex_chunk = OSG::TextureChunkPtr::dcast(tex_state_chunk);
+   OSG::StateChunkPtr tex_state_chunk = mat->find(OSG::TextureObjChunk::getClassType());
+   OSG::TextureObjChunkPtr tex_chunk = OSG::TextureObjChunkPtr::dcast(tex_state_chunk);
    vprASSERT(OSG::NullFC != tex_chunk);
 
    OSG::CPEditor tce(tex_chunk);
