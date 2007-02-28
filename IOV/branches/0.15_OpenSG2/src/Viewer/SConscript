@@ -20,8 +20,9 @@ if boost_options.isAvailable():
    if GetPlatform() == 'mac':
       viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
-   po_lib = boost_options.buildFullLibName('program_options')
-   viewerEnv.Prepend(LIBS = [po_lib])
+   viewerEnv.Prepend(LIBS = ['boost_program_options', 'OSGCluster', 'OSGState', 'OSGGroup', 'OSGDrawable', 'OSGWindow', 'OSGText'])
+   #po_lib = boost_options.buildFullLibName('program_options')
+   #viewerEnv.Prepend(LIBS = [po_lib])
 
    jconf_files = ['viewer-nav.jconf', 'viewer-vp.jconf']
    infi_app_prog = viewerEnv.Program('infi_app', ['infi_app.cpp',])
