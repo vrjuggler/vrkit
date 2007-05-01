@@ -100,13 +100,13 @@ void OpenSgViewer::init()
    if (mFileName.empty())
    {
       std::cout << "Loading fake geometry." << std::endl;
-      model_root = osg::makeTorus(0.75, 2.1, 21, 21);
+      model_root = OSG::makeTorus(0.75, 2.1, 21, 21);
    }
    else
    {
       std::cout << "Loading scene: " << mFileName << std::endl;
       model_root =
-         osg::SceneFileHandler::the()->read((osg::Char8*)(mFileName.c_str()));
+         OSG::SceneFileHandler::the()->read((OSG::Char8*)(mFileName.c_str()));
    }
 
    OSG::TransformPtr model_xform_core = OSG::Transform::create();
@@ -133,11 +133,11 @@ void OpenSgViewer::init()
 
    // Setup light beacon
    OSG::Matrix light_pos;
-   light_pos.setTransform(osg::Vec3f(2.0f, 5.0f, 4.0f));
+   light_pos.setTransform(OSG::Vec3f(2.0f, 5.0f, 4.0f));
 
-   OSG::beginEditCP(light_beacon_core, osg::Transform::MatrixFieldMask);
+   OSG::beginEditCP(light_beacon_core, OSG::Transform::MatrixFieldMask);
       light_beacon_core->setMatrix(light_pos);
-   OSG::endEditCP(light_beacon_core, osg::Transform::MatrixFieldMask);
+   OSG::endEditCP(light_beacon_core, OSG::Transform::MatrixFieldMask);
 
    OSG::beginEditCP(light_beacon);
       light_beacon->setCore(light_beacon_core);
@@ -169,9 +169,9 @@ void OpenSgViewer::init()
    OSG::TransformNodePtr scene_transform_root = scene->getTransformRoot();
 
    // Set up the root node
-   osg::beginEditCP(scene_transform_root.node());
+   OSG::beginEditCP(scene_transform_root.node());
       scene_transform_root.node()->addChild(light_node);
-   osg::endEditCP(scene_transform_root.node());
+   OSG::endEditCP(scene_transform_root.node());
 
    inf::GrabDataPtr grab_data = scene->getSceneData<inf::GrabData>();
    grab_data->addObject(model_xform);
