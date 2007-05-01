@@ -47,10 +47,6 @@ Viewer::~Viewer()
 
 void Viewer::init()
 {
-   // This has to be called before OSG::osgInit(), which is done by
-   // vrj::OpenSGApp::init().
-   OSG::ChangeList::setReadWriteDefault();
-
    vrj::OpenSGApp::init();
 
    // Verify configuration has been loaded
@@ -193,7 +189,7 @@ void Viewer::latePreFrame()
          mConnection = NULL;
       }
    }
-
+ 
    // We are using writeable change lists, so we need to clear them out
    // We do this here because it should be after anything else that the user may want to do
    OSG::Thread::getCurrentChangeList()->clear();
