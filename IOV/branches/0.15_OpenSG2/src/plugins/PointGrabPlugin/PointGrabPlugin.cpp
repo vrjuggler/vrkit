@@ -314,7 +314,7 @@ void PointGrabPlugin::run(inf::ViewerPtr viewer)
 
       gmtl::Matrix44f new_obj_mat = obj_M_wand * m_wand_M_obj_xform;
 
-      osg::Matrix obj_mat_osg;
+      OSG::Matrix obj_mat_osg;
       gmtl::set(obj_mat_osg, new_obj_mat);
       OSG::beginEditCP(mIntersectedObj, OSG::Transform::MatrixFieldMask);
          mIntersectedObj->setMatrix(obj_mat_osg);
