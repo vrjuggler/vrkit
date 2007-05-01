@@ -268,7 +268,7 @@ void SlaveViewer::initScene()
 
       for ( OSG::UInt32 i = 0; i < fcs.size(); ++i )
       {
-         OSG::NodePtr node = OSG::NodePtr::dcast((fcs)[i]);
+         OSG::NodePtr node = OSG::cast_dynamic<OSG::NodePtr>((fcs)[i]);
 
          if ( OSG::NullFC != node )
          {
@@ -467,7 +467,7 @@ bool SlaveViewer::createdFunction(OSG::FieldContainerPtrConstArg fcp,
              << fcp->getType().getId() << " " << vprDEBUG_FLUSH;
 #endif
 
-   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
+   OSG::AttachmentContainerPtr acp = OSG::cast_dynamic<OSG::AttachmentContainerPtr>(fcp);
 
    if ( OSG::NullFC != acp )
    {
@@ -502,7 +502,7 @@ bool SlaveViewer::changedFunction(OSG::FieldContainerPtrConstArg fcp,
       << "Changed: " << fcp->getType().getName().str() << " fc_id:"
              << fcp->getType().getId() << " "<< vprDEBUG_FLUSH;
 
-   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
+   OSG::AttachmentContainerPtr acp = OSG::cast_dynamic<OSG::AttachmentContainerPtr>(fcp);
 
    if ( OSG::NullFC != acp )
    {
@@ -534,7 +534,7 @@ bool SlaveViewer::destroyedFunction(OSG::FieldContainerPtrConstArg fcp,
       << "Destroyed: " << fcp->getType().getName().str() << " fc_id:"
              << fcp->getType().getId() << " "<< vprDEBUG_FLUSH;
 
-   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
+   OSG::AttachmentContainerPtr acp = OSG::cast_dynamic<OSG::AttachmentContainerPtr>(fcp);
 
    if ( OSG::NullFC != acp )
    {

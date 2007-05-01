@@ -243,7 +243,7 @@ void GeometryHighlightTraverser::addHighlightMaterial(OSG::NodePtr node,
       // mpass_mat.
       else
       {
-         mpass_mat = OSG::MultiPassMaterialPtr::dcast(mat);
+         mpass_mat = OSG::cast_dynamic<OSG::MultiPassMaterialPtr>(mat);
       }
 
 //      std::cout << "Ading material " << mMaterials[id] << std::endl;
@@ -269,7 +269,7 @@ void GeometryHighlightTraverser::swapHighlightMaterial(OSG::NodePtr node,
    {
       OSG::MaterialPtr mat = (*c)->getMaterial();
       OSG::MultiPassMaterialPtr mpass_mat =
-         OSG::MultiPassMaterialPtr::dcast(mat);
+         OSG::cast_dynamic<OSG::MultiPassMaterialPtr>(mat);
       if ( mpass_mat->hasMaterial(mMaterials[oldID]) )
       {
          OSG::beginEditCP(mpass_mat,
@@ -297,7 +297,7 @@ void GeometryHighlightTraverser::removeHighlightMaterial(OSG::NodePtr node,
       if ( OSG::NullFC != mat )
       {
          OSG::MultiPassMaterialPtr mpass_mat =
-            OSG::MultiPassMaterialPtr::dcast(mat);
+            OSG::cast_dynamic<OSG::MultiPassMaterialPtr>(mat);
 
          // Ensure that mpass_mat has the given material to be removed and
          // then remove it.
@@ -411,7 +411,7 @@ OSG::Action::ResultE GeometryHighlightTraverser::enter(OSG::NodePtrConstArg node
 {
    if ( node->getCore()->getType().isDerivedFrom(OSG::Geometry::getClassType()) )
    {
-      OSG::GeometryPtr geom = OSG::GeometryPtr::dcast(node->getCore());
+      OSG::GeometryPtr geom = OSG::cast_dynamic<OSG::GeometryPtr>(node->getCore());
       mGeomCores.push_back(OSG::GeometryRefPtr(geom));
    }
 

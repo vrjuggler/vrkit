@@ -86,7 +86,7 @@ void StatusPanel::initialize()
    mFont = new inf::UiBuilder::Font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
    //mFont = new inf::UiBuilder::Font("MONO", OSG::TextFace::STYLE_PLAIN, 64);
 
-   OSG::ChunkMaterialPtr text_mat = OSG::ChunkMaterialPtr::dcast(mTextGeomCore->getMaterial());
+   OSG::ChunkMaterialPtr text_mat = OSG::cast_dynamic<OSG::ChunkMaterialPtr>(mTextGeomCore->getMaterial());
    vprASSERT(OSG::NullFC != text_mat);
 
    mClipRight = OSG::ClipPlaneChunk::create();

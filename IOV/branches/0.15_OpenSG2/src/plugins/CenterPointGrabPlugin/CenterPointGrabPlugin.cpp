@@ -77,23 +77,23 @@ void CenterPointGrabPlugin::init(ViewerPtr viewer)
 
    OSG::GeoIndicesUI32Ptr index = OSG::GeoIndicesUI32::create();
    OSG::beginEditCP(index);
-      index->getFieldPtr()->push_back(0);
-      index->getFieldPtr()->push_back(1);
-      index->getFieldPtr()->push_back(3);
-      index->getFieldPtr()->push_back(2);
-      index->getFieldPtr()->push_back(0);
-      index->getFieldPtr()->push_back(4);
-      index->getFieldPtr()->push_back(5);
-      index->getFieldPtr()->push_back(7);
-      index->getFieldPtr()->push_back(6);
-      index->getFieldPtr()->push_back(4);
+      index->editFieldPtr()->push_back(0);
+      index->editFieldPtr()->push_back(1);
+      index->editFieldPtr()->push_back(3);
+      index->editFieldPtr()->push_back(2);
+      index->editFieldPtr()->push_back(0);
+      index->editFieldPtr()->push_back(4);
+      index->editFieldPtr()->push_back(5);
+      index->editFieldPtr()->push_back(7);
+      index->editFieldPtr()->push_back(6);
+      index->editFieldPtr()->push_back(4);
 
-      index->getFieldPtr()->push_back(1);
-      index->getFieldPtr()->push_back(5);
-      index->getFieldPtr()->push_back(2);
-      index->getFieldPtr()->push_back(6);
-      index->getFieldPtr()->push_back(3);
-      index->getFieldPtr()->push_back(7);
+      index->editFieldPtr()->push_back(1);
+      index->editFieldPtr()->push_back(5);
+      index->editFieldPtr()->push_back(2);
+      index->editFieldPtr()->push_back(6);
+      index->editFieldPtr()->push_back(3);
+      index->editFieldPtr()->push_back(7);
    OSG::endEditCP(index);
 
    mHighlightPoints = OSG::GeoPositions3f::create();
@@ -283,7 +283,7 @@ void CenterPointGrabPlugin::run(inf::ViewerPtr viewer)
       );
       const gmtl::Matrix44f vw_M_wand = vw_M_vp * vp_M_wand;
 
-      osg::Matrix obj_mat;
+      OSG::Matrix obj_mat;
       gmtl::set(obj_mat, vw_M_wand);
       OSG::beginEditCP(mGrabbedObj, OSG::Transform::MatrixFieldMask);
          mGrabbedObj->setMatrix(obj_mat);

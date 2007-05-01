@@ -122,11 +122,11 @@ void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom,
                                       const OSG::Pnt2f& maxPt,
                                       const float depth, const float alpha)
 {
-   OSG::GeoPTypesPtr types = OSG::GeoPTypesUI8Ptr::dcast(geom->getTypes());
-   OSG::GeoPLengthsPtr lens = OSG::GeoPLengthsUI32Ptr::dcast(geom->getLengths());
-   OSG::GeoPositions3fPtr verts = OSG::GeoPositions3fPtr::dcast(geom->getPositions());
-   OSG::GeoColors4fPtr colors = OSG::GeoColors4fPtr::dcast(geom->getColors());
-   OSG::GeoNormals3fPtr norms = OSG::GeoNormals3fPtr::dcast(geom->getNormals());
+   OSG::GeoPTypesPtr types = OSG::cast_dynamic<OSG::GeoPTypesUI8Ptr>(geom->getTypes());
+   OSG::GeoPLengthsPtr lens = OSG::cast_dynamic<OSG::GeoPLengthsUI32Ptr>(geom->getLengths());
+   OSG::GeoPositions3fPtr verts = OSG::cast_dynamic<OSG::GeoPositions3fPtr>(geom->getPositions());
+   OSG::GeoColors4fPtr colors = OSG::cast_dynamic<OSG::GeoColors4fPtr>(geom->getColors());
+   OSG::GeoNormals3fPtr norms = OSG::cast_dynamic<OSG::GeoNormals3fPtr>(geom->getNormals());
 
    assert(OSG::NullFC != types);
    assert(OSG::NullFC != lens);
@@ -134,7 +134,7 @@ void UiBuilder::buildRectangleOutline(OSG::GeometryPtr geom,
    assert(OSG::NullFC != colors);
    assert(OSG::NullFC != norms);
 
-   OSG::MFColor4f* mfc = colors->getFieldPtr();
+   OSG::MFColor4f* mfc = colors->editFieldPtr();
    assert(NULL != mfc);
 
    OSG::CPEditor types_ed(types);
@@ -167,11 +167,11 @@ void UiBuilder::buildRectangle(OSG::GeometryPtr geom,
                                const OSG::Pnt2f& maxPt, const float frontDepth,
                                const float backDepth, const float alpha)
 {
-   OSG::GeoPTypesPtr types = OSG::GeoPTypesUI8Ptr::dcast(geom->getTypes());
-   OSG::GeoPLengthsPtr lens = OSG::GeoPLengthsUI32Ptr::dcast(geom->getLengths());
-   OSG::GeoPositions3fPtr verts = OSG::GeoPositions3fPtr::dcast(geom->getPositions());
-   OSG::GeoColors4fPtr colors = OSG::GeoColors4fPtr::dcast(geom->getColors());
-   OSG::GeoNormals3fPtr norms = OSG::GeoNormals3fPtr::dcast(geom->getNormals());
+   OSG::GeoPTypesPtr types = OSG::cast_dynamic<OSG::GeoPTypesUI8Ptr>(geom->getTypes());
+   OSG::GeoPLengthsPtr lens = OSG::cast_dynamic<OSG::GeoPLengthsUI32Ptr>(geom->getLengths());
+   OSG::GeoPositions3fPtr verts = OSG::cast_dynamic<OSG::GeoPositions3fPtr>(geom->getPositions());
+   OSG::GeoColors4fPtr colors = OSG::cast_dynamic<OSG::GeoColors4fPtr>(geom->getColors());
+   OSG::GeoNormals3fPtr norms = OSG::cast_dynamic<OSG::GeoNormals3fPtr>(geom->getNormals());
 
    assert(OSG::NullFC != types);
    assert(OSG::NullFC != lens);
@@ -179,7 +179,7 @@ void UiBuilder::buildRectangle(OSG::GeometryPtr geom,
    assert(OSG::NullFC != colors);
    assert(OSG::NullFC != norms);
 
-   OSG::MFColor4f* mfc = colors->getFieldPtr();
+   OSG::MFColor4f* mfc = colors->editFieldPtr();
    assert(NULL != mfc);
 
    OSG::Color4f used_color(color.red(), color.green(), color.blue(), alpha);
@@ -276,11 +276,11 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f& color,
                           const float frontDepth, const float backDepth,
                           const bool capIt, const float alpha)
 {
-   OSG::GeoPTypesPtr types = OSG::GeoPTypesUI8Ptr::dcast(geom->getTypes());
-   OSG::GeoPLengthsPtr lens = OSG::GeoPLengthsUI32Ptr::dcast(geom->getLengths());
-   OSG::GeoPositions3fPtr verts = OSG::GeoPositions3fPtr::dcast(geom->getPositions());
-   OSG::GeoColors4fPtr colors = OSG::GeoColors4fPtr::dcast(geom->getColors());
-   OSG::GeoNormals3fPtr norms = OSG::GeoNormals3fPtr::dcast(geom->getNormals());
+   OSG::GeoPTypesPtr types = OSG::cast_dynamic<OSG::GeoPTypesUI8Ptr>(geom->getTypes());
+   OSG::GeoPLengthsPtr lens = OSG::cast_dynamic<OSG::GeoPLengthsUI32Ptr>(geom->getLengths());
+   OSG::GeoPositions3fPtr verts = OSG::cast_dynamic<OSG::GeoPositions3fPtr>(geom->getPositions());
+   OSG::GeoColors4fPtr colors = OSG::cast_dynamic<OSG::GeoColors4fPtr>(geom->getColors());
+   OSG::GeoNormals3fPtr norms = OSG::cast_dynamic<OSG::GeoNormals3fPtr>(geom->getNormals());
 
    assert(OSG::NullFC != types);
    assert(OSG::NullFC != lens);
@@ -288,7 +288,7 @@ void UiBuilder::buildDisc(OSG::GeometryPtr geom, const OSG::Color3f& color,
    assert(OSG::NullFC != colors);
    assert(OSG::NullFC != norms);
 
-   OSG::MFColor4f* mfc = colors->getFieldPtr();
+   OSG::MFColor4f* mfc = colors->editFieldPtr();
    assert(NULL != mfc);
 
    OSG::Color4f used_color(color.red(), color.green(), color.blue(), alpha);
@@ -482,9 +482,9 @@ void UiBuilder::Font::update() throw(inf::Exception)
    {
       throw inf::Exception("ERROR: Failed to allocate face.", IOV_LOCATION);
    }
-   subRefP(mFace);
+   subRef(mFace);
    mFace = new_face;
-   addRefP(mFace);
+   addRef(mFace);
 }
 
 OSG::GeometryPtr UiBuilder::createTextGeom()
@@ -587,11 +587,11 @@ void UiBuilder::buildText(OSG::GeometryPtr geom, UiBuilder::Font& font,
 
    font.mFace->fillGeo(geom, layout_result, scale, offset-single_line_offset, color);
 
-   OSG::ChunkMaterialPtr mat = OSG::ChunkMaterialPtr::dcast(geom->getMaterial());
+   OSG::ChunkMaterialPtr mat = OSG::cast_dynamic<OSG::ChunkMaterialPtr>(geom->getMaterial());
    vprASSERT(OSG::NullFC != mat);
 
    OSG::StateChunkPtr tex_state_chunk = mat->find(OSG::TextureObjChunk::getClassType());
-   OSG::TextureObjChunkPtr tex_chunk = OSG::TextureObjChunkPtr::dcast(tex_state_chunk);
+   OSG::TextureObjChunkPtr tex_chunk = OSG::cast_dynamic<OSG::TextureObjChunkPtr>(tex_state_chunk);
    vprASSERT(OSG::NullFC != tex_chunk);
 
    OSG::CPEditor tce(tex_chunk);
