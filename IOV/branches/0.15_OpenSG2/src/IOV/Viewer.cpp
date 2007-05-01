@@ -114,6 +114,8 @@ void Viewer::init()
          loadAndInitPlugins(app_cfg);
       }
 
+      OSG::commitChanges();
+
       // -- Configure cluster support --- //
       jccl::ConfigElementPtr cluster_cfg =
          mConfiguration.getConfigElement(cluster_elt_type);
@@ -147,6 +149,8 @@ void Viewer::preFrame()
 
    // Update the user (and navigation)
    getUser()->update(shared_from_this());
+
+   OSG::commitChanges();
 }
 
 void Viewer::latePreFrame()
@@ -189,6 +193,8 @@ void Viewer::latePreFrame()
          mConnection = NULL;
       }
    }
+
+   OSG::commitChanges();
  
    // We are using writeable change lists, so we need to clear them out
    // We do this here because it should be after anything else that the user may want to do
