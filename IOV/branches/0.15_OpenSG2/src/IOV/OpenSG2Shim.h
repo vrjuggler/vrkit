@@ -28,7 +28,7 @@ template< class Core > inline
 void endEditCP  (const CoredNodePtr<Core> &objectP, 
                        BitVector         whichField = FieldBits    ::AllFields,
                        UInt32            origin     = ChangedOrigin::External)
-                       {}
+                       {commitChanges();}
 #endif
 
 #if 0
