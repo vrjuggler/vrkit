@@ -163,8 +163,8 @@ if not SConsAddons.Util.hasHelpFlag():
    if boost_options.isAvailable():
       boost_options.updateEnv(baseEnv)
 
-   if SCons.Util.WhereIs('distcc'):
-      baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")
+   #if SCons.Util.WhereIs('distcc'):
+   #   baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")
 
    Export('baseEnv', 'build_dir', 'inst_paths')
 

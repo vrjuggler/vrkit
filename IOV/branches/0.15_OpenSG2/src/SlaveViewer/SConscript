@@ -21,8 +21,8 @@ if boost_options.isAvailable():
    if GetPlatform() == 'mac':
       viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
-   po_lib = boost_options.buildFullLibName('program_options')
-   viewerEnv.Prepend(LIBS = [po_lib])
+   #po_lib = boost_options.buildFullLibName('program_options')
+   viewerEnv.Prepend(LIBS = ['boost_program_options', 'OSGCluster', 'OSGState', 'OSGGroup', 'OSGDrawable', 'OSGWindow', 'OSGText', 'OSGRenderTraversal'])
 
    slave_viewer_prog = viewerEnv.Program('slaveViewer', 
                               ['slave_app.cpp'])
