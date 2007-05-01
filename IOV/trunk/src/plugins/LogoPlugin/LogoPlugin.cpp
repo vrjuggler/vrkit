@@ -158,7 +158,7 @@ PluginPtr LogoPlugin::init(inf::ViewerPtr viewer)
          mat->setMagFilter(GL_LINEAR);
          mat->setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
 
-         OSG::GeometryPtr geom = osg::makePlaneGeo(1.0, 1.0, 1,1);
+         OSG::GeometryPtr geom = OSG::makePlaneGeo(1.0, 1.0, 1,1);
          OSG::CPEditor ge(geom);
          geom->setMaterial(mat);
 
