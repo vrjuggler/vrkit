@@ -13,6 +13,7 @@
 #include <IOV/Status.h>
 #include <IOV/User.h>
 #include <IOV/Viewer.h>
+#include <IOV/WandInterface.h>
 
 #include "Grid.h"
 #include "GridPlugin.h"

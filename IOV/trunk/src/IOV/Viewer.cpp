@@ -23,11 +23,13 @@
 #include <IOV/Plugin.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/PluginFactory.h>
-#include <IOV/Viewer.h>
 #include <IOV/SceneObject.h>
 #include <IOV/Status.h>
+#include <IOV/WandInterface.h>
 #include <IOV/Util/OpenSGHelpers.h>
 #include <IOV/Util/Debug.h>
+
+#include <IOV/Viewer.h>
 
 
 namespace fs = boost::filesystem;
