@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <jccl/Config/Configuration.h>
-#include <jccl/Config/ConfigElement.h>
+#include <jccl/Config/ConfigElementPtr.h>
 
 
 namespace inf
