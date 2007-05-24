@@ -6,6 +6,8 @@
 #include <gmtl/gmtl.h>
 #include <gmtl/External/OpenSGConvert.h>
 
+#include <jccl/Config/ConfigElement.h>
+
 #include <IOV/PluginCreator.h>
 #include <IOV/Status.h>
 #include <IOV/Scene.h>

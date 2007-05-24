@@ -1,5 +1,9 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
+#include <IOV/Config.h>
+
+#include <iostream>
+
 #include <IOV/Configuration.h>
 
 

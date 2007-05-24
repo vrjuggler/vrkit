@@ -25,6 +25,7 @@
 #include <gmtl/External/OpenSGConvert.h>
 
 #include <vpr/Util/FileUtils.h>
+#include <jccl/Config/ConfigElement.h>
 
 #include "LogoPlugin.h"
 
