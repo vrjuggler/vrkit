@@ -60,7 +60,8 @@ Configuration::getAllConfigElements(const std::string& eltName)
       // Concat all of them
       for ( unsigned int i = 0; i < mElementLists.size(); ++i )
       {
-         std::vector<jccl::ConfigElementPtr> cur_elts = mElementLists[i].vec();
+         const std::vector<jccl::ConfigElementPtr>& cur_elts =
+            mElementLists[i].vec();
          ret_elts.insert(ret_elts.end(), cur_elts.begin(), cur_elts.end());
       }
    }
