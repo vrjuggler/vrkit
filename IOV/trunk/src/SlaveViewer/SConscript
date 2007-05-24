@@ -21,7 +21,7 @@ if boost_options.isAvailable():
    if GetPlatform() == 'darwin':
       viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
-   po_lib = boost_options.buildFullLibName('program_options', viewerEnv)
+   po_lib = boost_options.getFullLibName('program_options', viewerEnv)
    viewerEnv.Prepend(LIBS = [po_lib])
 
    slave_viewer_prog = viewerEnv.Program('slaveViewer', 
