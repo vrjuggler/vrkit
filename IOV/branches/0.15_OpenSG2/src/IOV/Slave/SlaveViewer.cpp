@@ -291,7 +291,7 @@ void SlaveViewer::initScene()
 
       std::cout << "------" << std::endl;
 
-      OSG::NodePtr temp_node = mSceneRoot.node();
+      //OSG::NodePtr temp_node = mSceneRoot.node();
       /*
       std::cout << "--- Verifying initial scene:" << std::endl;
       OSG::VerifyGraphOp verify_op;
@@ -335,8 +335,8 @@ void SlaveViewer::latePreFrame()
          sendDataToMaster(*mConnection);
          mConnection->flush();
 
+         //OSG::NodePtr temp_node = mSceneRoot.node();
          /*
-         OSG::NodePtr temp_node = mSceneRoot.node();
          std::cout << "--- Verifying Graph:" << std::endl;
          OSG::VerifyGraphOp verify_op;
          verify_op.setVerbose(true);
@@ -385,6 +385,7 @@ void SlaveViewer::latePreFrame()
 
    OSG::SceneFileHandler::the().write(getScene(), file_name.c_str());
    */
+   OSG::commitChanges();
 }
 
 void SlaveViewer::exit()
@@ -413,37 +414,6 @@ void SlaveViewer::readDataFromMaster(OSG::BinaryDataHandler& reader)
 
 void SlaveViewer::initGl()
 {
-   //glEnable(GL_NORMALIZE);
-
-   GLfloat light0_ambient[]  = { 0.1f,  0.1f,  0.1f, 1.0f };
-   GLfloat light0_diffuse[]  = { 0.7f,  0.7f,  0.7f, 1.0f };
-   GLfloat light0_specular[] = { 1.0f,  1.0f,  1.0f, 1.0f };
-   GLfloat light0_position[] = { 0.5f, 0.75f, 0.75f, 0.0f };
-
-   GLfloat mat_ambient[]   = { 0.7f, 0.7f, 0.7f, 1.0f };
-   GLfloat mat_diffuse[]   = { 1.0f, 0.5f, 0.8f, 1.0f };
-   GLfloat mat_specular[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-   GLfloat mat_shininess[] = { 50.0f };
-//   GLfloat mat_emission[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-   GLfloat no_mat[]        = { 0.0f, 0.0f, 0.0f, 1.0f };
-
-   glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
-   glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
-   glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
-   glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
-
-   glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-   glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-   glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-   glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-   glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
-
-   glEnable(GL_DEPTH_TEST);
-   glEnable(GL_NORMALIZE);
-   glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);
-   glEnable(GL_COLOR_MATERIAL);
-   glShadeModel(GL_SMOOTH);
 }
 
 bool SlaveViewer::createdFunction(OSG::FieldContainerPtrConstArg fcp,

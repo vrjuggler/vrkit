@@ -44,6 +44,11 @@ public:
       return mSceneRoot.node();
    }
 
+   virtual void init()
+   {
+      vrj::OpenSGApp::init();
+   }
+
    virtual void contextInit();
 
    virtual void latePreFrame();
