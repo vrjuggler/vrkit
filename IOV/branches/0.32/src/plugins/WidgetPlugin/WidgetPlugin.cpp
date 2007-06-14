@@ -109,12 +109,29 @@ WidgetPlugin::objectIntersected(inf::SceneObjectPtr obj,
 {
    const std::vector<SceneObjectPtr>& objs = mWidgetData->getWidgets();
 
+   std::cout << "WidgetPlugin objectIntersected: " << objs.size() << std::endl;
    if (!isFocused())
    {
+      std::cout << "Widget plugin is not focused" << std::endl;
       return inf::Event::CONTINUE;
    }
 
-   // Ensure that we intersected a widget and not a model etc.
+   WidgetPtr widget = boost::dynamic_pointer_cast<Widget>(obj);
+   if (NULL != widget.get())
+   {
+      std::cout << "We intersected a widget." << std::endl;
+      mIntersectedObj = obj;
+      mIntersectPoint = pnt;
+      //mIntersectSound.trigger();
+      mIntersecting = true;
+      mIntersectedObj->wandEntered();
+
+      // Don't allow anyone else to process this event since it is only
+      // for widgets. (ex. BasicHighlighter)
+      return inf::Event::DONE;
+   }
+
+   /*
    inf::SceneObjectPtr parent = obj->getParent();
    while ( NULL != parent.get() )
    {
@@ -132,6 +149,7 @@ WidgetPlugin::objectIntersected(inf::SceneObjectPtr obj,
       }
       parent = parent->getParent();
    }
+   */
 
    return inf::Event::CONTINUE;
 }

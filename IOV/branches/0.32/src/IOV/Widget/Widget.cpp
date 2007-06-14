@@ -44,6 +44,8 @@ void Widget::wandMoved()
 
 WidgetPtr Widget::init(const float metersToAppUnits)
 {
+   StaticSceneObject::init(OSG::TransformNodePtr::create());
+
    mMetersToAppUnits = metersToAppUnits;
 
    const float feet_to_app_units(0.3048f * mMetersToAppUnits);
@@ -51,22 +53,21 @@ WidgetPtr Widget::init(const float metersToAppUnits)
    mWidth = 1.0f * feet_to_app_units;
    mHeight = 1.0f * feet_to_app_units;
 
-   mRootWidgetNode = OSG::TransformNodePtr::create();
    mWidgetGeomNode = OSG::GeometryNodePtr::create();
    mWidgetGeomNode = mBuilder.createGeomGeo();
 
-   OSG::UInt32 trav_mask = mRootWidgetNode.node()->getTravMask();
+   OSG::UInt32 trav_mask = mTransformNode.node()->getTravMask();
    trav_mask = (trav_mask & ~128);
-   OSG::beginEditCP(mRootWidgetNode.node(), OSG::Node::TravMaskFieldMask);
-      mRootWidgetNode.node()->setTravMask(trav_mask);
-   OSG::endEditCP(mRootWidgetNode.node(), OSG::Node::TravMaskFieldMask);
+   OSG::beginEditCP(mTransformNode.node(), OSG::Node::TravMaskFieldMask);
+      mTransformNode.node()->setTravMask(trav_mask);
+   OSG::endEditCP(mTransformNode.node(), OSG::Node::TravMaskFieldMask);
 
-   OSG::setName(mRootWidgetNode.node(), "RootWidgetNode");
+   OSG::setName(mTransformNode.node(), "RootWidgetNode");
    OSG::setName(mWidgetGeomNode.node(), "WidgetGeomNode");
    OSG::setName(mWidgetGeomNode.core(), "WidgetGeomCore");
 
-   OSG::CPEditor rpne(mRootWidgetNode.node());
-   mRootWidgetNode.node()->addChild(mWidgetGeomNode);
+   OSG::CPEditor rpne(mTransformNode.node());
+   mTransformNode.node()->addChild(mWidgetGeomNode);
 
    setDirty();
 
@@ -98,16 +99,16 @@ void Widget::setWidthHeight(const float w, const float h,
 
 void Widget::move(const OSG::Pnt3f& pnt)
 {
-   OSG::beginEditCP(mRootWidgetNode.core(), OSG::Transform::MatrixFieldMask);
-      mRootWidgetNode.core()->getMatrix().setTranslate(pnt);
-   OSG::endEditCP(mRootWidgetNode.core(), OSG::Transform::MatrixFieldMask);
+   OSG::beginEditCP(mTransformNode.core(), OSG::Transform::MatrixFieldMask);
+      mTransformNode.core()->getMatrix().setTranslate(pnt);
+   OSG::endEditCP(mTransformNode.core(), OSG::Transform::MatrixFieldMask);
 }
 
 void Widget::moveTo(const OSG::Matrix& xform)
 {
-   OSG::beginEditCP(mRootWidgetNode.core(), OSG::Transform::MatrixFieldMask);
-      mRootWidgetNode.core()->setMatrix(xform);
-   OSG::endEditCP(mRootWidgetNode.core(), OSG::Transform::MatrixFieldMask);
+   OSG::beginEditCP(mTransformNode.core(), OSG::Transform::MatrixFieldMask);
+      mTransformNode.core()->setMatrix(xform);
+   OSG::endEditCP(mTransformNode.core(), OSG::Transform::MatrixFieldMask);
 }
 
 void Widget::updatePanelScene()

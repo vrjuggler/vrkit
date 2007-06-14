@@ -29,6 +29,11 @@ WidgetPtr SphereButton::init(const float metersToAppUnits)
                                                            1.0f,
                                                            mGrabColor);
 
+   
+   OSG::setName(mTransformNode.node(), "SphereRootNode");
+   OSG::setName(mWidgetGeomNode.node(), "SphereGeomNode");
+   OSG::setName(mWidgetGeomNode.core(), "SphereGeomCore");
+
    return myself;
 }
 
@@ -38,17 +43,18 @@ void SphereButton::updatePanelScene()
    mBuilder.resetGeomGeo(mWidgetGeomNode.core());
    OSG::GeometryPtr new_geo = mBuilder.buildSphere(3, radius, mBgColor, mBgAlpha);
    mWidgetGeomNode = new_geo;
-   OSG::setName(mWidgetGeomNode.core(), "WidgetGeomCore");
+   OSG::setName(mWidgetGeomNode.core(), "SphereGeomCore");
 }
 
 void SphereButton::wandEntered()
 {
-   mGeomTraverser.addHighlightMaterial(mRootWidgetNode.node(), mHoverHighlightID);
+   std::cout << "SphereButton::wandEntered" << std::endl;
+   mGeomTraverser.addHighlightMaterial(mTransformNode.node(), mHoverHighlightID);
 
 /*
    if (mActiveHighlightID == 0)
    {
-      mGeomTraverser.addHighlightMaterial(mRootWidgetNode.node(), mHoverHighlightID);
+      mGeomTraverser.addHighlightMaterial(mTransformNode.node(), mHoverHighlightID);
       mActiveHighlightID = mHoverHighlightID;
    }
 */
@@ -56,11 +62,11 @@ void SphereButton::wandEntered()
 
 void SphereButton::wandExited()
 {
-   mGeomTraverser.removeHighlightMaterial(mRootWidgetNode.node(), mHoverHighlightID);
+   mGeomTraverser.removeHighlightMaterial(mTransformNode.node(), mHoverHighlightID);
 /*
    if (!mPressed)
    {
-      mGeomTraverser.removeHighlightMaterial(mRootWidgetNode.node(), mHoverHighlightID);
+      mGeomTraverser.removeHighlightMaterial(mTransformNode.node(), mHoverHighlightID);
       mActiveHighlightID = 0;
    }
 */
@@ -70,7 +76,7 @@ void SphereButton::wandPressed()
 {
    mPressed = true;
 /*
-   mGeomTraverser.swapHighlightMaterial(mRootWidgetNode.node(), mHoverHighlightID,
+   mGeomTraverser.swapHighlightMaterial(mTransformNode.node(), mHoverHighlightID,
                                         mPressedHighlightID);
    mActiveHighlightID = mPressedHighlightID;
 */
@@ -83,7 +89,7 @@ void SphereButton::wandReleased()
 /*
    if (mActiveHighlightID != 0)
    {
-      mGeomTraverser.removeHighlightMaterial(mRootWidgetNode.node(), mActiveHighlightID);
+      mGeomTraverser.removeHighlightMaterial(mTransformNode.node(), mActiveHighlightID);
       mActiveHighlightID = 0;
    }
 */

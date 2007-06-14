@@ -54,9 +54,6 @@ public:
    virtual void wandReleased();
    virtual void wandMoved();
 
-   OSG::NodeRefPtr getRoot()
-   { return OSG::NodeRefPtr(mRootWidgetNode.node()); }
-
    /** Set the panel to dirty.  Next update will rebuild. */
    void setDirty();
 
@@ -74,7 +71,7 @@ public:  // Configuration params //
     * Positions this widget using the given transformation. This overrides
     * inf::SceneObject::moveTo().
     *
-    * @post The transform core of \c mRootWidgetNode has its matrix replaced
+    * @post The transform core of \c mTransformNode has its matrix replaced
     *       by \p xform.
     *
     * @param xform The transformation to use for positioning this widget.
@@ -89,7 +86,6 @@ protected:
    inf::UiBuilder        mBuilder;
    bool                  mIsDirty;     /**< When true, we need a rebuild of the panel. */
 
-   OSG::TransformNodePtr mRootWidgetNode;
    OSG::GeometryNodePtr  mWidgetGeomNode;
 
    float mMetersToAppUnits;

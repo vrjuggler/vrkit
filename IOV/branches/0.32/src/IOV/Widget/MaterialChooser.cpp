@@ -30,9 +30,9 @@ WidgetPtr MaterialChooser::init(const float metersToAppUnits)
          SphereButtonPtr sb = SphereButton::create();
          addChild(sb);
          sb->init(mMetersToAppUnits);
-         OSG::beginEditCP(mRootWidgetNode.node());
-            mRootWidgetNode.node()->addChild(sb->getRoot());
-         OSG::endEditCP(mRootWidgetNode.node());
+         OSG::beginEditCP(mTransformNode.node());
+            mTransformNode.node()->addChild(sb->getRoot());
+         OSG::endEditCP(mTransformNode.node());
          mMaterialButtons.push_back(sb);
 
       }
@@ -47,9 +47,9 @@ WidgetPtr MaterialChooser::init(const float metersToAppUnits)
    mScrollBar = ScrollBar::create();
    addChild(mScrollBar);
    mScrollBar->init(mMetersToAppUnits);
-   OSG::beginEditCP(mRootWidgetNode.node());
-      mRootWidgetNode.node()->addChild(mScrollBar->getRoot());
-   OSG::endEditCP(mRootWidgetNode.node());
+   OSG::beginEditCP(mTransformNode.node());
+      mTransformNode.node()->addChild(mScrollBar->getRoot());
+   OSG::endEditCP(mTransformNode.node());
 
    mScrollBar->mValueChangedSignal.connect(boost::bind(&MaterialChooser::onScrolled, this, _1));
 
