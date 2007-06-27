@@ -39,9 +39,10 @@ def BuildLinuxEnvironment():
    LIBPATH = []
 
    if optimize != 'no':
-      CXXFLAGS.extend(['-DNDEBUG', '-O2'])
+      CXXFLAGS.extend(['-DIOV_OPT', '-DNDEBUG', '-O2'])
    else:
-      CXXFLAGS.extend(['-D_DEBUG', '-gdwarf-2', '-fno-inline', '-fno-default-inline'])
+      CXXFLAGS.extend(['-DIOV_DEBUG', '-gdwarf-2', '-fno-inline',
+                       '-fno-default-inline'])
 
    env.Append(
       CXXFLAGS    = CXXFLAGS,
@@ -67,9 +68,9 @@ def BuildDarwinEnvironment():
 
    # Debug or optimize build?
    if optimize != 'no':
-      CXXFLAGS.extend(['-DNDEBUG', '-O2'])
+      CXXFLAGS.extend(['-DIOV_OPT', '-DNDEBUG', '-O2'])
    else:
-      CXXFLAGS.extend(['-D_DEBUG', '-g', '-fno-inline'])
+      CXXFLAGS.extend(['-DIOV_DEBUG', '-g', '-fno-inline'])
 
    return Environment(
       ENV         = os.environ,
