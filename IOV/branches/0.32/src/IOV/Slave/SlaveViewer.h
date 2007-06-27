@@ -117,7 +117,7 @@ private:
 
    std::vector<OSG::AttachmentContainerPtr> mMaybeNamedFcs;
 
-#ifdef _DEBUG
+#ifdef IOV_DEBUG
    unsigned int mNodes;
    unsigned int mTransforms;
    unsigned int mGeometries;
