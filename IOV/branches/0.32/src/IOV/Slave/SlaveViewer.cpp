@@ -159,7 +159,7 @@ SlaveViewer::SlaveViewer(const std::string& masterAddr,
    , mTravMask(travMask)
    , mAspect(new OSG::RemoteAspect())
    , mConnection(NULL)
-#ifdef _DEBUG
+#ifdef IOV_DEBUG
    , mNodes(0)
    , mTransforms(0)
    , mGeometries(0)
@@ -433,7 +433,7 @@ void SlaveViewer::initGl()
 bool SlaveViewer::createdFunction(OSG::FieldContainerPtr& fcp,
                                   OSG::RemoteAspect*)
 {
-#ifdef _DEBUG
+#ifdef IOV_DEBUG
    if ( OSG::Node::getClassType() == fcp->getType() )
    {
       ++mNodes;
@@ -455,7 +455,7 @@ bool SlaveViewer::createdFunction(OSG::FieldContainerPtr& fcp,
 
    if ( OSG::NullFC != acp )
    {
-#ifdef _DEBUG
+#ifdef IOV_DEBUG
       const char* node_name = OSG::getName(acp);
 
       if ( NULL == node_name )
@@ -471,7 +471,7 @@ bool SlaveViewer::createdFunction(OSG::FieldContainerPtr& fcp,
       mMaybeNamedFcs.push_back(acp);
    }
 
-#ifdef _DEBUG
+#ifdef IOV_DEBUG
    vprDEBUG_CONT(infSLAVE_APP, SLAVE_DBG_LVL) << std::endl << vprDEBUG_FLUSH;
 #endif
 
@@ -481,7 +481,7 @@ bool SlaveViewer::createdFunction(OSG::FieldContainerPtr& fcp,
 bool SlaveViewer::changedFunction(OSG::FieldContainerPtr& fcp,
                                   OSG::RemoteAspect*)
 {
-#ifdef _DEBUG
+#ifdef IOV_DEBUG
    vprDEBUG(infSLAVE_APP, SLAVE_DBG_LVL)
       << "Changed: " << fcp->getType().getName().str() << " fc_id:"
              << fcp.getFieldContainerId() << " "<< vprDEBUG_FLUSH;
@@ -513,7 +513,7 @@ bool SlaveViewer::changedFunction(OSG::FieldContainerPtr& fcp,
 bool SlaveViewer::destroyedFunction(OSG::FieldContainerPtr& fcp,
                                     OSG::RemoteAspect*)
 {
-#ifdef _DEBUG
+#ifdef IOV_DEBUG
    vprDEBUG(infSLAVE_APP, SLAVE_DBG_LVL)
       << "Destroyed: " << fcp->getType().getName().str() << " fc_id:"
              << fcp.getFieldContainerId() << " "<< vprDEBUG_FLUSH;
