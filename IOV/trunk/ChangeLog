@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-07-11 patrick  Refactored inf::SignalRepository to be much more generic
+                    and flexible.
+                    -- VERSION -- 0.34.0
 2006-12-01 patrick  Fixed forward/reverse inversion bug in the slide move
                     strategies.
 2006-10-30 patrick  Introduced the Simple Slide Move Strategy as an alternative

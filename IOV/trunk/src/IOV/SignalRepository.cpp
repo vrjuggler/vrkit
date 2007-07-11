@@ -22,7 +22,8 @@ SignalRepository::~SignalRepository()
    /* Do nothing. */ ;
 }
 
-void SignalRepository::addSignal(const std::string& id)
+void SignalRepository::addSignal(const std::string& id,
+                                 inf::SignalContainerBasePtr container)
 {
    if ( hasSignal(id) )
    {
@@ -31,7 +32,7 @@ void SignalRepository::addSignal(const std::string& id)
       throw inf::Exception(msg_stream.str(), IOV_LOCATION);
    }
 
-   mSignals[id] = boost::shared_ptr<signal_t>(new signal_t());
+   mSignals[id] = container;
 }
 
 void SignalRepository::removeSignal(const std::string& id)
@@ -42,32 +43,16 @@ void SignalRepository::removeSignal(const std::string& id)
    }
 }
 
-bool SignalRepository::hasSignal(const std::string& id) const
-{
-   return mSignals.count(id) > 0;
-}
-
-boost::signals::connection SignalRepository::
-connect(const std::string& id, SignalRepository::signal_t::slot_type slot)
-{
-   if ( ! hasSignal(id) )
-   {
-      addSignal(id);
-   }
-
-   return mSignals[id]->connect(slot);
-}
-
-void SignalRepository::emit(const std::string& id)
+SignalContainerBasePtr SignalRepository::getBaseSignal(const std::string& id)
 {
    if ( ! hasSignal(id) )
    {
       std::ostringstream msg_stream;
-      msg_stream << "No such signal '" << id << "'";
-      throw inf::Exception(msg_stream.str(), IOV_LOCATION);
+      msg_stream << "Unknown signal identifier " << id;
+      throw std::invalid_argument(msg_stream.str());
    }
 
-   (*mSignals[id])(id);
+   return mSignals[id];
 }
 
 }

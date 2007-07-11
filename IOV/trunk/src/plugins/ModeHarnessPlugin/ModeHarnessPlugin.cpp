@@ -54,6 +54,10 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
+typedef boost::signal<void (const std::string&)> signal_type;
+typedef SignalContainer<signal_type> signal_container_type;
+typedef signal_container_type::ptr_type signal_container_ptr;
+
 ModeHarnessPlugin::ModeHarnessPlugin()
 {
    /* Do nothing. */ ;
@@ -157,15 +161,15 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
             // Ensure that signal_id is a known signal.
             if ( ! signal_data->hasSignal(signal_id) )
             {
-               signal_data->addSignal(signal_id);
+               signal_data->addSignal(signal_id,
+                                      signal_container_type::create());
             }
 
             // Connect the newly instantiated component with its signal.
             mConnections.push_back(
-               signal_data->connect(
-                  signal_id,
+               signal_data->getSignal<signal_type>(signal_id)->connect(
                   boost::bind(&inf::ModeHarnessPlugin::prepComponentSwitch,
-                              this, _1, component)
+                              this, component)
                )
             );
 
@@ -372,8 +376,7 @@ ModeHarnessPlugin::loadComponent(const std::string& name,
    return component;
 }
 
-void ModeHarnessPlugin::prepComponentSwitch(const std::string& signalID,
-                                            inf::ModeComponentPtr newComponent)
+void ModeHarnessPlugin::prepComponentSwitch(inf::ModeComponentPtr newComponent)
 {
    // Update mNextComponent in a thread-safe manner. The actual component
    // swapping happens in run().

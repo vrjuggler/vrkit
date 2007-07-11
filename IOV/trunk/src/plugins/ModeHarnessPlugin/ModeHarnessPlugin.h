@@ -164,12 +164,9 @@ private:
     *
     * @post \c mNextComponent is assigned \p newComponent.
     *
-    * @param signaID      The identifier for the emitted signal that caused
-    *                     this method to be invoked.
     * @param newComponent The next component that will be used.
     */
-   void prepComponentSwitch(const std::string& signalID,
-                            inf::ModeComponentPtr newComponent);
+   void prepComponentSwitch(inf::ModeComponentPtr newComponent);
 
    struct ComponentInfo
    {
