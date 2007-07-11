@@ -99,7 +99,7 @@ opts = SConsAddons.Options.Options(files = [options_cache_filename, 'options.cus
                                    args= ARGUMENTS);
 boost_options = SConsAddons.Options.Boost.Boost("boost", "1.33.0",
                                                 libs = ['signals', 'program_options'],
-                                                required = False,
+                                                required = True,
                                                 useVersion = True)
 
 # XXX: This is not very robust. A user could have vrjuggler-config from
