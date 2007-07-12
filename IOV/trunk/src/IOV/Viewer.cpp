@@ -517,12 +517,24 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
 
    std::vector<std::string> search_path;
 
-   // Set up four default search paths:
+   // Set up default search paths:
+   //
    //    1. Relative path to './plugins'
    //    2. IOV_BASE_DIR/lib/IOV/plugins
    //    3. Relative path to './plugins/grab'
    //    4. IOV_BASE_DIR/lib/IOV/plugins/grab
+   //
+   // In all of the above cases, the 'debug' subdirectory is searched first if
+   // this is a debug build (i.e., when IOV_DEBUG is defined and _DEBUG is
+   // not).
+
+#if defined(IOV_DEBUG) && ! defined(_DEBUG)
+   search_path.push_back("plugins/debug");
+#endif
    search_path.push_back("plugins");
+#if defined(IOV_DEBUG) && ! defined(_DEBUG)
+   search_path.push_back("plugins/grab/debug");
+#endif
    search_path.push_back("plugins/grab");
 
    std::string iov_base_dir;
@@ -537,10 +549,16 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
 
          if ( fs::exists(def_iov_plugin_path) )
          {
-            std::string def_search_path =
+            const std::string def_search_path =
                def_iov_plugin_path.native_directory_string();
-            std::cout << "Setting default IOV plug-in path: " << def_search_path
-                     << std::endl;
+            std::cout << "Setting default IOV plug-in path: "
+                     << def_search_path << std::endl;
+
+#if defined(IOV_DEBUG) && ! defined(_DEBUG)
+            const std::string def_dbg_search_path =
+               (def_iov_plugin_path / "debug").native_directory_string();
+            search_path.push_back(def_dbg_search_path);
+#endif
             search_path.push_back(def_search_path);
          }
          else
@@ -558,6 +576,12 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
                def_strategy_path.native_directory_string();
             std::cout << "Setting default IOV intersection strategy plug-in "
                      << "to '" << def_search_path << "'" << std::endl;
+
+#if defined(IOV_DEBUG) && ! defined(_DEBUG)
+            const std::string def_dbg_search_path =
+               (def_strategy_path / "debug").native_directory_string();
+            search_path.push_back(def_dbg_search_path);
+#endif
             search_path.push_back(def_search_path);
          }
          else
@@ -576,8 +600,7 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
       }
    }
 
-
-   // Add paths from the application configuration
+   // Add plug-in paths from the application configuration.
    const unsigned int num_paths(appCfg->getNum(plugin_path_prop));
 
    for ( unsigned int i = 0; i < num_paths; ++i )
@@ -586,7 +609,7 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
       search_path.push_back(vpr::replaceEnvVars(dir));
    }
 
-   // Add paths from the application configuration.
+   // Add strategy search paths from the application configuration.
    const unsigned int num_plugin_paths =
       appCfg->getNum(strategy_plugin_path_prop);
    for ( unsigned int i = 0; i < num_plugin_paths; ++i )

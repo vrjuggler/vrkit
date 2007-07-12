@@ -1,5 +1,13 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-07-12 patrick  For debug builds, do not put "_d" in the plug-in name. The
+                    debug-enabled plug-ins (not linked against the debug
+                    runtime on Windows) are installed in the 'debug'
+                    subdirectory of the directory containing the optimized
+                    plug-ins. This is in line with changes in naming convention
+                    in VR Juggler 2.2, though this change does not make VR
+                    Juggler 2.2 the minimum required version.
+                    -- VERSION -- 0.35.0
 2007-07-11 patrick  Refactored inf::SignalRepository to be much more generic
                     and flexible.
                     -- VERSION -- 0.34.0

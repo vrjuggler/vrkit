@@ -25,8 +25,10 @@ def makePlugin(srcDir, pluginName, instDir):
    #print "   defs:", def_files
    lib_name = pluginName
    if (optimize != 'yes'):
-      lib_name += '_d'
-   plugin_lib = plugin_env.SharedLibrary(lib_name, plugin_srcs, SHLIBPREFIX = '')
+      instDir = os.path.join(instDir, 'debug')
+
+   plugin_lib = plugin_env.SharedLibrary(lib_name, plugin_srcs,
+                                         SHLIBPREFIX = '')
    env.Install(instDir, plugin_lib)
    env.Install(inst_paths['definitions'], def_files)
 

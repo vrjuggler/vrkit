@@ -43,15 +43,11 @@ void PluginFactory::addScanPath(const std::vector<std::string>& scanPath)
 #endif
 
    // Determine the build-specific part of the dynamically loadable module
-   // file name to be stripped off.  For a debug build, this would be "_d.so"
-   // on most UNIX-based platforms.  For an optimized build, it would simply
-   // be ".so" on the same platforms.
-#if defined(IOV_DEBUG)
-#  if defined(_DEBUG) || ! defined(VPR_OS_Windows)
+   // file name to be stripped off.  For a debug runtime build on Windows,
+   // this would be "_d.dll".  For all other builds, it would be ".so",
+   // ".dll", ".dylib", etc.  See above for the setting of driver_ext.
+#if defined(IOV_DEBUG) && defined(_DEBUG) && defined(VPR_OS_Windows)
    const std::string strip_str = std::string("_d.") + driver_ext;
-#  else
-   const std::string strip_str = std::string("_g.") + driver_ext;
-#endif
 #else
    const std::string strip_str = std::string(".") + driver_ext;
 #endif
