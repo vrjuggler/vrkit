@@ -245,6 +245,13 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
    // Set up two default search paths:
    //    1. Relative path to './plugins/grab'
    //    2. IOV_BASE_DIR/lib/IOV/plugins/grab
+   //
+   // In all of the above cases, the 'debug' subdirectory is searched first if
+   // this is a debug build (i.e., when IOV_DEBUG is defined and _DEBUG is
+   // not).
+#if defined(IOV_DEBUG) && ! defined(_DEBUG)
+   mStrategyPluginPath.push_back("plugins/grab/debug");
+#endif
    mStrategyPluginPath.push_back("plugins/grab");
 
    std::string iov_base_dir;
@@ -259,8 +266,14 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt)
       {
          std::string def_search_path =
             def_strategy_path.native_directory_string();
-         std::cout << "Setting default IOV grab strategy plug-in path: " << def_search_path
-                   << std::endl;
+         std::cout << "Setting default IOV grab strategy plug-in path: "
+                   << def_search_path << std::endl;
+
+#if defined(IOV_DEBUG) && ! defined(_DEBUG)
+         const std::string def_dbg_search_path =
+            (def_strategy_path / "debug").native_directory_string();
+         mStrategyPluginPath.push_back(def_dbg_search_path);
+#endif
          mStrategyPluginPath.push_back(def_search_path);
       }
       else
