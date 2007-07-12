@@ -8,31 +8,11 @@
 #include <boost/noncopyable.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include <IOV/SignalContainerBasePtr.h>
+#include <IOV/SignalContainerBase.h>
 
 
 namespace inf
 {
-
-/**
- * The base class for all signal containers that can be registered with the
- * signal repository. For all intents and purposes, this is an abstract base
- * class, although it does not define any pure virtual methods. Instead, it
- * has a virtual destructor to ensure that this class has a vtable and can be
- * handled polymorphically.
- *
- * inf::SignalRepository
- *
- * @since 0.34
- */
-class SignalContainerBase : private boost::noncopyable
-{
-protected:
-   SignalContainerBase();
-
-public:
-   virtual ~SignalContainerBase();
-};
 
 /**
  * This is the real signal container type. inf::SignalContainerBase is used so
