@@ -15,22 +15,31 @@ def makePlugins(srcDir, instDir):
    
 def makePlugin(srcDir, pluginName, instDir):
    plugin_srcs = glob.glob(pj(srcDir, pluginName, '*.cpp'))
-   def_files   = glob.glob(pj(srcDir, pluginName, '*.jdef'))
 
-   plugin_srcs = [src.replace(sca_util.getFullSrcPath(env), '.') for src in plugin_srcs] 
-   def_files = [d.replace(sca_util.getFullSrcPath(env), '.') for d in def_files] 
+   # If there are no source files in the plug-in source directory, do not try
+   # to build anything.
+   if len(plugin_srcs) > 0:
 
-   #print "Plugin: ", pluginName
-   #print "   srcs:", plugin_srcs
-   #print "   defs:", def_files
-   lib_name = pluginName
-   if (optimize != 'yes'):
-      instDir = os.path.join(instDir, 'debug')
+      plugin_srcs = \
+         [src.replace(sca_util.getFullSrcPath(env), '.') for src in plugin_srcs]
 
-   plugin_lib = plugin_env.SharedLibrary(lib_name, plugin_srcs,
-                                         SHLIBPREFIX = '')
-   env.Install(instDir, plugin_lib)
-   env.Install(inst_paths['definitions'], def_files)
+      #print "Plugin: ", pluginName
+      #print "   srcs:", plugin_srcs
+      #print "   defs:", def_files
+      lib_name = pluginName
+      if (optimize != 'yes'):
+         instDir = os.path.join(instDir, 'debug')
+
+      plugin_lib = plugin_env.SharedLibrary(lib_name, plugin_srcs,
+                                            SHLIBPREFIX = '')
+      env.Install(instDir, plugin_lib)
+
+   def_files = glob.glob(pj(srcDir, pluginName, '*.jdef'))
+
+   if len(def_files) > 0:
+      def_files = \
+         [d.replace(sca_util.getFullSrcPath(env), '.') for d in def_files] 
+      env.Install(inst_paths['definitions'], def_files)
 
    cur_dir = pj(srcDir, pluginName)
    subdirs = [d for d in os.listdir(cur_dir) if os.path.isdir(pj(cur_dir, d)) and not d.startswith('.')]

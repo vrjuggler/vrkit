@@ -521,8 +521,8 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
    //
    //    1. Relative path to './plugins'
    //    2. IOV_BASE_DIR/lib/IOV/plugins
-   //    3. Relative path to './plugins/grab'
-   //    4. IOV_BASE_DIR/lib/IOV/plugins/grab
+   //    3. Relative path to './plugins/isect'
+   //    4. IOV_BASE_DIR/lib/IOV/plugins/isect
    //
    // In all of the above cases, the 'debug' subdirectory is searched first if
    // this is a debug build (i.e., when IOV_DEBUG is defined and _DEBUG is
@@ -533,9 +533,9 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
 #endif
    search_path.push_back("plugins");
 #if defined(IOV_DEBUG) && ! defined(_DEBUG)
-   search_path.push_back("plugins/grab/debug");
+   search_path.push_back("plugins/isect/debug");
 #endif
-   search_path.push_back("plugins/grab");
+   search_path.push_back("plugins/isect");
 
    std::string iov_base_dir;
    vpr::System::getenv(iov_base_dir_tkn, iov_base_dir);
@@ -568,7 +568,7 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
                      << std::endl;
          }
 
-         fs::path def_strategy_path = iov_base_path / "lib/IOV/plugins/grab";
+         fs::path def_strategy_path = iov_base_path / "lib/IOV/plugins/isect";
 
          if ( fs::exists(def_strategy_path) )
          {
