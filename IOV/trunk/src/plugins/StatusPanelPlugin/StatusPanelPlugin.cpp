@@ -13,17 +13,30 @@
 #include <IOV/Scene.h>
 #include <IOV/Viewer.h>
 #include <IOV/StatusPanelData.h>
+#include <IOV/Version.h>
+#include <IOV/Plugin/Info.h>
 
 #include "StatusPanelPlugin.h"
 
-static inf::PluginCreator<inf::Plugin> sPluginCreator(&inf::StatusPanelPlugin::create,
-                                                      "Status Panel Plug-in");
+static inf::PluginCreator<inf::Plugin> sPluginCreator(
+   &inf::StatusPanelPlugin::create
+);
 
 extern "C"
 {
 
    /** @name Plug-in Entry Points */
 //@{
+IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+{
+   std::vector<unsigned int> version(3);
+   version[0] = IOV_VERSION_MAJOR;
+   version[1] = IOV_VERSION_MINOR;
+   version[2] = IOV_VERSION_PATCH;
+
+   return inf::plugin::Info("com.infiscape", "StatusPanelPlugin", version);
+}
+
    IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
    vpr::Uint32& minorVer)
    {

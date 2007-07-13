@@ -104,4 +104,18 @@ PluginInterfaceException::~PluginInterfaceException() throw ()
    /* Do nothing. */ ;
 }
 
+PluginDependencyException::
+PluginDependencyException(const std::string& msg,
+                          const std::string& location)
+   throw ()
+   : PluginException(msg, location)
+{
+   /* Do nothing. */ ;
+}
+
+PluginDependencyException::~PluginDependencyException() throw ()
+{
+   /* Do nothing. */ ;
+}
+
 }

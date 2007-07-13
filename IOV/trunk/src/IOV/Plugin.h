@@ -9,11 +9,12 @@
 
 #include <vpr/DynLoad/Library.h>
 
+#include <IOV/AbstractPlugin.h>
 #include <IOV/ViewerPtr.h>
 #include <IOV/PluginPtr.h>
 
-#define INF_PLUGIN_API_MAJOR    1
-#define INF_PLUGIN_API_MINOR    3
+#define INF_PLUGIN_API_MAJOR    2
+#define INF_PLUGIN_API_MINOR    0
 
 namespace inf
 {
@@ -22,14 +23,19 @@ namespace inf
  * A plugin is an abstract interface that allows for an extension point in the
  * system.  It is used to add capabilities to the application.
  */
-class IOV_CLASS_API Plugin
+class IOV_CLASS_API Plugin : public AbstractPlugin
 {
 public:
+   /**
+    * @since 0.36
+    */
+   typedef boost::shared_ptr<Plugin> ptr_type;
+
    /**
     * Returns the name of the entry point function used for retrieving the
     * creator of instances of this plug-in type.
     */
-   static std::string getCreatorFuncName()
+   static const std::string getCreatorFuncName()
    {
       return "getCreator";
    }

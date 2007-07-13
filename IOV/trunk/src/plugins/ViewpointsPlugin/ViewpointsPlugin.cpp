@@ -22,6 +22,8 @@
 #include <IOV/ViewPlatform.h>
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Status.h>
+#include <IOV/Version.h>
+#include <IOV/Plugin/Info.h>
 
 #include "ViewpointsPlugin.h"
 
@@ -40,7 +42,7 @@ namespace
 
 
 static inf::PluginCreator<inf::Plugin> sViewpointsPluginCreator(
-   &inf::ViewpointsPlugin::create, "Viewpoints Plugin"
+   &inf::ViewpointsPlugin::create
 );
 
 extern "C"
@@ -48,6 +50,16 @@ extern "C"
 
 /** @name Plug-in Entry points */
 //@{
+IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+{
+   std::vector<unsigned int> version(3);
+   version[0] = IOV_VERSION_MAJOR;
+   version[1] = IOV_VERSION_MINOR;
+   version[2] = IOV_VERSION_PATCH;
+
+   return inf::plugin::Info("com.infiscape", "ViewpointsPlugin", version);
+}
+
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
                                                vpr::Uint32& minorVer)
 {

@@ -20,13 +20,15 @@
 #include <IOV/InterfaceTrader.h>
 #include <IOV/User.h>
 #include <IOV/Status.h>
+#include <IOV/Version.h>
+#include <IOV/Plugin/Info.h>
 #include <IOV/Util/Exceptions.h>
 
 #include "ModelSwapPlugin.h"
 
 
 static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   &inf::ModelSwapPlugin::create, "Model Swap Plug-in"
+   &inf::ModelSwapPlugin::create
 );
 
 extern "C"
@@ -34,6 +36,16 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
+IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+{
+   std::vector<unsigned int> version(3);
+   version[0] = IOV_VERSION_MAJOR;
+   version[1] = IOV_VERSION_MINOR;
+   version[2] = IOV_VERSION_PATCH;
+
+   return inf::plugin::Info("com.infiscape", "ModelSwapPlugin", version);
+}
+
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
                                                vpr::Uint32& minorVer)
 {

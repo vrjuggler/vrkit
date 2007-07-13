@@ -25,6 +25,8 @@
 #include <IOV/WandInterface.h>
 #include <IOV/SceneObject.h>
 #include <IOV/Status.h>
+#include <IOV/Version.h>
+#include <IOV/Plugin/Info.h>
 #include <IOV/Grab/GrabStrategy.h>
 #include <IOV/Grab/MoveStrategy.h>
 #include <IOV/Util/Exceptions.h>
@@ -35,14 +37,23 @@
 
 namespace fs = boost::filesystem;
 
-static inf::PluginCreator<inf::Plugin> sPluginCreator(&inf::GrabPlugin::create,
-                                                      "Grab Plug-in");
+static inf::PluginCreator<inf::Plugin> sPluginCreator(&inf::GrabPlugin::create);
 
 extern "C"
 {
 
 /** @name Plug-in Entry Points */
 //@{
+IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+{
+   std::vector<unsigned int> version(3);
+   version[0] = IOV_VERSION_MAJOR;
+   version[1] = IOV_VERSION_MINOR;
+   version[2] = IOV_VERSION_PATCH;
+
+   return inf::plugin::Info("com.infiscape", "GrabPlugin", version);
+}
+
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
                                                vpr::Uint32& minorVer)
 {

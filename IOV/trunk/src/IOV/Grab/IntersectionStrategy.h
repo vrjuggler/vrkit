@@ -5,10 +5,10 @@
 
 #include <IOV/Config.h>
 
-#include <boost/noncopyable.hpp>
 #include <vpr/DynLoad/Library.h>
 #include <gmtl/Point.h>
 
+#include <IOV/AbstractPlugin.h>
 #include <IOV/SceneObjectPtr.h>
 #include <IOV/ViewerPtr.h>
 
@@ -16,8 +16,8 @@
 
 #include <vector>
 
-#define INF_ISECT_STRATEGY_PLUGIN_API_MAJOR 1
-#define INF_ISECT_STRATEGY_PLUGIN_API_MINOR 1
+#define INF_ISECT_STRATEGY_PLUGIN_API_MAJOR 2
+#define INF_ISECT_STRATEGY_PLUGIN_API_MINOR 0
 
 
 namespace inf
@@ -28,7 +28,7 @@ namespace inf
  *
  * @since 0.16.0
  */
-class IOV_CLASS_API IntersectionStrategy : boost::noncopyable
+class IOV_CLASS_API IntersectionStrategy : public AbstractPlugin
 {
 public:
    /**

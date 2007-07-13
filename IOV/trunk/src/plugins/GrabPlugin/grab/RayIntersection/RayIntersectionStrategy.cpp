@@ -23,12 +23,14 @@
 #include <IOV/Viewer.h>
 #include <IOV/WandInterface.h>
 #include <IOV/SceneObject.h>
+#include <IOV/Version.h>
+#include <IOV/Plugin/Info.h>
 
 #include "RayIntersectionStrategy.h"
 
 
 static inf::PluginCreator<inf::IntersectionStrategy> sPluginCreator(
-   &inf::RayIntersectionStrategy::create, "Ray Intersection Strategy Plug-in"
+   &inf::RayIntersectionStrategy::create
 );
 
 extern "C"
@@ -36,6 +38,17 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
+IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+{
+   std::vector<unsigned int> version(3);
+   version[0] = IOV_VERSION_MAJOR;
+   version[1] = IOV_VERSION_MINOR;
+   version[2] = IOV_VERSION_PATCH;
+
+   return inf::plugin::Info("com.infiscape.isect", "RayIntersectionStrategy",
+                            version);
+}
+
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
                                                vpr::Uint32& minorVer)
 {

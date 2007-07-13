@@ -6,19 +6,19 @@
 #include <IOV/Config.h>
 
 #include <vector>
-#include <boost/noncopyable.hpp>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/Point.h>
 #include <vpr/DynLoad/Library.h>
 
+#include <IOV/AbstractPlugin.h>
 #include <IOV/SceneObjectPtr.h>
 #include <IOV/ViewerPtr.h>
 
 #include <IOV/Grab/MoveStrategyPtr.h>
 
-#define INF_MOVE_STRATEGY_PLUGIN_API_MAJOR 1
-#define INF_MOVE_STRATEGY_PLUGIN_API_MINOR 2
+#define INF_MOVE_STRATEGY_PLUGIN_API_MAJOR 2
+#define INF_MOVE_STRATEGY_PLUGIN_API_MINOR 0
 
 
 namespace inf
@@ -29,7 +29,7 @@ namespace inf
  *
  * @since 0.16.0
  */
-class IOV_CLASS_API MoveStrategy : boost::noncopyable
+class IOV_CLASS_API MoveStrategy : public AbstractPlugin
 {
 public:
    /**

@@ -5,10 +5,8 @@
 
 #include <IOV/Config.h>
 
-#include <string>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
-#include <vpr/vpr.h>
 
 #include <IOV/PluginCreatorBase.h>
 
@@ -23,13 +21,8 @@ public:
    typedef boost::shared_ptr<PLUGIN_TYPE> plugin_ptr_t;
    typedef boost::function<plugin_ptr_t ()> creator_t;
 
-   PluginCreator(creator_t creator, const std::string& pluginName,
-                 const vpr::Uint32 pluginMajorVer = 1,
-                 const vpr::Uint32 pluginMinorVer = 0,
-                 const vpr::Uint32 pluginPatchVer = 0)
-      : PluginCreatorBase(pluginName, pluginMajorVer, pluginMinorVer,
-                          pluginPatchVer)
-      , mCreator(creator)
+   PluginCreator(creator_t creator)
+      : mCreator(creator)
    {
       /* Do nothing. */ ;
    }

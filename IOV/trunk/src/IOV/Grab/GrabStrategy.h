@@ -4,7 +4,6 @@
 #include <IOV/Config.h>
 
 #include <vector>
-#include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
 
 #include <gmtl/Matrix.h>
@@ -12,14 +11,15 @@
 
 #include <vpr/DynLoad/Library.h>
 
+#include <IOV/AbstractPlugin.h>
 #include <IOV/SceneObjectPtr.h>
 #include <IOV/ViewerPtr.h>
 #include <IOV/Util/SignalProxy.h>
 
 #include <IOV/Grab/GrabStrategyPtr.h>
 
-#define INF_GRAB_STRATEGY_PLUGIN_API_MAJOR 1
-#define INF_GRAB_STRATEGY_PLUGIN_API_MINOR 1
+#define INF_GRAB_STRATEGY_PLUGIN_API_MAJOR 2
+#define INF_GRAB_STRATEGY_PLUGIN_API_MINOR 0
 
 
 namespace inf
@@ -30,7 +30,7 @@ namespace inf
  *
  * @since 0.30.0
  */
-class IOV_CLASS_API GrabStrategy : boost::noncopyable
+class IOV_CLASS_API GrabStrategy : public AbstractPlugin
 {
 protected:
    GrabStrategy();

@@ -1,6 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
 #include <algorithm>
+#include <boost/bind.hpp>
 
 #include <gmtl/Generate.h>
 #include <gmtl/External/OpenSGConvert.h>
@@ -16,20 +17,31 @@
 #include <IOV/Viewer.h>
 #include <IOV/Widget/Widget.h>
 #include <IOV/Widget/WidgetData.h>
-
-#include <boost/bind.hpp>
+#include <IOV/Version.h>
+#include <IOV/Plugin/Info.h>
 
 #include "WidgetPlugin.h"
 
 
-static inf::PluginCreator<inf::Plugin> sPluginCreator(&inf::WidgetPlugin::create,
-                                                      "Widget Plug-in");
+static inf::PluginCreator<inf::Plugin> sPluginCreator(
+   &inf::WidgetPlugin::create
+);
 
 extern "C"
 {
 
 /** @name Plug-in Entry Points */
 //@{
+IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+{
+   std::vector<unsigned int> version(3);
+   version[0] = IOV_VERSION_MAJOR;
+   version[1] = IOV_VERSION_MINOR;
+   version[2] = IOV_VERSION_PATCH;
+
+   return inf::plugin::Info("com.infiscape", "WidgetPlugin", version);
+}
+
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
                                                vpr::Uint32& minorVer)
 {

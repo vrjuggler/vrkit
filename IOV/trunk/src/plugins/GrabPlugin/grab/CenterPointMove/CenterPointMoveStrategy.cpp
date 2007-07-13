@@ -5,17 +5,20 @@
 #include <gmtl/MatrixOps.h>
 #include <gmtl/External/OpenSGConvert.h>
 
+#include <vpr/vpr.h>
+#include <vpr/Util/Assert.h>
+
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/SceneObject.h>
-
-#include <vpr/Util/Assert.h>
+#include <IOV/Version.h>
+#include <IOV/Plugin/Info.h>
 
 #include "CenterPointMoveStrategy.h"
 
 
 static inf::PluginCreator<inf::MoveStrategy> sPluginCreator(
-   &inf::CenterPointMoveStrategy::create, "Center Point Move Strategy Plug-in"
+   &inf::CenterPointMoveStrategy::create
 );
 
 extern "C"
@@ -23,6 +26,17 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
+IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+{
+   std::vector<unsigned int> version(3);
+   version[0] = IOV_VERSION_MAJOR;
+   version[1] = IOV_VERSION_MINOR;
+   version[2] = IOV_VERSION_PATCH;
+
+   return inf::plugin::Info("com.infiscape.move", "CenterPointMoveStrategy",
+                            version);
+}
+
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
                                                vpr::Uint32& minorVer)
 {

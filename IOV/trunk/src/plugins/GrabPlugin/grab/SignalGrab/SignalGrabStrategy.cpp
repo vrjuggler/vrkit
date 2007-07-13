@@ -20,12 +20,14 @@
 #include <IOV/Util/OpenSGHelpers.h>
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Config.h>
+#include <IOV/Version.h>
+#include <IOV/Plugin/Info.h>
 
 #include "SignalGrabStrategy.h"
 
 
 static inf::PluginCreator<inf::GrabStrategy> sPluginCreator(
-   &inf::SignalGrabStrategy::create, "Signal Grab Strategy Plug-in"
+   &inf::SignalGrabStrategy::create
 );
 
 extern "C"
@@ -33,6 +35,17 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
+IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+{
+   std::vector<unsigned int> version(3);
+   version[0] = IOV_VERSION_MAJOR;
+   version[1] = IOV_VERSION_MINOR;
+   version[2] = IOV_VERSION_PATCH;
+
+   return inf::plugin::Info("com.infiscape.grab", "SignalGrabStrategy",
+                            version);
+}
+
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
                                                vpr::Uint32& minorVer)
 {
