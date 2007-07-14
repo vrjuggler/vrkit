@@ -14,7 +14,13 @@
 #include <OpenSG/OSGPointConnection.h>
 #include <OpenSG/OSGBinaryDataHandler.h>
 
-#include <vrj/Draw/OpenSG/OpenSGApp.h>
+#include <vrj/vrjParam.h>
+
+#if __VJ_version >= 2003011
+#  include <vrj/Draw/OpenSG/App.h>
+#else
+#  include <vrj/Draw/OpenSG/OpenSGApp.h>
+#endif
 
 
 namespace inf
@@ -27,7 +33,12 @@ namespace inf
  * See: @ref SlaveCommunicationProtocol
  *
  */
-class IOV_CLASS_API SlaveViewer : public vrj::OpenSGApp
+class IOV_CLASS_API SlaveViewer
+#if __VJ_version >= 2003011
+   : public vrj::opensg::App
+#else
+   : public vrj::OpenSGApp
+#endif
 {
 public:
    /**

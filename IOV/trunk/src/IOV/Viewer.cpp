@@ -38,7 +38,7 @@ namespace inf
 {
 
 Viewer::Viewer()
-   : vrj::OpenSGApp(NULL)
+   : OpenSGApp(NULL)
    , mAspect(NULL)
    , mConnection(NULL)
 {
@@ -53,10 +53,10 @@ Viewer::~Viewer()
 void Viewer::init()
 {
    // This has to be called before OSG::osgInit(), which is done by
-   // vrj::OpenSGApp::init().
+   // OpenSGApp::init().
    OSG::ChangeList::setReadWriteDefault();
 
-   vrj::OpenSGApp::init();
+   OpenSGApp::init();
 
    // Verify configuration has been loaded
    bool have_config = (mConfiguration.getAllConfigElements().size() > 0);
@@ -135,7 +135,7 @@ void Viewer::init()
 
 void Viewer::contextInit()
 {
-   vrj::OpenSGApp::contextInit();
+   OpenSGApp::contextInit();
 
    // Tell each plug-in to do its thing. Any given plug-in may change the
    // state of the system as a result of performing its context initialization
@@ -274,7 +274,7 @@ void Viewer::readDataFromSlave(OSG::BinaryDataHandler& reader)
 
 void Viewer::contextPreDraw()
 {
-   vrj::OpenSGApp::contextPreDraw();
+   OpenSGApp::contextPreDraw();
 
    // Tell each plug-in to do its thing. Any given plug-in may change the
    // state of the system as a result of performing its context pre-draw
@@ -285,7 +285,7 @@ void Viewer::contextPreDraw()
 
 void Viewer::draw()
 {
-   vrj::OpenSGApp::draw();
+   OpenSGApp::draw();
 
    // Tell each plug-in to do its thing. Any given plug-in may change the
    // state of the system as a result of performing its rendering task(s).
@@ -295,7 +295,7 @@ void Viewer::draw()
 
 void Viewer::contextPostDraw()
 {
-   vrj::OpenSGApp::contextPostDraw();
+   OpenSGApp::contextPostDraw();
 
    // Tell each plug-in to do its thing. Any given plug-in may change the
    // state of the system as a result of performing its rendering context
@@ -312,7 +312,7 @@ OSG::RenderAction* Viewer::getRenderAction()
 
 void Viewer::contextClose()
 {
-   vrj::OpenSGApp::contextClose();
+   OpenSGApp::contextClose();
 
    // Tell each plug-in to do its thing. Any given plug-in may change the
    // state of the system as a result of performing its rendering context
@@ -329,7 +329,7 @@ void Viewer::exit()
 
    // Then we call up to the base class implementation of this method, which
    // in turn tells OpenSG to exit.
-   vrj::OpenSGApp::exit();
+   OpenSGApp::exit();
 }
 
 void Viewer::deallocate()

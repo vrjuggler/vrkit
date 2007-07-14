@@ -12,7 +12,14 @@
 #include <OpenSG/OSGBinaryDataHandler.h>
 
 #include <jccl/Config/ConfigElementPtr.h>
-#include <vrj/Draw/OpenSG/OpenSGApp.h>
+
+#include <vrj/vrjParam.h>
+
+#if __VJ_version >= 2003011
+#  include <vrj/Draw/OpenSG/App.h>
+#else
+#  include <vrj/Draw/OpenSG/OpenSGApp.h>
+#endif
 
 #include <IOV/ViewerPtr.h>
 
@@ -37,6 +44,12 @@ namespace OSG
 namespace inf
 {
 
+#if __VJ_version >= 2003011
+typedef vrj::opensg::App OpenSGApp;
+#else
+typedef vrj::OpenSGApp OpenSGApp;
+#endif
+
 /**
  * Main viewer class.
  * This class controls the rest of the classes in the system.
@@ -50,7 +63,7 @@ namespace inf
  * for clustering.  See @ref SlaveCommunicationProtocol
  */
 class IOV_CLASS_API Viewer
-   : public vrj::OpenSGApp
+   : public OpenSGApp
    , public boost::enable_shared_from_this<Viewer>
 {
 protected:

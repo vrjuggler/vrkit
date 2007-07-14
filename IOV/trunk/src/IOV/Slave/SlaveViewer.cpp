@@ -152,7 +152,12 @@ namespace inf
 SlaveViewer::SlaveViewer(const std::string& masterAddr,
                          const std::string& rootNodeName,
                          const OSG::UInt32 travMask)
-   : vrj::OpenSGApp()
+   :
+#if __VJ_version >= 2003011
+     vrj::opensg::App()
+#else
+     vrj::OpenSGApp()
+#endif
    , mDrawScaleFactor(gadget::PositionUnitConversion::ConvertToFeet)
    , mMasterAddr(masterAddr)
    , mRootNodeName(rootNodeName)
@@ -293,7 +298,11 @@ void SlaveViewer::initScene()
 
 void SlaveViewer::contextInit()
 {
+#if __VJ_version >= 2003011
+   vrj::opensg::App::contextInit();
+#else
    vrj::OpenSGApp::contextInit();
+#endif
    std::cout << "Changing render action traversal mask from "
              << std::hex << mContextData->mRenderAction->getTravMask()
              << " to " << mTravMask << std::dec << std::endl;
@@ -376,7 +385,11 @@ void SlaveViewer::exit()
    mSceneRoot = OSG::NullFC;
    shutdown();
    mMaybeNamedFcs.clear();
+#if __VJ_version >= 2003011
+   vrj::opensg::App::exit();
+#else
    vrj::OpenSGApp::exit();
+#endif
 }
 
 void SlaveViewer::sendDataToMaster(OSG::BinaryDataHandler& writer)
