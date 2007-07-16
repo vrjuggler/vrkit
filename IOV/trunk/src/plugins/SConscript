@@ -27,12 +27,18 @@ def makePlugin(srcDir, pluginName, instDir):
       #print "   srcs:", plugin_srcs
       #print "   defs:", def_files
       lib_name = pluginName
+
+      # We use inst_dir here instead of changing instDir because we do not
+      # watch to modify the base installation directory. instDir gets
+      # referenced again later, and we need it to be the value that was passed
+      # in to this function.
+      inst_dir = instDir
       if (optimize != 'yes'):
-         instDir = os.path.join(instDir, 'debug')
+         inst_dir = os.path.join(instDir, 'debug')
 
       plugin_lib = plugin_env.SharedLibrary(lib_name, plugin_srcs,
                                             SHLIBPREFIX = '')
-      env.Install(instDir, plugin_lib)
+      env.Install(inst_dir, plugin_lib)
 
    def_files = glob.glob(pj(srcDir, pluginName, '*.jdef'))
 
