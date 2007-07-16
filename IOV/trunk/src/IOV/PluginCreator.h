@@ -27,7 +27,7 @@ public:
       /* Do nothing. */ ;
    }
 
-   ~PluginCreator()
+   virtual ~PluginCreator()
    {
       /* Do nothing. */ ;
    }
