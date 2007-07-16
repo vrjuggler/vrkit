@@ -29,10 +29,10 @@ class IOV_CLASS_API StatusPanelPlugin
    : public inf::Plugin, public boost::enable_shared_from_this<StatusPanelPlugin>
 {
 protected:
-   StatusPanelPlugin();
+   StatusPanelPlugin(const inf::plugin::Info& info);
 
 public:
-   static inf::PluginPtr create();
+   static inf::PluginPtr create(const inf::plugin::Info& info);
 
    virtual ~StatusPanelPlugin();
 

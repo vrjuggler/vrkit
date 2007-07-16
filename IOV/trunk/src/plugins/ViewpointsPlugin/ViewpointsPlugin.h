@@ -20,16 +20,18 @@ namespace inf
  *
  */
 class ViewpointsPlugin
-   : public inf::Plugin, public boost::enable_shared_from_this<ViewpointsPlugin>
+   : public inf::Plugin
+   , public boost::enable_shared_from_this<ViewpointsPlugin>
 {
 protected:
-   ViewpointsPlugin()
-      : mControlBtnNum(-1)
+   ViewpointsPlugin(const inf::plugin::Info& info)
+      : Plugin(info)
+      , mControlBtnNum(-1)
       , mNextViewpoint(0)
    {;}
 
 public:
-   static PluginPtr create();
+   static PluginPtr create(const inf::plugin::Info& info);
 
    virtual ~ViewpointsPlugin()
    {;}

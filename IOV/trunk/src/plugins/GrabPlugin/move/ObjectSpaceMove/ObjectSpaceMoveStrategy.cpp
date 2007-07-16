@@ -3,6 +3,7 @@
 #include <IOV/Config.h>
 
 #include <boost/bind.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <gmtl/Generate.h>
 #include <gmtl/MatrixOps.h>
@@ -20,8 +21,14 @@
 #include "ObjectSpaceMoveStrategy.h"
 
 
+using namespace boost::assign;
+
+static const inf::plugin::Info sInfo(
+   "com.infiscape.move", "ObjectSpaceMoveStrategy",
+   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+);
 static inf::PluginCreator<inf::MoveStrategy> sPluginCreator(
-   &inf::ObjectSpaceMoveStrategy::create
+   boost::bind(&inf::ObjectSpaceMoveStrategy::create, sInfo)
 );
 
 extern "C"
@@ -29,15 +36,9 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 {
-   std::vector<unsigned int> version(3);
-   version[0] = IOV_VERSION_MAJOR;
-   version[1] = IOV_VERSION_MINOR;
-   version[2] = IOV_VERSION_PATCH;
-
-   return inf::plugin::Info("com.infiscape.move", "ObjectSpaceMoveStrategy",
-                            version);
+   return &sInfo;
 }
 
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,

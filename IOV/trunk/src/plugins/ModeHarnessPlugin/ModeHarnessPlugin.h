@@ -16,7 +16,6 @@
 #include <jccl/Config/ConfigElementPtr.h>
 
 #include <IOV/Plugin.h>
-#include <IOV/PluginFactoryPtr.h>
 #include <IOV/ModeComponentPtr.h>
 
 
@@ -52,12 +51,12 @@ class ModeHarnessPlugin
    , public boost::enable_shared_from_this<ModeHarnessPlugin>
 {
 protected:
-   ModeHarnessPlugin();
+   ModeHarnessPlugin(const inf::plugin::Info& info);
 
 public:
-   static inf::PluginPtr create()
+   static inf::PluginPtr create(const inf::plugin::Info& info)
    {
-      return inf::PluginPtr(new ModeHarnessPlugin());
+      return inf::PluginPtr(new ModeHarnessPlugin(info));
    }
 
    virtual ~ModeHarnessPlugin();
@@ -137,15 +136,19 @@ private:
     */
    void configure(jccl::ConfigElementPtr elt);
 
+   void registerModule(vpr::LibraryPtr module);
+
+   void pluginInstantiated(inf::AbstractPluginPtr plugin);
+
    /**
-    * Loads, instantiates, and initializes the named component. The
-    * ready-to-use component is returned to the caller.
+    * Instantiates and initializes the named component. The ready-to-use mode
+    * component is returned to the caller.
     *
     * @post A new instance of the named component is created and initialized
     *       using the given instance of inf::Viewer.
     *
-    * @param name   The name of the component to load.
-    * @param viewer The VR Juggler application object.
+    * @param pluginType The type ID for the plug-in object to instantiate.
+    * @param viewer     The VR Juggler application object.
     *
     * @return A fully initialized component that implements the interface
     *         inf::ModeComponent is returned.
@@ -153,7 +156,7 @@ private:
     * @throw std::runtime_error is thrown if the named component cannot be
     *        loaded for some reason.
     */
-   inf::ModeComponentPtr loadComponent(const std::string& name,
+   inf::ModeComponentPtr makeComponent(const std::string& pluginType,
                                        inf::ViewerPtr viewer);
 
    /**
@@ -170,31 +173,45 @@ private:
 
    struct ComponentInfo
    {
-      ComponentInfo(const std::string& name_, const std::string& signalID_)
+      ComponentInfo(const std::string& name_, const std::string& plugin_)
          : name(name_)
-         , signalID(signalID_)
+         , plugin(plugin_)
       {
          /* Do nothing. */ ;
       }
 
       std::string name;
-      std::string signalID;
+      std::string plugin;
    };
 
-   inf::ViewerPtr        mViewer;
-   inf::PluginFactoryPtr mPluginFactory;
+   struct SignalDef
+   {
+      SignalDef(const std::string& name_, const std::string& componentName_)
+         : name(name_)
+         , componentName(componentName_)
+      {
+         /* Do nothing. */ ;
+      }
+
+      std::string name;
+      std::string componentName;
+   };
+
+   inf::ViewerPtr mViewer;
 
    /** @name Component Management */
    //@{
    std::string mDefaultComponentName;
 
-   /** The component search path. */
-   std::vector<std::string> mComponentPath;
-
    /**
     * Collection of component information as loaded from the configuration.
     */
    std::vector<ComponentInfo> mComponentInfo;
+
+   /**
+    * Collection of signal definitions as loaded from the configuration.
+    */
+   std::vector<SignalDef> mSignalDefs;
 
    /** All the components that were instantiated based on the configuration. */
    std::map<std::string, inf::ModeComponentPtr> mComponents;

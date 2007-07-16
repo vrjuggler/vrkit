@@ -16,8 +16,8 @@
 
 #include <IOV/EventData.h>
 #include <IOV/Plugin.h>
+#include <IOV/AbstractPluginPtr.h>
 #include <IOV/WandInterfacePtr.h>
-#include <IOV/PluginFactory.h>
 #include <IOV/Grab/GrabStrategyPtr.h>
 #include <IOV/Grab/MoveStrategyPtr.h>
 #include <IOV/SceneObjectPtr.h>
@@ -31,12 +31,12 @@ class GrabPlugin
    , public boost::enable_shared_from_this<GrabPlugin>
 {
 protected:
-   GrabPlugin();
+   GrabPlugin(const inf::plugin::Info& info);
 
 public:
-   static inf::PluginPtr create()
+   static inf::PluginPtr create(const inf::plugin::Info& info)
    {
-      return inf::PluginPtr(new GrabPlugin());
+      return inf::PluginPtr(new GrabPlugin(info));
    }
 
    virtual ~GrabPlugin();
@@ -49,8 +49,6 @@ public:
    virtual PluginPtr init(inf::ViewerPtr viewer);
 
    virtual void update(inf::ViewerPtr viewer);
-
-   bool config(jccl::ConfigElementPtr elt);
 
    /**
     * Invokes the global scope delete operator.  This is required for proper
@@ -82,6 +80,15 @@ private:
       return std::string("iov_grab_plugin");
    }
 
+   bool config(jccl::ConfigElementPtr elt, inf::ViewerPtr viewer);
+
+   std::vector<std::string> makeSearchPath(jccl::ConfigElementPtr elt,
+                                           const std::string& prop,
+                                           const std::string& subdir);
+
+   void pluginInstantiated(inf::AbstractPluginPtr plugin,
+                           inf::ViewerPtr viewer);
+
    void objectsGrabbed(inf::ViewerPtr viewer,
                        const std::vector<SceneObjectPtr>& objs,
                        const gmtl::Point3f& isectPoint);
@@ -103,12 +110,6 @@ private:
                                  inf::ViewerPtr viewer);
 
    WandInterfacePtr mWandInterface;
-
-   /** @name Plug-in Management */
-   //@{
-   std::vector<std::string> mStrategyPluginPath;
-   inf::PluginFactoryPtr mPluginFactory;
-   //@}
 
    /** @name Grab Strategy */
    //@{

@@ -1,7 +1,7 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
-#ifndef _INF_SIMPLE_SLIDE_MOVE_STRATEGY_H_
-#define _INF_SIMPLE_SLIDE_MOVE_STRATEGY_H_
+#ifndef _INF_SLIDE_MOVE_STRATEGY_H_
+#define _INF_SLIDE_MOVE_STRATEGY_H_
 
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
@@ -14,25 +14,25 @@
 namespace inf
 {
 
-class SimpleSlideMoveStrategy
+class SlideMoveStrategy
    : public inf::MoveStrategy
-   , public boost::enable_shared_from_this<SimpleSlideMoveStrategy>
+   , public boost::enable_shared_from_this<SlideMoveStrategy>
 {
 protected:
-   SimpleSlideMoveStrategy();
+   SlideMoveStrategy(const inf::plugin::Info& info);
 
 public:
    static std::string getId()
    {
-      return "SimpleSlideMove";
+      return "SlideMove";
    }
 
-   static inf::MoveStrategyPtr create()
+   static inf::MoveStrategyPtr create(const inf::plugin::Info& info)
    {
-      return inf::MoveStrategyPtr(new SimpleSlideMoveStrategy());
+      return inf::MoveStrategyPtr(new SlideMoveStrategy(info));
    }
 
-   virtual ~SimpleSlideMoveStrategy()
+   virtual ~SlideMoveStrategy()
    {
       /* Do nothing. */ ;
    }
@@ -75,7 +75,7 @@ protected:
 private:
    static std::string getElementType()
    {
-      return "simple_slide_move_strategy";
+      return "slide_move_strategy";
    }
 
    /**
@@ -91,13 +91,21 @@ private:
     */
    void configure(jccl::ConfigElementPtr cfgElt);
 
+   float mTransValue;
+   gmtl::Point3f mIntersectPoint;
+
    /** @name Slide Behavior Properties */
    //@{
-   float mTransValue;           /**< Accumulated translation */
-   int   mAnalogNum;            /**< The wand interface analog index */
-   float mForwardValue;         /**< Value for foroward sliing (0 or 1) */
-   float mSlideEpsilon;         /**< The slide start threshold */
-   float mSlideMultiplier;      /**< Slide acceleration multiplier */
+   enum SlideTarget
+   {
+      ISECT_POINT = 0,
+      WAND_CENTER
+   };
+
+   SlideTarget  mSlideTarget;   /**< */
+   int          mAnalogNum;     /**< The wand interface analog index */
+   float        mForwardValue;  /**< Value for foroward sliing (0 or 1) */
+   float        mSlideEpsilon;  /**< The slide start threshold */
    //@}
 };
 

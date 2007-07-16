@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <boost/bind.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <gmtl/Generate.h>
 #include <gmtl/External/OpenSGConvert.h>
@@ -23,8 +24,14 @@
 #include "WidgetPlugin.h"
 
 
+using namespace boost::assign;
+
+static const inf::plugin::Info sInfo(
+   "com.infiscape", "WidgetPlugin",
+   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+);
 static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   &inf::WidgetPlugin::create
+   boost::bind(&inf::WidgetPlugin::create, sInfo)
 );
 
 extern "C"
@@ -32,14 +39,9 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 {
-   std::vector<unsigned int> version(3);
-   version[0] = IOV_VERSION_MAJOR;
-   version[1] = IOV_VERSION_MINOR;
-   version[2] = IOV_VERSION_PATCH;
-
-   return inf::plugin::Info("com.infiscape", "WidgetPlugin", version);
+   return &sInfo;
 }
 
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
@@ -59,8 +61,9 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
-WidgetPlugin::WidgetPlugin()
-   : mSelectText("Activate/Deactivate Widgets")
+WidgetPlugin::WidgetPlugin(const inf::plugin::Info& info)
+   : Plugin(info)
+   , mSelectText("Activate/Deactivate Widgets")
 //   , SelectedWidget(-1)
    , mWidgetPressed(false)
    , mSelectedObject()

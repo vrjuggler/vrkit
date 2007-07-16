@@ -32,6 +32,11 @@ class IOV_CLASS_API IntersectionStrategy : public AbstractPlugin
 {
 public:
    /**
+    * @since 0.36
+    */
+   typedef boost::shared_ptr<IntersectionStrategy> ptr_type;
+
+   /**
     * Returns the name of the entry point function used for retrieving the
     * creator of instances of this plug-in type.
     */
@@ -140,7 +145,7 @@ protected:
    /**
     * Constructor. This does nothing.
     */
-   IntersectionStrategy();
+   IntersectionStrategy(const inf::plugin::Info& info);
 };
 
 }

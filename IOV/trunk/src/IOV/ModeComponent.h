@@ -10,10 +10,11 @@
 #include <vpr/vpr.h>
 #include <vpr/DynLoad/Library.h>
 
+#include <IOV/AbstractPlugin.h>
 #include <IOV/ViewerPtr.h>
 #include <IOV/ModeComponentPtr.h>
 
-#define INF_MODE_COMPONENT_API_MAJOR    1
+#define INF_MODE_COMPONENT_API_MAJOR    2
 #define INF_MODE_COMPONENT_API_MINOR    0
 
 
@@ -26,9 +27,14 @@ namespace inf
  *
  * @since 0.23
  */
-class IOV_CLASS_API ModeComponent
+class IOV_CLASS_API ModeComponent : public inf::AbstractPlugin
 {
 public:
+   /**
+    * @since 0.36
+    */
+   typedef boost::shared_ptr<ModeComponent> ptr_type;
+
    /**
     * Returns the name of the entry point function used for retrieving the
     * creator of instances of this plug-in type.
@@ -171,7 +177,7 @@ protected:
     *
     * @post \c mActive is false.
     */
-   ModeComponent();
+   ModeComponent(const inf::plugin::Info& info);
 
    /**
     * Subclasses must implement this so that dynamically loaded plug-ins

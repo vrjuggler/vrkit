@@ -48,7 +48,8 @@ MoveStrategy::~MoveStrategy()
    /* Do nothing. */ ;
 }
 
-MoveStrategy::MoveStrategy()
+MoveStrategy::MoveStrategy(const inf::plugin::Info& info)
+   : AbstractPlugin(info)
 {
    /* Do nothing. */ ;
 }

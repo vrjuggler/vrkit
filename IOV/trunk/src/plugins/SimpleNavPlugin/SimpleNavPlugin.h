@@ -20,13 +20,12 @@ class SimpleNavPlugin
    , public boost::enable_shared_from_this<SimpleNavPlugin>
 {
 protected:
-   SimpleNavPlugin();
+   SimpleNavPlugin(const inf::plugin::Info& info);
 
 public:
-   static inf::PluginPtr create()
+   static inf::PluginPtr create(const inf::plugin::Info& info)
    {
-      inf::PluginPtr new_strategy = inf::PluginPtr(new SimpleNavPlugin());
-      return new_strategy;
+      return inf::PluginPtr(new SimpleNavPlugin(info));
    }
 
    virtual ~SimpleNavPlugin()

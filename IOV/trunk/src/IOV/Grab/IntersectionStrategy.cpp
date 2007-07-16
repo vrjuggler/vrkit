@@ -46,7 +46,8 @@ IntersectionStrategy::~IntersectionStrategy()
    /* Do nothing. */ ;
 }
 
-IntersectionStrategy::IntersectionStrategy()
+IntersectionStrategy::IntersectionStrategy(const inf::plugin::Info& info)
+   : AbstractPlugin(info)
 {
    /* Do nothing. */ ;
 }

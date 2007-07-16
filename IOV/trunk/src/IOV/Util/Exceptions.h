@@ -118,11 +118,28 @@ public:
 /**
  * @since 0.36
  */
+class IOV_CLASS_API PluginTypeNameException : public PluginException
+{
+public:
+   PluginTypeNameException(const std::string& msg,
+                           const std::string& location) throw ();
+
+   virtual ~PluginTypeNameException() throw ();
+
+   std::string getExceptionName()
+   {
+      return "infi::PluginTypeNameException";
+   }
+};
+
+/**
+ * @since 0.36
+ */
 class IOV_CLASS_API PluginDependencyException : public PluginException
 {
 public:
    PluginDependencyException(const std::string& msg,
-                            const std::string& location) throw ();
+                             const std::string& location) throw ();
 
    virtual ~PluginDependencyException() throw ();
 

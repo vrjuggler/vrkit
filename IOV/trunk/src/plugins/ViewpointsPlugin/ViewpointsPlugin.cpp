@@ -4,8 +4,10 @@
 #include <windows.h>
 #endif
 
-#include <boost/format.hpp>
 #include <sstream>
+#include <boost/bind.hpp>
+#include <boost/format.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/Vec.h>
@@ -40,9 +42,14 @@ namespace
    const std::string vp_rot_elt_tkn("rotation");
 }
 
+using namespace boost::assign;
 
+static const inf::plugin::Info sInfo(
+   "com.infiscape", "ViewpointsPlugin",
+   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+);
 static inf::PluginCreator<inf::Plugin> sViewpointsPluginCreator(
-   &inf::ViewpointsPlugin::create
+   boost::bind(&inf::ViewpointsPlugin::create, sInfo)
 );
 
 extern "C"
@@ -50,14 +57,9 @@ extern "C"
 
 /** @name Plug-in Entry points */
 //@{
-IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 {
-   std::vector<unsigned int> version(3);
-   version[0] = IOV_VERSION_MAJOR;
-   version[1] = IOV_VERSION_MINOR;
-   version[2] = IOV_VERSION_PATCH;
-
-   return inf::plugin::Info("com.infiscape", "ViewpointsPlugin", version);
+   return &sInfo;
 }
 
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
@@ -78,9 +80,9 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
-PluginPtr ViewpointsPlugin::create()
+PluginPtr ViewpointsPlugin::create(const inf::plugin::Info& info)
 {
-   return PluginPtr(new ViewpointsPlugin);
+   return PluginPtr(new ViewpointsPlugin(info));
 }
 
 PluginPtr ViewpointsPlugin::init(inf::ViewerPtr viewer)

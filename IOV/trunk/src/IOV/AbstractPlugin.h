@@ -9,6 +9,7 @@
 
 #include <vpr/DynLoad/Library.h>
 
+#include <IOV/Plugin/Info.h>
 #include <IOV/AbstractPluginPtr.h>
 
 
@@ -28,7 +29,7 @@ class Module;
 class IOV_CLASS_API AbstractPlugin : private boost::noncopyable
 {
 protected:
-   AbstractPlugin();
+   AbstractPlugin(const inf::plugin::Info& info);
 
 public:
    virtual ~AbstractPlugin();
@@ -36,6 +37,11 @@ public:
    static std::string getInfoFuncName()
    {
       return "getPluginInfo";
+   }
+
+   const inf::plugin::Info& getInfo() const
+   {
+      return mInfo;
    }
 
 protected:
@@ -52,6 +58,9 @@ protected:
     *        valid dynamic code entity for an IOV plug-in.
     */
    static void basicValidation(const inf::plugin::Module& module);
+
+private:
+   const inf::plugin::Info mInfo;
 };
 
 }

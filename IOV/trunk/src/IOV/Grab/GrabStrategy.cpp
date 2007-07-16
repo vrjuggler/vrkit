@@ -15,7 +15,8 @@
 namespace inf
 {
 
-GrabStrategy::GrabStrategy()
+GrabStrategy::GrabStrategy(const inf::plugin::Info& info)
+   : AbstractPlugin(info)
 {
    /* Do nothing. */ ;
 }

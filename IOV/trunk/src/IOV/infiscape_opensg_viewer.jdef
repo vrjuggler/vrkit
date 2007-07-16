@@ -179,16 +179,20 @@
          <help>The name of a plug-in to be loaded and used by the Infiscape OpenSG Viewer application.</help>
          <value label="Module Name" defaultvalue=""/>
          <enumeration editable="true">
-            <enum label="GrabPlugin" value="GrabPlugin"/>
-            <enum label="GridPlugin" value="GridPlugin"/>
-            <enum label="LogoPlugin" value="LogoPlugin"/>
-            <enum label="ModeHarnessPlugin" value="ModeHarnessPlugin"/>
-            <enum label="ModeSwitchPlugin" value="ModeSwitchPlugin"/>
-            <enum label="PickPlugin" value="PickPlugin"/>
-            <enum label="SimpleNavPlugin" value="SimpleNavPlugin"/>
-            <enum label="ViewpointsPlugin" value="ViewpointsPlugin"/>
-            <enum label="WandNavPlugin" value="WandNavPlugin"/>
-            <enum label="WidgetPlugin" value="WidgetPlugin"/>
+            <enum label="GrabPlugin" value="com.infiscape.GrabPlugin"/>
+            <enum label="GridPlugin" value="com.infiscape.GridPlugin"/>
+            <enum label="LogoPlugin" value="com.infiscape.LogoPlugin"/>
+            <enum label="ModeHarnessPlugin" value="com.infiscape.ModeHarnessPlugin"/>
+            <enum label="ModelLoaderPlugin" value="com.infiscape.ModelLoaderPlugin"/>
+            <enum label="ModelSwapPlugin" value="com.infiscape.ModelSwapPlugin"/>
+            <enum label="ModeSwitchPlugin" value="com.infiscape.ModeSwitchPlugin"/>
+            <enum label="PickPlugin" value="com.infiscape.PickPlugin"/>
+            <enum label="SimpleNavPlugin" value="com.infiscape.SimpleNavPlugin"/>
+            <enum label="StatusPanelPlugin" value="com.infiscape.StatusPanelPlugin"/>
+            <enum label="VolumeDrawingPlugin" value="com.infiscape.VolumeDrawingPlugin"/>
+            <enum label="ViewpointsPlugin" value="com.infiscape.ViewpointsPlugin"/>
+            <enum label="WandNavPlugin" value="com.infiscape.WandNavPlugin"/>
+            <enum label="WidgetPlugin" value="com.infiscape.WidgetPlugin"/>
          </enumeration>
       </property>
       <property valuetype="string" variable="true" name="strategy_plugin_path">
@@ -197,10 +201,10 @@
       </property>
       <property valuetype="string" variable="false" name="isect_strategy">
          <help></help>
-         <value label="Intersection Strategy" defaultvalue="PointIntersection" />
+         <value label="Intersection Strategy" defaultvalue="com.infiscape.isect.PointIntersectionStrategy" />
          <enumeration editable="true">
-            <enum label="Point Intersection" value="PointIntersection"/>
-            <enum label="Ray Intersection" value="RayIntersection"/>
+            <enum label="Point Intersection" value="com.infiscape.isect.PointIntersectionStrategy"/>
+            <enum label="Ray Intersection" value="com.infiscape.isect.RayIntersectionStrategy"/>
          </enumeration>
       </property>
       <upgrade_transform>
@@ -222,7 +226,7 @@
                      <xsl:copy-of select="." />
                   </xsl:for-each>
                   <xsl:element namespace="{$jconf}" name="isect_strategy">
-                     <xsl:text>PointIntersection</xsl:text>
+                     <xsl:text>com.infiscape.isect.PointIntersectionStrategy</xsl:text>
                   </xsl:element>
                </xsl:element>
             </xsl:template>

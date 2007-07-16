@@ -32,7 +32,7 @@ class RayIntersectionStrategy
    , public boost::enable_shared_from_this<RayIntersectionStrategy>
 {
 protected:
-   RayIntersectionStrategy();
+   RayIntersectionStrategy(const inf::plugin::Info& info);
 
 public:
    virtual ~RayIntersectionStrategy()
@@ -45,9 +45,9 @@ public:
       return "RayIntersection";
    }
 
-   static IntersectionStrategyPtr create()
+   static IntersectionStrategyPtr create(const inf::plugin::Info& info)
    {
-      return IntersectionStrategyPtr(new RayIntersectionStrategy());
+      return IntersectionStrategyPtr(new RayIntersectionStrategy(info));
    }
 
    virtual inf::IntersectionStrategyPtr init(ViewerPtr viewer);

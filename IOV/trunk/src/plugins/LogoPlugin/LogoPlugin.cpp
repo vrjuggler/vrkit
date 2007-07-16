@@ -4,8 +4,10 @@
 #include <windows.h>
 #endif
 
-#include <boost/format.hpp>
 #include <sstream>
+#include <boost/bind.hpp>
+#include <boost/format.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <IOV/Viewer.h>
 #include <IOV/PluginCreator.h>
@@ -44,9 +46,14 @@ namespace
    const std::string scale_tkn("scale");
 }
 
+using namespace boost::assign;
 
+static const inf::plugin::Info sInfo(
+   "com.infiscape", "LogoPlugin",
+   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+);
 static inf::PluginCreator<inf::Plugin> sLogoPluginCreator(
-   &inf::LogoPlugin::create
+   boost::bind(&inf::LogoPlugin::create, sInfo)
 );
 
 extern "C"
@@ -54,14 +61,9 @@ extern "C"
 
 /** @name Plug-in Entry points */
 //@{
-IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 {
-   std::vector<unsigned int> version(3);
-   version[0] = IOV_VERSION_MAJOR;
-   version[1] = IOV_VERSION_MINOR;
-   version[2] = IOV_VERSION_PATCH;
-
-   return inf::plugin::Info("com.infiscape", "LogoPlugin", version);
+   return &sInfo;
 }
 
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
@@ -82,9 +84,9 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
-PluginPtr LogoPlugin::create()
+PluginPtr LogoPlugin::create(const inf::plugin::Info& info)
 {
-   return PluginPtr(new LogoPlugin);
+   return PluginPtr(new LogoPlugin(info));
 }
 
 PluginPtr LogoPlugin::init(inf::ViewerPtr viewer)

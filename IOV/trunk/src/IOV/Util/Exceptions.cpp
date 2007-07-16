@@ -104,9 +104,21 @@ PluginInterfaceException::~PluginInterfaceException() throw ()
    /* Do nothing. */ ;
 }
 
+PluginTypeNameException::
+PluginTypeNameException(const std::string& msg, const std::string& location)
+   throw ()
+   : PluginException(msg, location)
+{
+   /* Do nothing. */ ;
+}
+
+PluginTypeNameException::~PluginTypeNameException() throw ()
+{
+   /* Do nothing. */ ;
+}
+
 PluginDependencyException::
-PluginDependencyException(const std::string& msg,
-                          const std::string& location)
+PluginDependencyException(const std::string& msg, const std::string& location)
    throw ()
    : PluginException(msg, location)
 {

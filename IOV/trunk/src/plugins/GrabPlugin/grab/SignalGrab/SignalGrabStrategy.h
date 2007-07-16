@@ -25,12 +25,12 @@ class SignalGrabStrategy
    , public boost::enable_shared_from_this<SignalGrabStrategy>
 {
 protected:
-   SignalGrabStrategy();
+   SignalGrabStrategy(const inf::plugin::Info& info);
 
 public:
-   static GrabStrategyPtr create()
+   static GrabStrategyPtr create(const inf::plugin::Info& info)
    {
-      return GrabStrategyPtr(new SignalGrabStrategy());
+      return GrabStrategyPtr(new SignalGrabStrategy(info));
    }
 
    virtual ~SignalGrabStrategy();

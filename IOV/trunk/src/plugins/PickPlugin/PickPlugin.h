@@ -17,7 +17,6 @@
 #include <IOV/EventDataPtr.h>
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
-#include <IOV/PluginFactory.h>
 #include <IOV/Util/DigitalCommand.h>
 #include <IOV/Grab/IntersectionStrategy.h>
 #include <IOV/SceneObjectPtr.h>
@@ -31,12 +30,12 @@ class PickPlugin
    , public boost::enable_shared_from_this<PickPlugin>
 {
 protected:
-   PickPlugin();
+   PickPlugin(const inf::plugin::Info& info);
 
 public:
-   static inf::PluginPtr create()
+   static inf::PluginPtr create(const inf::plugin::Info& info)
    {
-      return inf::PluginPtr(new PickPlugin());
+      return inf::PluginPtr(new PickPlugin(info));
    }
 
    virtual ~PickPlugin()
@@ -121,8 +120,6 @@ private:
    snx::SoundHandle mPickSound;
 
    std::vector<std::string> mStrategyPluginPath;
-
-   inf::PluginFactoryPtr mPluginFactory;
 
    /** @name Intersection Strategy */
    //@{

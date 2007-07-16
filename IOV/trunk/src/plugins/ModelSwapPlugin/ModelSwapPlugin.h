@@ -22,13 +22,14 @@ class ModelSwapPlugin
    , public boost::enable_shared_from_this<ModelSwapPlugin>
 {
 protected:
-   ModelSwapPlugin()
+   ModelSwapPlugin(const inf::plugin::Info& info)
+      : Plugin(info)
    {
       /* Do nothing. */ ;
    }
 
 public:
-   static inf::PluginPtr create();
+   static inf::PluginPtr create(const inf::plugin::Info& info);
    
    virtual ~ModelSwapPlugin()
    {

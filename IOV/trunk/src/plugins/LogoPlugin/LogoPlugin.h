@@ -23,11 +23,12 @@ class LogoPlugin
    : public inf::Plugin, public boost::enable_shared_from_this<LogoPlugin>
 {
 protected:
-   LogoPlugin()
+   LogoPlugin(const inf::plugin::Info& info)
+      : Plugin(info)
    {;}
 
 public:
-   static PluginPtr create();
+   static PluginPtr create(const inf::plugin::Info& info);
 
    virtual ~LogoPlugin()
    {;}

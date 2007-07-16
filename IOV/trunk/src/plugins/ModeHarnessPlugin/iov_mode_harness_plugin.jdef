@@ -21,5 +21,79 @@
       </property>
       <upgrade_transform/>
    </definition_version>
+   <definition_version version="2" label="IOV Mode Harness Plug-In (Infiscape)">
+      <abstract>false</abstract>
+      <help>The Mode Harness Plug-in allows swapping of "mode components" based on signals being raised from within the application. Each mode component can be activated by multiple signals, but only one component can be activated by any one signal.</help>
+      <parent />
+      <category>/Infiscape/</category>
+      <property valuetype="string" variable="true" name="component_path">
+         <help>Each value adds to the path where dynamically loadable mode component plug-ins can be found. The path may make use of environment variables. For example: &lt;tt&gt;${HOME}/inf-plugins&lt;/tt&gt;. If no values are set for this property, the default search path will be &lt;tt&gt;${VJ_BASE_DIR}/lib{,32,64}/infiscape/viewer/plugins/mode&lt;/tt&gt; depending on the compile-time application binary interface (ABI).</help>
+         <value label="Component Plug-In Path" defaultvalue=""/>
+      </property>
+      <property valuetype="configelement" variable="true" name="component">
+         <help>The list of mode components and their activation signal mapping. The same component can associated with multiple activation signals by listing it more than once here. Activation signals cannot be repeated, however.</help>
+         <value label="Component Definition" defaultvalue="" />
+         <allowed_type>mode_component</allowed_type>
+      </property>
+      <property valuetype="configelementpointer" variable="false" name="default_component">
+         <help>The name of the default mode component. This will be the component that is activated at application startup. If no mode component is named here, then no component will be activated until a signal is raised by the application that initiates the activation process.</help>
+         <value label="Default Mode Component" />
+         <allowed_type>mode_component</allowed_type>
+      </property>
+      <property valuetype="configelement" variable="true" name="signal">
+         <help>The list of activation signals and the mode component activated. The same component can associated with multiple activation signals by listing it more than once here. Activation signals cannot be repeated, however.</help>
+         <value label="Activation Signals" defaultvalue="" />
+         <allowed_type>mode_change_signal</allowed_type>
+      </property>
+      <upgrade_transform>
+         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jconf="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" version="1.0">
+            <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
+            <xsl:variable name="jconf">http://www.vrjuggler.org/jccl/xsd/3.0/configuration</xsl:variable>
+
+            <xsl:template match="/">
+                <xsl:apply-templates/>
+            </xsl:template>
+
+            <xsl:template match="jconf:iov_mode_harness_plugin">
+               <xsl:element namespace="{$jconf}" name="iov_mode_harness_plugin">
+                  <xsl:attribute name="name">
+                     <xsl:value-of select="@name"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="version">2</xsl:attribute>
+                  <xsl:for-each select="./jconf:component_path">
+                     <xsl:copy-of select="." />
+                  </xsl:for-each>
+                  <xsl:for-each select="./jconf:component">
+                     <xsl:element namespace="{$jconf}" name="component">
+                        <xsl:element namespace="{$jconf}" name="mode_component">
+                           <xsl:attribute name="name">
+                              <xsl:value-of select="./jconf:component_name" />
+                           </xsl:attribute>
+                           <xsl:attribute name="version">2</xsl:attribute>
+                           <xsl:element namespace="{$jconf}" name="plugin">
+                              <xsl:value-of select="./jconf:component_name" />
+                           </xsl:element>
+                        </xsl:element>
+                     </xsl:element>
+                  </xsl:for-each>
+                  <xsl:copy-of select="./jconf:default_component" />
+                  <xsl:for-each select="./jconf:component">
+                     <xsl:element namespace="{$jconf}" name="signal">
+                        <xsl:element namespace="{$jconf}" name="mode_change_signal">
+                           <xsl:attribute name="name">
+                              <xsl:value-of select="./jconf:signal_id" />
+                           </xsl:attribute>
+                           <xsl:attribute name="version">1</xsl:attribute>
+                           <xsl:element namespace="{$jconf}" name="active_component">
+                              <xsl:value-of select="./jconf:component_name" />
+                           </xsl:element>
+                        </xsl:element>
+                     </xsl:element>
+                  </xsl:for-each>
+               </xsl:element>
+            </xsl:template>
+         </xsl:stylesheet>
+      </upgrade_transform>
+   </definition_version>
 </definition>
 

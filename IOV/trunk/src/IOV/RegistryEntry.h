@@ -41,7 +41,7 @@ public:
       return mModule;
    }
 
-   virtual inf::AbstractPluginPtr createAsDependency() = 0;
+   virtual inf::AbstractPluginPtr create() = 0;
 
 protected:
    inf::PluginCreatorBase* getCreatorFunc(

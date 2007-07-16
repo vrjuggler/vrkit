@@ -13,7 +13,8 @@
 namespace inf
 {
 
-AbstractPlugin::AbstractPlugin()
+AbstractPlugin::AbstractPlugin(const inf::plugin::Info& info)
+   : mInfo(info)
 {
    ;
 }

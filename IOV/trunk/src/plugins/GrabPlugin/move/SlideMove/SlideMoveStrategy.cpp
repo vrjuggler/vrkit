@@ -2,6 +2,9 @@
 
 #include <IOV/Config.h>
 
+#include <boost/bind.hpp>
+#include <boost/assign/list_of.hpp>
+
 #include <gmtl/MatrixOps.h>
 #include <gmtl/External/OpenSGConvert.h>
 #include <gmtl/Output.h>
@@ -20,8 +23,14 @@
 #include "SlideMoveStrategy.h"
 
 
+using namespace boost::assign;
+
+static const inf::plugin::Info sInfo(
+   "com.infiscape.move", "SlideMoveStrategy",
+   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+);
 static inf::PluginCreator<inf::MoveStrategy> sPluginCreator(
-   &inf::SlideMoveStrategy::create
+   boost::bind(&inf::SlideMoveStrategy::create, sInfo)
 );
 
 extern "C"
@@ -29,15 +38,9 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 {
-   std::vector<unsigned int> version(3);
-   version[0] = IOV_VERSION_MAJOR;
-   version[1] = IOV_VERSION_MINOR;
-   version[2] = IOV_VERSION_PATCH;
-
-   return inf::plugin::Info("com.infiscape.move", "SliveMoveStrategy",
-                            version);
+   return &sInfo;
 }
 
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
@@ -58,8 +61,8 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getMoveStrategyCreator()
 namespace inf
 {
 
-SlideMoveStrategy::SlideMoveStrategy()
-   : inf::MoveStrategy()
+SlideMoveStrategy::SlideMoveStrategy(const inf::plugin::Info& info)
+   : inf::MoveStrategy(info)
    , mTransValue(0.0f)
    , mAnalogNum(0)
    , mForwardValue(1.0f)

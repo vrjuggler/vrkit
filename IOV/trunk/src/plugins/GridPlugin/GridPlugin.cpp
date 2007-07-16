@@ -1,6 +1,8 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
 #include <algorithm>
+#include <boost/bind.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <gmtl/Generate.h>
 #include <gmtl/External/OpenSGConvert.h>
@@ -21,21 +23,24 @@
 #include "GridPlugin.h"
 
 
-static inf::PluginCreator<inf::Plugin> sPluginCreator(&inf::GridPlugin::create);
+using namespace boost::assign;
+
+static const inf::plugin::Info sInfo(
+   "com.infiscape", "GridPlugin",
+   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+);
+static inf::PluginCreator<inf::Plugin> sPluginCreator(
+   boost::bind(&inf::GridPlugin::create, sInfo)
+);
 
 extern "C"
 {
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 {
-   std::vector<unsigned int> version(3);
-   version[0] = IOV_VERSION_MAJOR;
-   version[1] = IOV_VERSION_MINOR;
-   version[2] = IOV_VERSION_PATCH;
-
-   return inf::plugin::Info("com.infiscape", "GridPlugin", version);
+   return &sInfo;
 }
 
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
@@ -55,8 +60,9 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
-GridPlugin::GridPlugin()
-   : mSelectedGridIndex(-1)
+GridPlugin::GridPlugin(const inf::plugin::Info& info)
+   : Plugin(info)
+   , mSelectedGridIndex(-1)
    , mGridsVisible(false)
    , mAnalogNum(-1)
    , mForwardVal(1.0f)

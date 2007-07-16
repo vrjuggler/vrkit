@@ -1,5 +1,6 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
+#include <iostream>
 #include <sstream>
 #include <iterator>
 #include <algorithm>
@@ -16,8 +17,7 @@ namespace plugin
 std::string Info::sSeparator(":");
 
 Info::Info(const std::string& nameSpace, const std::string& shortName,
-           const std::vector<unsigned int>& version,
-           const std::string& qualifier,
+           const Info::version_type& version, const std::string& qualifier,
            const std::vector<std::string>& dependencies)
    : mNamespace(nameSpace)
    , mShortName(shortName)
@@ -25,15 +25,7 @@ Info::Info(const std::string& nameSpace, const std::string& shortName,
    , mQualifier(qualifier)
    , mDependencies(dependencies)
 {
-   if ( mVersion.empty() )
-   {
-      mVersion.resize(3);
-      mVersion[0] = 0;
-      mVersion[1] = 0;
-      mVersion[2] = 0;
-   }
-
-   mNamespaceName = buildNamespaceName(mNamespace, mShortName);
+   mName     = buildNamespaceName(mNamespace, mShortName);
    mFullName = buildFullName(mNamespace, mShortName, mVersion, mQualifier);
 }
 
@@ -46,12 +38,12 @@ inline bool inDeps(const std::vector<std::string>& deps,
 bool Info::dependsOn(const Info& otherInfo) const
 {
    return inDeps(mDependencies, otherInfo.getFullName()) ||
-          inDeps(mDependencies, otherInfo.getNamespaceName());
+          inDeps(mDependencies, otherInfo.getName());
 }
 
 std::string Info::buildFullName(const std::string& nameSpace,
                                 const std::string& shortName,
-                                const std::vector<unsigned int>& version,
+                                const Info::version_type& version,
                                 const std::string& qualifier)
 {
    std::string full_name(buildNamespaceName(nameSpace, shortName));

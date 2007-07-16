@@ -11,6 +11,7 @@
 #include <OpenSG/OSGConnection.h>
 #include <OpenSG/OSGBinaryDataHandler.h>
 
+#include <vpr/DynLoad/Library.h>
 #include <jccl/Config/ConfigElementPtr.h>
 
 #include <vrj/vrjParam.h>
@@ -29,7 +30,8 @@
 #include <IOV/UserPtr.h>
 #include <IOV/ScenePtr.h>
 #include <IOV/SceneObjectPtr.h>
-#include <IOV/PluginFactoryPtr.h>
+#include <IOV/AbstractPluginPtr.h>
+#include <IOV/PluginRegistryPtr.h>
 
 #include <IOV/Scene.h>
 #include <IOV/Configuration.h>
@@ -175,10 +177,14 @@ public:
       return mConfiguration;
    }
 
-   /** Return the plugin factory being used by the system. */
-   inf::PluginFactoryPtr getPluginFactory()
+   /**
+    * Return the plugin factory being used by the core viewer object.
+    *
+    * @since 0.36
+    */
+   inf::PluginRegistryPtr getPluginRegistry()
    {
-      return mPluginFactory;
+      return mPluginRegistry;
    }
 
    /** Dummied init scene method.  It is pure virtual in base so we have
@@ -277,6 +283,10 @@ private:
     */
    void loadAndInitPlugins(jccl::ConfigElementPtr appCfg);
 
+   void processDeps(const std::vector<inf::AbstractPluginPtr>& deps);
+
+   void addPlugin(inf::PluginPtr plugin);
+
    void config(jccl::ConfigElementPtr appCfg);
 
 private:
@@ -299,8 +309,15 @@ private:
    std::vector<OSG::Connection::Channel> mChannels;
    //@}
 
-   /**< Plugin factory for the entire system. */
-   inf::PluginFactoryPtr mPluginFactory;
+   /** @name Plug-in Registry */
+   //@{
+   /**
+    * The plug-in registry instance. In general, all entities in the
+    * application should be using this instance so as to keep the knowledge
+    * of loaded and instantiated plug-ins centralized.
+    */
+   inf::PluginRegistryPtr mPluginRegistry;
+   //@}
 
    /** List of plugins managed by the viewer.
    * @link association

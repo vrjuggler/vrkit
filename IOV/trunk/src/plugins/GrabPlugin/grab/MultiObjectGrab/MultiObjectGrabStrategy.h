@@ -27,7 +27,7 @@ class MultiObjectGrabStrategy
    , public boost::enable_shared_from_this<MultiObjectGrabStrategy>
 {
 protected:
-   MultiObjectGrabStrategy();
+   MultiObjectGrabStrategy(const inf::plugin::Info& info);
 
 public:
    static std::string getId()
@@ -35,9 +35,9 @@ public:
       return "MultiObjectGrab";
    }
 
-   static GrabStrategyPtr create()
+   static GrabStrategyPtr create(const inf::plugin::Info& info)
    {
-      return GrabStrategyPtr(new MultiObjectGrabStrategy());
+      return GrabStrategyPtr(new MultiObjectGrabStrategy(info));
    }
 
    virtual ~MultiObjectGrabStrategy();

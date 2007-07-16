@@ -5,6 +5,8 @@
 #endif
 
 #include <sstream>
+#include <boost/bind.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
@@ -31,8 +33,14 @@
 #include "SimpleNavPlugin.h"
 
 
+using namespace boost::assign;
+
+static const inf::plugin::Info sInfo(
+   "com.infiscape", "SimpleNavPlugin",
+   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+);
 static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   &inf::SimpleNavPlugin::create
+   boost::bind(&inf::SimpleNavPlugin::create, sInfo)
 );
 
 extern "C"
@@ -40,14 +48,9 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 {
-   std::vector<unsigned int> version(3);
-   version[0] = IOV_VERSION_MAJOR;
-   version[1] = IOV_VERSION_MINOR;
-   version[2] = IOV_VERSION_PATCH;
-
-   return inf::plugin::Info("com.infiscape", "SimpleNavPlugin", version);
+   return &sInfo;
 }
 
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
@@ -68,8 +71,9 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
-SimpleNavPlugin::SimpleNavPlugin()
-   : mCanNavigate(false)
+SimpleNavPlugin::SimpleNavPlugin(const inf::plugin::Info& info)
+   : NavPlugin(info)
+   , mCanNavigate(false)
    , mVelocity(0.0f)
    , mNavMode(WALK)
    , mForBtn(-1)

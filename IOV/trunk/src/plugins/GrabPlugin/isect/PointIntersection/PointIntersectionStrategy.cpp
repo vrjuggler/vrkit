@@ -2,6 +2,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/External/OpenSGConvert.h>
@@ -20,8 +21,14 @@
 #include "PointIntersectionStrategy.h"
 
 
+using namespace boost::assign;
+
+static const inf::plugin::Info sInfo(
+   "com.infiscape.isect", "PointIntersectionStrategy",
+   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+);
 static inf::PluginCreator<inf::IntersectionStrategy> sPluginCreator(
-   &inf::PointIntersectionStrategy::create
+   boost::bind(&inf::PointIntersectionStrategy::create, sInfo)
 );
 
 extern "C"
@@ -29,15 +36,9 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 {
-   std::vector<unsigned int> version(3);
-   version[0] = IOV_VERSION_MAJOR;
-   version[1] = IOV_VERSION_MINOR;
-   version[2] = IOV_VERSION_PATCH;
-
-   return inf::plugin::Info("com.infiscape.isect",
-                            "PointIntersectionStrategy", version);
+   return &sInfo;
 }
 
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,

@@ -28,12 +28,12 @@ class GridPlugin
    , public boost::enable_shared_from_this<GridPlugin>
 {
 protected:
-   GridPlugin();
+   GridPlugin(const inf::plugin::Info& info);
 
 public:
-   static inf::PluginPtr create()
+   static inf::PluginPtr create(const inf::plugin::Info& info)
    {
-      return inf::PluginPtr(new GridPlugin());
+      return inf::PluginPtr(new GridPlugin(info));
    }
 
    virtual ~GridPlugin()

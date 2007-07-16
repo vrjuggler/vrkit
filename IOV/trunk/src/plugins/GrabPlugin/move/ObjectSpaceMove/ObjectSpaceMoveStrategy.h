@@ -1,24 +1,27 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
-#ifndef _INF_BASIC_MOVE_STRATEGY_H_
-#define _INF_BASIC_MOVE_STRATEGY_H_
+#ifndef _INF_OBJECT_SPACE_MOVE_STRATEGY_H_
+#define _INF_OBJECT_SPACE_MOVE_STRATEGY_H_
 
 #include <map>
 #include <boost/enable_shared_from_this.hpp>
 
 #include <IOV/Grab/MoveStrategy.h>
 
+#include <gmtl/Quat.h>
+#include <gmtl/QuatOps.h>
+
 
 namespace inf
 {
 
-class BasicMoveStrategy
+class ObjectSpaceMoveStrategy
    : public inf::MoveStrategy
-   , public boost::enable_shared_from_this<BasicMoveStrategy>
+   , public boost::enable_shared_from_this<ObjectSpaceMoveStrategy>
 {
 protected:
-   BasicMoveStrategy()
-      : inf::MoveStrategy()
+   ObjectSpaceMoveStrategy(const inf::plugin::Info& info)
+      : inf::MoveStrategy(info)
    {
       /* Do nothing. */ ;
    }
@@ -26,15 +29,15 @@ protected:
 public:
    static std::string getId()
    {
-      return "BasicMove";
+      return "ObjectSpaceMove";
    }
 
-   static inf::MoveStrategyPtr create()
+   static inf::MoveStrategyPtr create(const inf::plugin::Info& info)
    {
-      return inf::MoveStrategyPtr(new BasicMoveStrategy());
+      return inf::MoveStrategyPtr(new ObjectSpaceMoveStrategy(info));
    }
 
-   virtual ~BasicMoveStrategy()
+   virtual ~ObjectSpaceMoveStrategy()
    {
       /* Do nothing. */ ;
    }
@@ -52,7 +55,7 @@ public:
    virtual gmtl::Matrix44f computeMove(inf::ViewerPtr viewer,
                                        SceneObjectPtr obj,
                                        const gmtl::Matrix44f& vp_M_wand,
-                                       const gmtl::Matrix44f& curObjMat);
+                                       const gmtl::Matrix44f& curObjPos);
 
    /**
     * Invokes the global scope delete operator.  This is required for proper
@@ -76,11 +79,17 @@ protected:
 private:
    void objectGrabbed(SceneObjectPtr obj, const gmtl::Matrix44f& vp_M_wand);
 
-   /**
-    * Map of transformations from the wand coordinate space into the
-    * coordinate space of the parent of a grabbed scene object.
-    */
-   std::map<SceneObjectPtr, gmtl::Matrix44f> m_wand_M_pobj_map;
+   gmtl::Quatf     mRotation;
+   gmtl::Matrix44f m_wand_M_vp;
+
+   struct ObjectData
+   {
+      gmtl::Matrix44f m_wand_M_pobj;
+      gmtl::Matrix44f m_pobj_M_obj;
+      gmtl::Matrix44f m_obj_M_pobj;
+   };
+
+   std::map<SceneObjectPtr, ObjectData> mObjectDataMap;
 };
 
 }

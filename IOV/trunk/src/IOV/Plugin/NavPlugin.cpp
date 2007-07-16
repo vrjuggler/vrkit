@@ -9,7 +9,8 @@
 namespace inf
 {
 
-NavPlugin::NavPlugin()
+NavPlugin::NavPlugin(const inf::plugin::Info& info)
+   : Plugin(info)
 {
    /* Do nothing. */ ;
 }

@@ -14,7 +14,6 @@
 
 #include <IOV/EventData.h>
 #include <IOV/Plugin.h>
-#include <IOV/PluginFactory.h>
 #include <IOV/ViewerPtr.h>
 #include <IOV/WandInterfacePtr.h>
 #include <IOV/Grab/IntersectionStrategy.h>
@@ -34,12 +33,12 @@ class WidgetPlugin
    , public boost::enable_shared_from_this<WidgetPlugin>
 {
 protected:
-   WidgetPlugin();
+   WidgetPlugin(const inf::plugin::Info& info);
 
 public:
-   static inf::PluginPtr create()
+   static inf::PluginPtr create(const inf::plugin::Info& info)
    {
-      return inf::PluginPtr(new WidgetPlugin());
+      return inf::PluginPtr(new WidgetPlugin(info));
    }
 
    virtual ~WidgetPlugin()
@@ -168,9 +167,6 @@ private:
    bool mIntersecting;
    bool mWidgetPressed;
    SceneObjectPtr mIntersectedObj;
-
-   //std::vector<std::string> mStrategyPluginPath;
-   inf::PluginFactoryPtr mPluginFactory;
 
    /** @name Intersection Strategy */
    //@{

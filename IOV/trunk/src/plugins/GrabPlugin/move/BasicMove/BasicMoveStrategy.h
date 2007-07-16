@@ -1,8 +1,9 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
-#ifndef _INF_CENTER_POINT_MOVE_STRATEGY_H_
-#define _INF_CENTER_POINT_MOVE_STRATEGY_H_
+#ifndef _INF_BASIC_MOVE_STRATEGY_H_
+#define _INF_BASIC_MOVE_STRATEGY_H_
 
+#include <map>
 #include <boost/enable_shared_from_this.hpp>
 
 #include <IOV/Grab/MoveStrategy.h>
@@ -11,13 +12,13 @@
 namespace inf
 {
 
-class CenterPointMoveStrategy
+class BasicMoveStrategy
    : public inf::MoveStrategy
-   , public boost::enable_shared_from_this<CenterPointMoveStrategy>
+   , public boost::enable_shared_from_this<BasicMoveStrategy>
 {
 protected:
-   CenterPointMoveStrategy()
-      : inf::MoveStrategy()
+   BasicMoveStrategy(const inf::plugin::Info& info)
+      : inf::MoveStrategy(info)
    {
       /* Do nothing. */ ;
    }
@@ -25,15 +26,15 @@ protected:
 public:
    static std::string getId()
    {
-      return "CenterPointMove";
+      return "BasicMove";
    }
 
-   static inf::MoveStrategyPtr create()
+   static inf::MoveStrategyPtr create(const inf::plugin::Info& info)
    {
-      return inf::MoveStrategyPtr(new CenterPointMoveStrategy());
+      return inf::MoveStrategyPtr(new BasicMoveStrategy(info));
    }
 
-   virtual ~CenterPointMoveStrategy()
+   virtual ~BasicMoveStrategy()
    {
       /* Do nothing. */ ;
    }
@@ -71,9 +72,18 @@ protected:
    {
       delete this;
    }
+
+private:
+   void objectGrabbed(SceneObjectPtr obj, const gmtl::Matrix44f& vp_M_wand);
+
+   /**
+    * Map of transformations from the wand coordinate space into the
+    * coordinate space of the parent of a grabbed scene object.
+    */
+   std::map<SceneObjectPtr, gmtl::Matrix44f> m_wand_M_pobj_map;
 };
 
 }
 
 
-#endif /* _INF_CENTER_POINT_MOVE_STRATEGY_H_ */
+#endif /* _INF_BASIC_MOVE_STRATEGY_H_ */

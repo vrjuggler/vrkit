@@ -6,7 +6,7 @@
          <root_name>RootNode</root_name>
          <plugin>ModeSwitchPlugin</plugin>
          <plugin>StatusPanelPlugin</plugin>
-         <isect_strategy>PointIntersection</isect_strategy>
+         <isect_strategy>Point Intersection</isect_strategy>
       </infiscape_opensg_viewer>
       <wand_nav_plugin name="Viewer Wand Nav" version="3">
          <max_velocity>5.0</max_velocity>
@@ -152,7 +152,7 @@
          <initial_rot>0.0</initial_rot>
          <initial_rot>0.0</initial_rot>
       </status_panel_plugin>
-      <iov_grab_plugin name="Grab Plug-in" version="5">
+      <iov_grab_plugin name="Grab Plug-in" version="6">
          <grab_strategy>Single Object Grab</grab_strategy>
          <move_strategy>Slide Move</move_strategy>
          <move_strategy>Basic Move</move_strategy>

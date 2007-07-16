@@ -22,8 +22,8 @@ class PointIntersectionStrategy
    , public boost::enable_shared_from_this<PointIntersectionStrategy>
 {
 protected:
-   PointIntersectionStrategy()
-      : inf::IntersectionStrategy()
+   PointIntersectionStrategy(const inf::plugin::Info& info)
+      : inf::IntersectionStrategy(info)
    {;}
 
 public:
@@ -35,9 +35,9 @@ public:
       return "PointIntersection";
    }
 
-   static IntersectionStrategyPtr create()
+   static IntersectionStrategyPtr create(const inf::plugin::Info& info)
    {
-      return IntersectionStrategyPtr(new PointIntersectionStrategy());
+      return IntersectionStrategyPtr(new PointIntersectionStrategy(info));
    }
 
    virtual inf::IntersectionStrategyPtr init(ViewerPtr viewer);

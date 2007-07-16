@@ -25,7 +25,7 @@ class SingleObjectGrabStrategy
    , public boost::enable_shared_from_this<SingleObjectGrabStrategy>
 {
 protected:
-   SingleObjectGrabStrategy();
+   SingleObjectGrabStrategy(const inf::plugin::Info& info);
 
 public:
    static std::string getId()
@@ -33,9 +33,9 @@ public:
       return "SingleObjectGrab";
    }
 
-   static GrabStrategyPtr create()
+   static GrabStrategyPtr create(const inf::plugin::Info& info)
    {
-      return GrabStrategyPtr(new SingleObjectGrabStrategy());
+      return GrabStrategyPtr(new SingleObjectGrabStrategy(info));
    }
 
    virtual ~SingleObjectGrabStrategy();

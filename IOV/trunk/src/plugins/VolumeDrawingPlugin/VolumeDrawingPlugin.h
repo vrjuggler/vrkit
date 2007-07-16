@@ -19,12 +19,12 @@ class VolumeDrawingPlugin
    , public boost::enable_shared_from_this<VolumeDrawingPlugin>
 {
 protected:
-   VolumeDrawingPlugin();
+   VolumeDrawingPlugin(const inf::plugin::Info& info);
 
 public:
-   static inf::PluginPtr create()
+   static inf::PluginPtr create(const inf::plugin::Info& info)
    {
-      return inf::PluginPtr(new VolumeDrawingPlugin());
+      return inf::PluginPtr(new VolumeDrawingPlugin(info));
    }
 
    virtual ~VolumeDrawingPlugin()

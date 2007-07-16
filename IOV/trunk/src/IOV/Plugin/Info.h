@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/array.hpp>
 
 
 namespace inf
@@ -33,6 +34,8 @@ namespace plugin
 class IOV_CLASS_API Info
 {
 public:
+   typedef boost::array<unsigned int, 3> version_type;
+
    /**
     * Constructor.
     *
@@ -49,11 +52,11 @@ public:
     *                     users refer to the plug-in type. For example, such a
     *                     name may be "GrabPlugin".
     * @param version      The version number for the plug-in type expressed as
-    *                     a vector of unsigned integers. This will be
+    *                     a container of unsigned integers. This will be
     *                     concatenated as necessary using an appropriate
-    *                     character (usually '.'). The order of the vector
-    *                     must be in decreasing order of significance. For
-    *                     example, \p version[0] should be what is
+    *                     character (usually '.'). The order of the contained
+    *                     values must be in decreasing order of significance.
+    *                     For example, \p version[0] should be what is
     *                     traditionally thought of as the major version
     *                     number. The actual meaning of the version number is
     *                     left up to the plug-in implementor to decide.
@@ -71,15 +74,11 @@ public:
     *                     version [partial or full]) or the plug-in type name
     *                     with its namespace.
     *
-    * @note If \p version is an empty vector, the version information for the
-    *       associate plug-in type will be set to 0.0.0.
-    *
     * @see buildFullName()
     */
    Info(
       const std::string& nameSpace, const std::string& shortName,
-      const std::vector<unsigned int>& version,
-      const std::string& qualifier = "",
+      const version_type& version, const std::string& qualifier = "",
       const std::vector<std::string>& dependencies = std::vector<std::string>()
    );
 
@@ -92,24 +91,21 @@ public:
    }
 
    /**
-    * Returns the short (or "common") name for the plug-in type.
+    * Returns the name for the plug-in type with its namespace (if one was
+    * given to the constructor). If there is no namespace, then this will
+    * return the short name.
     */
-   const std::string& getShortName() const
+   const std::string& getName() const
    {
-      return mShortName;
-   }
-
-   const std::string& getNamespaceName() const
-   {
-      return mNamespaceName;
+      return mName;
    }
 
    /**
     * Returns the version of the plug-in type encoded as a sequence of
-    * unsigned integers. The returned vector is guaranteed to contain at least
-    * one value.
+    * unsigned integers. The returned container is guaranteed to contain at
+    * least one value.
     */
-   const std::vector<unsigned int>& getVersion() const
+   const version_type& getVersion() const
    {
       return mVersion;
    }
@@ -146,8 +142,8 @@ public:
     *
     * @param nameSpace The namespace for the plug-in type.
     * @param shortName The short or "common" name for the plug-in type.
-    * @param version   The version number for the plug-in type expressed as a
-    *                  vector of unsigned integers.
+    * @param version   The version number for the plug-in type expressed as an
+    *                  ordered container of unsigned integers.
     * @param qualifier An optional qualifier to distinguish a plug-in type
     *                  variant.
     *
@@ -157,7 +153,7 @@ public:
     */
    static std::string buildFullName(const std::string& nameSpace,
                                     const std::string& shortName,
-                                    const std::vector<unsigned int>& version,
+                                    const version_type& version,
                                     const std::string& qualifier = "");
 
    /**
@@ -190,14 +186,14 @@ private:
 
    /** @name Basic Plug-in Type Identifier Attributes */
    //@{
-   std::string               mNamespace;        /**< Namespace (optional) */
-   std::string               mShortName;        /**< Short name */
-   std::vector<unsigned int> mVersion;          /**< Version */
-   std::string               mQualifier;        /**< Qualifier (optional) */
+   std::string  mNamespace;     /**< Namespace (optional) */
+   std::string  mShortName;     /**< Short name */
+   version_type mVersion;       /**< Version */
+   std::string  mQualifier;     /**< Qualifier (optional) */
    //@}
 
-   /** Short name with namespace */
-   std::string mNamespaceName;
+   /** Short name with namespace. */
+   std::string mName;
 
    /**
     * The fully qualified name for the plug-in type. Ideally, this will

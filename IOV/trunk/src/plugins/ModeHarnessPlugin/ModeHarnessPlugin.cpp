@@ -5,6 +5,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/bind.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <OpenSG/OSGConfig.h>
 
@@ -18,19 +19,27 @@
 
 #include <IOV/SignalRepository.h>
 #include <IOV/ModeComponent.h>
-#include <IOV/PluginFactory.h>
+#include <IOV/PluginCreator.h>
+#include <IOV/PluginRegistry.h>
 #include <IOV/Status.h>
+#include <IOV/TypedInitRegistryEntry.h>
 #include <IOV/Viewer.h>
 #include <IOV/Version.h>
 #include <IOV/Plugin/Info.h>
+#include <IOV/Plugin/Helpers.h>
 
 #include "ModeHarnessPlugin.h"
 
 
+using namespace boost::assign;
 namespace fs = boost::filesystem;
 
+static const inf::plugin::Info sInfo(
+   "com.infiscape", "ModeHarnessPlugin",
+   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+);
 static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   &inf::ModeHarnessPlugin::create
+   boost::bind(&inf::ModeHarnessPlugin::create, sInfo)
 );
 
 extern "C"
@@ -38,14 +47,9 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 {
-   std::vector<unsigned int> version(3);
-   version[0] = IOV_VERSION_MAJOR;
-   version[1] = IOV_VERSION_MINOR;
-   version[2] = IOV_VERSION_PATCH;
-
-   return inf::plugin::Info("com.infiscape", "ModeHarnessPlugin", version);
+   return &sInfo;
 }
 
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
@@ -66,11 +70,8 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 namespace inf
 {
 
-typedef boost::signal<void (const std::string&)> signal_type;
-typedef SignalContainer<signal_type> signal_container_type;
-typedef signal_container_type::ptr_type signal_container_ptr;
-
-ModeHarnessPlugin::ModeHarnessPlugin()
+ModeHarnessPlugin::ModeHarnessPlugin(const inf::plugin::Info& info)
+   : Plugin(info)
 {
    /* Do nothing. */ ;
 }
@@ -116,87 +117,95 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
       configure(cfg_elt);
    }
 
-   mPluginFactory = viewer->getPluginFactory();
-   mPluginFactory->addScanPath(mComponentPath);
+   typedef std::vector<ComponentInfo>::iterator citer_type;
+   for ( citer_type i = mComponentInfo.begin(); i != mComponentInfo.end(); ++i )
+   {
+      const std::string& name((*i).name);
+      const std::string& plugin((*i).plugin);
+
+      inf::ModeComponentPtr component;
+
+      if ( mComponents.count(name) == 0 )
+      {
+         try
+         {
+            component = makeComponent(plugin, viewer);
+            mComponents[name] = component;
+         }
+         catch (std::runtime_error& ex)
+         {
+            IOV_STATUS << "[Mode Harness] ERROR: Failed to load mode "
+                       << "component '" << name << "':\n" << ex.what()
+                       << std::endl;
+         }
+      }
+      // If the named compnent is already known, reuse the existing instance.
+      // XXX: Should component reuse be configurable? It matters for the case
+      // of one component being activated by multiple mode activation signals.
+      else
+      {
+         component = mComponents[name];
+      }
+   }
 
    std::vector<std::string> registered_signals;
 
-   std::vector<ComponentInfo>::iterator i;
-   for ( i = mComponentInfo.begin(); i != mComponentInfo.end(); ++i )
+   typedef std::vector<SignalDef>::iterator siter_type;
+   for ( siter_type i = mSignalDefs.begin(); i != mSignalDefs.end(); ++i )
    {
-      const std::string& name((*i).name);
-      const std::string& signal_id((*i).signalID);
+      const std::string& sig_name((*i).name);
+      const std::string& comp_name((*i).componentName);
 
       // Determine whether a component has already been registered to respond
       // to signal_id.
       std::vector<std::string>::iterator ei =
          std::find(registered_signals.begin(), registered_signals.end(),
-                   signal_id);
+                   sig_name);
 
-      // If signal_id was not found in registered_signals, then we can go
-      // ahead and hook up the mode component with signal_id.
+      // If sig_name was not found in registered_signals, then we can go ahead
+      // and hook up the mode component with sig_name.
       if ( ei == registered_signals.end() )
       {
-         inf::ModeComponentPtr component;
+         if ( mComponents.count(comp_name) > 0 )
+         {
+            inf::ModeComponentPtr component = mComponents[comp_name];
 
-         if ( mComponents.count(name) == 0 )
-         {
-            try
-            {
-               component = loadComponent(name, viewer);
-               mComponents[name] = component;
-            }
-            catch (std::runtime_error& ex)
-            {
-               IOV_STATUS << "[Mode Harness] ERROR: Failed to load mode "
-                          << "component '" << name << "':\n" << ex.what()
-                          << std::endl;
-            }
-         }
-         // If the named compnent is already known, reuse the existing
-         // instance.
-         // XXX: Should component reuse be configurable? It matters for
-         // the case of one component being activated by multiple mode
-         // activation signals.
-         else
-         {
-            component = mComponents[name];
-         }
-
-         if ( component )
-         {
             IOV_STATUS << "[Mode Harness] Connecting mode component '"
                        << component->getDescription() << "'\n"
-                       << "               (from " << name << ") to signal '"
-                       << signal_id << "'" << std::endl;
+                       << "               to signal '" << sig_name << "'"
+                       << std::endl;
 
-            // Ensure that signal_id is a known signal.
-            if ( ! signal_data->hasSignal(signal_id) )
+            typedef boost::signal<void (const std::string&)> signal_type;
+            typedef SignalContainer<signal_type> signal_container_type;
+
+            // Ensure that sig_name is a known signal.
+            if ( ! signal_data->hasSignal(sig_name) )
             {
-               signal_data->addSignal(signal_id,
+               signal_data->addSignal(sig_name,
                                       signal_container_type::create());
             }
 
             // Connect the newly instantiated component with its signal.
             mConnections.push_back(
-               signal_data->getSignal<signal_type>(signal_id)->connect(
+               signal_data->getSignal<signal_type>(sig_name)->connect(
                   boost::bind(&inf::ModeHarnessPlugin::prepComponentSwitch,
                               this, component)
                )
             );
 
-            registered_signals.push_back(signal_id);
+            registered_signals.push_back(sig_name);
          }
          else
          {
-            IOV_STATUS << "[Mode Harness] ERROR: No component to connect to "
-                       << "signal '" << signal_id << "'" << std::endl;
+            IOV_STATUS << "[Mode Harness] ERROR: No component '" << comp_name
+                       << "'to connect to signal '" << sig_name << "'"
+                       << std::endl;
          }
       }
       else
       {
          IOV_STATUS << "[Mode Harness] ERROR: Component already registered "
-                    << "for signal '" << signal_id << "'" << std::endl;
+                    << "for signal '" << sig_name << "'" << std::endl;
       }
    }
 
@@ -207,19 +216,9 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
    {
       if ( mComponents.count(mDefaultComponentName) == 0 )
       {
-         try
-         {
-            inf::ModeComponentPtr component =
-               loadComponent(mDefaultComponentName, viewer);
-            mComponents[mDefaultComponentName] = component;
-            default_component = component;
-         }
-         catch (std::runtime_error& ex)
-         {
-            IOV_STATUS << "[Mode Harness] ERROR: Failed to load default "
-                       << "mode component '" << mDefaultComponentName
-                       << "':\n" << ex.what() << std::endl;
-         }
+         IOV_STATUS << "[Mode Harness] ERROR: Unknown or invalid component '"
+                    << mDefaultComponentName << "' used for default component!"
+                    << std::endl;
       }
       else
       {
@@ -304,46 +303,40 @@ void ModeHarnessPlugin::configure(jccl::ConfigElementPtr elt)
 {
    vprASSERT(elt->getID() == getElementType());
 
+   const unsigned int req_cfg_version(2);
+
+   // Check for correct version of plugin configuration.
+   if ( elt->getVersion() < req_cfg_version )
+   {
+      std::stringstream msg;
+      msg << "Configuration of ModeHarnessPlugin failed.  Required config "
+          << "element version is " << req_cfg_version << ", but element '"
+          << elt->getName() << "' is version " << elt->getVersion();
+      throw PluginException(msg.str(), IOV_LOCATION);
+   }
+
    const std::string component_path_prop("component_path");
    const std::string default_component_prop("default_component");
    const std::string component_prop("component");
-   const std::string component_name_prop("component_name");
-   const std::string signal_id_prop("signal_id");
+   const std::string plugin_prop("plugin");
+   const std::string signal_prop("signal");
+   const std::string active_component_prop("active_component");
 
    // Set up two default search paths:
    //    1. Relative path to './plugins/mode'
    //    2. IOV_BASE_DIR/lib/IOV/plugins/mode
-   mComponentPath.push_back("plugins/mode");
-
-   std::string iov_base_dir;
-   vpr::System::getenv("IOV_BASE_DIR", iov_base_dir);
-
-   if ( ! iov_base_dir.empty() )
-   {
-      fs::path iov_base_path(iov_base_dir, fs::native);
-      fs::path def_component_path = iov_base_path / "lib/IOV/plugins/mode";
-
-      if ( fs::exists(def_component_path) )
-      {
-         std::string def_search_path =
-            def_component_path.native_directory_string();
-         std::cout << "Setting default IOV mode component path: "
-                   << def_search_path << std::endl;
-         mComponentPath.push_back(def_search_path);
-      }
-      else
-      {
-         std::cerr << "Default IOV mode component path does not exist: "
-                   << def_component_path.native_directory_string()
-                   << std::endl;
-      }
-   }
+   //
+   // In all of the above cases, the 'debug' subdirectory is searched first if
+   // this is a debug build (i.e., when IOV_DEBUG is defined and _DEBUG is
+   // not).
+   std::vector<std::string> component_path =
+      inf::plugin::getDefaultSearchPath("mode");
 
    const unsigned int num_plugin_paths(elt->getNum(component_path_prop));
    for ( unsigned int i = 0; i < num_plugin_paths; ++i )
    {
       std::string dir = elt->getProperty<std::string>(component_path_prop, i);
-      mComponentPath.push_back(vpr::replaceEnvVars(dir));
+      component_path.push_back(vpr::replaceEnvVars(dir));
    }
 
    mDefaultComponentName =
@@ -355,37 +348,52 @@ void ModeHarnessPlugin::configure(jccl::ConfigElementPtr elt)
       jccl::ConfigElementPtr comp_elt =
          elt->getProperty<jccl::ConfigElementPtr>(component_prop, i);
       mComponentInfo.push_back(
-         ComponentInfo(comp_elt->getProperty<std::string>(component_name_prop),
-                       comp_elt->getProperty<std::string>(signal_id_prop))
+         ComponentInfo(comp_elt->getName(),
+                       comp_elt->getProperty<std::string>(plugin_prop))
       );
    }
+
+   const unsigned int num_signals(elt->getNum(signal_prop));
+   for ( unsigned int i = 0; i < num_signals; ++i )
+   {
+      jccl::ConfigElementPtr signal_elt =
+         elt->getProperty<jccl::ConfigElementPtr>(signal_prop, i);
+      mSignalDefs.push_back(
+         SignalDef(signal_elt->getName(),
+                   signal_elt->getProperty<std::string>(active_component_prop))
+      );
+   }
+
+   std::vector<vpr::LibraryPtr> modules =
+      inf::plugin::findModules(component_path);
+   std::for_each(modules.begin(), modules.end(),
+                 boost::bind(&ModeHarnessPlugin::registerModule, this, _1));
+}
+
+void ModeHarnessPlugin::registerModule(vpr::LibraryPtr module)
+{
+   mViewer->getPluginRegistry()->addEntry(
+      inf::TypedRegistryEntry<inf::ModeComponent>::create(
+         module, &inf::ModeComponent::validatePluginLib
+      )
+   );
 }
 
 inf::ModeComponentPtr
-ModeHarnessPlugin::loadComponent(const std::string& name,
+ModeHarnessPlugin::makeComponent(const std::string& pluginType,
                                  inf::ViewerPtr viewer)
 {
-   inf::ModeComponentPtr component;
-
-   IOV_STATUS << "   Loading mode component '" << name << "' ..."
+   IOV_STATUS << "   Instantiating mode component '" << pluginType << "' ..."
               << std::flush;
-   inf::PluginCreator<inf::ModeComponent>* creator(
-      mPluginFactory->getPluginCreator<inf::ModeComponent>(name)
-   );
+   std::vector<AbstractPluginPtr> deps;
+   AbstractPluginPtr m = viewer->getPluginRegistry()->makeInstance(pluginType,
+                                                                   deps);
+   inf::ModeComponentPtr component =
+      boost::dynamic_pointer_cast<inf::ModeComponent>(m);
+   vprASSERT(component.get() != NULL);
+   IOV_STATUS << " [OK]" << std::endl;
 
-   if ( NULL != creator )
-   {
-      component = creator->createPlugin()->init(viewer);
-   }
-   else
-   {
-      std::ostringstream msg_stream;
-      msg_stream << "Failed to get creator for mode component '" << name
-                 << "'";
-      throw inf::Exception(msg_stream.str(), IOV_LOCATION);
-   }
-
-   return component;
+   return component->init(viewer);
 }
 
 void ModeHarnessPlugin::prepComponentSwitch(inf::ModeComponentPtr newComponent)

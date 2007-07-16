@@ -3,6 +3,7 @@
 #include <IOV/Config.h>
 
 #include <boost/bind.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <gmtl/External/OpenSGConvert.h>
 
@@ -26,8 +27,14 @@
 #include "SingleObjectGrabStrategy.h"
 
 
+using namespace boost::assign;
+
+static const inf::plugin::Info sInfo(
+   "com.infiscape.grab", "SingleObjectGrabStrategy",
+   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+);
 static inf::PluginCreator<inf::GrabStrategy> sPluginCreator(
-   &inf::SingleObjectGrabStrategy::create
+   boost::bind(&inf::SingleObjectGrabStrategy::create, sInfo)
 );
 
 extern "C"
@@ -35,15 +42,9 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(inf::plugin::Info) getPluginInfo()
+IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 {
-   std::vector<unsigned int> version(3);
-   version[0] = IOV_VERSION_MAJOR;
-   version[1] = IOV_VERSION_MINOR;
-   version[2] = IOV_VERSION_PATCH;
-
-   return inf::plugin::Info("com.infiscape.grab", "SingleObjectGrabStrategy",
-                            version);
+   return &sInfo;
 }
 
 IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
@@ -64,8 +65,9 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getGrabStrategyCreator()
 namespace inf
 {
 
-SingleObjectGrabStrategy::SingleObjectGrabStrategy()
-   : GrabStrategy()
+SingleObjectGrabStrategy::
+SingleObjectGrabStrategy(const inf::plugin::Info& info)
+   : GrabStrategy(info)
    , mGrabText("Grab")
    , mReleaseText("Release")
    , mIntersecting(false)

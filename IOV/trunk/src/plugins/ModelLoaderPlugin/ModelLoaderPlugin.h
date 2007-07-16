@@ -17,14 +17,15 @@ class ModelLoaderPlugin
    , public boost::enable_shared_from_this<ModelLoaderPlugin>
 {
 protected:
-   ModelLoaderPlugin()
+   ModelLoaderPlugin(const inf::plugin::Info& info)
+      : Plugin(info)
    {
       /* Do nothing. */ ;
    }
 
 public:
-   static inf::PluginPtr create();
-   
+   static inf::PluginPtr create(const inf::plugin::Info& info);
+
    virtual ~ModelLoaderPlugin()
    {
       /* Do nothing. */ ;

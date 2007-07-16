@@ -2,9 +2,6 @@
 
 #include <algorithm>
 #include <boost/bind.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/exception.hpp>
 
 #include <OpenSG/OSGRemoteAspect.h>
 #include <OpenSG/OSGGroupConnection.h>
@@ -12,7 +9,6 @@
 #include <OpenSG/OSGSimpleAttachments.h>
 
 #include <vpr/vpr.h>
-#include <vpr/System.h>
 #include <vpr/Util/Debug.h>
 #include <vpr/Util/FileUtils.h>
 #include <jccl/Config/Configuration.h>
@@ -21,30 +17,38 @@
 #include <IOV/User.h>
 #include <IOV/Grab/IntersectionStrategy.h>
 #include <IOV/Plugin.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/PluginFactory.h>
+#include <IOV/PluginRegistry.h>
 #include <IOV/SceneObject.h>
 #include <IOV/Status.h>
 #include <IOV/WandInterface.h>
+#include <IOV/TypedInitRegistryEntry.h>
+#include <IOV/Plugin/Helpers.h>
 #include <IOV/Util/OpenSGHelpers.h>
 #include <IOV/Util/Debug.h>
 
 #include <IOV/Viewer.h>
 
 
-namespace fs = boost::filesystem;
-
 namespace inf
 {
+
+template<typename T>
+void registerModule(vpr::LibraryPtr module, ViewerPtr viewer)
+{
+   viewer->getPluginRegistry()->addEntry(
+      TypedInitRegistryEntry<T>::create(
+         module, &T::validatePluginLib, boost::bind(&T::init, _1, viewer)
+      )
+   );
+}
 
 Viewer::Viewer()
    : OpenSGApp(NULL)
    , mAspect(NULL)
    , mConnection(NULL)
 {
-   mPluginFactory = PluginFactory::create();
+   mPluginRegistry = PluginRegistry::create()->init();
 }
-
 
 Viewer::~Viewer()
 {
@@ -344,7 +348,6 @@ void Viewer::deallocate()
       delete mConnection;
    }
 
-//   mPluginFactory  = inf::PluginFactoryPtr();
    mIntersectedObj = inf::SceneObjectPtr();
    mIsectStrategy  = inf::IntersectionStrategyPtr();
 
@@ -366,7 +369,7 @@ void Viewer::deallocate()
    mScene.reset();
    mObjects.clear();
    mPlugins.clear();
-   mPluginFactory.reset();
+   mPluginRegistry.reset();
 
    // Output information about what is left over
    typedef std::vector<OSG::FieldContainerPtr> FieldContainerStore;
@@ -513,10 +516,6 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
    const std::string plugin_path_prop("plugin_path");
    const std::string strategy_plugin_path_prop("strategy_plugin_path");
 
-   const std::string iov_base_dir_tkn("IOV_BASE_DIR");
-
-   std::vector<std::string> search_path;
-
    // Set up default search paths:
    //
    //    1. Relative path to './plugins'
@@ -528,103 +527,57 @@ void Viewer::config(jccl::ConfigElementPtr appCfg)
    // this is a debug build (i.e., when IOV_DEBUG is defined and _DEBUG is
    // not).
 
-#if defined(IOV_DEBUG) && ! defined(_DEBUG)
-   search_path.push_back("plugins/debug");
-#endif
-   search_path.push_back("plugins");
-#if defined(IOV_DEBUG) && ! defined(_DEBUG)
-   search_path.push_back("plugins/isect/debug");
-#endif
-   search_path.push_back("plugins/isect");
-
-   std::string iov_base_dir;
-   vpr::System::getenv(iov_base_dir_tkn, iov_base_dir);
-
-   if ( ! iov_base_dir.empty() )
-   {
-      try
-      {
-         fs::path iov_base_path(iov_base_dir, fs::native);
-         fs::path def_iov_plugin_path = iov_base_path / "lib/IOV/plugins";
-
-         if ( fs::exists(def_iov_plugin_path) )
-         {
-            const std::string def_search_path =
-               def_iov_plugin_path.native_directory_string();
-            std::cout << "Setting default IOV plug-in path: "
-                     << def_search_path << std::endl;
-
-#if defined(IOV_DEBUG) && ! defined(_DEBUG)
-            const std::string def_dbg_search_path =
-               (def_iov_plugin_path / "debug").native_directory_string();
-            search_path.push_back(def_dbg_search_path);
-#endif
-            search_path.push_back(def_search_path);
-         }
-         else
-         {
-            std::cerr << "Default IOV plug-in path does not exist: "
-                     << def_iov_plugin_path.native_directory_string()
-                     << std::endl;
-         }
-
-         fs::path def_strategy_path = iov_base_path / "lib/IOV/plugins/isect";
-
-         if ( fs::exists(def_strategy_path) )
-         {
-            const std::string def_search_path =
-               def_strategy_path.native_directory_string();
-            std::cout << "Setting default IOV intersection strategy plug-in "
-                     << "to '" << def_search_path << "'" << std::endl;
-
-#if defined(IOV_DEBUG) && ! defined(_DEBUG)
-            const std::string def_dbg_search_path =
-               (def_strategy_path / "debug").native_directory_string();
-            search_path.push_back(def_dbg_search_path);
-#endif
-            search_path.push_back(def_search_path);
-         }
-         else
-         {
-            std::cerr << "Default IOV intersection strategy plug-in path ("
-                     << def_strategy_path.native_directory_string()
-                     << ") does not exist!" << std::endl;
-         }
-      }
-      catch (fs::filesystem_error& ex)
-      {
-         std::cerr << "ERROR: Failed to extend plug-in search path:\n"
-                   << ex.what() << std::endl
-                   << "ERROR: The default IOV plug-ins may not be found!"
-                   << std::endl;
-      }
-   }
+   std::vector<std::string> plugin_search_path =
+      inf::plugin::getDefaultSearchPath();
+   std::vector<std::string> isect_search_path =
+      inf::plugin::getDefaultSearchPath("isect");
 
    // Add plug-in paths from the application configuration.
    const unsigned int num_paths(appCfg->getNum(plugin_path_prop));
 
+   if ( num_paths > 0 )
+   {
+      plugin_search_path.reserve(plugin_search_path.size() + num_paths);
+   }
+
    for ( unsigned int i = 0; i < num_paths; ++i )
    {
       std::string dir = appCfg->getProperty<std::string>(plugin_path_prop, i);
-      search_path.push_back(vpr::replaceEnvVars(dir));
+      plugin_search_path.push_back(vpr::replaceEnvVars(dir));
    }
 
    // Add strategy search paths from the application configuration.
-   const unsigned int num_plugin_paths =
+   const unsigned int num_strategy_paths =
       appCfg->getNum(strategy_plugin_path_prop);
-   for ( unsigned int i = 0; i < num_plugin_paths; ++i )
+
+   if ( num_strategy_paths > 0 )
+   {
+      isect_search_path.reserve(isect_search_path.size() + num_strategy_paths);
+   }
+
+   for ( unsigned int i = 0; i < num_strategy_paths; ++i )
    {
       const std::string dir =
          appCfg->getProperty<std::string>(strategy_plugin_path_prop, i);
-      search_path.push_back(vpr::replaceEnvVars(dir));
+      isect_search_path.push_back(vpr::replaceEnvVars(dir));
    }
 
-   mPluginFactory->init(search_path);
+   ViewerPtr self = shared_from_this();
+   std::vector<vpr::LibraryPtr> modules =
+      inf::plugin::findModules(plugin_search_path);
+   std::for_each(modules.begin(), modules.end(),
+                 boost::bind(&registerModule<inf::Plugin>, _1, self));
+
+   modules = inf::plugin::findModules(isect_search_path);
+   std::for_each(
+      modules.begin(), modules.end(),
+      boost::bind(&registerModule<inf::IntersectionStrategy>, _1, self)
+   );
 }
 
 void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
 {
-   std::cout << "Viewer: Loading plugins" << std::endl;
+   IOV_STATUS << "Viewer: Loading plug-ins" << std::endl;
 
    const std::string plugin_prop("plugin");
    const std::string isect_strategy_prop("isect_strategy");
@@ -632,34 +585,39 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
 
    for ( unsigned int i = 0; i < num_plugins; ++i )
    {
-      std::string plugin_name =
+      const std::string plugin_type =
          appCfg->getProperty<std::string>(plugin_prop, i);
 
       try
       {
-         std::cout << "   Loading plugin: " << plugin_name << " .... ";
-         inf::PluginCreator<inf::Plugin>* creator =
-            mPluginFactory->getPluginCreator<inf::Plugin>(plugin_name);
+         IOV_STATUS << "   Creating instance of plug-in type "
+                    << plugin_type << " ... " << std::flush;
+         std::vector<AbstractPluginPtr> deps;
+         AbstractPluginPtr p = mPluginRegistry->makeInstance(plugin_type,
+                                                             deps);
+         processDeps(deps);
 
-         if ( NULL != creator )
+         PluginPtr cur_plugin = boost::dynamic_pointer_cast<Plugin>(p);
+
+         if ( cur_plugin )
          {
-            inf::PluginPtr plugin = creator->createPlugin();
-            // Initialize the plugin, and configure it.
-            plugin->init(shared_from_this());
-            plugin->setFocused(shared_from_this(), true);
-            mPlugins.push_back(plugin);
-            std::cout << "[OK]" << std::endl;
+            addPlugin(cur_plugin);
          }
          else
          {
-            std::cout << "[ERROR]\n   Plug-in '" << plugin_name
-                      << "' has a NULL creator!" << std::endl;
+            std::ostringstream msg_stream;
+            msg_stream << "Invalid plug-in type '"
+                       << p->getInfo().getFullName()
+                       << "' given as inf::Viewer plug-in!";
+            throw inf::PluginException(msg_stream.str(), IOV_LOCATION);
          }
+
+         IOV_STATUS << "[OK]" << std::endl;
       }
       catch (std::runtime_error& ex)
       {
-         std::cout << "[FAILED]\n   WARNING: Failed to load plug-in '"
-                   << plugin_name << "': " << ex.what() << std::endl;
+         IOV_STATUS << "[FAILED]\n   WARNING: Failed to load plug-in '"
+                    << plugin_type << "': " << ex.what() << std::endl;
       }
    }
 
@@ -670,24 +628,31 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
       // Build the IntersectionStrategy instance.
       try
       {
-         IOV_STATUS << "   Loading intersection strategy plug-in '"
+         IOV_STATUS << "   Creating instance of intersection strategy plug-in "
                     << mIsectStrategyName << "' ..." << std::flush;
-         inf::PluginCreator<inf::IntersectionStrategy>* creator =
-            mPluginFactory->getPluginCreator<inf::IntersectionStrategy>(
-               mIsectStrategyName
-            );
+         std::vector<AbstractPluginPtr> deps;
+         AbstractPluginPtr p =
+            mPluginRegistry->makeInstance(mIsectStrategyName, deps);
+         processDeps(deps);
 
-         if ( NULL != creator )
+         inf::IntersectionStrategyPtr s =
+            boost::dynamic_pointer_cast<inf::IntersectionStrategy>(p);
+
+         if ( s )
          {
-            mIsectStrategy = creator->createPlugin();
+            mIsectStrategy = s;
             mIsectStrategy->init(shared_from_this());
-            IOV_STATUS << "[OK]" << std::endl;
          }
          else
          {
-            IOV_STATUS << "[ERROR]\nWARNING: No creator for strategy plug-in "
-                       << mIsectStrategyName << std::endl;
+            std::ostringstream msg_stream;
+            msg_stream << "Invalid plug-in type '"
+                       << p->getInfo().getFullName()
+                       << "' used for inf::Viewer instersection strategy!";
+            throw inf::PluginException(msg_stream.str(), IOV_LOCATION);
          }
+
+         IOV_STATUS << "[OK]" << std::endl;
       }
       catch (std::runtime_error& ex)
       {
@@ -701,6 +666,25 @@ void Viewer::loadAndInitPlugins(jccl::ConfigElementPtr appCfg)
                  << "      inf::Viewer will not test for object intersections."
                  << std::endl;
    }
+}
+
+void Viewer::processDeps(const std::vector<AbstractPluginPtr>& deps)
+{
+   typedef std::vector<AbstractPluginPtr>::const_iterator iter_type;
+   for ( iter_type d = deps.begin(); d != deps.end(); ++d )
+   {
+      PluginPtr cur_dep = boost::dynamic_pointer_cast<Plugin>(*d);
+      if ( cur_dep )
+      {
+         addPlugin(cur_dep);
+      }
+   }
+}
+
+void Viewer::addPlugin(inf::PluginPtr plugin)
+{
+   plugin->setFocused(shared_from_this(), true);
+   mPlugins.push_back(plugin);
 }
 
 void Viewer::addObject(SceneObjectPtr obj)

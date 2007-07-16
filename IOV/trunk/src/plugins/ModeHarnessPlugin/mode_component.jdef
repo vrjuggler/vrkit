@@ -15,5 +15,36 @@
       </property>
       <upgrade_transform />
    </definition_version>
+   <definition_version version="1" label="Mode Component Plug-in">
+      <abstract>false</abstract>
+      <help>This is the definition of a mode component that will be managed by the IOV Mode Harness. Activation signals are defined that cause a named mode component to become active. Each mode component must have a unique name (as must all config elements), but multiple mode components can refer to the same plug-in type. A unique object will be created for each.</help>
+      <category>/Infiscape/</category>
+      <property valuetype="string" variable="false" name="plugin">
+         <help>The identifier of the plug-in type that will be instantiated for this mode component. This may include version information. The form is usually org.myorg.TypeName:major.minor (with the version number after the : being optional).</help>
+         <value label="Plug-in Type Identifier" defaultvalue="" />
+      </property>
+      <upgrade_transform>
+         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jconf="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" version="1.0">
+            <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
+            <xsl:variable name="jconf">http://www.vrjuggler.org/jccl/xsd/3.0/configuration</xsl:variable>
+
+            <xsl:template match="/">
+                <xsl:apply-templates/>
+            </xsl:template>
+
+            <xsl:template match="jconf:mode_component">
+               <xsl:element namespace="{$jconf}" name="mode_component">
+                  <xsl:attribute name="name">
+                     <xsl:value-of select="./jconf:component_name"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="version">2</xsl:attribute>
+                  <xsl:element namespace="{$jconf}" name="plugin">
+                     <xsl:value-of select="./jconf:component_name" />
+                  </xsl:element>
+               </xsl:element>
+            </xsl:template>
+         </xsl:stylesheet>
+      </upgrade_transform>
+   </definition_version>
 </definition>
 

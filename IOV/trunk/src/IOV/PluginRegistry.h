@@ -5,28 +5,30 @@
 
 #include <IOV/Config.h>
 
-#include <sstream>
 #include <string>
 #include <map>
-#include <stdexcept>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/function.hpp>
 #include <boost/signal.hpp>
 
 #include <vpr/DynLoad/Library.h>
 
 #include <IOV/AbstractPluginPtr.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/TypedRegistryEntry.h>
-#include <IOV/Plugin/Info.h>
+#include <IOV/RegistryEntryPtr.h>
 #include <IOV/Util/SignalProxy.h>
 #include <IOV/PluginRegistryPtr.h>
 
 
 namespace inf
 {
+
+namespace plugin
+{
+
+class Info;
+
+}
 
 /**
  *
@@ -47,9 +49,18 @@ public:
 
    ~PluginRegistry();
 
+   /**
+    * Performs post-creation initialization steps.
+    *
+    * @return This object is returned as a shared pointer.
+    */
+   PluginRegistryPtr init();
+
    /** @name Signal Accessors for Slot Connections */
    //@{
+   /** Plug-in instantiation signal. */
    typedef boost::signal<void (inf::AbstractPluginPtr)> instance_signal_t;
+
    typedef boost::signal<void (const inf::plugin::Info&, vpr::LibraryPtr)>
       register_signal_t;
    typedef boost::signal<void (vpr::LibraryPtr)> removal_signal_t;
@@ -70,49 +81,42 @@ public:
    }
    //@}
 
-   template<typename T>
-   void registerModule(
-      vpr::LibraryPtr pluginLib,
-      typename TypedRegistryEntry<T>::validator_func_type validatorFunc,
-      typename TypedRegistryEntry<T>::init_func_type initFunc = NULL
-   )
-   {
-      addEntry(TypedRegistryEntry<T>::create(pluginLib, validatorFunc,
-                                             initFunc));
-   }
+   void addEntry(RegistryEntryPtr entry);
 
-   template<typename T>
-   typename T::ptr_type create(const std::string& name)
-   {
-      typename TypedRegistryEntry<T>::ptr_type typed_entry =
-         boost::dynamic_pointer_cast< TypedRegistryEntry<T> >(preCreate(name));
+   /** @name Plug-In Instance Creation Interface */
+   //@{
+   inf::AbstractPluginPtr makeInstance(
+      const std::string& pluginTypeID,
+      std::vector<inf::AbstractPluginPtr>& deps
+   );
 
-      if ( ! typed_entry )
-      {
-         throw std::bad_cast();
-      }
+   inf::AbstractPluginPtr makeNamedInstance(
+      const std::string& pluginTypeID, const std::string& instanceName,
+      std::vector<inf::AbstractPluginPtr>& deps
+   );
+   //@}
 
-      satisfyDeps(typed_entry);
+   /** @name Instance Acquisition Interface */
+   //@{
+   inf::AbstractPluginPtr getInstanceByInfo(const inf::plugin::Info& info)
+      const;
 
-      typename T::ptr_type plugin = typed_entry->createPlugin();
-      postCreate(typed_entry, plugin);
+   inf::AbstractPluginPtr getInstanceByType(const std::string& pluginTypeID)
+      const;
 
-      return plugin;
-   }
+   inf::AbstractPluginPtr getInstanceByName(const std::string& name) const;
+   //@}
 
 private:
-   RegistryEntryPtr preCreate(const std::string& name);
-
-   void postCreate(RegistryEntryPtr entry, AbstractPluginPtr plugin);
-
    void registerInstantiatedPlugin(const inf::plugin::Info& pluginInfo,
                                    AbstractPluginPtr plugin);
-
-   void addEntry(RegistryEntryPtr entry);
 
    RegistryEntryPtr findEntry(const std::string& moduleName) const;
 
    RegistryEntryPtr findNewestVersionEntry(const std::string& moduleName)
+      const;
+
+   AbstractPluginPtr findNewestVersionInstance(const std::string& moduleName)
       const;
 
    void satisfyDeps(RegistryEntryPtr entry);
@@ -122,7 +126,9 @@ private:
    typedef std::map<std::string, RegistryEntryPtr> registry_type;
    registry_type mRegistry;
 
+   std::map<std::string, AbstractPluginPtr> mNamedInstances;
    std::multimap<std::string, AbstractPluginPtr> mInstantiated;
+   std::vector<std::string> mInProgress;
    //@}
 
    /** @name Signals */

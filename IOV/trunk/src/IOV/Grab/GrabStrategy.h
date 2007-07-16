@@ -32,8 +32,14 @@ namespace inf
  */
 class IOV_CLASS_API GrabStrategy : public AbstractPlugin
 {
+public:
+   /**
+    * @since 0.36
+    */
+   typedef boost::shared_ptr<GrabStrategy> ptr_type;
+
 protected:
-   GrabStrategy();
+   GrabStrategy(const inf::plugin::Info& info);
 
 public:
    /**

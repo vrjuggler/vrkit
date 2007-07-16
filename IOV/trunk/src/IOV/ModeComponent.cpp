@@ -117,8 +117,9 @@ void ModeComponent::exit(inf::ViewerPtr viewer)
 // compiled properly.  Should this code ever become part of a library, it is
 // important to ensure that polymorphic types are compiled into the correct
 // place.
-ModeComponent::ModeComponent()
-   : mActive(false)
+ModeComponent::ModeComponent(const inf::plugin::Info& info)
+   : AbstractPlugin(info)
+   , mActive(false)
 {
    /* Do nothing. */ ;
 }

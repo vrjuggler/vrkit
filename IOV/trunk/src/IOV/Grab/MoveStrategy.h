@@ -33,6 +33,11 @@ class IOV_CLASS_API MoveStrategy : public AbstractPlugin
 {
 public:
    /**
+    * @since 0.36
+    */
+   typedef boost::shared_ptr<MoveStrategy> ptr_type;
+
+   /**
     * Returns the name of the entry point function used for retrieving the
     * creator of instances of this plug-in type.
     */
@@ -167,7 +172,7 @@ protected:
    /**
     * Constructor. This does nothing.
     */
-   MoveStrategy();
+   MoveStrategy(const inf::plugin::Info& info);
 };
 
 }

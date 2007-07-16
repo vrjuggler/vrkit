@@ -35,15 +35,12 @@ public:
    //@{
    typedef boost::function<bool (vpr::LibraryPtr)> validator_func_type;
    typedef typename T::ptr_type plugin_ptr_type;
-   typedef boost::function<plugin_ptr_type (plugin_ptr_type)> init_func_type;
    //@}
 
-private:
-   TypedRegistryEntry(vpr::LibraryPtr module, validator_func_type validator,
-                      init_func_type initFunc)
+protected:
+   TypedRegistryEntry(vpr::LibraryPtr module, validator_func_type validator)
       : RegistryEntry(module)
       , mCreator(NULL)
-      , mInitFunc(initFunc)
    {
       if ( validator(module) )
       {
@@ -53,11 +50,6 @@ private:
             boost::polymorphic_downcast<inf::PluginCreator<T>*>(
                getCreatorFunc(module, T::getCreatorFuncName())
             );
-
-         // At this point, we are good to go, so we can finish initializing
-         // this object.
-         mModule   = module;
-         mInitFunc = initFunc;
       }
       else
       {
@@ -69,11 +61,9 @@ private:
 
 public:
    static RegistryEntryPtr create(vpr::LibraryPtr module,
-                                  validator_func_type validator,
-                                  init_func_type initFunc = NULL)
+                                  validator_func_type validator)
    {
-      return RegistryEntryPtr(new TypedRegistryEntry(module, validator,
-                                                     initFunc));
+      return RegistryEntryPtr(new TypedRegistryEntry(module, validator));
    }
 
    virtual ~TypedRegistryEntry()
@@ -81,31 +71,24 @@ public:
       /* Do nothing. */ ;
    }
 
-   virtual AbstractPluginPtr createAsDependency()
+   virtual AbstractPluginPtr create()
    {
-      return createPlugin();
+      return doCreate();
    }
 
-   plugin_ptr_type createPlugin()
+protected:
+   inf::PluginCreator<T>* getCreator() const
    {
-      plugin_ptr_type plugin_inst = mCreator->createPlugin();
-
-      if ( ! mInitFunc.empty() )
-      {
-         plugin_inst = mInitFunc(plugin_inst);
-      }
-
-      return plugin_inst;
+      return mCreator;
    }
 
-   init_func_type getInitFunc() const
+   virtual plugin_ptr_type doCreate()
    {
-      return mInitFunc;
+      return mCreator->createPlugin();
    }
 
 private:
    inf::PluginCreator<T>* mCreator;
-   init_func_type         mInitFunc;
 };
 
 }

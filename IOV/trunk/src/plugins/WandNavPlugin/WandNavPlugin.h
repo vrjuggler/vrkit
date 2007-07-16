@@ -22,13 +22,12 @@ class WandNavPlugin
    , public boost::enable_shared_from_this<WandNavPlugin>
 {
 protected:
-   WandNavPlugin();
+   WandNavPlugin(const inf::plugin::Info& info);
 
 public:
-   static inf::PluginPtr create()
+   static inf::PluginPtr create(const inf::plugin::Info& info)
    {
-      inf::PluginPtr new_strategy = inf::PluginPtr(new WandNavPlugin());
-      return new_strategy;
+      return inf::PluginPtr(new WandNavPlugin(info));
    }
 
    virtual ~WandNavPlugin()

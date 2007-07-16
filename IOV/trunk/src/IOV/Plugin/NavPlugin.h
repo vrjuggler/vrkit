@@ -16,7 +16,7 @@ class IOV_CLASS_API NavPlugin
    : public inf::Plugin
 {
 protected:
-   NavPlugin();
+   NavPlugin(const inf::plugin::Info& info);
 
 public:
    virtual ~NavPlugin();

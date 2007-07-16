@@ -30,16 +30,17 @@ class ModeSwitchPlugin
    , public boost::enable_shared_from_this<ModeSwitchPlugin>
 {
 protected:
-   ModeSwitchPlugin()
-      : mCurrentMode(0)
+   ModeSwitchPlugin(const inf::plugin::Info& info)
+      : Plugin(info)
+      , mCurrentMode(0)
    {
       /* Do nothing. */ ;
    }
 
 public:
-   static inf::PluginPtr create()
+   static inf::PluginPtr create(const inf::plugin::Info& info)
    {
-      return inf::PluginPtr(new ModeSwitchPlugin());
+      return inf::PluginPtr(new ModeSwitchPlugin(info));
    }
 
    virtual ~ModeSwitchPlugin()
@@ -76,7 +77,8 @@ public:
       ::operator delete(p);
    }
 
-protected:
+private:
+   void registerModule(vpr::LibraryPtr module, inf::ViewerPtr viewer);
 
    /** Internal helper for mode switching.
    * Switch to the given mode. Activates and deactivates the plugins needed.
@@ -97,7 +99,6 @@ protected:
       return std::string("mode_switch_plugin");
    }
 
-protected:
    struct PluginData
    {
       std::string            mName;         /**< Configured name of the plugin. */

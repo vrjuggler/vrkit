@@ -209,7 +209,7 @@ protected:
     */
    virtual void destroy() = 0;
 
-   Plugin();
+   Plugin(const inf::plugin::Info& info);
 
    virtual void focusChanged(inf::ViewerPtr viewer)
    {

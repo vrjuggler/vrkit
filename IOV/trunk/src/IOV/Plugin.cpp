@@ -80,8 +80,9 @@ void Plugin::contextClose(inf::ViewerPtr)
 // compiled properly.  Should this code ever become part of a library, it is
 // important to ensure that polymorphic types are compiled into the correct
 // place.
-Plugin::Plugin()
-   : mIsFocused(false)
+Plugin::Plugin(const inf::plugin::Info& info)
+   : AbstractPlugin(info)
+   , mIsFocused(false)
 {
    /* Do nothing. */ ;
 }
