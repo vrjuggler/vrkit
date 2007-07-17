@@ -54,6 +54,12 @@ IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 //@}
 }
 
+namespace inf
+{
+   typedef boost::shared_ptr<StatusPanelPlugin> StatusPanelPluginPtr;
+   typedef boost::weak_ptr<StatusPanelPlugin> StatusPanelPluginWeakPtr;
+}
+
 namespace
 {
 

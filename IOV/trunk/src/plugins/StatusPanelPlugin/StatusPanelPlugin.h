@@ -21,12 +21,9 @@
 namespace inf
 {
 
-class StatusPanelPlugin;
-typedef boost::shared_ptr<StatusPanelPlugin> StatusPanelPluginPtr;
-typedef boost::weak_ptr<StatusPanelPlugin> StatusPanelPluginWeakPtr;
-
-class IOV_CLASS_API StatusPanelPlugin
-   : public inf::Plugin, public boost::enable_shared_from_this<StatusPanelPlugin>
+class IOV_PLUGIN_CLASS_API StatusPanelPlugin
+   : public inf::Plugin
+   , public boost::enable_shared_from_this<StatusPanelPlugin>
 {
 protected:
    StatusPanelPlugin(const inf::plugin::Info& info);
