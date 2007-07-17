@@ -28,7 +28,6 @@
 #include <vpr/System.h>
 #include <jccl/Config/ConfigElement.h>
 #include <vrj/Kernel/Kernel.h>
-#include <vrj/Draw/OpenSG/OpenSGApp.h>
 
 #include <IOV/Viewer.h>
 #include <IOV/EventData.h>
