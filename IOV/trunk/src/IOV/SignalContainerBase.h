@@ -24,7 +24,7 @@ namespace inf
  *
  * @since 0.34
  */
-class SignalContainerBase : private boost::noncopyable
+class IOV_CLASS_API SignalContainerBase : private boost::noncopyable
 {
 protected:
    SignalContainerBase();

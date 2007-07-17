@@ -6,7 +6,7 @@
 namespace inf
 {
 
-class ResourceMgr
+class IOV_CLASS_API ResourceMgr
 {
 };
 

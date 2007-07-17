@@ -9,7 +9,7 @@ namespace inf
 /**
  * Provides event signaling types.
  */
-class Event
+class IOV_CLASS_API Event
 {
 public:
    /**

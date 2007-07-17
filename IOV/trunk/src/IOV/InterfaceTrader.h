@@ -18,7 +18,7 @@ namespace inf
  * finding the best match and adapting the current input in the system
  * to dynamically provide the needed capabilities.
  */
-class InterfaceTrader
+class IOV_CLASS_API InterfaceTrader
 {
 public:
    /**

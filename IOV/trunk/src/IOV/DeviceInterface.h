@@ -12,7 +12,7 @@ class InterfaceTrader;
 /**
 * @interface
 */
-class DeviceInterface
+class IOV_CLASS_API DeviceInterface
 {
 private:
 

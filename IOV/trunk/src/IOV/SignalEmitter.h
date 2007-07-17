@@ -55,7 +55,7 @@ template<typename SlotSignature
        , typename SignalListContainer
        , typename SignalListContainer::signals SignalBegin = SignalListContainer::BEGIN
        , typename SignalListContainer::signals SignalEnd = SignalListContainer::END>
-class SignalEmitter
+class IOV_CLASS_API SignalEmitter
 {
 public:
    typedef typename SignalListContainer::signals signal_list_t;

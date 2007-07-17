@@ -24,7 +24,7 @@ template<typename SlotSignature
        , typename SignalListContainer
        , typename SignalListContainer::signals SignalBegin = SignalListContainer::BEGIN
        , typename SignalListContainer::signals SignalEnd = SignalListContainer::END>
-class SignalData
+class IOV_CLASS_API SignalData
    : public inf::SignalEmitter<SlotSignature
                              , SignalListContainer
                              , SignalBegin

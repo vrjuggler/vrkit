@@ -1,5 +1,10 @@
-#include <IOV/StatusPanelDataPtr.h>
+// Copyright (C) Infiscape Corporation 2005-2007
 
+#ifndef _INF_STATUS_PANEL_DATA_H_
+#define _INF_STATUS_PANEL_DATA_H_
+
+#include <IOV/Config.h>
+#include <IOV/StatusPanelDataPtr.h>
 #include <IOV/SceneData.h>
 
 #include <vpr/vpr.h>
@@ -23,10 +28,7 @@ class IOV_CLASS_API StatusPanelData : public inf::SceneData
          return StatusPanelDataPtr(new StatusPanelData);
       }
       
-      virtual ~StatusPanelData()
-      {
-         /* Do nothing. */;
-      }
+      virtual ~StatusPanelData();
       
       typedef boost::signal<void (const std::string&)> set_string_t;
       typedef boost::signal<void (const int, const std::string&)> set_int_string_t;
@@ -76,3 +78,4 @@ class IOV_CLASS_API StatusPanelData : public inf::SceneData
 };
 
 } // end inf
+#endif /*_INF_STATUS_PANEL_DATA_H_*/

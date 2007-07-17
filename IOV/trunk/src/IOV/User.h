@@ -23,7 +23,7 @@ namespace inf
  *
  * @see inf::Scene
  */
-class User : public boost::enable_shared_from_this<User>
+class IOV_CLASS_API User : public boost::enable_shared_from_this<User>
 {
 protected:
    User()
