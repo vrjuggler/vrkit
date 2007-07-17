@@ -7,6 +7,46 @@ GetPlatform = SConsAddons.Util.GetPlatform;
 
 Import('*')
 
+appname = 'infi_app'
+
+def makeBundleCmd(target, source, env):
+   import shutil
+   import commands
+   import os.path
+
+   target     = 'Viewer'
+   sourceinfo = 'Info.plist'
+   targetinfo = "%s.app/Contents/Info.plist" % target
+
+   cmd = '%s.app' % target
+   if os.path.isdir(cmd):
+      shutil.rmtree('%s.app' % target)
+
+   instroot = '%s.app/Contents' % target
+   macdir = '%s/MacOS' % instroot
+   resdir = '%s/Resources' % instroot
+
+   path = ''
+   for d in instroot.split('/'):
+      path = os.path.join(path, d)
+      if not os.path.isdir(path):
+         os.mkdir(path, 0755)
+
+   os.mkdir(macdir, 0755)
+   os.mkdir(resdir, 0755)
+
+   shutil.copy2(str(source[0]), macdir)
+
+   if optimize == 'yes':
+      cmd = 'strip -u -r %s/%s' % (macdir, appname)
+      commands.getoutput(cmd)
+
+   os.chmod('%s/%s' % (macdir, appname), 0755)
+
+def makeBundle(target):
+   cmd = env.Command('bundle', appname, makeBundleCmd)
+   env.Alias(appname, cmd)
+
 viewerEnv = base_env.Copy()
 
 boost_options.apply(viewerEnv)
@@ -23,7 +63,7 @@ if boost_options.isAvailable():
    po_lib = boost_options.getFullLibName('program_options', viewerEnv)
    viewerEnv.Prepend(LIBS = [po_lib])
 
-   infi_app_name = 'infi_app' + runtime_suffix
+   infi_app_name = appname + runtime_suffix
    infi_app_prog = viewerEnv.Program(infi_app_name, ['infi_app.cpp',])
    viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), infi_app_prog)
 
@@ -34,6 +74,11 @@ if boost_options.isAvailable():
 
       viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jconf_files)
       viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jdef_files)
+
+   # This only needs to be done when building against VR Juggler 2.1.21 or
+   # newer.
+   if GetPlatform() == 'darwin':
+      release_target = viewerEnv.Alias('bundle', makeBundle(appname))
+      viewerEnv.Depends(release_target, appname)
 else:
    print "WARNING: Cannot build infi_app without Boost.program_options"
-
