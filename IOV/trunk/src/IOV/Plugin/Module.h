@@ -81,7 +81,14 @@ public:
       //    Signature = int (const char*)
       //    CFuncType = int (*)(const char*)
       typedef typename boost::add_pointer<Signature>::type CFuncType;
+
+      // GCC versions older than 4.0 do not handle the reinterpret_cast usage
+      // below correctly.
+#if defined(__GNUC__) && (__GNUC_MAJOR__) < 4
+      return (CFuncType) getSymbol(name);
+#else
       return reinterpret_cast<CFuncType>(getSymbol(name));
+#endif
    }
 
 private:
