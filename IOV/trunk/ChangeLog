@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-07-17 patrick  Changed the Mode Harness Plug-in slot signature from
+                    void (const std::string&) to void ().
 2007-07-13 patrick  Separated the Intersect Strategy plug-ins from the Grab
                     and Move Strategy plug-ins in the IOV installation tree.
 2007-07-12 patrick  For debug builds, do not put "_d" in the plug-in name. The
