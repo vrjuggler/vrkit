@@ -119,7 +119,6 @@ help_text = """---- IOV Build System ----
 
 This file will be loaded each time.  Note: Options are cached in the file: %s
 """ %(opts.GenerateHelpText(opt_env),options_cache_filename)
-Help(help_text)
 
 # ----- Application Setup ------------ #
 if not sca_util.hasHelpFlag():
