@@ -175,7 +175,7 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
                        << "               to signal '" << sig_name << "'"
                        << std::endl;
 
-            typedef boost::signal<void (const std::string&)> signal_type;
+            typedef boost::signal<void ()> signal_type;
             typedef SignalContainer<signal_type> signal_container_type;
 
             // Ensure that sig_name is a known signal.
