@@ -24,8 +24,6 @@ SetOption('implicit_cache',1)
 SConsignFile()                      # Store all .sconsign stuff in single file
 
 ####  Local Helper methods ###
-GetPlatform = sca_util.GetPlatform;
-
 def symlinkInstallFunc(dest, source, env):
     """Install a source file into a destination by sym linking it."""
     os.symlink(pj(os.getcwd(), source), dest)
@@ -48,7 +46,7 @@ else:
 
 # Export symbols for use by SConscript files in subdirectories.
 Export('GetPlatform')
-platform = sca_util.GetPlatform()
+platform = GetPlatform()
 unspecified_prefix = 'use-instlinks'
 
 # Default variants
