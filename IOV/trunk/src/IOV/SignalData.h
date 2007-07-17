@@ -1,6 +1,8 @@
 #ifndef _INF_SIGNAL_DATA_H_
 #define _INF_SIGNAL_DATA_H_
 
+#include <IOV/Config.h>
+
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
@@ -24,7 +26,7 @@ template<typename SlotSignature
        , typename SignalListContainer
        , typename SignalListContainer::signals SignalBegin = SignalListContainer::BEGIN
        , typename SignalListContainer::signals SignalEnd = SignalListContainer::END>
-class IOV_CLASS_API SignalData
+class SignalData
    : public inf::SignalEmitter<SlotSignature
                              , SignalListContainer
                              , SignalBegin
