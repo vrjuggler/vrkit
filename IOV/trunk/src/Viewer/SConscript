@@ -7,14 +7,14 @@ GetPlatform = SConsAddons.Util.GetPlatform;
 
 Import('*')
 
-viewerEnv = baseEnv.Copy()
+viewerEnv = base_env.Copy()
 
 boost_options.apply(viewerEnv)
 
 if boost_options.isAvailable():
    viewerEnv.Prepend(CPPPATH = inst_paths['include'],
                      LIBPATH = inst_paths['lib'],
-                     LIBS = 'iov')
+                     LIBS = 'iov'+shared_lib_suffix)
 
    # XXX: There has to be a better way to do this Mac-specific stuff.
    if GetPlatform() == 'darwin':
@@ -23,12 +23,17 @@ if boost_options.isAvailable():
    po_lib = boost_options.getFullLibName('program_options', viewerEnv)
    viewerEnv.Prepend(LIBS = [po_lib])
 
-   jdef_files = ['iov_app.jdef',]
-   jconf_files = ['viewer-nav.jconf', 'viewer-vp.jconf']
-   infi_app_prog = viewerEnv.Program('infi_app', ['infi_app.cpp',])
+   infi_app_name = 'infi_app' + runtime_suffix
+   infi_app_prog = viewerEnv.Program(infi_app_name, ['infi_app.cpp',])
    viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), infi_app_prog)
-   viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jconf_files)
-   viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jdef_files)
+
+   # Only install *.jdef files on first pass.
+   if 0 == variant_pass:
+      jdef_files = ['iov_app.jdef',]
+      jconf_files = ['viewer-nav.jconf', 'viewer-vp.jconf']
+
+      viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jconf_files)
+      viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jdef_files)
 else:
    print "WARNING: Cannot build infi_app without Boost.program_options"
 

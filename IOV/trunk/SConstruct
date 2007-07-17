@@ -4,16 +4,19 @@
 # Import the stuff we need
 
 import distutils.util
-import sys, os, re, string, glob
+import sys, os, re, string, glob, types
 pj = os.path.join
 
-sys.path.insert(0,pj('deps','scons-addons','src'))
+# XXX: Disable for now
+#sys.path.insert(0,pj('deps','scons-addons','src'))
 import SCons;
-import SConsAddons.Options;   # Get the modular options stuff
+import SConsAddons.Options as sca_opts   # Get the modular options stuff
 import SConsAddons.Options.Boost
 import SConsAddons.Options.VRJuggler.VRJ
 import SConsAddons.Options.OpenSG
-import SConsAddons.Util       # Get the utils
+from SConsAddons.EnvironmentBuilder import EnvironmentBuilder
+import SConsAddons.Util as sca_util      # Get the utils
+GetPlatform = sca_util.GetPlatform
 
 # Setup base scons options and settings
 EnsureSConsVersion(0,96)
@@ -22,62 +25,12 @@ SetOption('implicit_cache',1)
 SConsignFile()                      # Store all .sconsign stuff in single file
 
 ####  Local Helper methods ###
-GetPlatform = SConsAddons.Util.GetPlatform;
+GetPlatform = sca_util.GetPlatform;
 
 def symlinkInstallFunc(dest, source, env):
     """Install a source file into a destination by sym linking it."""
     os.symlink(pj(os.getcwd(), source), dest)
     return 0
-
-def BuildLinuxEnvironment():
-   "Builds a base environment for other modules to build on set up for linux"
-   env = Environment( ENV=os.environ)
-
-   CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions', '-Wunused',
-               '-Wno-conversion']
-   LINKFLAGS = []
-   LIBPATH = []
-
-   if optimize != 'no':
-      CXXFLAGS.extend(['-DIOV_OPT', '-DNDEBUG', '-O2'])
-   else:
-      CXXFLAGS.extend(['-DIOV_DEBUG', '-gdwarf-2', '-fno-inline',
-                       '-fno-default-inline'])
-
-   env.Append(
-      CXXFLAGS    = CXXFLAGS,
-      LINKFLAGS   = LINKFLAGS,
-      LIBPATH     = LIBPATH
-   )
-
-   return env
-
-def BuildDarwinEnvironment():
-   "Builds a base environment for other modules to build on set up for Darwin"
-   global optimize, profile, builders
-
-   CXX = WhereIs('g++')
-   CXXFLAGS = ['-fmessage-length=0', '-Wall', '-fexceptions', '-Wunused',
-               '-Wno-conversion', '-Wno-long-double']
-   LINKFLAGS = []
-
-   # Enable profiling?
-#   if profile != 'no':
-#      CXXFLAGS.extend(['-pg'])
-#      LINKFLAGS.extend(['-pg'])
-
-   # Debug or optimize build?
-   if optimize != 'no':
-      CXXFLAGS.extend(['-DIOV_OPT', '-DNDEBUG', '-O2'])
-   else:
-      CXXFLAGS.extend(['-DIOV_DEBUG', '-g', '-fno-inline'])
-
-   return Environment(
-      ENV         = os.environ,
-      CXX         = CXX,
-      CXXFLAGS    = CXXFLAGS,
-      LINKFLAGS   = LINKFLAGS
-   )
 
 optimize_default = 'no'
 optimize = ARGUMENTS.get('optimize', optimize_default)
@@ -85,34 +38,52 @@ Export('optimize')
 
 # --- Main Build --- #
 help_text = "\n---- Build system ----\n";
-if GetPlatform() == 'linux' or GetPlatform() == 'freebsd':
-   baseEnv = BuildLinuxEnvironment()
-elif GetPlatform() == 'darwin':
-   baseEnv = BuildDarwinEnvironment()
+if GetPlatform() == 'win32':
+   # XXX: Temp hack to get msvs version setting
+   if ARGUMENTS.has_key('MSVS_VERSION'):
+      opt_env = Environment(MSVS_VERSION=ARGUMENTS['MSVS_VERSION'])
+   else:
+      opt_env = Environment()
+else:
+   opt_env = Environment(ENV = os.environ)
 
 # Export symbols for use by SConscript files in subdirectories.
 Export('GetPlatform')
+platform = sca_util.GetPlatform()
+unspecified_prefix = 'use-instlinks'
+
+# Default variants
+default_types    = ['debug','optimized']
+if platform == 'win32':
+   default_types.append('hybrid')
+
+# XXX: Fix to allow all types.
+#default_types    = ["optimized"]
 
 # ---------- Options ------------ #
 options_cache_filename = 'options.cache.' + distutils.util.get_platform()
 opts = SConsAddons.Options.Options(files = [options_cache_filename, 'options.custom'],
-                                   args= ARGUMENTS);
+                                   args= ARGUMENTS)
+
+opts.Add(sca_opts.ListOption('types','Types of run-times to build.(comma separated list)',
+                             default_types,default_types))
+
+build_options = {}
+build_options["install_prefix"] = sca_opts.SimpleOption(
+    "prefix", "prefix", "Installation prefix", unspecified_prefix, None, None, None)
+#build_options["build_suffix"] = sca_opts.SimpleOption(
+#    "build_suffix", "build_suffix",
+#    "Suffix to append to build directory.  Useful for compiling multiple variations on the same platform",
+#    "", None, None, None)
+build_options["enable_distcc"] = sca_opts.BoolOption(
+    "enable_distcc", "Enable use of distcc during build. (distcc must be in your path)", False)
+
 boost_options = SConsAddons.Options.Boost.Boost("boost", "1.33.0",
                                                 libs = ['signals', 'program_options'],
                                                 required = True,
                                                 useVersion = True)
 
-# XXX: This is not very robust. A user could have vrjuggler-config from
-# VR Juggler 2.0 in his path but have specified the use of VR Juggler 2.1
-# on the scons command line.
-vrjuggler_config = WhereIs('vrjuggler-config')
-
-if vrjuggler_config != None:
-   vrj_opt_type = SConsAddons.Options.VRJuggler.VRJ.VRJ_config
-else:
-   vrj_opt_type = SConsAddons.Options.VRJuggler.VRJ.VRJ
-
-vrj_options = vrj_opt_type("vrjuggler", "2.0.1")
+vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("vrjuggler", "2.0.1")
 opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.6.0",
                                                    required = True, useCppPath=True)
 
@@ -122,6 +93,20 @@ opts.AddOption(boost_options)
 opts.AddOption( vrj_options )
 opts.AddOption( opensg_options )
 
+#
+# 2) Register options
+#    This should not require any changes unless a new option group is added.
+opts.AddOption(sca_opts.SeparatorOption("\nBuild/Install settings"))
+for opt in build_options.itervalues():
+   opts.AddOption(opt)
+
+#opts.AddOption(sca_opts.SeparatorOption("\nPackage settings (required libs)"))
+#for opt in required_libs_options.itervalues():
+#   opts.AddOption(opt)
+
+#Export('required_libs_options', 'build_options')
+Export('build_options')
+
 # Setup build dir and prefix settings
 build_dir = "build." + distutils.util.get_platform()
 def_prefix = pj( Dir('.').get_abspath(), build_dir, 'instlinks')
@@ -129,24 +114,40 @@ unspecified_prefix = "use-instlinks"
 opts.Add('prefix', 'Installation prefix: def:' + unspecified_prefix, unspecified_prefix)
 opts.Add('optimize', 'Enable optimization', optimize_default)
 
-help_text += opts.GenerateHelpText(baseEnv)
+help_text = """---- IOV Build System ---- 
+
+%s
+
+This file will be loaded each time.  Note: Options are cached in the file: %s
+""" %(opts.GenerateHelpText(opt_env),options_cache_filename)
+Help(help_text)
 
 # ----- Application Setup ------------ #
-if not SConsAddons.Util.hasHelpFlag():
-   opts.Update(baseEnv)
-   opts.Save(options_cache_filename, baseEnv)
+if not sca_util.hasHelpFlag():
+   opts.Process(opt_env)
+   opts.Save(options_cache_filename, opt_env)
+
+   if opt_env["enable_distcc"] and WhereIs("distcc"):
+      opt_env.Prepend(CXX = "distcc ", CC = "distcc ")
+
+   # Create base build directory.
+   base_build_dir = "build." + platform
+   if opt_env.has_key("MSVS"):
+      base_build_dir += "." + opt_env["MSVS"]["VERSION"]
 
    # If defaulting to instlinks prefix:
    #  - Use symlinks
    #  - Manually set the used prefix to the instlinks of the build dir
-   if baseEnv['prefix'] == unspecified_prefix:
-      baseEnv['INSTALL'] = symlinkInstallFunc
-      baseEnv['prefix'] = def_prefix
+   # Note: This gives us a type of "developer" installation
+   if opt_env['prefix'] == unspecified_prefix:
+      if hasattr(os,'symlink'):
+         opt_env['INSTALL'] = sca_util.symlinkInstallFunc
+      opt_env['prefix'] = pj( Dir('.').get_abspath(), base_build_dir, 'instlinks')
 
    # Setup a map with the paths that we will install everything to
    # - Note: this is used throughout the build to keep things consistent
    inst_paths = {}
-   inst_paths['base'] = baseEnv['prefix']
+   inst_paths['base'] = opt_env['prefix']
    inst_paths['lib'] = pj(inst_paths['base'],'lib')
    inst_paths['lib_plugin'] = pj(inst_paths['lib'],'IOV','plugins')
    inst_paths['include'] = pj(inst_paths['base'],'include')
@@ -155,7 +156,7 @@ if not SConsAddons.Util.hasHelpFlag():
    inst_paths['app_base'] = pj(inst_paths['share'],'apps')
    inst_paths['test_base'] = pj(inst_paths['share'],'test')
 
-   print "Using prefix: ", inst_paths["base"]
+   print "Using prefix: ", inst_paths['base']
 
    # XXX: Hack around SConsAddons.Options.OpenSG.OpenSG not letting us provide
    # extra arguments to osg-config.  (Of course, if osg-config wasn't totally
@@ -166,56 +167,139 @@ if not SConsAddons.Util.hasHelpFlag():
 
    # Setup the build environment
    # Add local directory to path and the "root" directory for this project
-   vrj_options.apply(baseEnv)
-   opensg_options.apply(baseEnv)
+   vrj_options.apply(opt_env)
+   vrj_options.dumpSettings()
+   # XXX: Hard code to use optimized.
+   opensg_options.apply(opt_env, optimize=True)
 
-   # Incorporate the Boost options into baseEnv if Boost is available.  This
+   # Incorporate the Boost options into opt_env if Boost is available.  This
    # accounts for the case when a Boost installation is not available through
    # the output returned by 'vrjuggler-config --cxxflags'.
    if boost_options.isAvailable():
-      boost_options.apply(baseEnv)
+      boost_options.apply(opt_env)
    else:
       print "WARNING: Cannot build IOV without Boost.Signals"
 
-   if SCons.Util.WhereIs('distcc'):
-      baseEnv.Prepend(CXX = "distcc ", CC = "distcc ")
+   if sca_util.WhereIs('distcc'):
+      opt_env.Prepend(CXX = "distcc ", CC = "distcc ")
 
-   Export('baseEnv', 'build_dir', 'inst_paths')
+   var_combos = []
+   for t in opt_env["types"]:
+      var_combos.append( {"type":t, "archs":"32"} )
 
-   SConscript(dirs=['src'], build_dir=build_dir, duplicate=0)
+   # ----- FOR EACH VARIANT ----- #
+   variant_pass = -1
+   for combo in var_combos:
+      variant_pass += 1
 
+      # -- Setup Environment builder --- #
+      env_bldr = EnvironmentBuilder()
+      #env_bldr.enableWarnings(EnvironmentBuilder.MAXIMUM)
+      env_bldr.enableWarnings(EnvironmentBuilder.MINIMAL)      
+   
+      # Process modifications for variant combo
+      if combo['type'] == 'debug':
+         env_bldr.enableDebug()
+         env_bldr.setMsvcRuntime(EnvironmentBuilder.MSVC_MT_DBG_DLL_RT)
+      elif combo['type'] == 'optimized':
+         env_bldr.enableOpt(EnvironmentBuilder.STANDARD)
+         env_bldr.setMsvcRuntime(EnvironmentBuilder.MSVC_MT_DLL_RT)
+      elif combo['type'] == 'hybrid':
+         env_bldr.enableDebug()
+         env_bldr.setMsvcRuntime(EnvironmentBuilder.MSVC_MT_DLL_RT)
+      
+      base_env = env_bldr.applyToEnvironment(opt_env.Copy(), variant=combo)      
 
-   srcdir_abs_path = baseEnv.Dir('data').srcnode().abspath
+      # Remove all old DEBUG cruft.
+      if base_env.get('CPPDEFINES','').count('_DEBUG') > 0:
+         base_env['CPPDEFINES'].remove('_DEBUG')
+      if base_env.get('CPPDEFINES','').count('NDEBUG') > 0:
+         base_env['CPPDEFINES'].remove('NDEBUG')
+
+      # If we are debug, then we want debug runtime and debug dve.
+      if combo['type'] == 'debug':
+         base_env.AppendUnique(CPPDEFINES = ['_DEBUG', 'IOV_DEBUG'])
+      # If we are optimized we want no debugging at all.
+      elif combo['type'] == 'optimized':
+         base_env.AppendUnique(CPPDEFINES = ['NDEBUG',])
+      # If we are 'hybrid', then we want IOV debug.
+      elif combo['type'] == 'hybrid':
+         base_env.AppendUnique(CPPDEFINES = ['IOV_DEBUG'])
+
+      # Can't use boost auto-linking with hybrid build.
+      if platform == 'win32':
+         base_env.Append(CPPDEFINES = ['BOOST_ALL_DYN_LINK',])
+
+      if base_env.has_key('MSVS'):
+         import pprint
+         print "Found MSVS. using version: ", base_env['MSVS']['VERSION']
+         pprint.pprint(base_env['MSVS'])
+
+      # Determine the build dir for this variant
+      combo_dirname = "--".join(['%s-%s'%(i[0],i[1]) for i in combo.iteritems() if not isinstance(i[1],(types.ListType))])
+      full_build_dir = pj(base_build_dir, combo_dirname)
+
+      # Build in a build directory
+      print "Build Directory: ", full_build_dir
+      print "Using prefix: ", opt_env["prefix"]
+      
+      if platform == "win32":
+         base_env.Append(LINKFLAGS = ['/OPT:NOREF'])
+
+      # Build up library name and paths to use
+      (static_lib_suffix,shared_lib_suffix) = ("","")
+      if platform == "win32":   
+         if combo["type"] == "debug":
+            (static_lib_suffix,shared_lib_suffix) = ("_d_s","_d")
+         elif combo["type"] == "optimized":
+            (static_lib_suffix,shared_lib_suffix) = ("_s","")
+         elif combo["type"] == "hybrid":
+            (static_lib_suffix,shared_lib_suffix) = ("_h_s","_h")
+         
+         base_env.Append(CPPFLAGS = ["/wd4996",])
+         gl_libraries = ["opengl32",]
+      else:
+         if combo["type"] == "debug":
+            inst_paths["lib"] = pj(inst_paths["lib"],"debug")
+         gl_libraries = ["GL",]
+
+      runtime_suffix = ""                # Suffix to add to the end of apps to install
+      shared_lib_suffix = ""
+      if combo["type"] == "debug":
+         runtime_suffix = "_d"
+         shared_lib_suffix = "_d"
+      elif combo["type"] == "hybrid":
+         runtime_suffix = "_h"
+         shared_lib_suffix = "_h"
+
+      Export('base_env','full_build_dir', 'combo', 'shared_lib_suffix', 'runtime_suffix', 'inst_paths', 'variant_pass')
+      SConscript(dirs=['src'], build_dir=full_build_dir, duplicate=0)
+
+   # Get the source location of data files.
+   srcdir_abs_path = opt_env.Dir('data').srcnode().abspath
    #print "src dir abs: ", srcdir_abs_path
-   ret_args = []
+   data_files = []
 
    # Collect all file arguments from the walk into dirs and files
-   def collect_args(junk, dir_path, name_list):
-      dirs = []
-      files = []
-      for n in name_list:
-         if os.path.isfile(os.path.join(dir_path, n)):
-            files.append(n)
-         else:
-            dirs.append(n)
-      ret_args.append( [dir_path, dirs, files] )
+   def collect_data_files(junk, dirPath, files):
+      for n in files:
+         if os.path.isfile(os.path.join(dirPath, n)):
+            full_filename = pj(dirPath, n)
+            if 0 == full_filename.count('.svn'):
+               data_files.append(full_filename)
+   os.path.walk(srcdir_abs_path, collect_data_files, None)
 
-   os.path.walk(srcdir_abs_path, collect_args, None)
+   # Find the part of the source path to strip off.
+   strip_path = srcdir_abs_path
+   if not strip_path.endswith(os.sep):
+      strip_path += os.sep
 
    # Install the contents of the data directory
-   for p, d, files in ret_args:
-      if not p.count('.svn'):
-         for fname in [pj(p,f) for f in files]:
-            strip_path = srcdir_abs_path
-            if not strip_path.endswith('/'):
-               strip_path += '/'
-            base_fname = fname.replace(strip_path, '')
-            baseEnv.InstallAs(pj(inst_paths['share'], 'data', base_fname),
-                              fname)
-                              
+   for fname in data_files:
+      base_fname = fname.replace(strip_path, '')
+      opt_env.InstallAs(pj(inst_paths['share'], 'data', base_fname), fname)
+
    # Aliases
-   baseEnv.Alias('install', inst_paths['base'])                           
+   opt_env.Alias('install', inst_paths['base'])                           
 
 Help(help_text)
-
-# end

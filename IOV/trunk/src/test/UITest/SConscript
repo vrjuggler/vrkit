@@ -16,13 +16,13 @@ opensg_options.apply(ui_env, lib='glut')
 
 ui_env.Prepend(CPPPATH = inst_paths['include'],
                LIBPATH = inst_paths['lib'],
-               LIBS = 'iov')
+               LIBS = 'iov'+shared_lib_suffix)
 
 if GetPlatform() == 'darwin':
    ui_env.Append(LINKFLAGS = ['-framework', 'Cocoa',
                               '-framework', 'GLUT',
                               '-framework', 'OpenGL'])
 
-uitest_prog = ui_env.Program('ui_test', ['ui_test.cpp',])
+uitest_prog_name = 'ui_test' + runtime_suffix
+uitest_prog = ui_env.Program(uitest_prog_name, ['ui_test.cpp',])
 ui_env.Install(pj(inst_paths['test_base'],'UITest'), uitest_prog)
-

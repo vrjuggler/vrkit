@@ -26,7 +26,7 @@ def makePlugin(srcDir, pluginName, instDir):
       #print "Plugin: ", pluginName
       #print "   srcs:", plugin_srcs
       #print "   defs:", def_files
-      lib_name = pluginName
+      lib_name = pluginName + shared_lib_suffix
 
       # We use inst_dir here instead of changing instDir because we do not
       # watch to modify the base installation directory. instDir gets
@@ -42,10 +42,12 @@ def makePlugin(srcDir, pluginName, instDir):
 
    def_files = glob.glob(pj(srcDir, pluginName, '*.jdef'))
 
-   if len(def_files) > 0:
-      def_files = \
-         [d.replace(sca_util.getFullSrcPath(env), '.') for d in def_files] 
-      env.Install(inst_paths['definitions'], def_files)
+   # Only install *.jdef files on first pass.
+   if 0 == variant_pass:
+      if len(def_files) > 0:
+         def_files = \
+            [d.replace(sca_util.getFullSrcPath(env), '.') for d in def_files] 
+         env.Install(inst_paths['definitions'], def_files)
 
    cur_dir = pj(srcDir, pluginName)
    subdirs = [d for d in os.listdir(cur_dir) if os.path.isdir(pj(cur_dir, d)) and not d.startswith('.')]
@@ -58,10 +60,13 @@ plugin_dirs = [d for d in os.listdir(src_dir) if (os.path.isdir(pj(src_dir,d)) a
 
 # Create plugin environment with paths
 # to the IOV library we built and installed
-plugin_env = baseEnv.Copy()
+plugin_env = base_env.Copy()
 plugin_env.Append(CPPPATH = inst_paths['include'],
                   LIBPATH = inst_paths['lib'])
 plugin_env.Prepend(LIBS = ['iov'])
+
+# Add define since we are building.
+plugin_env.AppendUnique(CPPDEFINES = ['_IOV_PLUGIN_BUILD_',])
 
 if GetPlatform() == 'darwin':
    plugin_env['SHLINKFLAGS'] = SCons.Util.CLVar('$LINKFLAGS -bundle')

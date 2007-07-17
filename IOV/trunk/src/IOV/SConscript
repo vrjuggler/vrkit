@@ -8,8 +8,11 @@ pj = os.path.join
 
 Import('*')
 
-env = baseEnv.Copy()
+env = base_env.Copy()
 env.Append(CPPPATH = [inst_paths['include']] )    # Need to find the IOV directory
+
+# Add define since we are building.
+env.AppendUnique(CPPDEFINES = ['_IOV_BUILD_',])
 
 header_path = pj(inst_paths['include'],'IOV')
 
@@ -24,10 +27,14 @@ for path, dirs, files in sca_util.WalkBuildFromSource('.',env):
 if GetPlatform() == 'darwin':
    env.Append(LINKFLAGS = ['-install_name', 'libiov.dylib'])
 
-iov_lib = env.SharedLibrary('iov', src_files)
+iov_lib_name = 'iov'+shared_lib_suffix
+iov_lib = env.SharedLibrary(iov_lib_name, src_files)
 
 # Install the library, headers, and definitions
 env.Install(inst_paths['lib'], iov_lib)
-env.InstallAs(target = [pj(header_path, h) for h in header_files],
-                 source = header_files)
-env.Install(inst_paths['definitions'], def_files)
+
+# Only install the headers on the first pass.
+if 0 == variant_pass:
+   env.InstallAs(target = [pj(header_path, h) for h in header_files],
+                    source = header_files)
+   env.Install(inst_paths['definitions'], def_files)

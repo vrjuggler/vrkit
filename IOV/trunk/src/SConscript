@@ -1,7 +1,7 @@
 #!python
 #
 Import('*')
-env = baseEnv.Copy()
+env = base_env.Copy()
 Export('env')
 
 SConscript(dirs = ['IOV', 'plugins', 'SlaveViewer', 'Viewer'])
