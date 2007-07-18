@@ -7,7 +7,7 @@ import distutils.util
 import sys, os, re, string, glob, types
 pj = os.path.join
 
-sys.path.insert(0,pj('deps','scons-addons','src'))
+#sys.path.insert(0,pj('deps','scons-addons','src'))
 import SCons;
 import SConsAddons.Options as sca_opts   # Get the modular options stuff
 import SConsAddons.Options.Boost
@@ -164,9 +164,13 @@ if not sca_util.hasHelpFlag():
    # Setup the build environment
    # Add local directory to path and the "root" directory for this project
    vrj_options.apply(opt_env)
-   vrj_options.dumpSettings()
-   # XXX: Hard code to use optimized.
-   opensg_options.apply(opt_env, optimize=True)
+   #vrj_options.dumpSettings()
+   if vrj_options.baseDir is not None:
+      # XXX: Remove this once we find a way to get versioned include dirs from
+      #      setting VrjBaseDir.
+      print "WARNING: Setting the VrjBaseDir option is not currently supported."
+
+   opensg_options.apply(opt_env)
 
    # Incorporate the Boost options into opt_env if Boost is available.  This
    # accounts for the case when a Boost installation is not available through
