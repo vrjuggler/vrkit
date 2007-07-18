@@ -7,7 +7,7 @@ import distutils.util
 import sys, os, re, string, glob, types
 pj = os.path.join
 
-#sys.path.insert(0,pj('deps','scons-addons','src'))
+sys.path.insert(0,pj('deps','scons-addons','src'))
 import SCons;
 import SConsAddons.Options as sca_opts   # Get the modular options stuff
 import SConsAddons.Options.Boost
