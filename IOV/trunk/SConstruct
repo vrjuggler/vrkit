@@ -29,10 +29,6 @@ def symlinkInstallFunc(dest, source, env):
     os.symlink(pj(os.getcwd(), source), dest)
     return 0
 
-optimize_default = 'no'
-optimize = ARGUMENTS.get('optimize', optimize_default)
-Export('optimize')
-
 # --- Main Build --- #
 help_text = "\n---- Build system ----\n";
 if GetPlatform() == 'win32':
@@ -53,9 +49,6 @@ unspecified_prefix = 'use-instlinks'
 default_types    = ['debug','optimized']
 if platform == 'win32':
    default_types.append('hybrid')
-
-# XXX: Fix to allow all types.
-#default_types    = ["optimized"]
 
 # ---------- Options ------------ #
 options_cache_filename = 'options.cache.' + distutils.util.get_platform()
@@ -109,7 +102,6 @@ build_dir = "build." + distutils.util.get_platform()
 def_prefix = pj( Dir('.').get_abspath(), build_dir, 'instlinks')
 unspecified_prefix = "use-instlinks"
 opts.Add('prefix', 'Installation prefix: def:' + unspecified_prefix, unspecified_prefix)
-opts.Add('optimize', 'Enable optimization', optimize_default)
 
 help_text = """---- IOV Build System ---- 
 
@@ -260,7 +252,9 @@ if not sca_util.hasHelpFlag():
          gl_libraries = ["opengl32",]
       else:
          if combo["type"] == "debug":
-            inst_paths["lib"] = pj(inst_paths["lib"],"debug")
+            inst_paths["lib"] = pj(inst_paths["base"], "lib", "debug")
+         else:
+            inst_paths["lib"] = pj(inst_paths["base"], "lib")
          gl_libraries = ["GL",]
 
       runtime_suffix = ""                # Suffix to add to the end of apps to install

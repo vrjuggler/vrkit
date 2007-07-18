@@ -33,7 +33,7 @@ def makePlugin(srcDir, pluginName, instDir):
       # referenced again later, and we need it to be the value that was passed
       # in to this function.
       inst_dir = instDir
-      if (optimize != 'yes'):
+      if combo['type'] == 'debug':
          inst_dir = os.path.join(instDir, 'debug')
 
       plugin_lib = plugin_env.SharedLibrary(lib_name, plugin_srcs,
@@ -63,7 +63,9 @@ plugin_dirs = [d for d in os.listdir(src_dir) if (os.path.isdir(pj(src_dir,d)) a
 plugin_env = base_env.Copy()
 plugin_env.Append(CPPPATH = inst_paths['include'],
                   LIBPATH = inst_paths['lib'])
-plugin_env.Prepend(LIBS = ['iov'])
+
+iov_lib_name = 'iov'+shared_lib_suffix
+plugin_env.Prepend(LIBS = [iov_lib_name])
 
 # Add define since we are building.
 plugin_env.AppendUnique(CPPDEFINES = ['_IOV_PLUGIN_BUILD_',])

@@ -37,7 +37,7 @@ def makeBundleCmd(target, source, env):
 
    shutil.copy2(str(source[0]), macdir)
 
-   if optimize == 'yes':
+   if combo['type'] == 'optimized':
       cmd = 'strip -u -r %s/%s' % (macdir, appname)
       commands.getoutput(cmd)
 
