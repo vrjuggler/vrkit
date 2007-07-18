@@ -13,6 +13,8 @@ import SConsAddons.Options as sca_opts   # Get the modular options stuff
 import SConsAddons.Options.Boost
 import SConsAddons.Options.VRJuggler.VRJ
 import SConsAddons.Options.OpenSG
+import SConsAddons.Variants as sca_variants
+
 from SConsAddons.EnvironmentBuilder import EnvironmentBuilder
 import SConsAddons.Util as sca_util      # Get the utils
 GetPlatform = sca_util.GetPlatform
@@ -45,18 +47,10 @@ Export('GetPlatform')
 platform = GetPlatform()
 unspecified_prefix = 'use-instlinks'
 
-# Default variants
-default_types    = ['debug','optimized']
-if platform == 'win32':
-   default_types.append('debugrt')
-
 # ---------- Options ------------ #
 options_cache_filename = 'options.cache.' + distutils.util.get_platform()
 opts = SConsAddons.Options.Options(files = [options_cache_filename, 'options.custom'],
                                    args= ARGUMENTS)
-
-opts.Add(sca_opts.ListOption('types','Types of run-times to build.(comma separated list)',
-                             default_types,default_types))
 
 build_options = {}
 build_options["install_prefix"] = sca_opts.SimpleOption(
@@ -80,8 +74,14 @@ opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.6.0",
 Export('boost_options','opensg_options')
 
 opts.AddOption(boost_options)
-opts.AddOption( vrj_options )
-opts.AddOption( opensg_options )
+opts.AddOption(vrj_options)
+opts.AddOption(opensg_options)
+
+# Create variant helper and builder
+variant_helper = sca_variants.VariantsHelper()
+base_bldr = EnvironmentBuilder()
+variant_helper.addOptions(opts)
+base_bldr.addOptions(opts)
 
 #
 # 2) Register options
@@ -113,7 +113,17 @@ This file will be loaded each time.  Note: Options are cached in the file: %s
 # ----- Application Setup ------------ #
 if not sca_util.hasHelpFlag():
    opts.Process(opt_env)
-   opts.Save(options_cache_filename, opt_env)
+
+   # Try to save the options if possible
+   try:
+      opts.Save(options_cache_filename, opt_env)
+   except LookupError, le:
+      pass
+
+   # -- Common builder settings
+   variant_helper.readOptions(opt_env)
+   base_bldr.readOptions(opt_env)
+   base_bldr.enableWarnings()      
 
    if opt_env["enable_distcc"] and WhereIs("distcc"):
       opt_env.Prepend(CXX = "distcc ", CC = "distcc ")
@@ -145,6 +155,9 @@ if not sca_util.hasHelpFlag():
    inst_paths['test_base'] = pj(inst_paths['share'],'test')
 
    print "Using prefix: ", inst_paths['base']
+   print "types: ",    variant_helper.variants["type"] 
+   print "libtypes: ", variant_helper.variants["libtype"] 
+   print "archs: ",    variant_helper.variants["arch"] 
 
    # XXX: Hack around SConsAddons.Options.OpenSG.OpenSG not letting us provide
    # extra arguments to osg-config.  (Of course, if osg-config wasn't totally
@@ -175,101 +188,46 @@ if not sca_util.hasHelpFlag():
    if sca_util.WhereIs('distcc'):
       opt_env.Prepend(CXX = "distcc ", CC = "distcc ")
 
-   var_combos = []
-   for t in opt_env["types"]:
-      var_combos.append( {"type":t, "archs":"32"} )
-
    # ----- FOR EACH VARIANT ----- #
-   variant_pass = -1
-   for combo in var_combos:
-      variant_pass += 1
-
-      # -- Setup Environment builder --- #
-      env_bldr = EnvironmentBuilder()
-      #env_bldr.enableWarnings(EnvironmentBuilder.MAXIMUM)
-      env_bldr.enableWarnings(EnvironmentBuilder.MINIMAL)      
-   
-      # Process modifications for variant combo
-      if combo['type'] == 'debugrt':
-         env_bldr.enableDebug()
-         env_bldr.setMsvcRuntime(EnvironmentBuilder.MSVC_MT_DBG_DLL_RT)
-      elif combo['type'] == 'optimized':
-         env_bldr.enableOpt(EnvironmentBuilder.STANDARD)
-         env_bldr.setMsvcRuntime(EnvironmentBuilder.MSVC_MT_DLL_RT)
-      elif combo['type'] == 'debug':
-         env_bldr.enableDebug()
-         env_bldr.setMsvcRuntime(EnvironmentBuilder.MSVC_MT_DLL_RT)
-      
-      base_env = env_bldr.applyToEnvironment(opt_env.Copy(), variant=combo)      
-
-      # Remove all old DEBUG cruft.
-      # XXX: Remove this when we clean up SconsAddons EnvironmentBuilder.
-      if base_env.get('CPPDEFINES','').count('_DEBUG') > 0:
-         base_env['CPPDEFINES'].remove('_DEBUG')
-      if base_env.get('CPPDEFINES','').count('NDEBUG') > 0:
-         base_env['CPPDEFINES'].remove('NDEBUG')
-
+   for combo in variant_helper.iterate(locals(), base_bldr, opt_env):
       # If we are debug, then we want debug runtime and debug dve.
       if combo['type'] == 'debug':
-         base_env.AppendUnique(CPPDEFINES = ['IOV_DEBUG'])
+         build_env.AppendUnique(CPPDEFINES = ['IOV_DEBUG'])
       # If we are optimized we want no debugging at all.
       elif combo['type'] == 'optimized':
-         base_env.AppendUnique(CPPDEFINES = ['NDEBUG',])
+         build_env.AppendUnique(CPPDEFINES = ['NDEBUG',])
       # If we are debug run-time.
       elif combo['type'] == 'debugrt':
-         base_env.AppendUnique(CPPDEFINES = ['IOV_DEBUG'])
+         build_env.AppendUnique(CPPDEFINES = ['IOV_DEBUG'])
 
+      # Enable boost auto-linking.
       if platform == 'win32':
-         base_env.Append(CPPDEFINES = ['BOOST_ALL_DYN_LINK',])
+         build_env.Append(CPPDEFINES = ['BOOST_ALL_DYN_LINK',])
 
-      if base_env.has_key('MSVS'):
+      if build_env.has_key('MSVS'):
          import pprint
-         print "Found MSVS. using version: ", base_env['MSVS']['VERSION']
-         pprint.pprint(base_env['MSVS'])
+         print "Found MSVS. using version: ", build_env['MSVS']['VERSION']
+         pprint.pprint(build_env['MSVS'])
 
       # Determine the build dir for this variant
-      combo_dirname = "--".join(['%s-%s'%(i[0],i[1]) for i in combo.iteritems() if not isinstance(i[1],(types.ListType))])
-      full_build_dir = pj(base_build_dir, combo_dirname)
-
-      # Build in a build directory
+      full_build_dir = pj(base_build_dir, combo_dir)
       print "Build Directory: ", full_build_dir
       print "Using prefix: ", opt_env["prefix"]
       
       if platform == "win32":
-         base_env.Append(LINKFLAGS = ['/OPT:NOREF'])
-
-      # Build up library name and paths to use
-      (static_lib_suffix,shared_lib_suffix) = ("","")
-      if platform == "win32":   
-         if combo["type"] == "debug":
-            (static_lib_suffix,shared_lib_suffix) = ("_s","")
-         elif combo["type"] == "optimized":
-            (static_lib_suffix,shared_lib_suffix) = ("_s","")
-         elif combo["type"] == "debugrt":
-            (static_lib_suffix,shared_lib_suffix) = ("_d_s","_d")
-
-      
-      # Suffix to add to the end of apps to install
-      runtime_suffix = ""
-      if combo["type"] == "debug":
-         runtime_suffix = "_d"
-      elif combo["type"] == "debugrt":
-         runtime_suffix = "_drt"
+         build_env.Append(LINKFLAGS = ['/OPT:NOREF'])
 
       # Set the directory to install libraries into.
-      if combo["type"] == "debug":
-         inst_paths["lib"] = pj(inst_paths["base"], "lib", "debug")
-      else:
-         inst_paths["lib"] = pj(inst_paths["base"], "lib")
+      inst_paths["lib"] = pj(inst_paths["base"], "lib", lib_subdir)
 
       # Specify the OpenGL libraries.
       if platform == "win32":   
-         base_env.Append(CPPFLAGS = ["/wd4996",])
+         build_env.Append(CPPFLAGS = ["/wd4996",])
          gl_libraries = ["opengl32",]
       else:
          gl_libraries = ["GL",]
 
-      Export('base_env','full_build_dir', 'combo', 'shared_lib_suffix', 'runtime_suffix', 'inst_paths', 'variant_pass')
+      Export('build_env','full_build_dir', 'combo', 'shared_lib_suffix', 'runtime_suffix', 'inst_paths', 'variant_pass')
       SConscript(dirs=['src'], build_dir=full_build_dir, duplicate=0)
 
    # Get the source location of data files.

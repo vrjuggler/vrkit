@@ -47,7 +47,7 @@ def makeBundle(target):
    cmd = env.Command('bundle', appname, makeBundleCmd)
    env.Alias(appname, cmd)
 
-viewerEnv = base_env.Copy()
+viewerEnv = build_env.Copy()
 
 boost_options.apply(viewerEnv)
 

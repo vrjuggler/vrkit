@@ -7,7 +7,7 @@ GetPlatform = SConsAddons.Util.GetPlatform;
 
 Import('*')
 
-viewerEnv = base_env.Copy()
+viewerEnv = build_env.Copy()
 
 boost_options.apply(viewerEnv)
 
