@@ -48,7 +48,7 @@ unspecified_prefix = 'use-instlinks'
 # Default variants
 default_types    = ['debug','optimized']
 if platform == 'win32':
-   default_types.append('hybrid')
+   default_types.append('debugrt')
 
 # ---------- Options ------------ #
 options_cache_filename = 'options.cache.' + distutils.util.get_platform()
@@ -190,19 +190,20 @@ if not sca_util.hasHelpFlag():
       env_bldr.enableWarnings(EnvironmentBuilder.MINIMAL)      
    
       # Process modifications for variant combo
-      if combo['type'] == 'debug':
+      if combo['type'] == 'debugrt':
          env_bldr.enableDebug()
          env_bldr.setMsvcRuntime(EnvironmentBuilder.MSVC_MT_DBG_DLL_RT)
       elif combo['type'] == 'optimized':
          env_bldr.enableOpt(EnvironmentBuilder.STANDARD)
          env_bldr.setMsvcRuntime(EnvironmentBuilder.MSVC_MT_DLL_RT)
-      elif combo['type'] == 'hybrid':
+      elif combo['type'] == 'debug':
          env_bldr.enableDebug()
          env_bldr.setMsvcRuntime(EnvironmentBuilder.MSVC_MT_DLL_RT)
       
       base_env = env_bldr.applyToEnvironment(opt_env.Copy(), variant=combo)      
 
       # Remove all old DEBUG cruft.
+      # XXX: Remove this when we clean up SconsAddons EnvironmentBuilder.
       if base_env.get('CPPDEFINES','').count('_DEBUG') > 0:
          base_env['CPPDEFINES'].remove('_DEBUG')
       if base_env.get('CPPDEFINES','').count('NDEBUG') > 0:
@@ -214,11 +215,10 @@ if not sca_util.hasHelpFlag():
       # If we are optimized we want no debugging at all.
       elif combo['type'] == 'optimized':
          base_env.AppendUnique(CPPDEFINES = ['NDEBUG',])
-      # If we are 'hybrid', then we want IOV debug.
-      elif combo['type'] == 'hybrid':
+      # If we are debug run-time.
+      elif combo['type'] == 'debugrt':
          base_env.AppendUnique(CPPDEFINES = ['IOV_DEBUG'])
 
-      # Can't use boost auto-linking with hybrid build.
       if platform == 'win32':
          base_env.Append(CPPDEFINES = ['BOOST_ALL_DYN_LINK',])
 
@@ -242,29 +242,32 @@ if not sca_util.hasHelpFlag():
       (static_lib_suffix,shared_lib_suffix) = ("","")
       if platform == "win32":   
          if combo["type"] == "debug":
-            (static_lib_suffix,shared_lib_suffix) = ("_d_s","_d")
+            (static_lib_suffix,shared_lib_suffix) = ("_s","")
          elif combo["type"] == "optimized":
             (static_lib_suffix,shared_lib_suffix) = ("_s","")
-         elif combo["type"] == "hybrid":
-            (static_lib_suffix,shared_lib_suffix) = ("_h_s","_h")
-         
+         elif combo["type"] == "debugrt":
+            (static_lib_suffix,shared_lib_suffix) = ("_d_s","_d")
+
+      
+      # Suffix to add to the end of apps to install
+      runtime_suffix = ""
+      if combo["type"] == "debug":
+         runtime_suffix = "_d"
+      elif combo["type"] == "debugrt":
+         runtime_suffix = "_drt"
+
+      # Set the directory to install libraries into.
+      if combo["type"] == "debug":
+         inst_paths["lib"] = pj(inst_paths["base"], "lib", "debug")
+      else:
+         inst_paths["lib"] = pj(inst_paths["base"], "lib")
+
+      # Specify the OpenGL libraries.
+      if platform == "win32":   
          base_env.Append(CPPFLAGS = ["/wd4996",])
          gl_libraries = ["opengl32",]
       else:
-         if combo["type"] == "debug":
-            inst_paths["lib"] = pj(inst_paths["base"], "lib", "debug")
-         else:
-            inst_paths["lib"] = pj(inst_paths["base"], "lib")
          gl_libraries = ["GL",]
-
-      runtime_suffix = ""                # Suffix to add to the end of apps to install
-      shared_lib_suffix = ""
-      if combo["type"] == "debug":
-         runtime_suffix = "_d"
-         shared_lib_suffix = "_d"
-      elif combo["type"] == "hybrid":
-         runtime_suffix = "_h"
-         shared_lib_suffix = "_h"
 
       Export('base_env','full_build_dir', 'combo', 'shared_lib_suffix', 'runtime_suffix', 'inst_paths', 'variant_pass')
       SConscript(dirs=['src'], build_dir=full_build_dir, duplicate=0)
