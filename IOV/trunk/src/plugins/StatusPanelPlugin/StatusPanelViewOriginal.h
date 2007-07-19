@@ -1,5 +1,14 @@
-#ifndef _INF_STATUS_PANEL_VIEW_H_
-#define _INF_STATUS_PANEL_VIEW_H_
+// Copyright (C) Infiscape Corporation 2005-2007
+
+#ifndef _INF_STATUS_PANEL_VIEW_ORIGINAL_H_
+#define _INF_STATUS_PANEL_VIEW_ORIGINAL_H_
+
+#include <IOV/Config.h>
+
+#include <vector>
+#include <string>
+#include <deque>
+#include <map>
 
 #include <OpenSG/OSGConfig.h>
 #include <OpenSG/OSGNode.h>
@@ -8,18 +17,14 @@
 #include <OpenSG/OSGClipPlaneChunk.h>
 
 #include <IOV/UiBuilder.h>
-#include <IOV/Config.h>
-#include <IOV/StatusPanel.h>
 
-#include <vector>
-#include <string>
-#include <deque>
-#include <map>
 
 namespace inf
 {
+
+class StatusPanel;
    
-class IOV_CLASS_API StatusPanelViewOriginal
+class StatusPanelViewOriginal
 {   
 public:
    
@@ -96,5 +101,6 @@ protected:
 };
    
 }
+
 
 #endif

@@ -4,20 +4,20 @@
 #define _INF_STATUS_PANEL_H_
 
 #include <IOV/Config.h>
-#include <IOV/Util/SignalProxy.h>
-
-#include <boost/signal.hpp>
 
 #include <vector>
 #include <string>
 #include <deque>
 #include <map>
+#include <boost/signal.hpp>
+
+#include <IOV/Util/SignalProxy.h>
 
 
 namespace inf
 {
 
-class IOV_CLASS_API StatusPanel
+class StatusPanel
 {
 public:
    StatusPanel();
@@ -204,5 +204,5 @@ protected:
 
 }
 
-#endif
 
+#endif

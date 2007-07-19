@@ -11,8 +11,8 @@ if GetPlatform() == 'darwin':
    mac_cflags = os.popen(opensg_options.osgconfig_cmd + " --cflags GLUT").read()
    opensg_options.found_cflags = mac_cflags.strip().split(" ")
 
-ui_env = baseEnv.Copy()
-opensg_options.apply(ui_env, lib='glut')
+ui_env = build_env.Copy()
+opensg_options.apply(ui_env, libs = ['glut'])
 
 ui_env.Prepend(CPPPATH = inst_paths['include'],
                LIBPATH = inst_paths['lib'],
@@ -23,6 +23,9 @@ if GetPlatform() == 'darwin':
                               '-framework', 'GLUT',
                               '-framework', 'OpenGL'])
 
+plugin_dir = os.path.join('..', '..', 'plugins', 'StatusPanelPlugin')
+srcs = ['ui_test.cpp', os.path.join(plugin_dir, 'StatusPanel.cpp'),
+        os.path.join(plugin_dir, 'StatusPanelViewOriginal.cpp')]
 uitest_prog_name = 'ui_test' + runtime_suffix
-uitest_prog = ui_env.Program(uitest_prog_name, ['ui_test.cpp',])
+uitest_prog = ui_env.Program(uitest_prog_name, srcs)
 ui_env.Install(pj(inst_paths['test_base'],'UITest'), uitest_prog)

@@ -6,6 +6,11 @@
 // to display locally.
 //
 
+#include <sstream>
+#include <algorithm>
+#include <vpr/vprConfig.h>
+#include <vpr/Util/Assert.h>
+
 #include <OpenSG/OSGGLUT.h>
 #include <OpenSG/OSGConfig.h>
 #include <OpenSG/OSGSimpleGeometry.h>
@@ -32,13 +37,11 @@
 #include <OpenSG/OSGVerifyGeoGraphOp.h>
 
 #include <IOV/UiBuilder.h>
-#include <IOV/StatusPanel.h>
-#include <IOV/StatusPanelViewOriginal.h>
 
-#include <vpr/vprConfig.h>
-#include <vpr/Util/Assert.h>
-#include <sstream>
-#include <algorithm>
+// XXX: These include paths stink.
+#include "../../plugins/StatusPanelPlugin/StatusPanel.h"
+#include "../../plugins/StatusPanelPlugin/StatusPanelViewOriginal.h"
+
 
 OSG::SimpleSceneManager* mgr;
 

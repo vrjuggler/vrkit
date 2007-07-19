@@ -1,4 +1,7 @@
-#include <IOV/StatusPanelViewOriginal.h>
+// Copyright (C) Infiscape Corporation 2005-2007
+
+#include <sstream>
+#include <boost/bind.hpp>
 
 #include <OpenSG/OSGGroup.h>
 #include <OpenSG/OSGChunkMaterial.h>
@@ -7,9 +10,9 @@
 
 #include <vpr/Util/Assert.h>
 
-#include <sstream>
+#include "StatusPanel.h"
+#include "StatusPanelViewOriginal.h"
 
-#include <boost/bind.hpp>
 
 namespace inf
 {

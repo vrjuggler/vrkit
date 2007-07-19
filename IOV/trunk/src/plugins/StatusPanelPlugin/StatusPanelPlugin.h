@@ -14,14 +14,14 @@
 #include <vpr/vpr.h>
 #include <vpr/Util/GUID.h>
 
-#include <IOV/StatusPanel.h>
-#include <IOV/StatusPanelViewOriginal.h>
+#include "StatusPanel.h"
+#include "StatusPanelViewOriginal.h"
 
 
 namespace inf
 {
 
-class IOV_PLUGIN_CLASS_API StatusPanelPlugin
+class StatusPanelPlugin
    : public inf::Plugin
    , public boost::enable_shared_from_this<StatusPanelPlugin>
 {
@@ -65,5 +65,6 @@ protected:
 };
 
 }
+
 
 #endif

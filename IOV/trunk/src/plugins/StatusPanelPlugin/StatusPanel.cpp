@@ -1,10 +1,10 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
-#include <IOV/StatusPanel.h>
-
 #include <vector>
 #include <algorithm>
 #include <boost/concept_check.hpp>
+
+#include "StatusPanel.h"
 
 
 namespace inf
@@ -98,7 +98,4 @@ void StatusPanel::setStatusHistorySize(const unsigned int size)
    mChangeSignal();
 }
 
-
-
 } // namespace inf
-
