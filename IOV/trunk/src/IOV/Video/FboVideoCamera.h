@@ -20,6 +20,8 @@ namespace inf
 
 /**
  * Renders a scene from a perspective camera into a FBO.
+ *
+ * @since 0.37
  */
 class IOV_CLASS_API FboVideoCamera : public boost::enable_shared_from_this<FboVideoCamera>
 {

@@ -36,6 +36,9 @@
 namespace inf
 {
 
+/**
+ * @since 0.37
+ */
 class IOV_CLASS_API VideoFfmpegEncoderException
    : public std::exception
 {
