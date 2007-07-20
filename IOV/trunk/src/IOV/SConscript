@@ -14,6 +14,10 @@ env.Append(CPPPATH = [inst_paths['include']] )    # Need to find the IOV directo
 # Add define since we are building.
 env.AppendUnique(CPPDEFINES = ['_IOV_BUILD_',])
 
+if ffmpeg_options.isAvailable():
+   env.AppendUnique(CPPDEFINES = ['IOV_WITH_FFMPEG',])
+   ffmpeg_options.apply(env)
+
 header_path = pj(inst_paths['include'],'IOV')
 
 src_files = []

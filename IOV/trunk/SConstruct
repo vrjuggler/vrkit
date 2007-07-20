@@ -43,8 +43,8 @@ else:
    opt_env = Environment(ENV = os.environ)
 
 # Export symbols for use by SConscript files in subdirectories.
-Export('GetPlatform')
 platform = GetPlatform()
+Export('GetPlatform', 'platform')
 unspecified_prefix = 'use-instlinks'
 
 # ---------- Options ------------ #
@@ -67,15 +67,18 @@ boost_options = SConsAddons.Options.Boost.Boost("boost", "1.33.0",
                                                 required = True,
                                                 useVersion = True)
 
-vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("vrjuggler", "2.0.1")
+vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("VR Juggler", "2.0.1")
 opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.6.0",
                                                    required = True, useCppPath=True)
 
-Export('boost_options','opensg_options')
+ffmpeg_options = SConsAddons.Options.FlagPollBasedOption.FlagPollBasedOption("AvFormat", "libavformat", "51.12.1", False, True)
+
+Export('boost_options','opensg_options', 'ffmpeg_options')
 
 opts.AddOption(boost_options)
 opts.AddOption(vrj_options)
 opts.AddOption(opensg_options)
+opts.AddOption(ffmpeg_options)
 
 # Create variant helper and builder
 variant_helper = sca_variants.VariantsHelper()
@@ -109,6 +112,9 @@ help_text = """---- IOV Build System ----
 
 This file will be loaded each time.  Note: Options are cached in the file: %s
 """ %(opts.GenerateHelpText(opt_env),options_cache_filename)
+
+
+#viewerEnv.Append(LIBS = ['avcodec', 'avformat', 'avutil', 'postproc'])
 
 # ----- Application Setup ------------ #
 if not sca_util.hasHelpFlag():
@@ -170,11 +176,6 @@ if not sca_util.hasHelpFlag():
    # Add local directory to path and the "root" directory for this project
    vrj_options.apply(opt_env)
    #vrj_options.dumpSettings()
-   if vrj_options.baseDir is not None:
-      # XXX: Remove this once we find a way to get versioned include dirs from
-      #      setting VrjBaseDir.
-      print "WARNING: Setting the VrjBaseDir option is not currently supported."
-
    opensg_options.apply(opt_env)
 
    # Incorporate the Boost options into opt_env if Boost is available.  This
