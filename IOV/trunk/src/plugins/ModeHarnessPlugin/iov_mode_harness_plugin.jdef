@@ -67,11 +67,11 @@
                      <xsl:element namespace="{$jconf}" name="component">
                         <xsl:element namespace="{$jconf}" name="mode_component">
                            <xsl:attribute name="name">
-                              <xsl:value-of select="./jconf:component_name" />
+                              <xsl:value-of select="./jconf:mode_component/jconf:component_name" />
                            </xsl:attribute>
                            <xsl:attribute name="version">2</xsl:attribute>
                            <xsl:element namespace="{$jconf}" name="plugin">
-                              <xsl:value-of select="./jconf:component_name" />
+                              <xsl:value-of select="./jconf:mode_component/jconf:component_name" />
                            </xsl:element>
                         </xsl:element>
                      </xsl:element>
@@ -81,11 +81,11 @@
                      <xsl:element namespace="{$jconf}" name="signal">
                         <xsl:element namespace="{$jconf}" name="mode_change_signal">
                            <xsl:attribute name="name">
-                              <xsl:value-of select="./jconf:signal_id" />
+                              <xsl:value-of select="./jconf:mode_component/jconf:signal_id" />
                            </xsl:attribute>
                            <xsl:attribute name="version">1</xsl:attribute>
                            <xsl:element namespace="{$jconf}" name="active_component">
-                              <xsl:value-of select="./jconf:component_name" />
+                              <xsl:value-of select="./jconf:mode_component/jconf:component_name" />
                            </xsl:element>
                         </xsl:element>
                      </xsl:element>
