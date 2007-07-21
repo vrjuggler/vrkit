@@ -366,7 +366,7 @@ void Viewer::deallocate()
 
    mObjects.clear();
    mPlugins.clear();
-   mPluginRegistry.reset();
+//   mPluginRegistry.reset();
    mUser.reset();
    mEventData.reset();
    mScene.reset();
