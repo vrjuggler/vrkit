@@ -7,11 +7,13 @@
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/OSGViewport.h>
+#include <OpenSG/OSGFBOViewport.h>
+#include <OpenSG/OSGGeometry.h>
+#include <OpenSG/OSGPerspectiveCamera.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGTextureChunk.h>
+#include <OpenSG/OSGViewport.h>
 #include <OpenSG/OSGWindow.h>
-#include <OpenSG/OSGFBOViewport.h>
 
 #include <IOV/Video/FboVideoCameraPtr.h>
 
@@ -31,6 +33,7 @@ protected:
       , mFboCamBeacon(OSG::NullFC)
       , mFboCamTrans(OSG::NullFC)
       , mFboTexture(OSG::NullFC)
+      , mFboCam(OSG::NullFC)
       , mFboWidth(512)
       , mFboHeight(512)
    {;}
@@ -58,25 +61,21 @@ public:
       return mFboTexture;
    }
 
-   void setCameraPos(OSG::Matrix camPos)
-   {
-      // set the fbo camera to show the whole model
-      OSG::beginEditCP(mFboCamTrans, OSG::Transform::MatrixFieldMask);
-         mFboCamTrans->setMatrix(camPos);
-      OSG::endEditCP(mFboCamTrans, OSG::Transform::MatrixFieldMask);
-   }
+   void setCameraPos(OSG::Matrix camPos);
 
    OSG::NodePtr getDebugPlane();
+   OSG::NodePtr getFrame();
 
 private:
    OSG::FBOViewportPtr     mFboVP;
    OSG::NodePtr            mFboCamBeacon;
    OSG::RefPtr<OSG::TransformPtr>       mFboCamTrans;
+   OSG::RefPtr<OSG::TransformPtr>       mFrameTrans;
    OSG::TextureChunkPtr    mFboTexture;
+   OSG::PerspectiveCameraPtr            mFboCam;
    // fbo size
    const int               mFboWidth;
    const int               mFboHeight;
-
 };
 
 }
