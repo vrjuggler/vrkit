@@ -98,7 +98,7 @@ StatusPanelPlugin::StatusPanelPlugin(const inf::plugin::Info& info)
 
 StatusPanelPlugin::~StatusPanelPlugin()
 {
-   /* Do nothing. */;
+   mOutputConn.disconnect();
 }
 
 inf::PluginPtr StatusPanelPlugin::create(const inf::plugin::Info& info)
@@ -178,7 +178,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
 
    // Register with status
    StatusOutputter status_outputter(shared_from_this());
-   inf::Status::instance()->addOutputter(status_outputter);
+   mOutputConn = inf::Status::instance()->addOutputter(status_outputter);
 
    // Connect StatusPanel methods to StatusPanelData signals
    StatusPanelDataPtr status_panel_data =

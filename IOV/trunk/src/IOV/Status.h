@@ -7,25 +7,29 @@
 
 #include <string>
 #include <iostream>
-#include <vector>
 #include <sstream>
 #include <boost/shared_ptr.hpp>
-#include <boost/function.hpp>
+#include <boost/signal.hpp>
+#include <boost/signals/connection.hpp>
+
 #include <vpr/Util/Singleton.h>
 
 
 namespace inf
 {
 
-/** Status output class.
+/**
+ * Status output class.
  */
 class IOV_CLASS_API Status
 {
 vprSingletonHeader(Status);
 
+   typedef boost::signal<void (const std::string&)> signal_type;
+
 public:
-   /**< Typedef for status output functor type. */
-   typedef boost::function<void (const std::string&)> status_func_t;
+   /** Typedef for status output slot type. */
+   typedef signal_type::slot_type status_func_t;
 
 protected:
    Status();
@@ -35,7 +39,7 @@ public:
    void writeStatusMsg(const std::string& msg);
 
    /** Registery a listener that will be called with status updates. */
-   void addOutputter(status_func_t newFunc);
+   boost::signals::connection addOutputter(status_func_t newFunc);
 
 public:
    /** Allows writing to status as a stream.
@@ -83,7 +87,8 @@ public:
    }
 
 private:
-   std::vector<status_func_t>  mOutputFuncs;    /**< List of listeners to pass messages. */
+   /** Signal emitted when a statuc message is received. */
+   signal_type mOutputSignal;
 };
 
 }  // namespace inf

@@ -8,6 +8,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+#include <boost/signals/connection.hpp>
 
 #include <OpenSG/OSGTransform.h>
 
@@ -60,6 +61,8 @@ protected:
    StatusPanel                mStatusPanel;        /**< The status panel we are using. */
    StatusPanelViewOriginal    mStatusPanelView;    /**< The status panel view that we are using. */
    OSG::TransformNodePtr      mPanelXformNode;     /**< Root node of panel. */
+
+   boost::signals::connection mOutputConn;
 
    virtual void destroy();
 };

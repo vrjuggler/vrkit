@@ -6,7 +6,7 @@
 namespace
 {
 
-void write_to_cout(const std::string &msg)
+void write_to_cout(const std::string& msg)
 {
    std::cout << msg << std::flush;
 }
@@ -21,25 +21,17 @@ vprSingletonImp(Status);
 
 Status::Status()
 {
-   addOutputter(write_to_cout);
+   addOutputter(&write_to_cout);
 }
 
 void Status::writeStatusMsg(const std::string& msg)
 {
-   for(unsigned i=0; i<mOutputFuncs.size(); ++i)
-   {
-      if(!mOutputFuncs[i].empty())
-      {
-         (mOutputFuncs[i])(msg);
-      }
-   }
+   mOutputSignal(msg);
 }
 
-void Status::addOutputter(status_func_t newFunc)
+boost::signals::connection Status::addOutputter(status_func_t newFunc)
 {
-   mOutputFuncs.push_back(newFunc);
+   return mOutputSignal.connect(newFunc);
 }
 
 } // namespace inf
-
-
