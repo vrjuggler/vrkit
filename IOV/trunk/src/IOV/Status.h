@@ -47,12 +47,7 @@ public:
     */
    struct StatusStreamer
    {
-      StatusStreamer(Status* status)
-         : mStream(new std::ostringstream)
-         , mStatus(status)
-      {
-         /* Do nothing. */ ;
-      }
+      StatusStreamer(Status* status);
 
       StatusStreamer(const StatusStreamer& rhs)
          : mStream(rhs.mStream)
@@ -61,15 +56,7 @@ public:
          /* Do nothing. */ ;
       }
 
-      ~StatusStreamer()
-      {
-         if(mStream)
-         {
-            mStatus->writeStatusMsg(mStream->str());
-         }
-
-         mStatus = NULL;
-      }
+      ~StatusStreamer();
 
       std::ostringstream* stream()
       {
