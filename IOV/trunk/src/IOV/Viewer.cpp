@@ -364,12 +364,12 @@ void Viewer::deallocate()
    );
 #endif
 
-   mUser.reset();
-   mEventData.reset();
-   mScene.reset();
    mObjects.clear();
    mPlugins.clear();
    mPluginRegistry.reset();
+   mUser.reset();
+   mEventData.reset();
+   mScene.reset();
 
    // Output information about what is left over
    typedef std::vector<OSG::FieldContainerPtr> FieldContainerStore;
