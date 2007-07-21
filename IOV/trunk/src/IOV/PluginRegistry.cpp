@@ -45,7 +45,9 @@ PluginRegistry::PluginRegistry()
 
 PluginRegistry::~PluginRegistry()
 {
-   /* Do nothing. */ ;
+   mNamedInstances.clear();
+   mInstantiated.clear();
+   mRegistry.clear();
 }
 
 PluginRegistryPtr PluginRegistry::init()
