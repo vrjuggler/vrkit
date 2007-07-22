@@ -73,7 +73,7 @@ opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.6.0",
 
 ffmpeg_options = SConsAddons.Options.FlagPollBasedOption.FlagPollBasedOption("AvFormat", "libavformat", "51.12.1", False, True)
 
-Export('boost_options','opensg_options', 'ffmpeg_options')
+Export('boost_options','opensg_options', 'ffmpeg_options', 'vrj_options')
 
 opts.AddOption(boost_options)
 opts.AddOption(vrj_options)

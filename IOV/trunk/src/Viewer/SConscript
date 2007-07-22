@@ -78,7 +78,12 @@ if boost_options.isAvailable():
    # This only needs to be done when building against VR Juggler 2.1.21 or
    # newer.
    if GetPlatform() == 'darwin':
-      release_target = viewerEnv.Alias('bundle', makeBundle(appname))
-      viewerEnv.Depends(release_target, appname)
+      if hasattr(vrj_options, 'flagpoll_parser') and \
+         vrj_options.flagpoll_parser is not None:
+         parser = vrj_options.flagpoll_parser
+         use_cocoa = parser.callFlagPoll('--get-all-use-cocoa')
+         if use_cocoa == 'yes':
+            release_target = viewerEnv.Alias('bundle', makeBundle(appname))
+            viewerEnv.Depends(release_target, appname)
 else:
    print "WARNING: Cannot build infi_app without Boost.program_options"
