@@ -33,11 +33,8 @@ RegistryEntry::getCreatorFunc(vpr::LibraryPtr module,
 inf::plugin::Info RegistryEntry::getModuleInfo(vpr::LibraryPtr module)
 {
    inf::plugin::Module pm(module);
-   boost::function<const plugin::Info* ()> f =
-      pm.getFunction<const plugin::Info* ()>(
-         inf::AbstractPlugin::getInfoFuncName()
-      );
-   return *f();
+   typedef const plugin::Info* sig_type();
+   return *pm.getFunction<sig_type>(inf::AbstractPlugin::getInfoFuncName())();
 }
 
 }
