@@ -30,8 +30,13 @@
 #include <math.h>
 //#include <ffmpeg/config.h>
 
+extern "C"
+{
+
 #include <ffmpeg/avformat.h>
 #include <ffmpeg/swscale.h>
+
+}
 
 namespace inf
 {
