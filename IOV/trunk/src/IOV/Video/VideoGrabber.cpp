@@ -53,7 +53,7 @@ VideoGrabberPtr VideoGrabber::init(OSG::ViewportPtr viewport)
    return shared_from_this();
 }
 
-void VideoGrabber::record(const std::string& filename)
+void VideoGrabber::record(const std::string& filename, const OSG::UInt32 fps)
 {
    OSG::UInt32 width = ( mViewport->getPixelWidth() / 2 ) * 2;
    OSG::UInt32 height = ( mViewport->getPixelHeight() / 2 ) * 2;
@@ -63,7 +63,7 @@ void VideoGrabber::record(const std::string& filename)
    {
       mEncoder->close();
    }
-   mEncoder = FfmpegEncoder::create()->init(filename, width, height);
+   mEncoder = FfmpegEncoder::create()->init(filename, width, height, fps);
 #endif
 
    mRecording = true;

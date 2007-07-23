@@ -62,9 +62,7 @@ class IOV_CLASS_API FfmpegEncoder : public boost::enable_shared_from_this<Ffmpeg
 {
 protected:
    FfmpegEncoder()
-      : mEnabled(true)
-      , mFilename()
-      , mFormatContext(NULL)
+      : mFormatContext(NULL)
       , mFormatOut(NULL)
       , mVideoStream(NULL)
       , mAudioStream(NULL)
@@ -75,7 +73,6 @@ protected:
       , mVideoOutBuffer(NULL)
       , mVideoOutBufferSize(0)
       , mFrameCount(0)
-      , mVideoPts(0.0)
       , mFlipBeforeEncode(true)
    {;}
 
@@ -89,56 +86,68 @@ public:
     *
     * @param filename Movie file to save data to.
     */
-   FfmpegEncoderPtr init(const std::string& filename, const vpr::Uint32 width, const vpr::Uint32 height);
+   FfmpegEncoderPtr init(const std::string& filename, const vpr::Uint32 width,
+                         const vpr::Uint32 height, const vpr::Uint32 fps);
 
+   /**
+    * Close the video stream.
+    */
    void close();
 
-private:
-   bool                 mEnabled;
-   std::string          mFilename;
+   /**
+    * Set source RGB data to be used in next frame.
+    */
+   void setRgb(unsigned char* rgb);
 
-public:
+   /**
+    * Encode a frame using the current RGB data.
+    */
+   void writeFrame();
+
    int width() const
    { return mVideoStream->codec->width; }
 
    int height() const
    { return mVideoStream->codec->height; }
 
-   unsigned char* rgb() const
-   { return mRgbFrame->data[0]; }
-
-   AVCodecContext*   context() const
-   { return mVideoStream->codec; }
-
-   unsigned int      codecid() const
-   { return mVideoStream->codec->codec_id; }
-
-   //unsigned int      fps()     const
-   //{ return mVideoStream->codec->frame_rate; }
-
-   bool              flip() const
-   { return mFlipBeforeEncode; }
-
-   unsigned int      bitrate() const
-   { return mVideoStream->codec->bit_rate; }
-   
-   void setRgb(unsigned char* rgb);
-   void setBitrate(int bitrate);
-   void writeFrame();
-
 private:
+   /**
+    * Allocate a new movie frame.
+    */
+   AVFrame* allocFrame(int pixFormat, int width, int height);
 
-   AVFrame* allocFrame(int pix_fmt, int width, int height);
+   /**
+    * Add a video stream to the format context.
+    */
+   void addVideoStream(const vpr::Uint32 width, const vpr::Uint32 height,
+                       const vpr::Uint32 fps);
 
-   void addVideoStream(int width, int height);
+   /**
+    * Add an audio stream to the format context.
+    */
    void addAudioStream();
+
+   /**
+    * Open the video stream.
+    */
    void openVideo();
+
+   /**
+    * Open the audio stream.
+    */
    void openAudio();
+
+   /**
+    * Close the video stream.
+    */
    void closeVideo();
+
+   /**
+    * Close the audio stream.
+    */
    void closeAudio();
 
 private:
-
    AVFormatContext*  mFormatContext;
    AVOutputFormat*   mFormatOut;
    AVStream*         mVideoStream;
@@ -150,13 +159,12 @@ private:
    unsigned int       mAudioOutBufferSize;
    int                audio_input_frame_size;
    int16_t*           mAudioSamples;
-   float              mT;
-   float              mTincr;
-   float              mTincr2;
+   //float              mT;
+   //float              mTincr;
+   //float              mTincr2;
    unsigned char*    mVideoOutBuffer;
    unsigned int      mVideoOutBufferSize;
    unsigned int      mFrameCount;
-   double            mVideoPts;
 
    bool              mFlipBeforeEncode;
 };

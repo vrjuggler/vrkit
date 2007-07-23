@@ -34,16 +34,55 @@ FfmpegEncoderPtr FfmpegEncoder::create()
 
 FfmpegEncoder::~FfmpegEncoder()
 {
+   close();
 }
 
-FfmpegEncoderPtr FfmpegEncoder::init(const std::string& filename, const vpr::Uint32 width, const vpr::Uint32 height)
+void FfmpegEncoder::close()
 {
-   mFilename = filename;
+   // Close each codec.
+   if (NULL != mVideoStream)
+   {
+      closeVideo();
+   }
+   // XXX:Don't add audio for now,
+   /*
+   if (NULL != mAudioStream)
+   {
+      closeAudio();
+   }
+   */
 
+   if (NULL != mFormatContext)
+   {
+      // Write the trailer, if any
+      av_write_trailer(mFormatContext);
+
+      // free the streams
+      for(int i = 0; i < mFormatContext->nb_streams; i++)
+      {
+         av_freep(&mFormatContext->streams[i]->codec);
+         av_freep(&mFormatContext->streams[i]);
+      }
+
+      if (!(mFormatOut->flags & AVFMT_NOFILE))
+      {
+         // close the output file
+         url_fclose(&mFormatContext->pb);
+      }
+
+      // free the stream
+      av_free(mFormatContext);
+      mFormatContext = NULL;
+   }
+}
+
+FfmpegEncoderPtr FfmpegEncoder::init(const std::string& filename,
+   const vpr::Uint32 width, const vpr::Uint32 height, const vpr::Uint32 fps)
+{
    //vpr::Uint32 width = ( mVideoViewport->getPixelWidth() / 2 ) * 2;
    //vpr::Uint32 height = ( mVideoViewport->getPixelHeight() / 2 ) * 2;
 
-   std::cout << "Creating a encoder. file: " << mFilename
+   std::cout << "Creating a encoder. file: " << filename 
       << " w: " << width << " h: " << height << std::endl;
    try
    {
@@ -80,8 +119,8 @@ FfmpegEncoderPtr FfmpegEncoder::init(const std::string& filename, const vpr::Uin
       // Auto-detect the output format from the name.
       if (NULL == mFormatOut)
       {
-         std::cout << "Trying to guess codec from filename: " << mFilename << std::endl;
-         mFormatOut = guess_format(NULL, mFilename.c_str(), NULL);
+         std::cout << "Trying to guess codec from filename: " << filename << std::endl;
+         mFormatOut = guess_format(NULL, filename.c_str(), NULL);
       }
 
       // If we can't guess the format from the filename, fallback on mpeg.
@@ -105,13 +144,13 @@ FfmpegEncoderPtr FfmpegEncoder::init(const std::string& filename, const vpr::Uin
          throw VideoFfmpegEncoderException("Memory error.");
       }
       mFormatContext->oformat = mFormatOut;
-      snprintf(mFormatContext->filename, sizeof(mFormatContext->filename), "%s", mFilename.c_str());
+      snprintf(mFormatContext->filename, sizeof(mFormatContext->filename), "%s", filename.c_str());
 
       // Add the audio and video streams using the default format codecs
       // and initialize the codecs.
       if (mFormatOut->video_codec != CODEC_ID_NONE)
       {
-         addVideoStream(width, height);
+         addVideoStream(width, height, fps);
       }
 
       // XXX:Don't add audio for now,
@@ -129,7 +168,7 @@ FfmpegEncoderPtr FfmpegEncoder::init(const std::string& filename, const vpr::Uin
          throw VideoFfmpegEncoderException("Invalid output format parameters.");
       }
 
-      dump_format(mFormatContext, 0, mFilename.c_str(), 1);
+      dump_format(mFormatContext, 0, filename.c_str(), 1);
 
       // Now that all the parameters are set, we can open the audio and
       // video codecs and allocate the necessary encode buffers.
@@ -149,15 +188,15 @@ FfmpegEncoderPtr FfmpegEncoder::init(const std::string& filename, const vpr::Uin
       // Open the output file, if needed.
       if (!(mFormatOut->flags & AVFMT_NOFILE))
       {
-         if (url_fopen(&mFormatContext->pb, mFilename.c_str(), URL_WRONLY) < 0)
+         if (url_fopen(&mFormatContext->pb, filename.c_str(), URL_WRONLY) < 0)
          {
-            std::string err = "Could not open" + mFilename;
+            std::string err = "Could not open" + filename;
             throw VideoFfmpegEncoderException(err);
          }
       }
 
-      // XXX: Should this be somewhere else?
-      setBitrate(bitrate);
+      // Set the correct bitrate.
+      mVideoStream->codec->bit_rate = bitrate * 1000;
 
       // Write the stream header, if any.
       av_write_header(mFormatContext);
@@ -273,41 +312,6 @@ static void show_formats(void)
     printf("\n");
 }
 
-void FfmpegEncoder::close()
-{
-   // close each codec
-   if (NULL != mVideoStream)
-   {
-      closeVideo();
-   }
-   // XXX:Don't add audio for now,
-   /*
-   if (NULL != mAudioStream)
-   {
-      closeAudio();
-   }
-   */
-
-   // Write the trailer, if any
-   av_write_trailer(mFormatContext);
-
-   // free the streams
-   for(int i = 0; i < mFormatContext->nb_streams; i++)
-   {
-      av_freep(&mFormatContext->streams[i]->codec);
-      av_freep(&mFormatContext->streams[i]);
-   }
-
-   if (!(mFormatOut->flags & AVFMT_NOFILE))
-   {
-      // close the output file
-      url_fclose(&mFormatContext->pb);
-   }
-
-   // free the stream
-   av_free(mFormatContext);
-}
-
 // Add an audio output stream
 void FfmpegEncoder::addAudioStream()
 {
@@ -328,7 +332,7 @@ void FfmpegEncoder::addAudioStream()
 }
 
 // Add a video output stream
-void FfmpegEncoder::addVideoStream(int width, int height)
+void FfmpegEncoder::addVideoStream(const vpr::Uint32 width, const vpr::Uint32 height, const vpr::Uint32 fps)
 {
    mVideoStream = av_new_stream(mFormatContext, 0);
    if (NULL == mVideoStream)
@@ -336,7 +340,7 @@ void FfmpegEncoder::addVideoStream(int width, int height)
       throw VideoFfmpegEncoderException("Could not allocate video stream.");
    }
 
-   // Should we be discarding this?
+   // XXX: Should we be discarding this?
    mVideoStream->discard = AVDISCARD_NONKEY;
 
    AVCodecContext* vcc = mVideoStream->codec;
@@ -355,7 +359,7 @@ void FfmpegEncoder::addVideoStream(int width, int height)
    // timebase should be 1/framerate and timestamp increments should be
    // identically 1.
    //vcc->time_base.den = STREAM_FRAME_RATE;
-   vcc->time_base.den = 60;
+   vcc->time_base.den = fps;
    vcc->time_base.num = 1;
    //vcc->discard = AVDISCARD_NONKEY;
    vcc->gop_size = 12; /* emit one intra frame every twelve frames at most */
@@ -434,10 +438,16 @@ void FfmpegEncoder::closeVideo()
 
    av_free(mYuvFrame->data[0]);
    av_free(mYuvFrame);
+   mYuvFrame = NULL;
+
    av_free(mRgbFrame->data[0]);
    av_free(mRgbFrame);
+   mRgbFrame = NULL;
 
    av_free(mVideoOutBuffer);
+   mVideoOutBuffer = NULL;
+
+   mVideoStream = NULL;
 }
 
 void FfmpegEncoder::openAudio()
@@ -458,10 +468,12 @@ void FfmpegEncoder::openAudio()
    }
 
    // Init signal generator.
+   /*
    mT = 0;
    mTincr = 2 * M_PI * 110.0 / acc->sample_rate;
    // Increment frequency by 110 Hz per second.
    mTincr2 = 2 * M_PI * 110.0 / acc->sample_rate / acc->sample_rate;
+   */
 
    mAudioOutBufferSize = 10000;
    mAudioOutBuffer = (unsigned char*)av_malloc(mAudioOutBufferSize);
@@ -495,6 +507,10 @@ void FfmpegEncoder::closeAudio()
    avcodec_close(mAudioStream->codec);
    av_free(mAudioSamples);
    av_free(mAudioOutBuffer);
+
+   mAudioSamples = NULL;
+   mAudioOutBuffer = NULL;
+   mAudioStream = NULL;
 }
 
 AVFrame* FfmpegEncoder::allocFrame(int pixFormat, int width, int height)
@@ -642,12 +658,6 @@ void FfmpegEncoder::writeFrame()
 void FfmpegEncoder::setRgb(unsigned char* rgb)
 {
    avpicture_fill((AVPicture*)mRgbFrame, rgb, PIX_FMT_RGB24, width(), height());
-}
-
-
-void FfmpegEncoder::setBitrate(int bitrate)
-{
-   mVideoStream->codec->bit_rate = bitrate * 1000;
 }
 
 }

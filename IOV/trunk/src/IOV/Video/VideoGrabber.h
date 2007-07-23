@@ -55,7 +55,7 @@ public:
    /**
     * Start recording movie to the given file.
     */
-   void record(const std::string& filename);
+   void record(const std::string& filename, const OSG::UInt32 fps = 60.0);
 
    /**
     * Pause the recording.
@@ -73,10 +73,10 @@ public:
    void stop();
 
 private:
-   bool                 mRecording;
-   bool                 mUseFbo;
-   OSG::ImagePtr        mImage;
-   OSG::ViewportPtr     mViewport;
+   bool                 mRecording;     /**< Wether we are currently recording. */
+   bool                 mUseFbo;        /**< If we are using a FBO or the default pixel buffer. */
+   OSG::ImagePtr        mImage;         /**< Image to hold the pixel data while encoding. */
+   OSG::ViewportPtr     mViewport;      /**< Viewport that contains source frame buffer. */
 #ifdef IOV_WITH_FFMPEG
    FfmpegEncoderPtr     mEncoder;
 #endif
