@@ -31,37 +31,79 @@ VideoGrabberPtr VideoGrabber::create()
 VideoGrabber::~VideoGrabber()
 {
 #ifdef IOV_WITH_FFMPEG
-   mEncoder->close();
-   mEncoder = FfmpegEncoderPtr();
+   if (NULL != mEncoder.get())
+   {
+      mEncoder->close();
+      mEncoder = FfmpegEncoderPtr();
+   }
 #endif
    mImage = OSG::NullFC;
    mViewport = OSG::NullFC;
 }
 
-VideoGrabberPtr VideoGrabber::init(OSG::ViewportPtr viewport, const std::string& filename)
+VideoGrabberPtr VideoGrabber::init(OSG::ViewportPtr viewport)
 {
    mViewport = viewport;
-   mFilename = filename;
 
    if (mViewport->getType() == OSG::FBOViewport::getClassType())
    {
       mUseFbo = true;
    }
 
+   return shared_from_this();
+}
+
+void VideoGrabber::record(const std::string& filename)
+{
    OSG::UInt32 width = ( mViewport->getPixelWidth() / 2 ) * 2;
    OSG::UInt32 height = ( mViewport->getPixelHeight() / 2 ) * 2;
 
-
 #ifdef IOV_WITH_FFMPEG
-   mEncoder = FfmpegEncoder::create()->init(mFilename, width, height);
+   if (NULL != mEncoder.get())
+   {
+      mEncoder->close();
+   }
+   mEncoder = FfmpegEncoder::create()->init(filename, width, height);
 #endif
 
-   return shared_from_this();
+   mRecording = true;
+}
+
+void VideoGrabber::pause()
+{
+#ifdef IOV_WITH_FFMPEG
+   OSG_ASSERT(NULL != mEncoder.get() && "Can't pause if we aren't recording.");
+#endif
+   mRecording = false;
+}
+
+void VideoGrabber::resume()
+{
+#ifdef IOV_WITH_FFMPEG
+   OSG_ASSERT(NULL != mEncoder.get() && "Can't resume if we aren't recording.");
+   if (NULL != mEncoder.get())
+   {
+      mRecording = true;
+   }
+#endif
+}
+
+void VideoGrabber::stop()
+{
+#ifdef IOV_WITH_FFMPEG
+   OSG_ASSERT(NULL != mEncoder.get() && "Can't stop if we aren't recording.");
+   if (NULL != mEncoder.get())
+   {
+      mEncoder->close();
+      mEncoder = FfmpegEncoderPtr();
+   }
+#endif
+   mRecording = false;
 }
 
 void VideoGrabber::draw()
 {
-   if (!mEnabled)
+   if (!mRecording)
    {
       return;
    }
@@ -99,6 +141,8 @@ void VideoGrabber::draw()
       glReadBuffer(GL_COLOR_ATTACHMENT0_EXT); // FBO version
       checkGLError("before glReadPixels 1");
    }
+
+   // Read the buffer into an OpenSG image.
    glReadPixels(mViewport->getPixelLeft(), mViewport->getPixelBottom(),
                 mEncoder->width(), mEncoder->height(), mImage->getPixelFormat(),
                 GL_UNSIGNED_BYTE, mImage->getData());

@@ -25,9 +25,8 @@ class IOV_CLASS_API VideoGrabber : public boost::enable_shared_from_this<VideoGr
 {
 protected:
    VideoGrabber()
-      : mEnabled(true)
+      : mRecording(false)
       , mUseFbo(false)
-      , mFilename()
       , mImage(OSG::NullFC)
       , mViewport(OSG::NullFC)
 #ifdef IOV_WITH_FFMPEG
@@ -46,14 +45,36 @@ public:
     * @param viewport Viewport to grab image from.
     * @param filename Movie file to save data to.
     */
-   VideoGrabberPtr init(OSG::ViewportPtr viewport, const std::string& filename);
+   VideoGrabberPtr init(OSG::ViewportPtr viewport);
 
+   /**
+    * Called be viewer each frame to render scene into FBO.
+    */
    void draw();
 
+   /**
+    * Start recording movie to the given file.
+    */
+   void record(const std::string& filename);
+
+   /**
+    * Pause the recording.
+    */
+   void pause();
+
+   /**
+    * Resume recording.
+    */
+   void resume();
+
+   /**
+    * Stop recording the scene.
+    */
+   void stop();
+
 private:
-   bool                 mEnabled;
+   bool                 mRecording;
    bool                 mUseFbo;
-   std::string          mFilename;
    OSG::ImagePtr        mImage;
    OSG::ViewportPtr     mViewport;
 #ifdef IOV_WITH_FFMPEG
