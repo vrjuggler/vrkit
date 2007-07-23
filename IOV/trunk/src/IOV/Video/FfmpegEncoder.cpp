@@ -10,10 +10,7 @@
 #include <iostream>
 #include <IOV/Video/FfmpegEncoder.h>
 
-// 5 seconds stream duration
-#define STREAM_DURATION   5.0
 #define STREAM_FRAME_RATE 25 // 25 images/s
-#define STREAM_NB_FRAMES  ((int)(STREAM_DURATION * STREAM_FRAME_RATE))
 #define STREAM_PIX_FMT PIX_FMT_YUV420P // default pix_fmt
 
 namespace inf
@@ -51,7 +48,6 @@ FfmpegEncoderPtr FfmpegEncoder::init(const std::string& filename, const vpr::Uin
    try
    {
       const vpr::Uint32 bitrate = 1400;
-      const vpr::Uint32 fps = 25;
       const CodecID codecid = CODEC_ID_NONE;
       //const CodecID codecid = CODEC_ID_MPEG2VIDEO;
       //const CodecID codecid = CODEC_ID_MPEG4;
@@ -340,6 +336,9 @@ void FfmpegEncoder::addVideoStream(int width, int height)
       throw VideoFfmpegEncoderException("Could not allocate video stream.");
    }
 
+   // Should we be discarding this?
+   mVideoStream->discard = AVDISCARD_NONKEY;
+
    AVCodecContext* vcc = mVideoStream->codec;
    vcc->codec_id = mFormatOut->video_codec;
    vcc->codec_type = CODEC_TYPE_VIDEO;
@@ -358,8 +357,10 @@ void FfmpegEncoder::addVideoStream(int width, int height)
    //vcc->time_base.den = STREAM_FRAME_RATE;
    vcc->time_base.den = 60;
    vcc->time_base.num = 1;
+   //vcc->discard = AVDISCARD_NONKEY;
    vcc->gop_size = 12; /* emit one intra frame every twelve frames at most */
    vcc->pix_fmt = STREAM_PIX_FMT;
+//   vcc->rate_emu
    if (vcc->codec_id == CODEC_ID_MPEG2VIDEO)
    {
       // just for testing, we also add B frames
