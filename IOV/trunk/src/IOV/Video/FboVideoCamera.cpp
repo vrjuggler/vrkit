@@ -4,11 +4,13 @@
 
 #include <OpenSG/OSGFrustumVolume.h>
 #include <OpenSG/OSGGeometry.h>
+#include <OpenSG/OSGGeoPropPtrs.h>
 #include <OpenSG/OSGImage.h>
+#include <OpenSG/OSGMergeGraphOp.h>
+#include <OpenSG/OSGGraphOpSeq.h>
 #include <OpenSG/OSGSimpleGeometry.h>
 #include <OpenSG/OSGSimpleMaterial.h>
 #include <OpenSG/OSGSolidBackground.h>
-#include <OpenSG/OSGGeoPropPtrs.h>
 
 namespace inf
 {
@@ -27,20 +29,29 @@ void FboVideoCamera::contextInit(OSG::WindowPtr gwin)
    mFboVP->setParent(gwin);
 }
 
-FboVideoCameraPtr FboVideoCamera::init()
+FboVideoCameraPtr FboVideoCamera::init(const OSG::UInt32 width, const OSG::UInt32 height, const OSG::Real32 fov,
+                                       const OSG::Real32 borderSize, const OSG::Real32 frameDist)
 {
-   // Create FBO camera xform.
-   mFboCamTrans = OSG::Transform::create();
-   mFboCamBeacon = OSG::Node::create();
-   OSG::beginEditCP(mFboCamBeacon);
-      mFboCamBeacon->setCore(mFboCamTrans);
-   OSG::endEditCP(mFboCamBeacon);
+   mBorderSize = borderSize;
+   mFrameDist = frameDist;
 
-   mFrameTrans = OSG::Transform::create();
+   // Create a transform to contain the location and orientation of the camera.
+   mTransform = OSG::Transform::create();
+
+   OSG::NodePtr beacon = OSG::Node::create();
+   OSG::beginEditCP(beacon);
+      beacon->setCore(mTransform);
+   OSG::endEditCP(beacon);
+
+   // Create the frame root.
+   mFrameRoot = OSG::Node::create();
+   OSG::beginEditCP(mFrameRoot);
+      mFrameRoot->setCore(mTransform);
+   OSG::endEditCP(mFrameRoot);
 
    // Where should we attach the FBO camera beacon.
    //OSG::beginEditCP(fboRoot);
-      //fboRoot->addChild(mFboCamBeacon);
+      //fboRoot->addChild(beacon);
    //OSG::endEditCP(fboRoot);
 
    // Create the FBO texture.
@@ -49,24 +60,29 @@ FboVideoCameraPtr FboVideoCamera::init()
       mFboTexture->setEnvMode(GL_MODULATE);
    OSG::endEditCP(mFboTexture);
 
-   setupFBO();
+   // setup camera
+   mFboCam = OSG::PerspectiveCamera::create();
+   OSG::beginEditCP(mFboCam);
+      // If fov is in degrees, convert to radians first.
+      if (fov > OSG::Pi)
+      {
+         mFboCam->setFov(OSG::osgdegree2rad(fov));
+      }
+      else
+      {
+         mFboCam->setFov(fov);
+      }
+      mFboCam->setNear(0.01);
+      mFboCam->setFar(10000);
+      mFboCam->setBeacon(beacon);
+   OSG::endEditCP(mFboCam);
 
-   return shared_from_this();
-}
-
-void FboVideoCamera::setupFBO()
-{
-   // setup FBO
-   OSG::ImagePtr img = OSG::Image::create();
-   OSG::beginEditCP(img);
-      img->set(OSG::Image::OSG_RGBA_PF, mFboWidth, mFboHeight);
-   OSG::endEditCP(img);
+   // Setup FBO
    OSG::beginEditCP(mFboTexture);
       mFboTexture->setMinFilter(GL_LINEAR);
       mFboTexture->setMagFilter(GL_LINEAR);
       mFboTexture->setTarget(GL_TEXTURE_2D);
       mFboTexture->setInternalFormat(GL_RGBA8);
-      mFboTexture->setImage(img);
    OSG::endEditCP(mFboTexture);
    
    OSG::SolidBackgroundPtr bg = OSG::SolidBackground::create();
@@ -74,59 +90,65 @@ void FboVideoCamera::setupFBO()
       bg->setColor(OSG::Color3f(0, 0, 0));
    OSG::endEditCP(bg);
 
-   // setup camera
-   mFboCam = OSG::PerspectiveCamera::create();
-   OSG::beginEditCP(mFboCam);
-      // we already compensated aspect ratio with the texture/fbo sizes
-      mFboCam->setAspect(1.0);
-      mFboCam->setFov(OSG::osgdegree2rad(60.0));
-      mFboCam->setNear(0.01);
-      mFboCam->setFar(10000);
-      mFboCam->setBeacon(mFboCamBeacon);
-   OSG::endEditCP(mFboCam);
-
-    // create FBOViewport
+   // create FBOViewport
    mFboVP = OSG::FBOViewport::create();
    OSG::beginEditCP(mFboVP);
-      mFboVP->setSize(0, 0, mFboWidth - 1, mFboHeight - 1);
-      mFboVP->setStorageWidth(mFboWidth);
-      mFboVP->setStorageHeight(mFboHeight);
       mFboVP->setBackground(bg);
       mFboVP->setCamera(mFboCam);
-      //mFboVP->setParent(gwin);
-      // attach texture as render target
       mFboVP->getTextures().push_back(mFboTexture);
    OSG::endEditCP(mFboVP);
+
+   // Set the correct size of FBO.
+   // This also generates the frame geometry around the captured scene.
+   setSize(width, height);
+
+   return shared_from_this();
 }
 
-void FboVideoCamera::setCameraPos(OSG::Matrix camPos)
+void FboVideoCamera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 {
-   //OSG::FrustumVolume vol;
-   //mFboCam->getFrustum(vol, *mFboVP);
-   //vol.dump();
+   // Resize the viewport.
+   OSG::beginEditCP(mFboVP);
+      mFboVP->setSize(0, 0, width - 1, height - 1);
+      mFboVP->setStorageWidth(width);
+      mFboVP->setStorageHeight(height);
+   OSG::endEditCP(mFboVP);
 
-   // set the fbo camera to show the whole model
-   OSG::beginEditCP(mFboCamTrans, OSG::Transform::MatrixFieldMask);
-   OSG::beginEditCP(mFrameTrans, OSG::Transform::MatrixFieldMask);
-      mFboCamTrans->setMatrix(camPos);
-      mFrameTrans->setMatrix(camPos);
-   OSG::endEditCP(mFboCamTrans, OSG::Transform::MatrixFieldMask);
-   OSG::endEditCP(mFrameTrans, OSG::Transform::MatrixFieldMask);
+   // Resize the debug texture.
+   OSG::ImagePtr img = OSG::Image::create();
+   OSG::beginEditCP(img);
+      img->set(OSG::Image::OSG_RGBA_PF, width, height);
+   OSG::endEditCP(img);
+   OSG::beginEditCP(mFboTexture);
+      mFboTexture->setImage(img);
+   OSG::endEditCP(mFboTexture);
+
+   //setAspect(width/ height);
+   // We already compensated aspect ratio with the texture/fbo sizes
+   mFboCam->setAspect(width/height);
+   generateFrame();
 }
 
-OSG::NodePtr FboVideoCamera::getDebugPlane()
+void FboVideoCamera::setCameraPos(const OSG::Matrix camPos)
 {
-   OSG::SimpleMaterialPtr fboMaterial = OSG::SimpleMaterial::create();
-   OSG::beginEditCP(fboMaterial);
-      fboMaterial->addChunk(mFboTexture);
-      fboMaterial->setSpecular(OSG::Color3f(0.7f, 0.7f, 0.7f));
-      fboMaterial->setDiffuse(OSG::Color3f(0.22f, 0.2f, 0.2f));
-   OSG::endEditCP(fboMaterial);
+   OSG::beginEditCP(mTransform, OSG::Transform::MatrixFieldMask);
+      mTransform->setMatrix(camPos);
+   OSG::endEditCP(mTransform, OSG::Transform::MatrixFieldMask);
+}
+
+OSG::NodePtr FboVideoCamera::getDebugPlane() const
+{
+   OSG::SimpleMaterialPtr fbo_mat = OSG::SimpleMaterial::create();
+   OSG::beginEditCP(fbo_mat);
+      fbo_mat->addChunk(mFboTexture);
+      fbo_mat->setSpecular(OSG::Color3f(0.7f, 0.7f, 0.7f));
+      fbo_mat->setDiffuse(OSG::Color3f(0.22f, 0.2f, 0.2f));
+   OSG::endEditCP(fbo_mat);
 
    // Create the test plane to put the texture on.
-   OSG::GeometryPtr plane_geom = OSG::makePlaneGeo(10, 10, 10, 10);
+   OSG::GeometryPtr plane_geom = OSG::makePlaneGeo(10, 10, 2, 2);
    OSG::beginEditCP(plane_geom);
-      plane_geom->setMaterial(fboMaterial);
+      plane_geom->setMaterial(fbo_mat);
    OSG::endEditCP(plane_geom);
 
    OSG::NodePtr plane_root = OSG::Node::create();
@@ -136,21 +158,28 @@ OSG::NodePtr FboVideoCamera::getDebugPlane()
    return plane_root;
 }
 
-OSG::NodePtr FboVideoCamera::getFrame()
+void FboVideoCamera::generateFrame()
 {
-   float far = 100.0;
-   float frame_size = OSG::osgatan(mFboCam->getFov()/2.0) * far * 2.25;
-   float width = 2.0;
+   // The size of the internal frame.
+   OSG::Real32 frame_height = 2.0 * (OSG::osgtan(mFboCam->getFov()/2.0) * mFrameDist);
+   OSG::Real32 frame_width = frame_height * mFboCam->getAspect();
 
-   OSG::GeometryNodePtr top = OSG::GeometryNodePtr::create();
-   OSG::GeometryNodePtr bottom = OSG::GeometryNodePtr::create();
-   OSG::GeometryNodePtr left = OSG::GeometryNodePtr::create();
-   OSG::GeometryNodePtr right = OSG::GeometryNodePtr::create();
+   // =============
+   // |           |
+   // |           |
+   // |           |
+   // |           |
+   // =============
 
-   top = OSG::makeBox(frame_size+width+width, width, width, 2, 2, 2);
-   bottom = OSG::makeBox(frame_size+width+width, width, width, 2, 2, 2);
-   left = OSG::makeBox(width, frame_size, width, 2, 2, 2);
-   right = OSG::makeBox(width, frame_size, width, 2, 2, 2);
+   // Top and bottom lines need to be long enough to go past left and
+   // right sides.
+   OSG::Real32 real_frame_width = frame_width + (2.0*mBorderSize);
+
+   // Create the geometry nodes.
+   OSG::GeometryNodePtr top(OSG::makeBox(real_frame_width, mBorderSize, mBorderSize, 2, 2, 2));
+   OSG::GeometryNodePtr bottom(OSG::makeBox(real_frame_width, mBorderSize, mBorderSize, 2, 2, 2));
+   OSG::GeometryNodePtr left(OSG::makeBox(mBorderSize, frame_height, mBorderSize, 2, 2, 2));
+   OSG::GeometryNodePtr right(OSG::makeBox(mBorderSize, frame_height, mBorderSize, 2, 2, 2));
 
    OSG::TransformNodePtr top_xform = OSG::TransformNodePtr::create();
    OSG::TransformNodePtr bottom_xform = OSG::TransformNodePtr::create();
@@ -160,8 +189,12 @@ OSG::NodePtr FboVideoCamera::getFrame()
    // Create material for the frame.
    OSG::SimpleMaterialPtr mat = OSG::SimpleMaterial::create();
    OSG::beginEditCP(mat);
-      mat->setLit(false);
-      mat->setDiffuse(OSG::Color3f(1.0f, 0.0f, 0.0f));
+      //mat->setLit(false);
+      //mat->setDiffuse(OSG::Color3f(1.0f, 0.0f, 0.0f));
+      //mat->setAmbient(OSG::Color3f(0.2f, 0.2f, 0.2f));
+      mat->setDiffuse(OSG::Color3f(0.8f, 0.0f, 0.0f));
+      //mat->setSpecular(OSG::Color3f(0.2f, 0.2f, 0.2f));
+      //mat->setShininess(2);
    OSG::endEditCP(mat);
 
    // Set the material for all parts of the frame.
@@ -178,12 +211,19 @@ OSG::NodePtr FboVideoCamera::getFrame()
    OSG::endEditCP(left);
    OSG::endEditCP(right);
 
+   // We need to pull the frame in half the border size to ensure that we don't
+   // see it.
+   OSG::Real32 zoffset = -mFrameDist + (mBorderSize/2.0);
+   OSG::Real32 xoffset = (frame_width/2.0) + (mBorderSize/2.0);
+   OSG::Real32 yoffset = (frame_height/2.0) + (mBorderSize/2.0);
+
    // Create the xforms for each box.
    OSG::Matrix topm, bottomm, leftm, rightm;
-   topm.setTranslate(0.0, (frame_size/2.0) + (width/2.0), -far);
-   bottomm.setTranslate(0.0, (-frame_size/2.0) - (width/2.0), -far);
-   leftm.setTranslate((-frame_size/2.0) - (width/2.0), 0.0, -far);
-   rightm.setTranslate((frame_size/2.0) + (width/2.0), 0.0, -far);
+   topm.setTranslate(0.0, yoffset, zoffset);
+   bottomm.setTranslate(0.0, -yoffset, zoffset);
+   leftm.setTranslate(-xoffset, 0.0, zoffset);
+   rightm.setTranslate(xoffset, 0.0, zoffset);
+
 
    OSG::beginEditCP(top_xform);
    OSG::beginEditCP(bottom_xform);
@@ -203,16 +243,29 @@ OSG::NodePtr FboVideoCamera::getFrame()
    OSG::endEditCP(left_xform);
    OSG::endEditCP(right_xform);
 
-   OSG::NodePtr frame_root = OSG::Node::create();
-   OSG::beginEditCP(frame_root);
-      frame_root->setCore(mFrameTrans);
-      frame_root->addChild(top_xform.node());
-      frame_root->addChild(bottom_xform.node());
-      frame_root->addChild(left_xform.node());
-      frame_root->addChild(right_xform.node());
-   OSG::endEditCP(frame_root);
+   // Create a node that will contain all geometry after the the merge op.
+   OSG::NodePtr frame = OSG::Node::create();
+   OSG::GroupPtr frame_group = OSG::Group::create();
+   OSG::beginEditCP(frame);
+      frame->setCore(frame_group);
+      frame->addChild(top_xform.node());
+      frame->addChild(bottom_xform.node());
+      frame->addChild(left_xform.node());
+      frame->addChild(right_xform.node());
+   OSG::endEditCP(frame);
 
-   return frame_root;
+   // Merge all geometry into one node.
+   OSG::MergeGraphOp merge;
+   merge.traverse(frame);
+
+   // Remove old geometry and add new.
+   OSG::beginEditCP(mFrameRoot);
+      while (mFrameRoot->getNChildren() > 0)
+      {
+         mFrameRoot->subChild(0);
+      }
+      mFrameRoot->addChild(frame);
+   OSG::endEditCP(mFrameRoot);
 }
 
 }

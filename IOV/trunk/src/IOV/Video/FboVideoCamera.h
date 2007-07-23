@@ -8,11 +8,9 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include <OpenSG/OSGFBOViewport.h>
-#include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGPerspectiveCamera.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGTextureChunk.h>
-#include <OpenSG/OSGViewport.h>
 #include <OpenSG/OSGWindow.h>
 
 #include <IOV/Video/FboVideoCameraPtr.h>
@@ -30,12 +28,11 @@ class IOV_CLASS_API FboVideoCamera : public boost::enable_shared_from_this<FboVi
 protected:
    FboVideoCamera()
       : mFboVP(OSG::NullFC)
-      , mFboCamBeacon(OSG::NullFC)
-      , mFboCamTrans(OSG::NullFC)
+      , mTransform(OSG::NullFC)
       , mFboTexture(OSG::NullFC)
       , mFboCam(OSG::NullFC)
-      , mFboWidth(512)
-      , mFboHeight(512)
+      , mBorderSize(2.0)
+      , mFrameDist(100.0)
    {;}
 
 public:
@@ -46,36 +43,82 @@ public:
    /**
     * Initialize the FBO camera.
     */
-   FboVideoCameraPtr init();
+   FboVideoCameraPtr init(const OSG::UInt32 width = 512, const OSG::UInt32 height = 512,
+                          const OSG::Real32 fov = 60.0, const OSG::Real32 borderSize = 2.0,
+                          const OSG::Real32 frameDist = 100.0);
+
+   /**
+    * Called from the Viewer's context init so that we can set the
+    * correct window.
+    */
    void contextInit(OSG::WindowPtr gwin);
 
-   void setupFBO();
-
-   OSG::FBOViewportPtr getFBO()
+   /**
+    * Returns the FBOViewport.
+    */
+   OSG::FBOViewportPtr getFboViewport() const
    {
       return mFboVP;
    }
 
-   OSG::TextureChunkPtr getTexture()
+   /**
+    * Set the position of the camera.
+    */
+   void setCameraPos(const OSG::Matrix camPos);
+
+   /**
+    * Set the field of view for the camera.
+    */
+   void setFov(const OSG::Real32 fov)
    {
-      return mFboTexture;
+      mFboCam->setFov(fov);
+      generateFrame();
    }
 
-   void setCameraPos(OSG::Matrix camPos);
+   /**
+    * Set the aspect ratio (w/h) for the camera.
+    */
+   /* XXX: Doesn't make sense unless the user want's to make a
+    *      video that has the incorrect aspect for the given
+    *      width and height.
+   void setAspect(const OSG::Real32 fov)
+   {
+      mFboCam->setAspect(fov);
+      generateFrame();
+   }
+   */
 
-   OSG::NodePtr getDebugPlane();
-   OSG::NodePtr getFrame();
+   /**
+    * Set the size of the FBO you want to use.
+    */
+   void setSize(const OSG::UInt32 width, const OSG::UInt32 height);
+
+   /**
+    * Get a debug node that contains a plane with the FBO texture
+    * applied to it.
+    */
+   OSG::NodePtr getDebugPlane() const;
+
+   /**
+    * Returns the root of the frame that surrounds what will be captured
+    * in the FBOViewport.
+    */
+   OSG::NodePtr getFrame() const
+   {
+      return mFrameRoot;
+   }
 
 private:
-   OSG::FBOViewportPtr     mFboVP;
-   OSG::NodePtr            mFboCamBeacon;
-   OSG::RefPtr<OSG::TransformPtr>       mFboCamTrans;
-   OSG::RefPtr<OSG::TransformPtr>       mFrameTrans;
-   OSG::TextureChunkPtr    mFboTexture;
-   OSG::PerspectiveCameraPtr            mFboCam;
-   // fbo size
-   const int               mFboWidth;
-   const int               mFboHeight;
+   void generateFrame();
+
+private:
+   OSG::FBOViewportPtr                  mFboVP;         /**< FBOViewport that we use to render to an FBO. */
+   OSG::RefPtr<OSG::TransformPtr>       mTransform;     /**< The location and orientation of the camera. */
+   OSG::RefPtr<OSG::NodePtr>            mFrameRoot;     /**< The frame that surrounds the captured scene. */
+   OSG::TextureChunkPtr                 mFboTexture;    /**< Texture that the FBO renders into. */
+   OSG::PerspectiveCameraPtr            mFboCam;        /**< Perspective camera for the FBO. */
+   OSG::Real32                          mBorderSize;    /**< The width of the frame geometry. */
+   OSG::Real32                          mFrameDist;     /**< The distance between the camera and the frame. */
 };
 
 }
