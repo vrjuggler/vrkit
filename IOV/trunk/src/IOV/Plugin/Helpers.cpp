@@ -58,8 +58,20 @@ findModules(const std::vector<std::string>& searchPath)
       try
       {
          vpr::LibraryFinder finder(*i, driver_ext);
-         vpr::LibraryFinder::LibraryList libs = finder.getLibraries();
-         modules.insert(modules.end(), libs.begin(), libs.end());
+         typedef vpr::LibraryFinder::LibraryList lib_list_t;
+         lib_list_t libs = finder.getLibraries();
+         for (lib_list_t::const_iterator itr = libs.begin(); itr != libs.end(); ++itr)
+         {
+            try
+            {
+               (*itr)->load();
+               modules.push_back(*itr);
+            }
+            catch(vpr::IOException& ex)
+            {
+               IOV_STATUS << ex.getDescription() << std::endl;
+            }
+         }
       }
       catch (std::exception& ex)
       {
