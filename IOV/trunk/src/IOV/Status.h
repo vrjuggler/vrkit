@@ -45,7 +45,7 @@ public:
    /** Allows writing to status as a stream.
     * Uses a guard idiom for status output.
     */
-   struct StatusStreamer
+   struct IOV_CLASS_API StatusStreamer
    {
       StatusStreamer(Status* status);
 
