@@ -27,7 +27,7 @@ const char* VideoFfmpegEncoderException::what(void) const throw()
 { return s.c_str(); }
 
 
-FfmpegEncoderPtr FfmpegEncoder::create()
+EncoderPtr FfmpegEncoder::create()
 {
    return FfmpegEncoderPtr(new FfmpegEncoder);
 }
@@ -152,7 +152,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       // and initialize the codecs.
       if (mFormatOut->video_codec != CODEC_ID_NONE)
       {
-         addVideoStream(width, height, fps);
+         addVideoStream(width, height, framesPerSecond);
       }
 
       // XXX:Don't add audio for now,
@@ -536,7 +536,7 @@ AVFrame* FfmpegEncoder::allocFrame(int pixFormat, int width, int height)
    return picture;
 }
 
-void FfmpegEncoder::writeFrame(int width, int height, vpr::Uint8* data);
+void FfmpegEncoder::writeFrame(int width, int height, vpr::Uint8* data)
 {
    double audio_pts, video_pts = 0.0;
 
@@ -565,7 +565,7 @@ void FfmpegEncoder::writeFrame(int width, int height, vpr::Uint8* data);
       return;
    }
 
-   avpicture_fill((AVPicture*)mRgbFrame, rgb, PIX_FMT_RGB24, width, height);
+   avpicture_fill((AVPicture*)mRgbFrame, data, PIX_FMT_RGB24, width, height);
 
    // convert rgb to yuv420
    img_convert( (AVPicture*)(mYuvFrame), mVideoStream->codec->pix_fmt,

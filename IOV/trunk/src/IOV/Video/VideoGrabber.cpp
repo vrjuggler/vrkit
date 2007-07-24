@@ -2,7 +2,6 @@
 
 #include <sstream>
 #include <OpenSG/OSGFBOViewport.h>
-#include <OpenSG/OSGGLExt.h>
 
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Video/VideoGrabber.h>
@@ -61,14 +60,14 @@ VideoGrabberPtr VideoGrabber::init(OSG::ViewportPtr viewport)
    }
 
 #ifdef IOV_WITH_FFMPEG
-   const std::string encoder_name = VfwEncoder::getName();
+   const std::string encoder_name = FfmpegEncoder::getName();
 
    // Register the creator.
-   mCreatorMap[encoder_name] = &VfwEncoder::create;
+   mCreatorMap[encoder_name] = &FfmpegEncoder::create;
 
    // Register each codec type.
-   VfwEncoder::codec_list_t cl = VfwEncoder::getCodecs();
-   for (VfwEncoder::codec_list_t::const_iterator itr = cl.begin(); 
+   FfmpegEncoder::codec_list_t cl = FfmpegEncoder::getCodecs();
+   for (FfmpegEncoder::codec_list_t::const_iterator itr = cl.begin(); 
         itr != cl.end(); ++itr)
    {
       mCodecMap[*itr].push_back(encoder_name);
