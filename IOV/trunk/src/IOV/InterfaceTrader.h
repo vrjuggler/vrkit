@@ -6,7 +6,6 @@
 #include <IOV/Config.h>
 #include <IOV/WandInterfacePtr.h>
 
-
 namespace inf
 {
 
@@ -29,7 +28,7 @@ public:
    WandInterfacePtr getWandInterface();
 
 protected:
-   WandInterfaceWeakPtr mWandInterface;
+   WandInterfacePtr mWandInterface;
 };
 
 } // namespace inf
