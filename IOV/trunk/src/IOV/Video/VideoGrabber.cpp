@@ -1,9 +1,21 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
+#include <sstream>
 #include <OpenSG/OSGFBOViewport.h>
+#include <OpenSG/OSGGLExt.h>
 
+#include <IOV/Util/Exceptions.h>
 #include <IOV/Video/VideoGrabber.h>
-#include <IOV/Video/FfmpegEncoder.h>
+
+#ifndef GL_COLOR_ATTACHMENT0_EXT
+#   define GL_COLOR_ATTACHMENT0_EXT 0x8CE0
+#endif
+
+#ifdef IOV_WITH_FFMPEG
+#   include <IOV/Video/FfmpegEncoder.h>
+#elif defined(IOV_WITH_VFW)
+#   include <IOV/Video/VfwEncoder.h>
+#endif
 
 namespace
 {
@@ -30,13 +42,11 @@ VideoGrabberPtr VideoGrabber::create()
 
 VideoGrabber::~VideoGrabber()
 {
-#ifdef IOV_WITH_FFMPEG
    if (NULL != mEncoder.get())
    {
       mEncoder->close();
-      mEncoder = FfmpegEncoderPtr();
+      mEncoder = EncoderPtr();
    }
-#endif
    mImage = OSG::NullFC;
    mViewport = OSG::NullFC;
 }
@@ -50,54 +60,91 @@ VideoGrabberPtr VideoGrabber::init(OSG::ViewportPtr viewport)
       mUseFbo = true;
    }
 
+#ifdef IOV_WITH_FFMPEG
+   const std::string encoder_name = VfwEncoder::getName();
+
+   // Register the creator.
+   mCreatorMap[encoder_name] = &VfwEncoder::create;
+
+   // Register each codec type.
+   VfwEncoder::codec_list_t cl = VfwEncoder::getCodecs();
+   for (VfwEncoder::codec_list_t::const_iterator itr = cl.begin(); 
+        itr != cl.end(); ++itr)
+   {
+      mCodecMap[*itr].push_back(encoder_name);
+   }
+#endif
+
+#ifdef IOV_WITH_VFW
+   const std::string encoder_name = VfwEncoder::getName();
+
+   // Register the creator.
+   mCreatorMap[encoder_name] = &VfwEncoder::create;
+
+   // Register each codec type.
+   VfwEncoder::codec_list_t cl = VfwEncoder::getCodecs();
+   for (VfwEncoder::codec_list_t::const_iterator itr = cl.begin(); 
+        itr != cl.end(); ++itr)
+   {
+      mCodecMap[*itr].push_back(encoder_name);
+   }
+#endif
+
    return shared_from_this();
 }
 
-void VideoGrabber::record(const std::string& filename, const OSG::UInt32 fps)
+void VideoGrabber::record(const std::string& filename, const std::string& codec,
+                          const OSG::UInt32 framesPerSecond)
 {
    OSG::UInt32 width = ( mViewport->getPixelWidth() / 2 ) * 2;
    OSG::UInt32 height = ( mViewport->getPixelHeight() / 2 ) * 2;
 
-#ifdef IOV_WITH_FFMPEG
+   codec_map_t::const_iterator found = mCodecMap.find(codec);
+   if (mCodecMap.end() == found)
+   {
+      std::stringstream ss;
+      ss << "Can't find encoder for codec: " << codec;
+      throw inf::Exception(ss.str(), IOV_LOCATION);
+   }
+
    if (NULL != mEncoder.get())
    {
       mEncoder->close();
    }
-   mEncoder = FfmpegEncoder::create()->init(filename, width, height, fps);
-#endif
+
+   // Get the first encoder.
+   std::string encoder_name = (*found).second[0];
+   vprASSERT(mCreatorMap.count(encoder_name) > 0 && "Must have the encoder.");
+   // Create new encoder.
+   encoder_create_t creator = mCreatorMap[encoder_name];
+   mEncoder = creator()->init(filename, codec, width, height, framesPerSecond);
 
    mRecording = true;
 }
 
 void VideoGrabber::pause()
 {
-#ifdef IOV_WITH_FFMPEG
    OSG_ASSERT(NULL != mEncoder.get() && "Can't pause if we aren't recording.");
-#endif
    mRecording = false;
 }
 
 void VideoGrabber::resume()
 {
-#ifdef IOV_WITH_FFMPEG
    OSG_ASSERT(NULL != mEncoder.get() && "Can't resume if we aren't recording.");
    if (NULL != mEncoder.get())
    {
       mRecording = true;
    }
-#endif
 }
 
 void VideoGrabber::stop()
 {
-#ifdef IOV_WITH_FFMPEG
    OSG_ASSERT(NULL != mEncoder.get() && "Can't stop if we aren't recording.");
    if (NULL != mEncoder.get())
    {
       mEncoder->close();
-      mEncoder = FfmpegEncoderPtr();
+      mEncoder = EncoderPtr();
    }
-#endif
    mRecording = false;
 }
 
@@ -112,7 +159,12 @@ void VideoGrabber::draw()
    {
       mImage = OSG::Image::create();
       OSG::beginEditCP(mImage);
+// Video for Windows wants bytes in BRG order. Ask the GL driver for them in that order.
+#if defined(IOV_WITH_VFW)
+         mImage->set(OSG::Image::OSG_BGR_PF, 1);
+#else
          mImage->set(OSG::Image::OSG_RGB_PF, 1);
+#endif
       OSG::endEditCP(mImage);
    }
 
@@ -124,9 +176,6 @@ void VideoGrabber::draw()
    {
       mImage->set(mImage->getPixelFormat(), w, h);
    }
-
-#ifdef IOV_WITH_FFMPEG
-   mEncoder->setRgb(mImage->getData());
 
    bool storeChanged = false;
    if(mEncoder->width() != mViewport->getPixelWidth() )
@@ -154,8 +203,7 @@ void VideoGrabber::draw()
       glPixelStorei(GL_PACK_ROW_LENGTH, 0);
    }
 
-   mEncoder->writeFrame();
-#endif
+   mEncoder->writeFrame(mEncoder->width(), mEncoder->height(), mImage->getData());
 }
 
 }

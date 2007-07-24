@@ -76,8 +76,9 @@ void FfmpegEncoder::close()
    }
 }
 
-FfmpegEncoderPtr FfmpegEncoder::init(const std::string& filename,
-   const vpr::Uint32 width, const vpr::Uint32 height, const vpr::Uint32 fps)
+EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& codec,
+                               const vpr::Uint32 width, const vpr::Uint32 height,
+                               const vpr::Uint32 framesPerSecond)
 {
    //vpr::Uint32 width = ( mVideoViewport->getPixelWidth() / 2 ) * 2;
    //vpr::Uint32 height = ( mVideoViewport->getPixelHeight() / 2 ) * 2;
@@ -87,6 +88,7 @@ FfmpegEncoderPtr FfmpegEncoder::init(const std::string& filename,
    try
    {
       const vpr::Uint32 bitrate = 1400;
+      // XXX: Convert the codec string into codec.
       const CodecID codecid = CODEC_ID_NONE;
       //const CodecID codecid = CODEC_ID_MPEG2VIDEO;
       //const CodecID codecid = CODEC_ID_MPEG4;
@@ -534,7 +536,7 @@ AVFrame* FfmpegEncoder::allocFrame(int pixFormat, int width, int height)
    return picture;
 }
 
-void FfmpegEncoder::writeFrame()
+void FfmpegEncoder::writeFrame(int width, int height, vpr::Uint8* data);
 {
    double audio_pts, video_pts = 0.0;
 
@@ -562,6 +564,8 @@ void FfmpegEncoder::writeFrame()
    {
       return;
    }
+
+   avpicture_fill((AVPicture*)mRgbFrame, rgb, PIX_FMT_RGB24, width, height);
 
    // convert rgb to yuv420
    img_convert( (AVPicture*)(mYuvFrame), mVideoStream->codec->pix_fmt,
@@ -653,11 +657,6 @@ void FfmpegEncoder::writeFrame()
 
    //std::cout << "frame: " << mFrameCount << std::endl;
    mFrameCount++;
-}
-
-void FfmpegEncoder::setRgb(unsigned char* rgb)
-{
-   avpicture_fill((AVPicture*)mRgbFrame, rgb, PIX_FMT_RGB24, width(), height());
 }
 
 }

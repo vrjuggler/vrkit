@@ -5,13 +5,15 @@
 
 #include <IOV/Config.h>
 
+#include <boost/function.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
 #include <OpenSG/OSGViewport.h>
 #include <OpenSG/OSGImage.h>
 
 #include <IOV/Video/VideoGrabberPtr.h>
-#include <IOV/Video/FfmpegEncoderPtr.h>
+
+#include <IOV/Video/EncoderPtr.h>
 
 namespace inf
 {
@@ -29,9 +31,7 @@ protected:
       , mUseFbo(false)
       , mImage(OSG::NullFC)
       , mViewport(OSG::NullFC)
-#ifdef IOV_WITH_FFMPEG
       , mEncoder()
-#endif
    {;}
 
 public:
@@ -55,7 +55,8 @@ public:
    /**
     * Start recording movie to the given file.
     */
-   void record(const std::string& filename, const OSG::UInt32 fps = 60.0);
+   void record(const std::string& filename, const std::string& codec,
+               const OSG::UInt32 framesPerSecond = 60);
 
    /**
     * Pause the recording.
@@ -73,13 +74,17 @@ public:
    void stop();
 
 private:
+   typedef std::vector<std::string> encoder_list_t;
+   typedef std::map<std::string, encoder_list_t> codec_map_t;
+   typedef boost::function<EncoderPtr ()> encoder_create_t;
+   typedef std::map<std::string, encoder_create_t> creator_map_t;
    bool                 mRecording;     /**< Wether we are currently recording. */
    bool                 mUseFbo;        /**< If we are using a FBO or the default pixel buffer. */
    OSG::ImagePtr        mImage;         /**< Image to hold the pixel data while encoding. */
    OSG::ViewportPtr     mViewport;      /**< Viewport that contains source frame buffer. */
-#ifdef IOV_WITH_FFMPEG
-   FfmpegEncoderPtr     mEncoder;
-#endif
+   EncoderPtr           mEncoder;
+   codec_map_t          mCodecMap;
+   creator_map_t        mCreatorMap;
 };
 
 }

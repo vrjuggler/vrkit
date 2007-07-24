@@ -38,6 +38,8 @@ extern "C"
 
 }
 
+#include <IOV/Video/Encoder.h>
+
 namespace inf
 {
 
@@ -58,7 +60,7 @@ private:
    std::string s;
 };
 
-class IOV_CLASS_API FfmpegEncoder : public boost::enable_shared_from_this<FfmpegEncoder>
+class IOV_CLASS_API FfmpegEncoder : public Encoder
 {
 protected:
    FfmpegEncoder()
@@ -77,7 +79,7 @@ protected:
    {;}
 
 public:
-   static FfmpegEncoderPtr create();
+   static EncoderPtr create();
 
    virtual ~FfmpegEncoder();
 
@@ -86,29 +88,36 @@ public:
     *
     * @param filename Movie file to save data to.
     */
-   FfmpegEncoderPtr init(const std::string& filename, const vpr::Uint32 width,
-                         const vpr::Uint32 height, const vpr::Uint32 fps);
-
+   EncoderPtr init(const std::string& filename, const std::string& codec,
+                   const vpr::Uint32 width, const vpr::Uint32 height,
+                   const vpr::Uint32 framesPerSecond);
    /**
     * Close the video stream.
     */
-   void close();
-
-   /**
-    * Set source RGB data to be used in next frame.
-    */
-   void setRgb(unsigned char* rgb);
+   virtual void close();
 
    /**
     * Encode a frame using the current RGB data.
     */
-   void writeFrame();
+   void writeFrame(int width, int height, vpr::Uint8* data);
 
-   int width() const
+   virtual vpr::Uint32 width() const
    { return mVideoStream->codec->width; }
 
-   int height() const
+   virtual vpr::Uint32 height() const
    { return mVideoStream->codec->height; }
+
+   static codec_list_t getCodecs()
+   {
+      codec_list_t codecs;
+      codecs.push_back("mpg4");
+      return codecs;
+   }
+
+   static std::string getName()
+   {
+      return "FFmpegEncoder";
+   }
 
 private:
    /**
