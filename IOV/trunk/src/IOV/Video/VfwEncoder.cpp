@@ -7,6 +7,8 @@
 #define __countof(x)	((sizeof(x)/sizeof(x[0])))
 #endif
 
+#pragma comment(lib, "Vfw32.lib")
+
 namespace inf
 {
 

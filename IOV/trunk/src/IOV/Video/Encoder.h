@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <vpr/vprTypes.h>
 #include <vpr/Util/Assert.h>
@@ -13,7 +14,9 @@
 namespace inf
 {
 
-class IOV_CLASS_API Encoder : public boost::enable_shared_from_this<Encoder>
+class IOV_CLASS_API Encoder
+   : public boost::enable_shared_from_this<Encoder>
+   , private boost::noncopyable
 {
 public:
    typedef std::vector<std::string> codec_list_t;
