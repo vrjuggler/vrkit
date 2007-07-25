@@ -78,13 +78,14 @@ private:
    typedef std::map<std::string, encoder_list_t> codec_map_t;
    typedef boost::function<EncoderPtr ()> encoder_create_t;
    typedef std::map<std::string, encoder_create_t> creator_map_t;
+
    bool                 mRecording;     /**< Wether we are currently recording. */
    bool                 mUseFbo;        /**< If we are using a FBO or the default pixel buffer. */
    OSG::ImagePtr        mImage;         /**< Image to hold the pixel data while encoding. */
    OSG::ViewportPtr     mViewport;      /**< Viewport that contains source frame buffer. */
-   EncoderPtr           mEncoder;
-   codec_map_t          mCodecMap;
-   creator_map_t        mCreatorMap;
+   EncoderPtr           mEncoder;       /**< Encoder that can write encode and write movie. */
+   codec_map_t          mCodecMap;      /**< Map of codec_name to a list of encoders. */
+   creator_map_t        mCreatorMap;    /**< Map of encoder names to encoder creators. */
 };
 
 }
