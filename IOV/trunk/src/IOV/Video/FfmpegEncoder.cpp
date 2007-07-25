@@ -9,6 +9,7 @@
 #include <cmath>
 #include <iostream>
 #include <IOV/Video/FfmpegEncoder.h>
+#include <IOV/Util/Exceptions.h>
 
 #define STREAM_FRAME_RATE 25 // 25 images/s
 #define STREAM_PIX_FMT PIX_FMT_YUV420P // default pix_fmt
@@ -31,6 +32,26 @@ EncoderPtr FfmpegEncoder::create()
 {
    return FfmpegEncoderPtr(new FfmpegEncoder);
 }
+
+FfmpegEncoder::codec_list_t FfmpegEncoder::getCodecs()
+{
+   avcodec_register_all();
+   av_register_all();
+
+   // Get a lost of all codecs.
+   codec_list_t codecs;
+   for (AVCodec* p = ::first_avcodec; p != NULL; p = p->next)
+   {
+      // We only care about video encoders.
+      if (CODEC_TYPE_VIDEO == p->type && NULL != p->encode)
+      {
+         codecs.push_back(std::string(p->name));
+      }
+   }
+
+   return codecs;
+}
+
 
 FfmpegEncoder::~FfmpegEncoder()
 {
@@ -76,13 +97,10 @@ void FfmpegEncoder::close()
    }
 }
 
-EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& codec,
+EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& codecName,
                                const vpr::Uint32 width, const vpr::Uint32 height,
                                const vpr::Uint32 framesPerSecond)
 {
-   //vpr::Uint32 width = ( mVideoViewport->getPixelWidth() / 2 ) * 2;
-   //vpr::Uint32 height = ( mVideoViewport->getPixelHeight() / 2 ) * 2;
-
    std::cout << "Creating a encoder. file: " << filename 
       << " w: " << width << " h: " << height << std::endl;
    try
@@ -90,8 +108,6 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       const vpr::Uint32 bitrate = 1400;
       // XXX: Convert the codec string into codec.
       const CodecID codecid = CODEC_ID_NONE;
-      //const CodecID codecid = CODEC_ID_MPEG2VIDEO;
-      //const CodecID codecid = CODEC_ID_MPEG4;
       const bool flip = true;
 
       // init avcodec && avformat
@@ -101,29 +117,8 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       // XXX: Debug code to output all valid formats & codecs.
       //show_formats();
 
-      // Try to find the correct output format using codedid, filename, or default.
-
-      // Search output formats for given codecid.
-      if ( codecid != CODEC_ID_NONE && !mFormatOut )
-      {
-         std::cout << "Searching for codec. id: " << codecid << std::endl;
-         extern AVOutputFormat* first_oformat;
-         for(AVOutputFormat* f = ::first_oformat; !f; f= f->next )
-         {
-            if ( f->video_codec == codecid )
-            {
-               mFormatOut= f;
-               break;
-            }
-         }
-      }
-
-      // Auto-detect the output format from the name.
-      if (NULL == mFormatOut)
-      {
-         std::cout << "Trying to guess codec from filename: " << filename << std::endl;
-         mFormatOut = guess_format(NULL, filename.c_str(), NULL);
-      }
+      std::cout << "Trying to guess codec from filename: " << filename << std::endl;
+      mFormatOut = guess_format(NULL, filename.c_str(), NULL);
 
       // If we can't guess the format from the filename, fallback on mpeg.
       if (NULL == mFormatOut)
@@ -131,7 +126,6 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
          std::cout << "Could not deduce output format from file extension: using MPEG." << std::endl;
          mFormatOut = guess_format("mpeg", NULL, NULL);
       }
-
       if (NULL == mFormatOut)
       {
          throw VideoFfmpegEncoderException("Couldnt find suitable output format.");
@@ -150,10 +144,18 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
 
       // Add the audio and video streams using the default format codecs
       // and initialize the codecs.
-      if (mFormatOut->video_codec != CODEC_ID_NONE)
+      if (mFormatOut->video_codec == CODEC_ID_NONE)
       {
-         addVideoStream(width, height, framesPerSecond);
+         throw inf::Exception("File format does not support video codec.", IOV_LOCATION);
       }
+
+      AVCodec* codec = avcodec_find_encoder_by_name(codecName.c_str());
+      if (NULL == codec)
+      {
+         throw VideoFfmpegEncoderException("Couldn't find video encoder.");
+      }
+
+      addVideoStream(width, height, framesPerSecond, codec);
 
       // XXX:Don't add audio for now,
       /*
@@ -176,7 +178,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       // video codecs and allocate the necessary encode buffers.
       if (NULL != mVideoStream)
       {
-         openVideo();
+         openVideo(codec);
       }
 
       // XXX:Don't add audio for now,
@@ -268,15 +270,19 @@ static void show_formats(void)
         const char *type_str;
 
         p2=NULL;
-        for(p = first_avcodec; p != NULL; p = p->next) {
-            if((p2==NULL || strcmp(p->name, p2->name)<0) &&
-                strcmp(p->name, last_name)>0){
+        for(p = first_avcodec; p != NULL; p = p->next)
+        {
+            if((p2==NULL || strcmp(p->name, p2->name)<0) && strcmp(p->name, last_name)>0)
+            {
                 p2= p;
                 decode= encode= cap=0;
             }
-            if(p2 && strcmp(p->name, p2->name)==0){
-                if(p->decode) decode=1;
-                if(p->encode) encode=1;
+            if(p2 && strcmp(p->name, p2->name)==0)
+            {
+                if(p->decode)
+                   decode=1;
+                if(p->encode)
+                   encode=1;
                 cap |= p->capabilities;
             }
         }
@@ -334,8 +340,10 @@ void FfmpegEncoder::addAudioStream()
 }
 
 // Add a video output stream
-void FfmpegEncoder::addVideoStream(const vpr::Uint32 width, const vpr::Uint32 height, const vpr::Uint32 fps)
+void FfmpegEncoder::addVideoStream(const vpr::Uint32 width, const vpr::Uint32 height,
+                                   const vpr::Uint32 fps, AVCodec* codec)
 {
+   // Create a new video stream to write data to.
    mVideoStream = av_new_stream(mFormatContext, 0);
    if (NULL == mVideoStream)
    {
@@ -346,7 +354,7 @@ void FfmpegEncoder::addVideoStream(const vpr::Uint32 width, const vpr::Uint32 he
    mVideoStream->discard = AVDISCARD_NONKEY;
 
    AVCodecContext* vcc = mVideoStream->codec;
-   vcc->codec_id = mFormatOut->video_codec;
+   vcc->codec_id = codec->id;
    vcc->codec_type = CODEC_TYPE_VIDEO;
 
    // put sample parameters
@@ -389,16 +397,9 @@ void FfmpegEncoder::addVideoStream(const vpr::Uint32 width, const vpr::Uint32 he
    }
 }
 
-void FfmpegEncoder::openVideo()
+void FfmpegEncoder::openVideo(AVCodec* codec)
 {
    AVCodecContext* vcc = mVideoStream->codec;
-
-   // Find the video encoder
-   AVCodec* codec = avcodec_find_encoder(vcc->codec_id);
-   if (NULL == codec)
-   {
-      throw VideoFfmpegEncoderException("Couldn't find video encoder.");
-   }
 
    // open the codec
    if (avcodec_open(vcc, codec) < 0)

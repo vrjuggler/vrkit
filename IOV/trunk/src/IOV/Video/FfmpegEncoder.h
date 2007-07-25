@@ -107,12 +107,7 @@ public:
    virtual vpr::Uint32 height() const
    { return mVideoStream->codec->height; }
 
-   static codec_list_t getCodecs()
-   {
-      codec_list_t codecs;
-      codecs.push_back("mpg4");
-      return codecs;
-   }
+   static codec_list_t getCodecs();
 
    static std::string getName()
    {
@@ -129,7 +124,7 @@ private:
     * Add a video stream to the format context.
     */
    void addVideoStream(const vpr::Uint32 width, const vpr::Uint32 height,
-                       const vpr::Uint32 fps);
+                       const vpr::Uint32 fps, AVCodec* codec);
 
    /**
     * Add an audio stream to the format context.
@@ -139,7 +134,7 @@ private:
    /**
     * Open the video stream.
     */
-   void openVideo();
+   void openVideo(AVCodec* codec);
 
    /**
     * Open the audio stream.
