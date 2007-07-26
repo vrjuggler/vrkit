@@ -40,6 +40,7 @@ class SignalContainer
 {
 public:
    typedef boost::shared_ptr<SignalContainer> ptr_type;
+   typedef SignalType                         signal_type;
 
 protected:
    SignalContainer()
@@ -61,19 +62,19 @@ public:
 
    //@{
    /** @name Smart Pointer Interface */
-   SignalType* operator->()
+   signal_type* operator->()
    {
       return &mSignal;
    }
 
-   SignalType& operator*()
+   signal_type& operator*()
    {
       return mSignal;
    }
    //@}
 
 private:
-   SignalType mSignal;
+   signal_type mSignal;
 };
 
 }
