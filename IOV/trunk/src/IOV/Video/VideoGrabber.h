@@ -50,13 +50,15 @@ public:
    /**
     * Called be viewer each frame to render scene into FBO.
     */
-   void draw();
+   void grabFrame(const bool leftEye = true);
+
+   void writeFrame();
 
    /**
     * Start recording movie to the given file.
     */
    void record(const std::string& filename, const std::string& codec,
-               const OSG::UInt32 framesPerSecond = 60);
+               const OSG::UInt32 framesPerSecond = 60, const bool stereo = false);
 
    /**
     * Pause the recording.
@@ -73,6 +75,14 @@ public:
     */
    void stop();
 
+   /**
+    * Returns if we are recording.
+    */
+   bool isRecording()
+   {
+      return mRecording;
+   }
+
 private:
    typedef std::vector<std::string> encoder_list_t;
    typedef std::map<std::string, encoder_list_t> codec_map_t;
@@ -80,6 +90,7 @@ private:
    typedef std::map<std::string, encoder_create_t> creator_map_t;
 
    bool                 mRecording;     /**< Wether we are currently recording. */
+   bool                 mStereo;
    bool                 mUseFbo;        /**< If we are using a FBO or the default pixel buffer. */
    OSG::ImagePtr        mImage;         /**< Image to hold the pixel data while encoding. */
    OSG::ViewportPtr     mViewport;      /**< Viewport that contains source frame buffer. */

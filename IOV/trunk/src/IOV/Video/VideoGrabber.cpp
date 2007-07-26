@@ -96,10 +96,19 @@ VideoGrabberPtr VideoGrabber::init(OSG::ViewportPtr viewport)
 }
 
 void VideoGrabber::record(const std::string& filename, const std::string& codec,
-                          const OSG::UInt32 framesPerSecond)
+                          const OSG::UInt32 framesPerSecond, const bool stereo)
 {
-   OSG::UInt32 width = ( mViewport->getPixelWidth() / 2 ) * 2;
-   OSG::UInt32 height = ( mViewport->getPixelHeight() / 2 ) * 2;
+   OSG::UInt32 source_width = ( mViewport->getPixelWidth() / 2 ) * 2;
+   OSG::UInt32 source_height = ( mViewport->getPixelHeight() / 2 ) * 2;
+
+   OSG::UInt32 image_width = source_width;
+   OSG::UInt32 image_height = source_height;
+
+   mStereo = stereo;
+   if (mStereo)
+   {
+      image_width *= 2;
+   }
 
    codec_map_t::const_iterator found = mCodecMap.find(codec);
    if (mCodecMap.end() == found)
@@ -119,7 +128,21 @@ void VideoGrabber::record(const std::string& filename, const std::string& codec,
    vprASSERT(mCreatorMap.count(encoder_name) > 0 && "Must have the encoder.");
    // Create new encoder.
    encoder_create_t creator = mCreatorMap[encoder_name];
-   mEncoder = creator()->init(filename, codec, width, height, framesPerSecond);
+   mEncoder = creator()->init(filename, codec, image_width, image_height, framesPerSecond);
+
+   // Create the image to store the pixel data in.
+   mImage = OSG::Image::create();
+   OSG::beginEditCP(mImage);
+// Video for Windows wants bytes in BRG order. Ask the GL driver for them in that order.
+#if defined(IOV_WITH_VFW)
+      mImage->set(OSG::Image::OSG_BGR_PF, 1);
+#else
+      mImage->set(OSG::Image::OSG_RGB_PF, 1);
+#endif
+   OSG::endEditCP(mImage);
+
+   // Fill in the image.
+   mImage->set(mImage->getPixelFormat(), image_width, image_height);
 
    mRecording = true;
 }
@@ -150,59 +173,71 @@ void VideoGrabber::stop()
    mRecording = false;
 }
 
-void VideoGrabber::draw()
+void VideoGrabber::grabFrame(const bool leftEye)
 {
    if (!mRecording)
    {
       return;
    }
 
-   if (OSG::NullFC == mImage)
+   OSG::UInt32 source_width = ( mViewport->getPixelWidth() / 2 ) * 2;
+   OSG::UInt32 source_height = ( mViewport->getPixelHeight() / 2 ) * 2;
+
+   OSG::UInt32 image_width = source_width;
+   OSG::UInt32 image_height = source_height;
+
+   if (mStereo)
    {
-      mImage = OSG::Image::create();
-      OSG::beginEditCP(mImage);
-// Video for Windows wants bytes in BRG order. Ask the GL driver for them in that order.
-#if defined(IOV_WITH_VFW)
-         mImage->set(OSG::Image::OSG_BGR_PF, 1);
-#else
-         mImage->set(OSG::Image::OSG_RGB_PF, 1);
-#endif
-      OSG::endEditCP(mImage);
+      image_width *= 2;
    }
 
-   OSG::UInt32 w = ( mViewport->getPixelWidth() / 2 ) * 2;
-   OSG::UInt32 h = ( mViewport->getPixelHeight() / 2 ) * 2;
+   // Tell the OpenGL driver the rouw length of the target image. This
+   // will result in the driver getting the array indices with the
+   // following formula. index = SP + (IR * RL) + IC.
+   // Where:
+   //   IR = Input pixel row.
+   //   IC = Input pixel column.
+   //   SP = GL_PACK_SKIP_PIXELS
+   //   RL = GL_PACK_ROW_LENGTH
+   glPixelStorei(GL_PACK_ROW_LENGTH, mEncoder->width());
 
-
-   if(mImage->getWidth() <= 1 && mImage->getHeight() <= 1)
+   // If we are grabbing the image for the right eye, then we want to
+   // skip the first n destination pixels. Also because we set the row
+   // length above it will skip this number of pixels for each row.
+   //
+   // (NOTE: This has the same effect as mImage->getData + source_width)
+   if (!leftEye)
    {
-      mImage->set(mImage->getPixelFormat(), w, h);
+      glPixelStorei(GL_PACK_SKIP_PIXELS, source_width);
    }
 
-   bool storeChanged = false;
-   if(mEncoder->width() != mViewport->getPixelWidth() )
-   {
-      glPixelStorei(GL_PACK_ROW_LENGTH, mEncoder->width());
-      storeChanged = true;
-   }
-
+   // If we are using an FBO, then we should change to the FBO buffer.
    if (mUseFbo)
    {
-      checkGLError("before glReadBuffer 1");
-      glReadBuffer(GL_COLOR_ATTACHMENT0_EXT); // FBO version
-      checkGLError("before glReadPixels 1");
+      glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
+      checkGLError("before glReadPixels");
    }
 
    // Read the buffer into an OpenSG image.
    glReadPixels(mViewport->getPixelLeft(), mViewport->getPixelBottom(),
-                mEncoder->width(), mEncoder->height(), mImage->getPixelFormat(),
+                source_width, source_height, mImage->getPixelFormat(),
                 GL_UNSIGNED_BYTE, mImage->getData());
+
+   // XXX: We don't really need to change the read buffer target since we
+   //      are not reading from the pixel buffer anywhere else.
    // Double buffered.
    //glReadBuffer(GL_BACK);
 
-   if(storeChanged)
+   // Restore the pixel storage settings to the default.
+   glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+   glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+}
+
+void VideoGrabber::writeFrame()
+{
+   if (!mRecording)
    {
-      glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+      return;
    }
 
    mEncoder->writeFrame(mEncoder->width(), mEncoder->height(), mImage->getData());

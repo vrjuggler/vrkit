@@ -14,6 +14,7 @@
 #include <OpenSG/OSGWindow.h>
 
 #include <IOV/Video/FboVideoCameraPtr.h>
+#include <IOV/Video/VideoGrabberPtr.h>
 
 namespace inf
 {
@@ -26,15 +27,7 @@ namespace inf
 class IOV_CLASS_API FboVideoCamera : public boost::enable_shared_from_this<FboVideoCamera>
 {
 protected:
-   FboVideoCamera()
-      : mFboVP(OSG::NullFC)
-      , mTransform(OSG::NullFC)
-      , mLeftTexture(OSG::NullFC)
-      , mRightTexture(OSG::NullFC)
-      , mFboCam(OSG::NullFC)
-      , mBorderSize(2.0)
-      , mFrameDist(100.0)
-   {;}
+   FboVideoCamera();
 
 public:
    static FboVideoCameraPtr create();
@@ -62,11 +55,15 @@ public:
       return mFboVP;
    }
 
-   /**
-    * Set the position of the camera.
-    */
-   void setCameraPos(const OSG::Matrix camPos, const OSG::Real32 interocular = 0.0f,
-                     const OSG::UInt32 currentEye = 0);
+
+   void record(const std::string& filename, const std::string& codec,
+               const OSG::UInt32 framesPerSecond, const bool stereo);
+
+   void pause();
+   void resume();
+   void stop();
+
+   void render(OSG::RenderAction* ra, const OSG::Matrix camPos, const OSG::Real32 interocular);
 
    /**
     * Set the field of view for the camera.
@@ -113,8 +110,14 @@ public:
 private:
    void generateFrame();
 
+   /**
+    * Set the position of the camera.
+    */
+   void setCameraPos(const OSG::Matrix camPos);
+
 private:
    OSG::FBOViewportPtr                  mFboVP;         /**< FBOViewport that we use to render to an FBO. */
+   VideoGrabberPtr                      mVideoGrabber;
    OSG::RefPtr<OSG::TransformPtr>       mTransform;     /**< The location and orientation of the camera. */
    OSG::RefPtr<OSG::NodePtr>            mFrameRoot;     /**< The frame that surrounds the captured scene. */
    OSG::TextureChunkPtr                 mLeftTexture;   /**< Texture that the FBO renders into. */
@@ -122,6 +125,7 @@ private:
    OSG::PerspectiveCameraPtr            mFboCam;        /**< Perspective camera for the FBO. */
    OSG::Real32                          mBorderSize;    /**< The width of the frame geometry. */
    OSG::Real32                          mFrameDist;     /**< The distance between the camera and the frame. */
+   bool                                 mStereo;        /**< If this camera should render/record in stereo. */
 };
 
 }

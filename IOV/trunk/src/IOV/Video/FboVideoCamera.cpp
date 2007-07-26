@@ -1,7 +1,5 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
-#include <IOV/Video/FboVideoCamera.h>
-
 #include <OpenSG/OSGFrustumVolume.h>
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGGeoPropPtrs.h>
@@ -14,8 +12,23 @@
 
 #include <vrj/Display/Projection.h>
 
+#include <IOV/Video/VideoGrabber.h>
+#include <IOV/Video/FboVideoCamera.h>
+
 namespace inf
 {
+
+FboVideoCamera::FboVideoCamera()
+   : mFboVP(OSG::NullFC)
+   , mVideoGrabber()
+   , mTransform(OSG::NullFC)
+   , mLeftTexture(OSG::NullFC)
+   , mRightTexture(OSG::NullFC)
+   , mFboCam(OSG::NullFC)
+   , mBorderSize(2.0)
+   , mFrameDist(100.0)
+   , mStereo(false)
+{;}
 
 FboVideoCameraPtr FboVideoCamera::create()
 {
@@ -116,6 +129,8 @@ FboVideoCameraPtr FboVideoCamera::init(const OSG::UInt32 width, const OSG::UInt3
    // This also generates the frame geometry around the captured scene.
    setSize(width, height);
 
+   mVideoGrabber = VideoGrabber::create()->init(mFboVP);
+
    return shared_from_this();
 }
 
@@ -150,46 +165,113 @@ void FboVideoCamera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
    generateFrame();
 }
 
-void FboVideoCamera::setCameraPos(const OSG::Matrix camPos, const OSG::Real32 interocular,
-                                  const OSG::UInt32 currentEye)
+void FboVideoCamera::setCameraPos(const OSG::Matrix camPos)
 {
-   OSG::Matrix4f camera_pos = camPos;
+   OSG::beginEditCP(mTransform, OSG::Transform::MatrixFieldMask);
+      mTransform->setMatrix(camPos);
+   OSG::endEditCP(mTransform, OSG::Transform::MatrixFieldMask);
+}
 
-   const bool render_stereo = true;
+void FboVideoCamera::record(const std::string& filename, const std::string& codec,
+                            const OSG::UInt32 framesPerSecond, const bool stereo)
+{
+   mStereo = stereo;
+   mVideoGrabber->record(filename, codec, framesPerSecond, stereo);
+}
+
+void FboVideoCamera::pause()
+{
+   mVideoGrabber->pause();
+}
+
+void FboVideoCamera::resume()
+{
+   mVideoGrabber->resume();
+}
+
+void FboVideoCamera::stop()
+{
+   mVideoGrabber->stop();
+}
+
+void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos, const OSG::Real32 interocular)
+{
+   /* XXX: Disable rendering if we are not recording. For right now
+    *      render anyway so that we can see the debug panels.
+   if (!mVideoGrabber->isRecording())
+   {
+      return;
+   }
+   */
+
    // If we are rendering stereo, then offset the camera position.
-   if (render_stereo)
+   if (mStereo)
    {
       // Distance to move eye
       float eye_offset = interocular/2.0f;
       // XXX: Exagerate to debug code.
       eye_offset *= 10;
+
       OSG::Matrix offset;
-      if ( currentEye == vrj::Projection::LEFT )
-      {
-         OSG::beginEditCP(mFboVP);
-            mFboVP->getTextures()[0] = mLeftTexture;
-         OSG::endEditCP(mFboVP);
+      OSG::Matrix camera_pos;
 
-         //std::cout << "RENDER LEFT" << std::endl;
-         offset.setTranslate(-eye_offset, 0.0f, 0.0f);
-      }
-      else
-      {
-         OSG::beginEditCP(mFboVP);
-            mFboVP->getTextures()[0] = mRightTexture;
-         OSG::endEditCP(mFboVP);
-
-         //std::cout << "RENDER RIGHT" << std::endl;
-         offset.setTranslate(eye_offset, 0.0f, 0.0f);
-      }
-
+      // Render left eye.
+      OSG::beginEditCP(mFboVP);
+        mFboVP->getTextures()[0] = mLeftTexture;
+      OSG::endEditCP(mFboVP);
+      
+      camera_pos = camPos;
+      offset.setTranslate(-eye_offset, 0.0f, 0.0f);
       camera_pos.multLeft(offset);
-      //std::cout << camera_pos << std::endl;
+      setCameraPos(camera_pos);
+
+      // Do the actual rendering.
+      //glClear(GL_DEPTH_BUFFER_BIT);
+      mFboVP->render(ra);
+
+      // XXX: Only capturing right eye right now.
+      mFboVP->bind(ra->getWindow());
+      mVideoGrabber->grabFrame(true);
+      mFboVP->stop(ra->getWindow());
+
+      // Render right eye.
+      OSG::beginEditCP(mFboVP);
+         mFboVP->getTextures()[0] = mRightTexture;
+      OSG::endEditCP(mFboVP);
+
+      // Set the correct camera position.
+      camera_pos = camPos;
+      offset.setTranslate(eye_offset, 0.0f, 0.0f);
+      camera_pos.multLeft(offset);
+      setCameraPos(camera_pos);
+
+      // Do the actual rendering.
+      //glClear(GL_DEPTH_BUFFER_BIT);
+      mFboVP->render(ra);
+
+      // XXX: Only capturing right eye right now.
+      mFboVP->bind(ra->getWindow());
+      mVideoGrabber->grabFrame(false);
+      mFboVP->stop(ra->getWindow());
+   }
+   else
+   {
+      OSG::beginEditCP(mFboVP);
+         mFboVP->getTextures()[0] = mLeftTexture;
+      OSG::endEditCP(mFboVP);
+
+      setCameraPos(camPos);
+
+      // Do the actual rendering.
+      //glClear(GL_DEPTH_BUFFER_BIT);
+      mFboVP->render(ra);
+
+      mFboVP->bind(ra->getWindow());
+      mVideoGrabber->grabFrame();
+      mFboVP->stop(ra->getWindow());
    }
 
-   OSG::beginEditCP(mTransform, OSG::Transform::MatrixFieldMask);
-      mTransform->setMatrix(camera_pos);
-   OSG::endEditCP(mTransform, OSG::Transform::MatrixFieldMask);
+   mVideoGrabber->writeFrame();
 }
 
 OSG::NodePtr FboVideoCamera::getDebugPlane() const
@@ -266,6 +348,7 @@ OSG::NodePtr FboVideoCamera::getDebugPlane() const
    return group_node;
 }
 
+// XXX: This has not been updated to behave correctly in stereo mode.
 void FboVideoCamera::generateFrame()
 {
    // The size of the internal frame.
