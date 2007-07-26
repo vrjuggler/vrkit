@@ -176,6 +176,10 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
       mPanelVisSwitchNode.node()->addChild(mStatusPanelView.getPanelRoot());
    OSG::endEditCP(mPanelVisSwitchNode);
 
+   OSG::beginEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
+      mPanelVisSwitchNode->setChoice(OSG::Switch::ALL);
+   OSG::endEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
+
    OSG::beginEditCP(mPanelXformNode);
       mPanelXformNode.node()->addChild(mPanelVisSwitchNode.node());
    OSG::endEditCP(mPanelXformNode);
