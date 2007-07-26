@@ -21,6 +21,81 @@ namespace inf
 {
 
 /**
+ * @example "Example of using inf::SignalRepository"
+ *
+ * The following shows how the IOV Signal Repository can be used for dynamic
+ * signal registration and retrieval.
+ *
+ * \code
+ * typedef boost::signal<void (int)> sig_type;
+ *
+ * void register(inf::SignalRepositoryPtr repos)
+ * {
+ *    inf::SignalContainerBasePtr c =
+ *       inf::SignalContainer<sig_type>::create();
+ *    repos->addSignal("My Signal", c);
+ * }
+ *
+ * void slot(int v)
+ * {
+ *    std::cout << "I received " << v << std::endl;
+ * }
+ *
+ * void connect(inf::SignalRepositoryPtr repos)
+ * {
+ *    repos->getSignal<sig_type>("My Signal")->connect(&slot);
+ * }
+ *
+ * void emit(inf::SignalRepositoryPtr repos, const int value)
+ * {
+ *    (*repos->getSignal<sig_type>("My Signal"))(value);
+ * }
+ *
+ * void run()
+ * {
+ *    inf::SignalRepositoryPtr repos = inf::SignalRepository::create();
+ *
+ *    register(repos);
+ *    connect(repos);
+ *
+ *    for ( int i = 0; i < 5; ++i )
+ *    {
+ *       emit(repos, i);
+ *    }
+ * }
+ * \endcode
+ *
+ * The emit() function could also be implemented in this way:
+ *
+ * \code
+ * void emit(inf::SignalRepositoryPtr repos, const int value)
+ * {
+ *    SignalContainer<sig_type> c = repos->getSignal("My Signal");
+ *    sig_type& signal = *c;
+ *    signal(value);
+ * }
+ * \endcode
+ *
+ * A more realistic usage would not have everything (registration, connection,
+ * and emission) happen in one function (as is done in run() above). A more
+ * likely sceanrio is that one plug-in would register a signal and another
+ * would connect a slot to that signal by retrieving it from the Signal
+ * Repository. Then, the first plug-in would emit signals, and the second
+ * would have its slot invoked.
+ *
+ * Alternatively, the first plug-in would register the signal and connect a
+ * slot of its own to it. Then, some other code (the application, a plug-in,
+ * etc.) would get the signal container to emit the signal. The plug-in that
+ * registered the signal would then have its slot invoked.
+ *
+ * In both of these scenarios, the inf::SignalRepository instance would be
+ * retrieved as IOV scene data. This is the standard IOV mechanism for
+ * plug-ins to get access to shared objects.
+ *
+ * @see inf::Scene
+ */
+
+/**
  * Centrailzed storage for signals. This is typically used for inter-plug-in
  * communication where one plug-in emits a signal and one or more other
  * plug-ins are interested in receiving the signal. Signals are identified and
