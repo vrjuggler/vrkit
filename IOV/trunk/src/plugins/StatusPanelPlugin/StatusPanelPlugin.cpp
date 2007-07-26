@@ -99,6 +99,7 @@ StatusPanelPlugin::StatusPanelPlugin(const inf::plugin::Info& info)
 
 StatusPanelPlugin::~StatusPanelPlugin()
 {
+   mVisConn.disconnect();
    mOutputConn.disconnect();
 }
 
@@ -197,7 +198,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    }
 
    // Connect new signal to slot after SwitchNode creation
-   sig_repos->getSignal<sig_type>(sig_name)->connect(
+   mVisConn = sig_repos->getSignal<sig_type>(sig_name)->connect(
       boost::bind(&inf::StatusPanelPlugin::setVisibility, this, _1)
       );
 

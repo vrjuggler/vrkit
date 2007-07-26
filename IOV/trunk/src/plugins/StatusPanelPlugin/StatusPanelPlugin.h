@@ -75,6 +75,7 @@ protected:
    OSG::SwitchNodePtr		mPanelVisSwitchNode; /**< Switch Node for hiding panel geometry. */
 
    boost::signals::connection mOutputConn;
+   boost::signals::connection mVisConn;		/**< Visibility connection object. */
 
    virtual void destroy();
 };
