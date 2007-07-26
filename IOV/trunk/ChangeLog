@@ -1,7 +1,20 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-07-26 dshipton Added dynamic visibility toggling to the Status Panel
+                    Plug-in.
+                    -- VERSION -- 0.38.0
+2007-07-26 aronb    Added support for stereo movie creation.
+                    -- VERSION -- 0.37.2
+2007-07-24 aronb    Added support for creating movies using Video for Windows.
+                    -- VERSION -- 0.37.1
+2007-07-20 aronb    Added video capture support.
+                    -- VERSION -- 0.37.0
 2007-07-17 patrick  Changed the Mode Harness Plug-in slot signature from
                     void (const std::string&) to void ().
+2007-07-16 patrick  Reimplemented plug-in handling to support dependency
+                    management and versioning. Replaced inf::PluginFactory
+                    with inf::PluginRegistry. Introduced inf::plugin::Info.
+                    -- VERSION -- 0.36.0
 2007-07-13 patrick  Separated the Intersect Strategy plug-ins from the Grab
                     and Move Strategy plug-ins in the IOV installation tree.
 2007-07-12 patrick  For debug builds, do not put "_d" in the plug-in name. The
