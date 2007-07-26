@@ -12,9 +12,30 @@
 
 #ifdef IOV_WITH_FFMPEG
 #   include <IOV/Video/FfmpegEncoder.h>
-#elif defined(IOV_WITH_VFW)
+#endif
+
+#if defined(IOV_WITH_VFW)
 #   include <IOV/Video/VfwEncoder.h>
 #endif
+
+#if defined(IOV_WITH_DIRECT_SHOW)
+#   include <IOV/Video/DirectShowEncoder.h>
+#endif
+
+#define REGISTER_ENCODER(ENCODER)                               \
+   std::string ENCODER ## name = ENCODER::getName();            \
+                                                                \
+   /* Register the creator. */                                  \
+   mCreatorMap[ENCODER ## name] = &ENCODER::create;             \
+                                                                \
+   /* Register each codec type. */                              \
+   ENCODER::codec_list_t ENCODER ## cl = ENCODER::getCodecs();  \
+   for (Encoder::codec_list_t::const_iterator itr =             \
+        ENCODER ## cl.begin();                                  \
+        itr != ENCODER ## cl.end(); ++itr)                      \
+   {                                                            \
+      mCodecMap[*itr].push_back(ENCODER ## name);               \
+   }
 
 namespace
 {
@@ -60,33 +81,15 @@ VideoGrabberPtr VideoGrabber::init(OSG::ViewportPtr viewport)
    }
 
 #ifdef IOV_WITH_FFMPEG
-   const std::string encoder_name = FfmpegEncoder::getName();
-
-   // Register the creator.
-   mCreatorMap[encoder_name] = &FfmpegEncoder::create;
-
-   // Register each codec type.
-   FfmpegEncoder::codec_list_t cl = FfmpegEncoder::getCodecs();
-   for (FfmpegEncoder::codec_list_t::const_iterator itr = cl.begin(); 
-        itr != cl.end(); ++itr)
-   {
-      mCodecMap[*itr].push_back(encoder_name);
-   }
+   REGISTER_ENCODER(FfmpegEncoder)
 #endif
 
 #ifdef IOV_WITH_VFW
-   const std::string encoder_name = VfwEncoder::getName();
+   REGISTER_ENCODER(VfwEncoder)
+#endif
 
-   // Register the creator.
-   mCreatorMap[encoder_name] = &VfwEncoder::create;
-
-   // Register each codec type.
-   VfwEncoder::codec_list_t cl = VfwEncoder::getCodecs();
-   for (VfwEncoder::codec_list_t::const_iterator itr = cl.begin(); 
-        itr != cl.end(); ++itr)
-   {
-      mCodecMap[*itr].push_back(encoder_name);
-   }
+#ifdef IOV_WITH_DIRECT_SHOW
+   REGISTER_ENCODER(DirectShowEncoder)
 #endif
 
    return shared_from_this();
