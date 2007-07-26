@@ -121,21 +121,6 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
 {
    IOV_STATUS << "StatusPanelPlugin::init: Initializing plugin." << std::endl;
 
-   // Register signal with SignalRepository
-   inf::SignalRepositoryPtr sig_repos =
-      viewer->getSceneObj()->getSceneData<SignalRepository>();
-
-   typedef boost::signal<void (bool)> sig_type;
-   std::string sig_name("Toggle Status Panel Visibility");
-
-   if( ! sig_repos->hasSignal(sig_name) )
-   {
-      sig_repos->addSignal(sig_name,
-			   SignalContainer<sig_type>::create());
-   }
-
-   //TODO: Connect Signal to slot
-
    // Initialize panel
    mStatusPanelView.initialize(viewer->getDrawScaleFactor(), &mStatusPanel);
 
@@ -184,13 +169,37 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    ScenePtr scene_obj = viewer->getSceneObj();
    OSG::GroupNodePtr dec_root = scene_obj->getDecoratorRoot();
 
+   mPanelVisSwitchNode = OSG::SwitchNodePtr::create();
+
+   OSG::beginEditCP(mPanelVisSwitchNode);
+      mPanelVisSwitchNode.node()->addChild(mStatusPanelView.getPanelRoot());
+   OSG::endEditCP(mPanelVisSwitchNode);
+
    OSG::beginEditCP(mPanelXformNode);
-      mPanelXformNode.node()->addChild(mStatusPanelView.getPanelRoot());
+      mPanelXformNode.node()->addChild(mPanelVisSwitchNode.node());
    OSG::endEditCP(mPanelXformNode);
 
    OSG::beginEditCP(dec_root);
       dec_root.node()->addChild(mPanelXformNode.node());
    OSG::endEditCP(dec_root);
+
+   // Register visibility signal with SignalRepository
+   inf::SignalRepositoryPtr sig_repos =
+      viewer->getSceneObj()->getSceneData<SignalRepository>();
+
+   typedef boost::signal<void (bool)> sig_type;
+   std::string sig_name("Toggle Status Panel Visibility");
+
+   if( ! sig_repos->hasSignal(sig_name) )
+   {
+      sig_repos->addSignal(sig_name,
+			   SignalContainer<sig_type>::create());
+   }
+
+   // Connect new signal to slot after SwitchNode creation
+   sig_repos->getSignal<sig_type>(sig_name)->connect(
+      boost::bind(&inf::StatusPanelPlugin::setVisibility, this, _1)
+      );
 
    // Register with status
    StatusOutputter status_outputter(shared_from_this());
@@ -269,6 +278,21 @@ void StatusPanelPlugin::update(inf::ViewerPtr)
 {
    mStatusPanelView.update();        // Do any updates that we need from this frame
 }
+
+void StatusPanelPlugin::setVisibility(bool visible)
+{
+   OSG::beginEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
+      if( visible )
+      {
+	 mPanelVisSwitchNode->setChoice(OSG::Switch::ALL);
+      }
+      else
+      {
+	 mPanelVisSwitchNode->setChoice(OSG::Switch::NONE);
+      }
+   OSG::endEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
+}
+
 
 void StatusPanelPlugin::destroy()
 {

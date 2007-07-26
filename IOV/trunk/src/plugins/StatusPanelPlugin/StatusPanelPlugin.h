@@ -11,6 +11,7 @@
 #include <boost/signals/connection.hpp>
 
 #include <OpenSG/OSGTransform.h>
+#include <OpenSG/OSGSwitch.h>
 
 #include <vpr/vpr.h>
 #include <vpr/Util/GUID.h>
@@ -47,6 +48,16 @@ public:
 
    /** Get status panel for direct usage. */
    StatusPanel& getPanel();
+   
+   /**
+    * Sets the visibility of the StatusPanel scenegraph.
+    *
+    * @post The StatusPanel scenegraph reflects the desired visibility
+    * 	    state.
+    *
+    * @param visible The new desired visibility state.
+    */
+   void setVisibility(bool visible);
 
    /**
     * Invokes the global scope delete operator.  This is required for proper
@@ -58,9 +69,10 @@ public:
    }
 
 protected:
-   StatusPanel                mStatusPanel;        /**< The status panel we are using. */
-   StatusPanelViewOriginal    mStatusPanelView;    /**< The status panel view that we are using. */
-   OSG::TransformNodePtr      mPanelXformNode;     /**< Root node of panel. */
+   StatusPanel			mStatusPanel;        /**< The status panel we are using. */
+   StatusPanelViewOriginal	mStatusPanelView;    /**< The status panel view that we are using. */
+   OSG::TransformNodePtr	mPanelXformNode;     /**< Root node of panel. */
+   OSG::SwitchNodePtr		mPanelVisSwitchNode; /**< Switch Node for hiding panel geometry. */
 
    boost::signals::connection mOutputConn;
 
