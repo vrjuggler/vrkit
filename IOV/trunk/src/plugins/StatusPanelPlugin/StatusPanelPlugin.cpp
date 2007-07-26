@@ -9,6 +9,7 @@
 
 #include <jccl/Config/ConfigElement.h>
 
+#include <IOV/SignalRepository.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/Status.h>
 #include <IOV/Scene.h>
@@ -119,6 +120,21 @@ StatusPanel& StatusPanelPlugin::getPanel()
 inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
 {
    IOV_STATUS << "StatusPanelPlugin::init: Initializing plugin." << std::endl;
+
+   // Register signal with SignalRepository
+   inf::SignalRepositoryPtr sig_repos =
+      viewer->getSceneObj()->getSceneData<SignalRepository>();
+
+   typedef boost::signal<void (bool)> sig_type;
+   std::string sig_name("Toggle Status Panel Visibility");
+
+   if( ! sig_repos->hasSignal(sig_name) )
+   {
+      sig_repos->addSignal(sig_name,
+			   SignalContainer<sig_type>::create());
+   }
+
+   //TODO: Connect Signal to slot
 
    // Initialize panel
    mStatusPanelView.initialize(viewer->getDrawScaleFactor(), &mStatusPanel);
