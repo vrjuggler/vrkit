@@ -131,7 +131,7 @@ if not sca_util.hasHelpFlag():
    base_bldr.readOptions(opt_env)
    base_bldr.enableWarnings()      
 
-   if opt_env["enable_distcc"] and WhereIs("distcc"):
+   if opt_env["enable_distcc"] and sca_util.WhereIs("distcc"):
       opt_env.Prepend(CXX = "distcc ", CC = "distcc ")
 
    # Create base build directory.
@@ -186,8 +186,8 @@ if not sca_util.hasHelpFlag():
    else:
       print "WARNING: Cannot build IOV without Boost.Signals"
 
-   if sca_util.WhereIs('distcc'):
-      opt_env.Prepend(CXX = "distcc ", CC = "distcc ")
+   if "win32" == platform:
+      opt_env.Append(CPPFLAGS = ["/wd4251","/wd4275",])
 
    # ----- FOR EACH VARIANT ----- #
    for combo in variant_helper.iterate(locals(), base_bldr, opt_env):
