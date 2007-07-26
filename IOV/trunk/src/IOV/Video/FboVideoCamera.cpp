@@ -12,6 +12,8 @@
 #include <OpenSG/OSGSimpleMaterial.h>
 #include <OpenSG/OSGSolidBackground.h>
 
+#include <vrj/Display/Projection.h>
+
 namespace inf
 {
 
@@ -54,11 +56,15 @@ FboVideoCameraPtr FboVideoCamera::init(const OSG::UInt32 width, const OSG::UInt3
       //fboRoot->addChild(beacon);
    //OSG::endEditCP(fboRoot);
 
-   // Create the FBO texture.
-   mFboTexture = OSG::TextureChunk::create();
-   OSG::beginEditCP(mFboTexture);
-      mFboTexture->setEnvMode(GL_MODULATE);
-   OSG::endEditCP(mFboTexture);
+   // Create the FBO textures.
+   mLeftTexture = OSG::TextureChunk::create();
+   OSG::beginEditCP(mLeftTexture);
+      mLeftTexture->setEnvMode(GL_MODULATE);
+   OSG::endEditCP(mLeftTexture);
+   mRightTexture = OSG::TextureChunk::create();
+   OSG::beginEditCP(mRightTexture);
+      mRightTexture->setEnvMode(GL_MODULATE);
+   OSG::endEditCP(mRightTexture);
 
    // setup camera
    mFboCam = OSG::PerspectiveCamera::create();
@@ -77,13 +83,21 @@ FboVideoCameraPtr FboVideoCamera::init(const OSG::UInt32 width, const OSG::UInt3
       mFboCam->setBeacon(beacon);
    OSG::endEditCP(mFboCam);
 
-   // Setup FBO
-   OSG::beginEditCP(mFboTexture);
-      mFboTexture->setMinFilter(GL_LINEAR);
-      mFboTexture->setMagFilter(GL_LINEAR);
-      mFboTexture->setTarget(GL_TEXTURE_2D);
-      mFboTexture->setInternalFormat(GL_RGBA8);
-   OSG::endEditCP(mFboTexture);
+   // Setup FBO textures.
+   OSG::beginEditCP(mLeftTexture);
+      mLeftTexture->setMinFilter(GL_LINEAR);
+      mLeftTexture->setMagFilter(GL_LINEAR);
+      mLeftTexture->setTarget(GL_TEXTURE_2D);
+      mLeftTexture->setInternalFormat(GL_RGBA8);
+   OSG::endEditCP(mLeftTexture);
+
+   OSG::beginEditCP(mRightTexture);
+      mRightTexture->setMinFilter(GL_LINEAR);
+      mRightTexture->setMagFilter(GL_LINEAR);
+      mRightTexture->setTarget(GL_TEXTURE_2D);
+      mRightTexture->setInternalFormat(GL_RGBA8);
+   OSG::endEditCP(mRightTexture);
+
    
    OSG::SolidBackgroundPtr bg = OSG::SolidBackground::create();
    OSG::beginEditCP(bg);
@@ -95,7 +109,7 @@ FboVideoCameraPtr FboVideoCamera::init(const OSG::UInt32 width, const OSG::UInt3
    OSG::beginEditCP(mFboVP);
       mFboVP->setBackground(bg);
       mFboVP->setCamera(mFboCam);
-      mFboVP->getTextures().push_back(mFboTexture);
+      mFboVP->getTextures().push_back(mLeftTexture);
    OSG::endEditCP(mFboVP);
 
    // Set the correct size of FBO.
@@ -115,47 +129,141 @@ void FboVideoCamera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
    OSG::endEditCP(mFboVP);
 
    // Resize the debug texture.
-   OSG::ImagePtr img = OSG::Image::create();
-   OSG::beginEditCP(img);
-      img->set(OSG::Image::OSG_RGBA_PF, width, height);
-   OSG::endEditCP(img);
-   OSG::beginEditCP(mFboTexture);
-      mFboTexture->setImage(img);
-   OSG::endEditCP(mFboTexture);
+   OSG::ImagePtr left_img = OSG::Image::create();
+   OSG::beginEditCP(left_img);
+      left_img->set(OSG::Image::OSG_RGBA_PF, width, height);
+   OSG::endEditCP(left_img);
+   OSG::beginEditCP(mLeftTexture);
+      mLeftTexture->setImage(left_img);
+   OSG::endEditCP(mLeftTexture);
 
-   //setAspect(width/ height);
+   OSG::ImagePtr right_img = OSG::Image::create();
+   OSG::beginEditCP(right_img);
+      right_img->set(OSG::Image::OSG_RGBA_PF, width, height);
+   OSG::endEditCP(right_img);
+   OSG::beginEditCP(mRightTexture);
+      mRightTexture->setImage(right_img);
+   OSG::endEditCP(mRightTexture);
+
    // We already compensated aspect ratio with the texture/fbo sizes
    mFboCam->setAspect(width/height);
    generateFrame();
 }
 
-void FboVideoCamera::setCameraPos(const OSG::Matrix camPos)
+void FboVideoCamera::setCameraPos(const OSG::Matrix camPos, const OSG::Real32 interocular,
+                                  const OSG::UInt32 currentEye)
 {
+   OSG::Matrix4f camera_pos = camPos;
+
+   const bool render_stereo = true;
+   // If we are rendering stereo, then offset the camera position.
+   if (render_stereo)
+   {
+      // Distance to move eye
+      float eye_offset = interocular/2.0f;
+      // XXX: Exagerate to debug code.
+      eye_offset *= 10;
+      OSG::Matrix offset;
+      if ( currentEye == vrj::Projection::LEFT )
+      {
+         OSG::beginEditCP(mFboVP);
+            mFboVP->getTextures()[0] = mLeftTexture;
+         OSG::endEditCP(mFboVP);
+
+         //std::cout << "RENDER LEFT" << std::endl;
+         offset.setTranslate(-eye_offset, 0.0f, 0.0f);
+      }
+      else
+      {
+         OSG::beginEditCP(mFboVP);
+            mFboVP->getTextures()[0] = mRightTexture;
+         OSG::endEditCP(mFboVP);
+
+         //std::cout << "RENDER RIGHT" << std::endl;
+         offset.setTranslate(eye_offset, 0.0f, 0.0f);
+      }
+
+      camera_pos.multLeft(offset);
+      //std::cout << camera_pos << std::endl;
+   }
+
    OSG::beginEditCP(mTransform, OSG::Transform::MatrixFieldMask);
-      mTransform->setMatrix(camPos);
+      mTransform->setMatrix(camera_pos);
    OSG::endEditCP(mTransform, OSG::Transform::MatrixFieldMask);
 }
 
 OSG::NodePtr FboVideoCamera::getDebugPlane() const
 {
-   OSG::SimpleMaterialPtr fbo_mat = OSG::SimpleMaterial::create();
-   OSG::beginEditCP(fbo_mat);
-      fbo_mat->addChunk(mFboTexture);
-      fbo_mat->setSpecular(OSG::Color3f(0.7f, 0.7f, 0.7f));
-      fbo_mat->setDiffuse(OSG::Color3f(0.22f, 0.2f, 0.2f));
-   OSG::endEditCP(fbo_mat);
+   // Create material for left eye.
+   OSG::SimpleMaterialPtr left_mat = OSG::SimpleMaterial::create();
+   OSG::beginEditCP(left_mat);
+      left_mat->addChunk(mLeftTexture);
+      left_mat->setSpecular(OSG::Color3f(0.7f, 0.7f, 0.7f));
+      left_mat->setDiffuse(OSG::Color3f(0.22f, 0.2f, 0.2f));
+   OSG::endEditCP(left_mat);
 
-   // Create the test plane to put the texture on.
-   OSG::GeometryPtr plane_geom = OSG::makePlaneGeo(10, 10, 2, 2);
-   OSG::beginEditCP(plane_geom);
-      plane_geom->setMaterial(fbo_mat);
-   OSG::endEditCP(plane_geom);
+   // Create material for right eye.
+   OSG::SimpleMaterialPtr right_mat = OSG::SimpleMaterial::create();
+   OSG::beginEditCP(right_mat);
+      right_mat->addChunk(mRightTexture);
+      right_mat->setSpecular(OSG::Color3f(0.7f, 0.7f, 0.7f));
+      right_mat->setDiffuse(OSG::Color3f(0.22f, 0.2f, 0.2f));
+   OSG::endEditCP(right_mat);
 
-   OSG::NodePtr plane_root = OSG::Node::create();
-   OSG::beginEditCP(plane_root);
-      plane_root->setCore(plane_geom);
-   OSG::endEditCP(plane_root);
-   return plane_root;
+   // Create geometry for left eye.
+   OSG::GeometryPtr left_geom = OSG::makePlaneGeo(5, 5, 2, 2);
+   OSG::NodePtr left_node = OSG::Node::create();
+   OSG::beginEditCP(left_geom);
+      left_geom->setMaterial(left_mat);
+   OSG::endEditCP(left_geom);
+   OSG::beginEditCP(left_node);
+      left_node->setCore(left_geom);
+   OSG::endEditCP(left_node);
+
+   // Create geometry for right eye.
+   OSG::GeometryPtr right_geom = OSG::makePlaneGeo(5, 5, 2, 2);
+   OSG::NodePtr right_node = OSG::Node::create();
+   OSG::beginEditCP(right_geom);
+      right_geom->setMaterial(right_mat);
+   OSG::endEditCP(right_geom);
+   OSG::beginEditCP(right_node);
+      right_node->setCore(right_geom);
+   OSG::endEditCP(right_node);
+
+   // Create the xforms for each eye's geometry.
+   OSG::Matrix leftm, rightm;
+   leftm.setTranslate(-2.5, 2.5, 0.0);
+   rightm.setTranslate(2.5, 2.5, 0.0);
+
+   // Create the transform nodes for each eye's geometry.
+   OSG::TransformNodePtr left_xform = OSG::TransformNodePtr::create();
+   OSG::TransformNodePtr right_xform = OSG::TransformNodePtr::create();
+   OSG::beginEditCP(left_xform);
+   OSG::beginEditCP(right_xform);
+      left_xform->setMatrix(leftm);
+      right_xform->setMatrix(rightm);
+      left_xform.node()->addChild(left_node);
+      right_xform.node()->addChild(right_node);
+   OSG::endEditCP(left_xform);
+   OSG::endEditCP(right_xform);
+
+   /* XXX: Fro some reason this causes a crash.
+   OSG::GroupNodePtr group = OSG::GroupNodePtr::create();
+   OSG::beginEditCP(group);
+      group.node()->addChild(left_xform.node());
+      group.node()->addChild(right_xform.node());
+   OSG::endEditCP(group);
+   return group.node();
+   */
+
+   OSG::GroupPtr group = OSG::Group::create();
+   OSG::NodePtr group_node = OSG::Node::create();
+   OSG::beginEditCP(group_node);
+      group_node->setCore(group);
+      group_node->addChild(left_xform.node());
+      group_node->addChild(right_xform.node());
+   OSG::endEditCP(group_node);
+   return group_node;
 }
 
 void FboVideoCamera::generateFrame()

@@ -29,7 +29,8 @@ protected:
    FboVideoCamera()
       : mFboVP(OSG::NullFC)
       , mTransform(OSG::NullFC)
-      , mFboTexture(OSG::NullFC)
+      , mLeftTexture(OSG::NullFC)
+      , mRightTexture(OSG::NullFC)
       , mFboCam(OSG::NullFC)
       , mBorderSize(2.0)
       , mFrameDist(100.0)
@@ -64,7 +65,8 @@ public:
    /**
     * Set the position of the camera.
     */
-   void setCameraPos(const OSG::Matrix camPos);
+   void setCameraPos(const OSG::Matrix camPos, const OSG::Real32 interocular = 0.0f,
+                     const OSG::UInt32 currentEye = 0);
 
    /**
     * Set the field of view for the camera.
@@ -115,7 +117,8 @@ private:
    OSG::FBOViewportPtr                  mFboVP;         /**< FBOViewport that we use to render to an FBO. */
    OSG::RefPtr<OSG::TransformPtr>       mTransform;     /**< The location and orientation of the camera. */
    OSG::RefPtr<OSG::NodePtr>            mFrameRoot;     /**< The frame that surrounds the captured scene. */
-   OSG::TextureChunkPtr                 mFboTexture;    /**< Texture that the FBO renders into. */
+   OSG::TextureChunkPtr                 mLeftTexture;   /**< Texture that the FBO renders into. */
+   OSG::TextureChunkPtr                 mRightTexture;  /**< Texture that the FBO renders into. */
    OSG::PerspectiveCameraPtr            mFboCam;        /**< Perspective camera for the FBO. */
    OSG::Real32                          mBorderSize;    /**< The width of the frame geometry. */
    OSG::Real32                          mFrameDist;     /**< The distance between the camera and the frame. */
