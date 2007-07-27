@@ -6,7 +6,6 @@
 #include <boost/bind.hpp>
 #include <boost/assign/list_of.hpp>
 
-#include <OpenSG/OSGConfig.h>
 
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
@@ -18,7 +17,6 @@
 #include <IOV/SceneObject.h>
 #include <IOV/Viewer.h>
 #include <IOV/StatusPanelData.h>
-#include <IOV/Util/OpenSGHelpers.h>
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Config.h>
 #include <IOV/Version.h>
