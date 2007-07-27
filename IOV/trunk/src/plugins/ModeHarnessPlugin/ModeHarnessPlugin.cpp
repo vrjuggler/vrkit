@@ -198,7 +198,7 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
          else
          {
             IOV_STATUS << "[Mode Harness] ERROR: No component '" << comp_name
-                       << "'to connect to signal '" << sig_name << "'"
+                       << "' to connect to signal '" << sig_name << "'"
                        << std::endl;
          }
       }
