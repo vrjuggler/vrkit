@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="iov_wand_interface" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="IOV Wand Interface">
+      <abstract>false</abstract>
+      <help>Configuration for the IOV wand interface. The wand interface is a combination position, digital, and analog data. The position interface name is required. Zero or more digital buttons and analog axes can (and should) also be defined.</help>
+      <category>/Infiscape/</category>
+      <property valuetype="configelementpointer" variable="false" name="position_name">
+         <help>The name of the position proxy (or alias for a position proxy) that will be used for retrieving the position transformation data for the wand.</help>
+         <value label="Position Interface Name" defaultvalue="VJWand"/>
+         <allowed_type>alias</allowed_type>
+         <allowed_type>position_proxy</allowed_type>
+      </property>
+      <property valuetype="configelementpointer" variable="true" name="digital_name">
+         <help>The name of the digital proxy (or alias for a digital proxy) that will be used for retrieving the digital state data for a wand button. The order of this list of names indicates the order of the (zero-based) button indices.</help>
+         <value label="Digital Interface Name" defaultvalue=""/>
+         <allowed_type>alias</allowed_type>
+         <allowed_type>digital_proxy</allowed_type>
+      </property>
+      <property valuetype="configelementpointer" variable="true" name="analog_name">
+         <help>The name of the analog proxy (or alias for a analog proxy) that will be used for retrieving the analog state data for a wand axis. The order of this list of names indicates the order of the (zero-based) axis indices.</help>
+         <value label="Analog Interface Name" defaultvalue=""/>
+         <allowed_type>alias</allowed_type>
+         <allowed_type>analog_proxy</allowed_type>
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>

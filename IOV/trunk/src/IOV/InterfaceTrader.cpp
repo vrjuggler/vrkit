@@ -6,12 +6,14 @@
 namespace inf
 {
 
+void InterfaceTrader::init(inf::ViewerPtr viewer)
+{
+   mWandInterface = WandInterfacePtr(new WandInterface);
+   mWandInterface->init(viewer);
+}
+
 WandInterfacePtr InterfaceTrader::getWandInterface()
 {
-   if (NULL == mWandInterface.get())
-   {
-      mWandInterface = WandInterfacePtr(new WandInterface);
-   }
    return mWandInterface;
 }
 

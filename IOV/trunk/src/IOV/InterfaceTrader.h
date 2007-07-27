@@ -1,16 +1,21 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
-#ifndef _INF_INTERFACE_TRADER_H
-#define _INF_INTERFACE_TRADER_H
+#ifndef _INF_INTERFACE_TRADER_H_
+#define _INF_INTERFACE_TRADER_H_
 
 #include <IOV/Config.h>
+
 #include <IOV/WandInterfacePtr.h>
+#include <IOV/ViewerPtr.h>
+
 
 namespace inf
 {
 
-/** Class for creating a desired IO interface based on reqs.
- * This will be an implementation of the Product Trader pattern (when complete)
+/**
+ * Class for creating a desired IO interface based on reqs.
+ * This will be an implementation of the Product Trader pattern (when
+ * complete).
  *
  * The idea is to give this class a description of what is needed
  * for an interface, and then have it create it on the fly by
@@ -20,17 +25,18 @@ namespace inf
 class IOV_CLASS_API InterfaceTrader
 {
 public:
+   void init(inf::ViewerPtr viewer);
+
    /**
     * Returns a shared pointer to a wand interface.
-    *
-    * @post A valid WandInterfacePtr is returned.
     */
    WandInterfacePtr getWandInterface();
 
-protected:
+private:
    WandInterfacePtr mWandInterface;
 };
 
 } // namespace inf
+
 
 #endif

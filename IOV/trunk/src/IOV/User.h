@@ -3,16 +3,20 @@
 #ifndef _INF_USER_H_
 #define _INF_USER_H_
 
+#include <IOV/Config.h>
+
+#include <boost/enable_shared_from_this.hpp>
+
 #include <IOV/UserPtr.h>
 #include <IOV/InterfaceTrader.h>
 #include <IOV/ViewPlatform.h>
 #include <IOV/ViewerPtr.h>
 
-#include <boost/enable_shared_from_this.hpp>
-
 
 namespace inf
 {
+
+class Configuration;
 
 /**
  * This class holds all information related to a user of the application.
@@ -26,8 +30,7 @@ namespace inf
 class IOV_CLASS_API User : public boost::enable_shared_from_this<User>
 {
 protected:
-   User()
-   {;}
+   User();
 
 public:
    static UserPtr create();

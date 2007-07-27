@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-07-27 patrick  Made inf::WandInterface configurable.
+                    -- VERSION -- 0.39.0
 2007-07-26 dshipton Added dynamic visibility toggling to the Status Panel
                     Plug-in.
                     -- VERSION -- 0.38.0

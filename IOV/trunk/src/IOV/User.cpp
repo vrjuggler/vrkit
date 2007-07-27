@@ -8,16 +8,23 @@
 namespace inf
 {
 
+User::User()
+{
+   /* Do nothing. */ ;
+}
+
 UserPtr User::create()
 {
-   UserPtr new_user(new User);
-   return new_user;
+   return UserPtr(new User());
 }
 
 UserPtr User::init(ViewerPtr viewer)
 {
    mViewPlatform.platformMoved().connect(boost::bind(&User::platformMoved,
                                                      this, viewer));
+
+   mInterfaceTrader.init(viewer);
+
    return shared_from_this();
 }
 
