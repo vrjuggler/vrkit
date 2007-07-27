@@ -100,6 +100,8 @@ void WandInterface::configure(jccl::ConfigElementPtr elt)
       throw inf::Exception("Empty wand name is not allowed", IOV_LOCATION);
    }
 
+   mWandInterface.init(wand_name);
+
    const unsigned int num_digitals(elt->getNum(digital_name_prop));
 
    if ( num_digitals > 0 )
