@@ -72,14 +72,13 @@ void Viewer::init()
 
    ViewerPtr myself(shared_from_this());
 
-   // Create an initialize the user
+   // Create and initialize the user.
    mUser = User::create()->init(myself);
 
-   // Create and initialize the base scene object
+   // Create and initialize the base scene object.
    mScene = Scene::create()->init();
 
    mEventData = mScene->getSceneData<EventData>();
-
 
    // Load the app configuration and then...
    // - Setup scene root for networking
