@@ -1,5 +1,12 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-07-31 patrick  inf::plugin::buildSearchPath() now looks in the "debug"
+                    subdirectory for optimized and debug-enabled builds. For a
+                    debug-enabled build, it looks in the "debug" subdirectory
+                    first; for an optimized build, second.
+                    inf::PluginRegistry::addEntry() now ignores duplicate entry
+                    additions.
+                    -- VERSION -- 0.40.0
 2007-07-27 patrick  Made inf::WandInterface configurable.
                     -- VERSION -- 0.39.0
 2007-07-26 dshipton Added dynamic visibility toggling to the Status Panel

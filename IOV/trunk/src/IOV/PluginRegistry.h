@@ -81,7 +81,25 @@ public:
    }
    //@}
 
-   void addEntry(RegistryEntryPtr entry);
+   /**
+    * Adds the given registry entry to this registry if the associated plug-in
+    * has not already been registered. If \p entry is for a known plug-in
+    * (determined using its full name), then the duplicate entry is ignored.
+    *
+    * @post The plug-in referred to by \p entry is a member of this plug-in
+    *       registry.
+    *
+    * @param entry The registry entry to add. This contains an
+    *              inf::Plugin::Info object that is used to perform the
+    *              registration process. It is this object that is queried to
+    *              get the full name of the plug-in to determine whether the
+    *              plug-in associated with the given entry is already
+    *              registered.
+    *
+    * @return \c true is returned if \p entry is added to the registry;
+    *         \c false otherwise.
+    */
+   bool addEntry(RegistryEntryPtr entry);
 
    /** @name Plug-In Instance Creation Interface */
    //@{

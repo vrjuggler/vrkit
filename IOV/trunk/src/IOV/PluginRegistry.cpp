@@ -148,10 +148,26 @@ registerInstantiatedPlugin(const inf::plugin::Info& pluginInfo,
    mPluginInstantiated(plugin);
 }
 
-void PluginRegistry::addEntry(RegistryEntryPtr entry)
+bool PluginRegistry::addEntry(RegistryEntryPtr entry)
 {
-   mRegistry[entry->getInfo().getFullName()] = entry;
-   mModuleRegistered(entry->getInfo(), entry->getModule());
+   bool result(false);
+   const std::string& full_name(entry->getInfo().getFullName());
+
+   if ( mRegistry.count(full_name) == 0 )
+   {
+      mRegistry[full_name] = entry;
+      mModuleRegistered(entry->getInfo(), entry->getModule());
+      result = true;
+   }
+#if defined(IOV_DEBUG)
+   else
+   {
+      std::cerr << "NOTE: Igoring duplicate addition of " << full_name
+                << std::endl;
+   }
+#endif
+
+   return result;
 }
 
 RegistryEntryPtr PluginRegistry::findEntry(const std::string& moduleName) const

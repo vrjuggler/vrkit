@@ -115,15 +115,30 @@ buildSearchPath(const std::vector<std::string>& roots,
 
          if ( fs::exists(cur_path) )
          {
-#if defined(IOV_DEBUG) && ! defined(_DEBUG)
+// If this is a debug-enabled build, search the "debug" subdirectory of
+// cur_path before cur_path.
+#if defined(IOV_DEBUG)
+            // Search the "debug" subdirectory if we were told to do so.
+            if ( searchDebug )
+            {
+               fs::path dbg_path(cur_path / "debug");
+               search_path.push_back(dbg_path.native_directory_string());
+            }
+
+            search_path.push_back(cur_path.native_directory_string());
+
+// If this is not a debug-enabled build, search the "debug" subdirectory of
+// cur_path after cur_path.
+#else
+            search_path.push_back(cur_path.native_directory_string());
+
+            // Search the "debug" subdirectory if we were told to do so.
             if ( searchDebug )
             {
                fs::path dbg_path(cur_path / "debug");
                search_path.push_back(dbg_path.native_directory_string());
             }
 #endif
-
-            search_path.push_back(cur_path.native_directory_string());
          }
 /*
          else
