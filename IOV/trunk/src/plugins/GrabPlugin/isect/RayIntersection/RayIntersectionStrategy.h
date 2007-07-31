@@ -6,6 +6,7 @@
 #include <string>
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/signals/connection.hpp>
 
 #include <OpenSG/OSGColor.h>
 #include <OpenSG/OSGLine.h>
@@ -115,6 +116,8 @@ private:
    // The visualisation geometry, needed for update.
    OSG::GeometryNodePtr mGeomNode;
    OSG::SwitchNodePtr   mSwitchNode;
+
+   boost::signals::connection mRayIsectConn;	/**< Visibility connection object. */
 
    /** @name Ray Properties */
    //@{

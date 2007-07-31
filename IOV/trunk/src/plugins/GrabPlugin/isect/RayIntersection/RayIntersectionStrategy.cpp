@@ -17,6 +17,7 @@
 
 #include <jccl/Config/ConfigElement.h>
 
+#include <IOV/SignalRepository.h>
 #include <IOV/InterfaceTrader.h>
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
@@ -150,6 +151,24 @@ inf::IntersectionStrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
       decorator_root.node()->addChild(mSwitchNode);
    OSG::endEditCP(decorator_root.node());
    setVisible(true);
+
+   // Register visibility signal with SignalRepository
+   inf::SignalRepositoryPtr sig_repos =
+      viewer->getSceneObj()->getSceneData<SignalRepository>();
+
+   typedef boost::signal<void (bool)> sig_type;
+   std::string sig_name("Set Ray Intersection Visibility");
+
+   if( ! sig_repos->hasSignal(sig_name) )
+   {
+      sig_repos->addSignal(sig_name,
+			   SignalContainer<sig_type>::create());
+   }
+
+   // Connect new signal to slot after SwitchNode creation
+   mRayIsectConn = sig_repos->getSignal<sig_type>(sig_name)->connect(
+      boost::bind(&inf::RayIntersectionStrategy::setVisible, this, _1)
+      );
 
    return shared_from_this();
 }
