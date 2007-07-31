@@ -106,7 +106,7 @@ void WandInterface::configure(jccl::ConfigElementPtr elt)
 
    if ( num_digitals > 0 )
    {
-      mButtonInterfaces.reserve(num_digitals);
+      mButtonInterfaces.resize(num_digitals);
 
       for ( unsigned int d = 0; d < num_digitals; ++d )
       {
@@ -123,9 +123,7 @@ void WandInterface::configure(jccl::ConfigElementPtr elt)
             throw inf::Exception(msg_stream.str(), IOV_LOCATION);
          }
 
-         gadget::DigitalInterface dig_if;
-         dig_if.init(digital_name);
-         mButtonInterfaces.push_back(dig_if);
+         mButtonInterfaces[d].init(digital_name);
       }
    }
 
@@ -133,7 +131,7 @@ void WandInterface::configure(jccl::ConfigElementPtr elt)
 
    if ( num_analogs > 0 )
    {
-      mAnalogInterfaces.reserve(num_analogs);
+      mAnalogInterfaces.resize(num_analogs);
 
       for ( unsigned int a = 0; a < num_analogs; ++a )
       {
@@ -150,9 +148,7 @@ void WandInterface::configure(jccl::ConfigElementPtr elt)
             throw inf::Exception(msg_stream.str(), IOV_LOCATION);
          }
 
-         gadget::AnalogInterface analog_if;
-         analog_if.init(analog_name);
-         mAnalogInterfaces.push_back(analog_if);
+         mAnalogInterfaces[a].init(analog_name);
       }
    }
 }
