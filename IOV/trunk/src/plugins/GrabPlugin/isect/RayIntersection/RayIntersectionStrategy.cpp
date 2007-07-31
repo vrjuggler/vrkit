@@ -157,7 +157,7 @@ inf::IntersectionStrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
       viewer->getSceneObj()->getSceneData<SignalRepository>();
 
    typedef boost::signal<void (bool)> sig_type;
-   std::string sig_name("Set Ray Intersection Visibility");
+   std::string sig_name("Set Intersection Ray Visibility");
 
    if( ! sig_repos->hasSignal(sig_name) )
    {
