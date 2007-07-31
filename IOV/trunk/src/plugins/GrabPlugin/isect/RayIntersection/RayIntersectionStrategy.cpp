@@ -111,6 +111,11 @@ RayIntersectionStrategy(const inf::plugin::Info& info)
    /* Do nothing. */ ;
 }
 
+RayIntersectionStrategy::~RayIntersectionStrategy()
+{
+   mRayIsectConn.disconnect();
+}
+
 inf::IntersectionStrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
 {
    jccl::ConfigElementPtr cfg_elt =

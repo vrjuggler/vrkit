@@ -36,10 +36,7 @@ protected:
    RayIntersectionStrategy(const inf::plugin::Info& info);
 
 public:
-   virtual ~RayIntersectionStrategy()
-   {
-      /* Do nothing. */ ;
-   }
+   virtual ~RayIntersectionStrategy();
 
    static std::string getId()
    {
