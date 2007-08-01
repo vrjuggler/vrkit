@@ -39,13 +39,14 @@ FboVideoCamera::~FboVideoCamera()
 {
 }
 
-void FboVideoCamera::contextInit(OSG::WindowPtr gwin)
+void FboVideoCamera::contextInit(OSG::WindowPtr window)
 {
-   mFboVP->setParent(gwin);
+   mFboVP->setParent(window);
 }
 
-FboVideoCameraPtr FboVideoCamera::init(const OSG::UInt32 width, const OSG::UInt32 height, const OSG::Real32 fov,
-                                       const OSG::Real32 borderSize, const OSG::Real32 frameDist)
+FboVideoCameraPtr FboVideoCamera::init(const OSG::UInt32 width, const OSG::UInt32 height,
+				       const OSG::Real32 fov, const OSG::Real32 borderSize,
+				       const OSG::Real32 frameDist)
 {
    mBorderSize = borderSize;
    mFrameDist = frameDist;
@@ -64,16 +65,12 @@ FboVideoCameraPtr FboVideoCamera::init(const OSG::UInt32 width, const OSG::UInt3
       mFrameRoot->setCore(mTransform);
    OSG::endEditCP(mFrameRoot);
 
-   // Where should we attach the FBO camera beacon.
-   //OSG::beginEditCP(fboRoot);
-      //fboRoot->addChild(beacon);
-   //OSG::endEditCP(fboRoot);
-
    // Create the FBO textures.
    mLeftTexture = OSG::TextureChunk::create();
    OSG::beginEditCP(mLeftTexture);
       mLeftTexture->setEnvMode(GL_MODULATE);
    OSG::endEditCP(mLeftTexture);
+
    mRightTexture = OSG::TextureChunk::create();
    OSG::beginEditCP(mRightTexture);
       mRightTexture->setEnvMode(GL_MODULATE);
@@ -194,8 +191,11 @@ void FboVideoCamera::stop()
    mVideoGrabber->stop();
 }
 
-void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos, const OSG::Real32 interocular)
+void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos,
+			   const OSG::Real32 interocular)
 {
+   glPushAttrib(GL_ALL_ATTRIB_BITS);
+   glPushMatrix();
    /* XXX: Disable rendering if we are not recording. For right now
     *      render anyway so that we can see the debug panels.
    if (!mVideoGrabber->isRecording())
@@ -272,6 +272,8 @@ void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos, con
    }
 
    mVideoGrabber->writeFrame();
+   glPopMatrix();
+   glPopAttrib();
 }
 
 OSG::NodePtr FboVideoCamera::getDebugPlane() const

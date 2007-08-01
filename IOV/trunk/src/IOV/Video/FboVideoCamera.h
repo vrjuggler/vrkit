@@ -45,7 +45,7 @@ public:
     * Called from the Viewer's context init so that we can set the
     * correct window.
     */
-   void contextInit(OSG::WindowPtr gwin);
+   void contextInit(OSG::WindowPtr window);
 
    /**
     * Returns the FBOViewport.
