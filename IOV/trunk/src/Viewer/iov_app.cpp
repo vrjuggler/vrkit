@@ -28,6 +28,8 @@
 #include <vpr/System.h>
 #include <jccl/Config/ConfigElement.h>
 #include <vrj/Kernel/Kernel.h>
+#include <vrj/Draw/OGL/GlWindow.h>
+#include <vrj/Kernel/User.h>
 
 #include <IOV/Viewer.h>
 #include <IOV/EventData.h>
@@ -44,7 +46,30 @@
 
 #include <IOV/Status.h>
 
+// Video VideoGrabber includes.
+#include <OpenSG/OSGSimpleMaterial.h>
+#include <OpenSG/OSGTextureChunk.h>
+#include <OpenSG/OSGWindow.h>
+#include <OpenSG/OSGFBOViewport.h>
+#include <OpenSG/OSGMatrixUtility.h>
+#include <OpenSG/OSGImageFunctions.h>
+#include <IOV/Video/VideoGrabber.h>
+#include <IOV/Video/FboVideoCamera.h>
 
+namespace
+{
+   bool checkGLError(const char* where)
+   {
+      GLenum errCode = 0;
+      if ((errCode = glGetError()) != GL_NO_ERROR)
+      {
+         const GLubyte *errString = gluErrorString(errCode);
+         FWARNING(("%s OpenGL Error: %s!\n", where, errString));
+      }
+
+      return errCode == GL_NO_ERROR;
+   }
+}
 
 template<typename T>
 boost::shared_ptr<T> makeSceneObject(OSG::TransformNodePtr modelXform)
@@ -54,7 +79,6 @@ boost::shared_ptr<T> makeSceneObject(OSG::TransformNodePtr modelXform)
 
 class OpenSgViewer;
 typedef boost::shared_ptr<OpenSgViewer> OpenSgViewerPtr;
-
 
 class OpenSgViewer : public inf::Viewer
 {
@@ -75,6 +99,8 @@ public:
 
    virtual void init();
    virtual void contextInit();
+   virtual void contextPreDraw();
+   virtual void draw();
    virtual void preFrame();
 
    virtual void deallocate();
@@ -86,6 +112,13 @@ public:
       mFileName = filename;
    }
 
+   void setVideoFilename(const std::string& filename)
+   {
+      mVideoFileName = filename;
+      // If the user passed in a filename they want to record!
+      mUseVidRec = true;
+   }
+
 protected:
    void initGl();
 
@@ -95,6 +128,7 @@ protected:
       , mSceneObjTypeName("StaticSceneObject")
       , mMatChooserWidth(1.0f)  // 1 foot wide
       , mMatChooserHeight(1.5f) // 1.5 feet tall
+      , mUseVidRec(false)
    {
       /* Do nothing. */ ;
    }
@@ -107,9 +141,9 @@ protected:
    void configure(jccl::ConfigElementPtr cfgElt);
 
 protected:
-   std::string              mFileName;
-   inf::BasicHighlighterPtr mHighlighter;
-   inf::EventSoundPlayerPtr mSoundPlayer;
+   std::string			mFileName;
+   inf::BasicHighlighterPtr	mHighlighter;
+   inf::EventSoundPlayerPtr	mSoundPlayer;
 
    /** @name Scene Object Handling */
    //@{
@@ -125,12 +159,26 @@ protected:
    inf::MaterialChooserPtr mMaterialChooser; /**< The chooser we are using. */
    OSG::MaterialPoolPtr    mMaterialPool;
    //@}
-};
 
+   gadget::PositionInterface mHead;
+   gadget::PositionInterface mWand;
+
+   bool				mUseVidRec;
+   inf::FboVideoCameraPtr       mVideoCamera;
+   std::string			mVideoFileName;
+};
 
 void OpenSgViewer::contextInit()
 {
    inf::Viewer::contextInit();
+
+   if(mUseVidRec)
+   {
+      // Context specific data. Should be one copy per context
+      context_data* c_data = &(*mContextData);
+      mVideoCamera->contextInit(c_data->mWin);
+   }
+
    initGl();
 }
 
@@ -151,6 +199,34 @@ void OpenSgViewer::preFrame()
    }
 }
 
+void OpenSgViewer::draw()
+{
+   inf::Viewer::draw();
+}
+
+void OpenSgViewer::contextPreDraw()
+{
+   inf::Viewer::contextPreDraw();
+
+   if(mUseVidRec)
+   {
+      context_data* c_data = &(*mContextData);
+
+      vrj::User* user = vrj::Kernel::instance()->getUsers()[0];
+
+      OSG::Matrix4f head_trans;
+      //gmtl::set(head_trans, mHead->getData());
+      gmtl::set(head_trans, mWand->getData());
+
+      float interocular_dist = user->getInterocularDistance();
+      interocular_dist *= getDrawScaleFactor();      // Scale eye separation
+
+      c_data->mRenderAction->setWindow(c_data->mWin.getCPtr());
+
+      mVideoCamera->render(c_data->mRenderAction, head_trans, interocular_dist);
+   }
+}
+
 void OpenSgViewer::deallocate()
 {
    inf::Viewer::deallocate();
@@ -159,6 +235,7 @@ void OpenSgViewer::deallocate()
    mMaterialPool    = OSG::NullFC;
    mHighlighter     = inf::BasicHighlighterPtr();
    mSoundPlayer     = inf::EventSoundPlayerPtr();
+   mVideoCamera = inf::FboVideoCameraPtr();
 }
 
 inf::Event::ResultType OpenSgViewer::
@@ -171,7 +248,10 @@ objectsMovedSlot(const inf::EventData::moved_obj_list_t&)
 
 void OpenSgViewer::init()
 {
+   std::cout << "RUNNING INIT!" << std::endl;
    inf::Viewer::init();
+   mHead.init("VJHead");
+   mWand.init("VJWand");
 
    jccl::ConfigElementPtr app_cfg =
       getConfiguration().getConfigElement(getElementType());
@@ -250,6 +330,8 @@ void OpenSgViewer::init()
       model_xform.node()->addChild(model_root);
    OSG::endEditCP(model_xform);
 
+
+   
    // --- Light setup --- //
    // - Add directional light for scene
    // - Create a beacon for it and connect to that beacon
@@ -323,6 +405,35 @@ void OpenSgViewer::init()
 
       // Register object for intersection.
       addObject(model_obj);
+   }
+
+   if(mUseVidRec)
+   {
+      mVideoCamera = inf::FboVideoCamera::create()->init();
+      //mVideoCamera->record(mVideoFileName, "mpg4", 60, false);
+      mVideoCamera->record(mVideoFileName, "mpeg4", 60, true);
+
+      OSG::NodePtr frame_root = mVideoCamera->getFrame();
+
+      // Create the test plane to put the texture on.
+      OSG::NodePtr plane_root = mVideoCamera->getDebugPlane();
+
+      OSG::GroupNodePtr decorator_root = scene->getDecoratorRoot();
+      OSG::beginEditCP(decorator_root);
+	 decorator_root.node()->addChild(plane_root);
+	 decorator_root.node()->addChild(frame_root);
+      OSG::endEditCP(decorator_root);
+
+      // Ensure that this is called after anythin that effects getScene().
+      // VR Juggler normally calls this each frame before rendering.
+      OSG::FBOViewportPtr fbo = mVideoCamera->getFboViewport();
+      OSG::beginEditCP(fbo);
+	 fbo->setRoot(getScene());
+      OSG::endEditCP(fbo);
+   }
+   else
+   {
+      mVideoCamera = inf::FboVideoCameraPtr(); // Don't make one.
    }
 }
 
@@ -455,6 +566,9 @@ int main(int argc, char* argv[])
          ("file,f",
           po::value<std::string>()->default_value("data/scenes/test_scene.osb"),
           "File to load in scene")
+         ("video-file,v",
+          po::value<std::string>()->composing(),
+          "File to save video to.")
       ;
 
       po::options_description cmdline_options;
@@ -565,6 +679,13 @@ int main(int argc, char* argv[])
       {
          std::string filename = vm["file"].as<std::string>();
          app->setFilename(filename);
+      }
+
+      if (vm.count("video-file") != 0)
+      {
+	 std::cout << "Setting video file name!" << std::endl;
+	 std::string video_file = vm["video-file"].as<std::string>();
+	 app->setVideoFilename(video_file);
       }
 
       IOV_STATUS << "Starting the kernel." << std::endl;
