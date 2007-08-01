@@ -158,7 +158,10 @@ void FboVideoCamera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
    OSG::endEditCP(mRightTexture);
 
    // We already compensated aspect ratio with the texture/fbo sizes
-   mFboCam->setAspect(width/height);
+   OSG::beginEditCP(mFboCam);
+      mFboCam->setAspect(width/height);
+   OSG::endEditCP(mFboCam);
+
    generateFrame();
 }
 
