@@ -131,6 +131,13 @@ FboVideoCameraPtr FboVideoCamera::init(const OSG::UInt32 width, const OSG::UInt3
    return shared_from_this();
 }
 
+void FboVideoCamera::setSceneRoot(OSG::NodePtr root)
+{
+   OSG::beginEditCP(mFboVP);
+      mFboVP->setRoot(root);
+   OSG::endEditCP(mFboVP);
+}
+
 void FboVideoCamera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 {
    // Resize the viewport.

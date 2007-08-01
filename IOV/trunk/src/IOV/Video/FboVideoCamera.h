@@ -55,6 +55,8 @@ public:
       return mFboVP;
    }
 
+   void setSceneRoot(OSG::NodePtr root);
+
 
    void record(const std::string& filename, const std::string& codec,
                const OSG::UInt32 framesPerSecond, const bool stereo);
