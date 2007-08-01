@@ -26,13 +26,7 @@ namespace inf
 class IOV_CLASS_API VideoGrabber : public boost::enable_shared_from_this<VideoGrabber>
 {
 protected:
-   VideoGrabber()
-      : mRecording(false)
-      , mUseFbo(false)
-      , mImage(OSG::NullFC)
-      , mViewport(OSG::NullFC)
-      , mEncoder()
-   {;}
+   VideoGrabber();
 
 public:
    static VideoGrabberPtr create();

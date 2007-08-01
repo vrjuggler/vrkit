@@ -55,6 +55,16 @@ namespace
 namespace inf
 {
 
+VideoGrabber::VideoGrabber()
+   : mRecording(false)
+   , mUseFbo(false)
+   , mImage(OSG::NullFC)
+   , mViewport(OSG::NullFC)
+   , mEncoder()
+{
+   /* Do nothing. */ ;
+}
+
 VideoGrabberPtr VideoGrabber::create()
 {
    return VideoGrabberPtr(new VideoGrabber);
