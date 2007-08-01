@@ -204,8 +204,6 @@ void FboVideoCamera::stop()
 void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos,
 			   const OSG::Real32 interocular)
 {
-   glPushAttrib(GL_ALL_ATTRIB_BITS);
-   glPushMatrix();
    /* XXX: Disable rendering if we are not recording. For right now
     *      render anyway so that we can see the debug panels.
    if (!mVideoGrabber->isRecording())
@@ -220,7 +218,7 @@ void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos,
       // Distance to move eye
       float eye_offset = interocular/2.0f;
       // XXX: Exagerate to debug code.
-      eye_offset *= 10;
+      //eye_offset *= 10;
 
       OSG::Matrix offset;
       OSG::Matrix camera_pos;
@@ -236,8 +234,12 @@ void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos,
       setCameraPos(camera_pos);
 
       // Do the actual rendering.
-      //glClear(GL_DEPTH_BUFFER_BIT);
-      mFboVP->render(ra);
+      glClear(GL_DEPTH_BUFFER_BIT);
+      glPushAttrib(GL_ALL_ATTRIB_BITS);
+	 glPushMatrix();
+	    mFboVP->render(ra);
+	 glPopMatrix();
+      glPopAttrib();
 
       // XXX: Only capturing right eye right now.
       mFboVP->bind(ra->getWindow());
@@ -256,8 +258,12 @@ void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos,
       setCameraPos(camera_pos);
 
       // Do the actual rendering.
-      //glClear(GL_DEPTH_BUFFER_BIT);
-      mFboVP->render(ra);
+      glClear(GL_DEPTH_BUFFER_BIT);
+      glPushAttrib(GL_ALL_ATTRIB_BITS);
+	 glPushMatrix();
+	    mFboVP->render(ra);
+	 glPopMatrix();
+      glPopAttrib();
 
       // XXX: Only capturing right eye right now.
       mFboVP->bind(ra->getWindow());
@@ -273,8 +279,12 @@ void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos,
       setCameraPos(camPos);
 
       // Do the actual rendering.
-      //glClear(GL_DEPTH_BUFFER_BIT);
-      mFboVP->render(ra);
+      glClear(GL_DEPTH_BUFFER_BIT);
+      glPushAttrib(GL_ALL_ATTRIB_BITS);
+	 glPushMatrix();
+	    mFboVP->render(ra);
+	 glPopMatrix();
+      glPopAttrib();
 
       mFboVP->bind(ra->getWindow());
       mVideoGrabber->grabFrame();
@@ -282,8 +292,6 @@ void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos,
    }
 
    mVideoGrabber->writeFrame();
-   glPopMatrix();
-   glPopAttrib();
 }
 
 OSG::NodePtr FboVideoCamera::getDebugPlane() const
