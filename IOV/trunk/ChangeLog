@@ -2,6 +2,7 @@ DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
 2007-08-02 dshipton Added inf::User::getInterocularDistance() for obtaining
                     the users eye separation with an optional scaling factor.
+                    -- VERSION -- 0.40.2
 2007-08-01 patrick  Added inf::User::getHeadProxy() for getting access to the
                     user head position.
                     -- VERSION -- 0.40.1
