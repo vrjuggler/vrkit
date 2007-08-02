@@ -39,6 +39,19 @@ if GetPlatform() == 'win32':
       opt_env = Environment(MSVS_VERSION=ARGUMENTS['MSVS_VERSION'])
    else:
       opt_env = Environment()
+
+   # When using Visual C++ 8.0 or newer, embed the manifest in all DLLs and
+   # EXEs.
+   # NOTE: The [:3] bit used before passing the MSVS_VERSION value to float()
+   # is to handle the case of Visual C++ Express Edition which appends "Exp"
+   # to the version number.
+   if opt_env.has_key('MSVS_VERSION') and float(opt_env['MSVS_VERSION'][:3]) >= 8.0:
+      opt_env['SHLINKCOM'] = \
+         [opt_env['SHLINKCOM'],
+          'mt.exe -manifest ${TARGET}.manifest -outputresource:$TARGET;2']
+      opt_env['LINKCOM'] = \
+         [opt_env['LINKCOM'],
+          'mt.exe -manifest ${TARGET}.manifest -outputresource:$TARGET;1']
 else:
    opt_env = Environment(ENV = os.environ)
 
