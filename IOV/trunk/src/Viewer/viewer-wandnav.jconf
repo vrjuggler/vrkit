@@ -7,6 +7,19 @@
          <plugin>WandNavPlugin</plugin>
          <isect_strategy>PointIntersection</isect_strategy>
       </infiscape_opensg_viewer>
+      <iov_wand_interface name="Wand Interface" version="1">
+         <position_name>VJWand</position_name>
+         <digital_name>VJButton0</digital_name>
+         <digital_name>VJButton1</digital_name>
+         <digital_name>VJButton2</digital_name>
+         <digital_name>VJButton3</digital_name>
+         <digital_name>VJButton4</digital_name>
+         <digital_name>VJButton5</digital_name>
+         <analog_name>VJAnalog0</analog_name>
+         <analog_name>VJAnalog1</analog_name>
+         <analog_name>VJAnalog2</analog_name>
+         <analog_name>VJAnalog3</analog_name>
+      </iov_wand_interface>
       <wand_nav_plugin name="Viewer Wand Nav" version="3">
          <max_velocity>5.0</max_velocity>
          <acceleration>0.05</acceleration>
