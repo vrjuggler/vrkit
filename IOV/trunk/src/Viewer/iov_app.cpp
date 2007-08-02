@@ -178,7 +178,7 @@ protected:
    OSG::MaterialPoolPtr    mMaterialPool;
    //@}
 
-   bool				mUseVidRec;
+   bool                         mUseVidRec;
    inf::FboVideoCameraPtr       mVideoCamera;
    std::string			mVideoFileName;
 };
@@ -266,7 +266,6 @@ objectsMovedSlot(const inf::EventData::moved_obj_list_t&)
 
 void OpenSgViewer::init()
 {
-   std::cout << "RUNNING INIT!" << std::endl;
    inf::Viewer::init();
 
    jccl::ConfigElementPtr app_cfg =
@@ -423,6 +422,8 @@ void OpenSgViewer::init()
       addObject(model_obj);
    }
 
+   mVideoCamera = inf::FboVideoCameraPtr(); // Init when not using vidcam
+
    if(mUseVidRec)
    {
       mVideoCamera = inf::FboVideoCamera::create()->init();
@@ -446,10 +447,6 @@ void OpenSgViewer::init()
       OSG::beginEditCP(fbo);
 	 fbo->setRoot(getScene());
       OSG::endEditCP(fbo);
-   }
-   else
-   {
-      mVideoCamera = inf::FboVideoCameraPtr(); // Don't make one.
    }
 }
 
