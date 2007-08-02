@@ -2,6 +2,7 @@
 #
 import SConsAddons.Util       # Get the utils
 import sys, os, re, string, glob
+import os.path
 pj = os.path.join
 GetPlatform = SConsAddons.Util.GetPlatform;
 
@@ -9,39 +10,80 @@ Import('*')
 
 appname = 'iov_app'
 
+#def installDir(toDir, fromDir, env):
+#   if not os.path.exists(toDir):
+#      env.Execute(Mkdir(toDir))
+#
+#   dest_dir = toDir
+#   for root, dirs, files in os.walk(fromDir):
+#      base = os.path.join(toDir, root.replace(fromDir, ''))
+#      for d in dirs:
+#         new_dir = os.path.join(base, d)
+#         if not os.path.exists(new_dir):
+#            env.Execute(Mkdir(new_dir))
+#      for f in files:
+#         src_file = os.path.join(root, f)
+#         env.Install(base, src_file)
+
 def makeBundleCmd(target, source, env):
-   import shutil
    import commands
-   import os.path
 
-   target     = 'Viewer'
-   sourceinfo = 'Info.plist'
-   targetinfo = "%s.app/Contents/Info.plist" % target
+   bundle = 'Viewer'
 
-   cmd = '%s.app' % target
-   if os.path.isdir(cmd):
-      shutil.rmtree('%s.app' % target)
+   cmd = '%s.app' % bundle
+#   if os.path.isdir(cmd):
+#      import shutil
+#      shutil.rmtree('%s.app' % bundle)
 
-   instroot = '%s.app/Contents' % target
+   instroot = '%s.app/Contents' % bundle
    macdir = '%s/MacOS' % instroot
    resdir = '%s/Resources' % instroot
+   langdir = '%s/en.lproj' % resdir
 
    path = ''
    for d in instroot.split('/'):
       path = os.path.join(path, d)
-      if not os.path.isdir(path):
-         os.mkdir(path, 0755)
+      if not os.path.exists(path):
+         env.Execute(Mkdir(path))
 
-   os.mkdir(macdir, 0755)
-   os.mkdir(resdir, 0755)
+   if not os.path.exists(macdir):
+      env.Execute(Mkdir(macdir))
+   if not os.path.exists(resdir):
+      env.Execute(Mkdir(resdir))
+   if not os.path.exists(langdir):
+      env.Execute(Mkdir(langdir))
 
-   shutil.copy2(str(source[0]), macdir)
+   env.Install(macdir, str(source[0]))
+   env.Install(instroot, 'src/Viewer/Info.plist')
+   env.Install(instroot, 'src/Viewer/PkgInfo')
+
+   parser = vrj_options.flagpoll_parser
+
+   app_resources    = parser.callFlagPoll('--get-vrj-app-all-resources')
+   app_nib          = parser.callFlagPoll('--get-vrj-app-nib')
+   app_info_strings = parser.callFlagPoll('--get-vrj-app-info-strings')
+
+   if app_resources:
+      for f in  app_resources.split(' '):
+         env.Install(resdir, f)
+
+#   if env.has_key('APP_RESOURCE_DIRS'):
+#      for d in  env['APP_RESOURCE_DIRS']:
+#         installDir(resdir, d, env)
+
+   if app_nib:
+#      installDir(langdir, app_nib, env)
+      cmd = 'cp -r %s %s' % (app_nib, langdir)
+      commands.getoutput(cmd)
+
+   if app_info_strings:
+      env.Install(langdir, app_info_strings)
 
    if combo['type'] == 'optimized':
       cmd = 'strip -u -r %s/%s' % (macdir, appname)
       commands.getoutput(cmd)
 
-   os.chmod('%s/%s' % (macdir, appname), 0755)
+   env.Execute(Chmod('%s/%s' % (macdir, appname), 0755))
 
 def makeBundle(target):
    cmd = env.Command('bundle', appname, makeBundleCmd)
