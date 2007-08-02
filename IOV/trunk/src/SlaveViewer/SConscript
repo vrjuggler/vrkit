@@ -25,9 +25,25 @@ if boost_options.isAvailable():
       po_lib = boost_options.getFullLibName('program_options', viewerEnv)
       viewerEnv.Prepend(LIBS = ['iov' + shared_lib_suffix, po_lib])
 
-   slave_viewer_name = 'slaveViewer' + runtime_suffix
+   appname = 'slaveViewer'
+   slave_viewer_name = appname + runtime_suffix
    slave_viewer_prog = viewerEnv.Program(slave_viewer_name, ['slave_app.cpp'])
    viewerEnv.Install(pj(inst_paths['app_base'],'slaveViewer'), slave_viewer_prog)
+
+   # This only needs to be done when building against VR Juggler 2.1.21 or
+   # newer.
+   if platform == 'darwin':
+      if hasattr(vrj_options, 'flagpoll_parser') and \
+         vrj_options.flagpoll_parser is not None:
+         parser = vrj_options.flagpoll_parser
+         use_cocoa = parser.callFlagPoll('--get-all-use-cocoa')
+         if use_cocoa == 'yes':
+            viewerEnv['BUNDLE_APP_NAME']   = 'SlaveViewer'
+            viewerEnv['BUNDLE_INFO_PLIST'] = 'src/SlaveViewer/Info.plist'
+            viewerEnv['BUNDLE_PKG_INFO']   = 'src/SlaveViewer/PkgInfo'
+            release_target = viewerEnv.Alias('bundle',
+                                             makeBundle(appname, viewerEnv))
+            viewerEnv.Depends(release_target, appname)
 else:
    print "WARNING: Cannot build slaveViewer without Boost.program_options"
 
