@@ -13,18 +13,17 @@ boost_options.apply(viewerEnv)
 
 if boost_options.isAvailable():
    viewerEnv.Prepend(CPPPATH = inst_paths['include'],
-                     LIBPATH = inst_paths['lib'],
-                     LIBS = 'iov'+shared_lib_suffix)
+                     LIBPATH = inst_paths['lib'])
    viewerEnv.Append(CPPPATH = ['.'])
 
    # XXX: There has to be a better way to do this Mac-specific stuff.
    if platform == 'darwin':
       viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
-   # We use automatic linking against the Boost libraries on Windows.
+   # We use automatic linking against the Boost libraries and IOV on Windows.
    if platform != 'win32':
       po_lib = boost_options.getFullLibName('program_options', viewerEnv)
-      viewerEnv.Prepend(LIBS = [po_lib])
+      viewerEnv.Prepend(LIBS = ['iov' + shared_lib_suffix, po_lib])
 
    slave_viewer_name = 'slaveViewer' + runtime_suffix
    slave_viewer_prog = viewerEnv.Program(slave_viewer_name, ['slave_app.cpp'])

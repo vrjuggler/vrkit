@@ -62,4 +62,8 @@
 #   define IOV_DATA_API(__type) IOV_IMPORT_DATA(__type)
 #endif
 
+#if ! defined(_IOV_BUILD_)
+#  include <IOV/AutoLink.h>
+#endif
+
 #endif

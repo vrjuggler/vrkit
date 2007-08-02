@@ -70,8 +70,9 @@ plugin_env = build_env.Copy()
 plugin_env.Append(CPPPATH = inst_paths['include'],
                   LIBPATH = inst_paths['lib'])
 
-iov_lib_name = 'iov'+shared_lib_suffix
-plugin_env.Prepend(LIBS = [iov_lib_name])
+# On Windows, we use automatic linking.
+if platform != 'win32':
+   plugin_env.Prepend(LIBS = ['iov' + shared_lib_suffix])
 
 # Add define since we are building.
 plugin_env.AppendUnique(CPPDEFINES = ['_IOV_PLUGIN_BUILD_',])

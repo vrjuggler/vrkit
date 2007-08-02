@@ -15,13 +15,15 @@ ui_env = build_env.Copy()
 opensg_options.apply(ui_env, libs = ['glut'])
 
 ui_env.Prepend(CPPPATH = inst_paths['include'],
-               LIBPATH = inst_paths['lib'],
-               LIBS = 'iov'+shared_lib_suffix)
+               LIBPATH = inst_paths['lib'])
 
-if GetPlatform() == 'darwin':
+if platform == 'darwin':
    ui_env.Append(LINKFLAGS = ['-framework', 'Cocoa',
                               '-framework', 'GLUT',
                               '-framework', 'OpenGL'])
+
+if platform != 'win32':
+   ui_env.Prepend(LIBS = ['iov' + shared_lib_suffix])
 
 plugin_dir = os.path.join('..', '..', 'plugins', 'StatusPanelPlugin')
 srcs = ['ui_test.cpp', os.path.join(plugin_dir, 'StatusPanel.cpp'),
