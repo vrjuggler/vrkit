@@ -1,5 +1,6 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
@@ -42,16 +43,6 @@ findModules(const std::vector<std::string>& searchPath)
    const std::string driver_ext("so");
 #endif
 
-   // Determine the build-specific part of the dynamically loadable module
-   // file name to be stripped off.  For a debug runtime build on Windows,
-   // this would be "_d.dll".  For all other builds, it would be ".so",
-   // ".dll", ".dylib", etc.  See above for the setting of driver_ext.
-#if defined(IOV_DEBUG) && defined(_DEBUG) && defined(VPR_OS_Windows)
-   const std::string strip_str = std::string("_d.") + driver_ext;
-#else
-   const std::string strip_str = std::string(".") + driver_ext;
-#endif
-
    typedef std::vector<std::string>::const_iterator iter_type;
    for ( iter_type i = searchPath.begin(); i != searchPath.end(); ++i )
    {
@@ -59,15 +50,34 @@ findModules(const std::vector<std::string>& searchPath)
       {
          vpr::LibraryFinder finder(*i, driver_ext);
          typedef vpr::LibraryFinder::LibraryList lib_list_t;
+         typedef lib_list_t::const_iterator iter_type;
          lib_list_t libs = finder.getLibraries();
-         for (lib_list_t::const_iterator itr = libs.begin(); itr != libs.end(); ++itr)
+         for ( iter_type itr = libs.begin(); itr != libs.end(); ++itr )
          {
+#if defined(VPR_OS_Windows)
+            const bool is_debugrt(boost::iends_with((*itr)->getName(),
+                                                    "_d.dll"));
+
+            // With a debug runtime build on Windows, we only want plug-ins
+            // named as "_d.dll".
+#if defined(IOV_DEBUG) && defined(_DEBUG)
+            if ( ! is_debugrt )
+#else
+            // In all other cases on Windows, we want to skip plug-ins named
+            // as "_d.dll".
+            if ( is_debugrt )
+#endif
+            {
+               continue;
+            }
+#endif
+
             try
             {
                (*itr)->load();
                modules.push_back(*itr);
             }
-            catch(vpr::IOException& ex)
+            catch (vpr::IOException& ex)
             {
                IOV_STATUS << ex.getDescription() << std::endl;
             }
