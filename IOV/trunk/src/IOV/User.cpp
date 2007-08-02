@@ -41,6 +41,11 @@ gadget::PositionProxyPtr User::getHeadProxy() const
    return mVrjUser->getHeadPosProxy();
 }
 
+float User::getInterocularDistance(float scale) const
+{
+   return mVrjUser->getInterocularDistance() * scale;
+}
+
 void User::platformMoved(inf::ViewerPtr viewer)
 {
    mViewPlatform.update(viewer);

@@ -74,6 +74,14 @@ public:
     */
    gadget::PositionProxyPtr getHeadProxy() const;
 
+   /**
+    * Retrieves the interocular distance for this
+    * users eyes
+    *
+    * @since 0.40.1
+    */
+   float getInterocularDistance(float scale = 1.0f) const;
+
    InterfaceTrader& getInterfaceTrader()
    {
       return mInterfaceTrader;
