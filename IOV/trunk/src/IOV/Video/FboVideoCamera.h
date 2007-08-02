@@ -37,9 +37,7 @@ public:
    /**
     * Initialize the FBO camera.
     */
-   FboVideoCameraPtr init(const OSG::UInt32 width = 512, const OSG::UInt32 height = 512,
-                          const OSG::Real32 fov = 60.0, const OSG::Real32 borderSize = 2.0,
-                          const OSG::Real32 frameDist = 100.0);
+   FboVideoCameraPtr init();
 
    /**
     * Called from the Viewer's context init so that we can set the
@@ -57,15 +55,35 @@ public:
 
    void setSceneRoot(OSG::NodePtr root);
 
+   void setFilename(const std::string& filename);
 
-   void record(const std::string& filename, const std::string& codec,
-               const OSG::UInt32 framesPerSecond, const bool stereo);
+   void setFramesPerSecond(const OSG::UInt32 framesPerSecond);
+
+   void setCodec(const std::string& codec);
+
+   void setStereo(const bool stereo);
+
+   void setInterocularDistance(const OSG::Real32 interocular);
+
+   void startRecording();
 
    void pause();
-   void resume();
-   void stop();
 
-   void render(OSG::RenderAction* ra, const OSG::Matrix camPos, const OSG::Real32 interocular);
+   void resume();
+
+   void endRecording();
+
+   bool isRecording()
+   {
+      return mRecording;
+   }
+
+   bool isPaused()
+   {
+      return mPaused;
+   }
+
+   void render(OSG::RenderAction* ra, const OSG::Matrix camPos);
 
    /**
     * Set the field of view for the camera.
@@ -73,21 +91,8 @@ public:
    void setFov(const OSG::Real32 fov)
    {
       mFboCam->setFov(fov);
-      generateFrame();
+      generateDebugFrame();
    }
-
-   /**
-    * Set the aspect ratio (w/h) for the camera.
-    */
-   /* XXX: Doesn't make sense unless the user want's to make a
-    *      video that has the incorrect aspect for the given
-    *      width and height.
-   void setAspect(const OSG::Real32 fov)
-   {
-      mFboCam->setAspect(fov);
-      generateFrame();
-   }
-   */
 
    /**
     * Set the size of the FBO you want to use.
@@ -110,7 +115,7 @@ public:
    }
 
 private:
-   void generateFrame();
+   void generateDebugFrame();
 
    /**
     * Set the position of the camera.
@@ -125,9 +130,18 @@ private:
    OSG::TextureChunkPtr                 mLeftTexture;   /**< Texture that the FBO renders into. */
    OSG::TextureChunkPtr                 mRightTexture;  /**< Texture that the FBO renders into. */
    OSG::PerspectiveCameraPtr            mFboCam;        /**< Perspective camera for the FBO. */
+   OSG::UInt32				mWidth;		/**< Width of the FBO. */
+   OSG::UInt32				mHeight;	/**< Height of the FBO. */
+   OSG::Real32                          mFov;		/**< Field of view for the FBO cam. */
+   OSG::Real32                          mEyeOffset;	/**< Interocular distance / 2 for stereo. */
+   std::string				mFilename;	/**< Filename to save the recording to. */
+   std::string				mCodec;		/**< Name of codec to encode movie with. */
+   OSG::UInt32				mFps;		/**< Frames per second to record. */
    OSG::Real32                          mBorderSize;    /**< The width of the frame geometry. */
    OSG::Real32                          mFrameDist;     /**< The distance between the camera and the frame. */
    bool                                 mStereo;        /**< If this camera should render/record in stereo. */
+   bool                                 mRecording;        /**< Whether the camera is recording. */
+   bool                                 mPaused;        /**< Whether the camera is paused. */
 };
 
 }
