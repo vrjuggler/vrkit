@@ -65,7 +65,8 @@ build_options["enable_distcc"] = sca_opts.BoolOption(
 boost_options = SConsAddons.Options.Boost.Boost("boost", "1.33.0",
                                                 libs = ['signals', 'program_options'],
                                                 required = True,
-                                                useVersion = True)
+                                                useVersion = True,
+                                                autoLink = True)
 
 vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("VR Juggler", "2.0.1")
 opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.6.0",
@@ -176,7 +177,6 @@ if not sca_util.hasHelpFlag():
    # Add local directory to path and the "root" directory for this project
    vrj_options.apply(opt_env)
    #vrj_options.dumpSettings()
-   opensg_options.apply(opt_env)
 
    # Incorporate the Boost options into opt_env if Boost is available.  This
    # accounts for the case when a Boost installation is not available through
@@ -191,6 +191,8 @@ if not sca_util.hasHelpFlag():
 
    # ----- FOR EACH VARIANT ----- #
    for combo in variant_helper.iterate(locals(), base_bldr, opt_env):
+      opensg_options.apply(build_env, optimize = combo['type'] != 'debugrt')
+
       # If we are debug, then we want debug runtime and debug dve.
       if combo['type'] == 'debug':
          build_env.AppendUnique(CPPDEFINES = ['IOV_DEBUG'])
