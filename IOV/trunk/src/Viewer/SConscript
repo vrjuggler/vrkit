@@ -57,11 +57,13 @@ if boost_options.isAvailable():
                      LIBS = 'iov'+shared_lib_suffix)
 
    # XXX: There has to be a better way to do this Mac-specific stuff.
-   if GetPlatform() == 'darwin':
+   if platform == 'darwin':
       viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
-   po_lib = boost_options.getFullLibName('program_options', viewerEnv)
-   viewerEnv.Prepend(LIBS = [po_lib])
+   # We use automatic linking against the Boost libraries on Windows.
+   if platform != 'win32':
+      po_lib = boost_options.getFullLibName('program_options', viewerEnv)
+      viewerEnv.Prepend(LIBS = [po_lib])
 
    iov_app_name = appname + runtime_suffix
    iov_app_prog = viewerEnv.Program(iov_app_name, ['iov_app.cpp',])
