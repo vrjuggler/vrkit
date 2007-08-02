@@ -228,20 +228,13 @@ void OpenSgViewer::contextPreDraw()
       context_data* c_data = &(*mContextData);
 
       inf::UserPtr iov_user = getUser();
-      inf::WandInterfacePtr wand_if =
-         iov_user->getInterfaceTrader().getWandInterface();
 
       OSG::Matrix4f head_trans;
-      //gmtl::set(head_trans, iov_user->getHeadProxy()->getData());
-      gmtl::set(head_trans, wand_if->getWandPos()->getData());
-
-      vrj::UserPtr user = vrj::Kernel::instance()->getUsers()[0];
-      float interocular_dist = user->getInterocularDistance();
-      interocular_dist *= getDrawScaleFactor();      // Scale eye separation
+      gmtl::set(head_trans, iov_user->getHeadProxy()->getData(getDrawScaleFactor()));
 
       c_data->mRenderAction->setWindow(c_data->mWin.getCPtr());
 
-      mVideoCamera->render(c_data->mRenderAction, head_trans, interocular_dist);
+      mVideoCamera->render(c_data->mRenderAction, head_trans);
    }
 }
 
@@ -253,7 +246,11 @@ void OpenSgViewer::deallocate()
    mMaterialPool    = OSG::NullFC;
    mHighlighter     = inf::BasicHighlighterPtr();
    mSoundPlayer     = inf::EventSoundPlayerPtr();
-   mVideoCamera = inf::FboVideoCameraPtr();
+   if(mUseVidRec)
+   {
+      mVideoCamera->endRecording();
+      mVideoCamera = inf::FboVideoCameraPtr();
+   }
 }
 
 inf::Event::ResultType OpenSgViewer::
@@ -427,8 +424,8 @@ void OpenSgViewer::init()
    if(mUseVidRec)
    {
       mVideoCamera = inf::FboVideoCamera::create()->init();
-      //mVideoCamera->record(mVideoFileName, "mpg4", 60, false);
-      mVideoCamera->record(mVideoFileName, "mpeg4", 60, true);
+      mVideoCamera->setFilename(mVideoFileName);
+      mVideoCamera->startRecording();
 
       OSG::NodePtr frame_root = mVideoCamera->getFrame();
 
