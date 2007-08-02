@@ -38,6 +38,12 @@ def makePlugin(srcDir, pluginName, instDir):
 
       plugin_lib = plugin_env.SharedLibrary(lib_name, plugin_srcs,
                                             SHLIBPREFIX = '')
+
+      # On Windows, we only want to install the .dll file for the plug-in
+      # case.
+      if platform == 'win32':
+         plugin_lib = [p for p in plugin_lib if str(p).endswith('.dll')]
+
       env.Install(inst_dir, plugin_lib)
 
    def_files = glob.glob(pj(srcDir, pluginName, '*.jdef'))
@@ -70,7 +76,7 @@ plugin_env.Prepend(LIBS = [iov_lib_name])
 # Add define since we are building.
 plugin_env.AppendUnique(CPPDEFINES = ['_IOV_PLUGIN_BUILD_',])
 
-if GetPlatform() == 'darwin':
+if platform == 'darwin':
    plugin_env['SHLINKFLAGS'] = SCons.Util.CLVar('$LINKFLAGS -bundle')
 
 makePlugins(src_dir, inst_paths['lib_plugin'])
