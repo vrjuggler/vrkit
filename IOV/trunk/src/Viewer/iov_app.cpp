@@ -27,8 +27,16 @@
 #include <vpr/vpr.h>
 #include <vpr/System.h>
 #include <jccl/Config/ConfigElement.h>
+
+#include <vrj/vrjParam.h>
 #include <vrj/Kernel/Kernel.h>
-#include <vrj/Draw/OGL/GlWindow.h>
+
+#if __VJ_version < 2003011
+#  include <vrj/Draw/OGL/GlWindow.h>
+#else
+#  include <vrj/Draw/OpenGL/Window.h>
+#endif
+
 #include <vrj/Kernel/User.h>
 
 #include <IOV/Viewer.h>
@@ -55,6 +63,16 @@
 #include <OpenSG/OSGImageFunctions.h>
 #include <IOV/Video/VideoGrabber.h>
 #include <IOV/Video/FboVideoCamera.h>
+
+
+#if __VJ_version < 2003002
+namespace vrj
+{
+
+typedef class User* UserPtr;
+
+}
+#endif
 
 namespace
 {
@@ -212,7 +230,7 @@ void OpenSgViewer::contextPreDraw()
    {
       context_data* c_data = &(*mContextData);
 
-      vrj::User* user = vrj::Kernel::instance()->getUsers()[0];
+      vrj::UserPtr user = vrj::Kernel::instance()->getUsers()[0];
 
       OSG::Matrix4f head_trans;
       //gmtl::set(head_trans, mHead->getData());
