@@ -12,6 +12,26 @@
 #include <IOV/ViewPlatform.h>
 #include <IOV/ViewerPtr.h>
 
+#include <vrj/vrjParam.h>
+
+#if __VJ_version >= 2003005
+#  include <gadget/Type/PositionProxyPtr.h>
+#  include <vrj/Kernel/UserPtr.h>
+#else
+namespace gadget
+{
+
+typedef class PositionProxy* PositionProxyPtr;
+
+}
+
+namespace vrj
+{
+
+typedef class User* UserPtr;
+}
+#endif
+
 
 namespace inf
 {
@@ -40,12 +60,19 @@ public:
     *
     * @return This object is returned as a shared pointer.
     */
-   UserPtr init(ViewerPtr viewer);
+   UserPtr init(ViewerPtr viewer, vrj::UserPtr user);
 
    /**
     * Updates the user and user-associated information.
     */
    void update(ViewerPtr viewer);
+
+   /**
+    * Retrieves the position proxy for this user's head.
+    *
+    * @since 0.40.1
+    */
+   gadget::PositionProxyPtr getHeadProxy() const;
 
    InterfaceTrader& getInterfaceTrader()
    {
@@ -60,6 +87,8 @@ public:
 
 private:
    void platformMoved(ViewerPtr viewer);
+
+   vrj::UserPtr mVrjUser;
 
    /** Devices abstraction for the user. */
    InterfaceTrader    mInterfaceTrader;

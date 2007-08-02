@@ -2,6 +2,8 @@
 
 #include <boost/bind.hpp>
 
+#include <vrj/Kernel/User.h>
+
 #include <IOV/User.h>
 
 
@@ -18,11 +20,12 @@ UserPtr User::create()
    return UserPtr(new User());
 }
 
-UserPtr User::init(ViewerPtr viewer)
+UserPtr User::init(ViewerPtr viewer, vrj::UserPtr user)
 {
    mViewPlatform.platformMoved().connect(boost::bind(&User::platformMoved,
                                                      this, viewer));
 
+   mVrjUser = user;
    mInterfaceTrader.init(viewer);
 
    return shared_from_this();
@@ -31,6 +34,11 @@ UserPtr User::init(ViewerPtr viewer)
 void User::update(ViewerPtr)
 {
    /* Do nothing. */ ;
+}
+
+gadget::PositionProxyPtr User::getHeadProxy() const
+{
+   return mVrjUser->getHeadPosProxy();
 }
 
 void User::platformMoved(inf::ViewerPtr viewer)

@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-01 patrick  Added inf::User::getHeadProxy() for getting access to the
+                    user head position.
+                    -- VERSION -- 0.40.1
 2007-07-31 patrick  inf::plugin::buildSearchPath() now looks in the "debug"
                     subdirectory for optimized and debug-enabled builds. For a
                     debug-enabled build, it looks in the "debug" subdirectory

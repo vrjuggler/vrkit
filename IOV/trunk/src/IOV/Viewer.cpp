@@ -12,6 +12,7 @@
 #include <vpr/Util/Debug.h>
 #include <vpr/Util/FileUtils.h>
 #include <jccl/Config/Configuration.h>
+#include <vrj/Kernel/Kernel.h>
 
 #include <IOV/EventData.h>
 #include <IOV/User.h>
@@ -73,7 +74,8 @@ void Viewer::init()
    ViewerPtr myself(shared_from_this());
 
    // Create and initialize the user.
-   mUser = User::create()->init(myself);
+   mUser = User::create()->init(myself,
+                                vrj::Kernel::instance()->getUsers()[0]);
 
    // Create and initialize the base scene object.
    mScene = Scene::create()->init();
