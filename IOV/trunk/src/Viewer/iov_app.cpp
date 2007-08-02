@@ -178,9 +178,6 @@ protected:
    OSG::MaterialPoolPtr    mMaterialPool;
    //@}
 
-   gadget::PositionInterface mHead;
-   gadget::PositionInterface mWand;
-
    bool				mUseVidRec;
    inf::FboVideoCameraPtr       mVideoCamera;
    std::string			mVideoFileName;
@@ -230,12 +227,15 @@ void OpenSgViewer::contextPreDraw()
    {
       context_data* c_data = &(*mContextData);
 
-      vrj::UserPtr user = vrj::Kernel::instance()->getUsers()[0];
+      inf::UserPtr iov_user = getUser();
+      inf::WandInterfacePtr wand_if =
+         iov_user->getInterfaceTrader().getWandInterface();
 
       OSG::Matrix4f head_trans;
-      //gmtl::set(head_trans, mHead->getData());
-      gmtl::set(head_trans, mWand->getData());
+      //gmtl::set(head_trans, iov_user->getHeadProxy()->getData());
+      gmtl::set(head_trans, wand_if->getWandPos()->getData());
 
+      vrj::UserPtr user = vrj::Kernel::instance()->getUsers()[0];
       float interocular_dist = user->getInterocularDistance();
       interocular_dist *= getDrawScaleFactor();      // Scale eye separation
 
@@ -268,8 +268,6 @@ void OpenSgViewer::init()
 {
    std::cout << "RUNNING INIT!" << std::endl;
    inf::Viewer::init();
-   mHead.init("VJHead");
-   mWand.init("VJWand");
 
    jccl::ConfigElementPtr app_cfg =
       getConfiguration().getConfigElement(getElementType());
