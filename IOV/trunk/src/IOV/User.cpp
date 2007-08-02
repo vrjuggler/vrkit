@@ -41,7 +41,7 @@ gadget::PositionProxyPtr User::getHeadProxy() const
    return mVrjUser->getHeadPosProxy();
 }
 
-float User::getInterocularDistance(float scale) const
+float User::getInterocularDistance(const float scale) const
 {
    return mVrjUser->getInterocularDistance() * scale;
 }

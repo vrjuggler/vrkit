@@ -78,9 +78,9 @@ public:
     * Retrieves the interocular distance for this
     * users eyes
     *
-    * @since 0.40.1
+    * @since 0.40.2
     */
-   float getInterocularDistance(float scale = 1.0f) const;
+   float getInterocularDistance(const float scale = 1.0f) const;
 
    InterfaceTrader& getInterfaceTrader()
    {
