@@ -32,8 +32,12 @@ for path, dirs, files in sca_util.WalkBuildFromSource('.',env):
    header_files += [pj(path,f) for f in files if f.endswith('.h')]
    def_files += [pj(path,f) for f in files if f.endswith('.jdef')]
 
-if GetPlatform() == 'darwin':
+if platform == 'darwin':
    env.Append(LINKFLAGS = ['-install_name', 'libiov.dylib'])
+
+if platform == 'win32':
+   iov_res = env.RES('iov.rc')
+   src_files.append(iov_res)
 
 iov_lib_name = 'iov'+shared_lib_suffix
 iov_lib = env.SharedLibrary(iov_lib_name, src_files)
