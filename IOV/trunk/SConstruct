@@ -32,7 +32,6 @@ def symlinkInstallFunc(dest, source, env):
     return 0
 
 # --- Main Build --- #
-help_text = "\n---- Build system ----\n";
 if GetPlatform() == 'win32':
    # XXX: Temp hack to get msvs version setting
    if ARGUMENTS.has_key('MSVS_VERSION'):
@@ -113,12 +112,6 @@ for opt in build_options.itervalues():
 
 #Export('required_libs_options', 'build_options')
 Export('build_options')
-
-# Setup build dir and prefix settings
-build_dir = "build." + distutils.util.get_platform()
-def_prefix = pj( Dir('.').get_abspath(), build_dir, 'instlinks')
-unspecified_prefix = "use-instlinks"
-opts.Add('prefix', 'Installation prefix: def:' + unspecified_prefix, unspecified_prefix)
 
 help_text = """---- IOV Build System ---- 
 
@@ -206,19 +199,18 @@ if not sca_util.hasHelpFlag():
    for combo in variant_helper.iterate(locals(), base_bldr, opt_env):
       opensg_options.apply(build_env, optimize = combo['type'] != 'debugrt')
 
-      # If we are debug, then we want debug runtime and debug dve.
-      if combo['type'] == 'debug':
-         build_env.AppendUnique(CPPDEFINES = ['IOV_DEBUG'])
+      # If we are debug or debug runtime, then we define preprocessor symbols
+      # to indicate as much.
+      if combo['type'].startswith('debug'):
+         build_env.AppendUnique(CPPDEFINES = ['IOV_DEBUG', 'JUGGLER_DEBUG'])
       # If we are optimized we want no debugging at all.
       elif combo['type'] == 'optimized':
-         build_env.AppendUnique(CPPDEFINES = ['NDEBUG',])
-      # If we are debug run-time.
-      elif combo['type'] == 'debugrt':
-         build_env.AppendUnique(CPPDEFINES = ['IOV_DEBUG'])
+         build_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'IOV_OPT',
+                                              'JUGGLER_OPT'])
 
       # Enable boost auto-linking.
       if platform == 'win32':
-         build_env.Append(CPPDEFINES = ['BOOST_ALL_DYN_LINK',])
+         build_env.Append(CPPDEFINES = ['BOOST_ALL_DYN_LINK'])
 
       if build_env.has_key('MSVS'):
          import pprint
@@ -238,10 +230,10 @@ if not sca_util.hasHelpFlag():
 
       # Specify the OpenGL libraries.
       if platform == "win32":   
-         build_env.Append(CPPFLAGS = ["/wd4996",])
-         gl_libraries = ["opengl32",]
+         build_env.Append(CPPFLAGS = ["/wd4996"])
+         gl_libraries = ["opengl32"]
       else:
-         gl_libraries = ["GL",]
+         gl_libraries = ["GL"]
 
       Export('build_env','full_build_dir', 'combo', 'shared_lib_suffix', 'runtime_suffix', 'inst_paths', 'variant_pass')
       SConscript(dirs=['src'], build_dir=full_build_dir, duplicate=0)
