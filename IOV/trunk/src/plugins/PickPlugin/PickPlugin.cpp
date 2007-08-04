@@ -149,8 +149,7 @@ void PickPlugin::update(ViewerPtr)
 
       // If we are intersecting an object but not grabbing it and the grab
       // button has just been pressed, grab the intersected object.
-      if ( mPickBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) &&
-           NULL != mIntersectedObj.get() )
+      if ( mPickBtn() && NULL != mIntersectedObj.get() )
       {
          if (mIntersectedObj == mPickedObj)
          {
@@ -200,41 +199,28 @@ bool PickPlugin::config(jccl::ConfigElementPtr elt)
    const std::string strategy_plugin_path_prop("strategy_plugin_path");
    const std::string isect_strategy_prop("isect_strategy");
 
-   mPickBtn.configButtons(elt->getProperty<std::string>(pick_btn_prop));
+   mPickBtn.configure(elt->getProperty<std::string>(pick_btn_prop),
+                      mWandInterface);
 
    return true;
 }
-
-struct IncValue
-{
-   int operator()(int v)
-   {
-      return v + 1;
-   }
-};
 
 void PickPlugin::focusChanged(inf::ViewerPtr viewer)
 {
    // If we have focus and our grab/release button is configured, we
    // will update the status panel to include our command.
-   if ( isFocused() && mPickBtn.isConfigured() )
+   if ( isFocused() && mPickBtn )
    {
       inf::ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
-      bool has = false;
-      status_panel_data->mHasControlTexts(mPickBtn.getButtons(), mPickText, has);
+      bool has(false);
+      status_panel_data->mHasControlText(mPickBtn.toString(), mPickText, has);
+
       if ( ! has )
       {
-         // The button numbers in mPickBtn are zero-based, but we would like
-         // them to be one-based in the status panel display.
-         std::vector<int> btns(mPickBtn.getButtons().size());
-         IncValue inc;
-         std::transform(mPickBtn.getButtons().begin(),
-                        mPickBtn.getButtons().end(), btns.begin(), inc);
-
-         status_panel_data->mAddControlTexts(btns, mPickText, 1);
+         status_panel_data->mAddControlText(mPickBtn.toString(), mPickText, 1);
       }
    }
    else if ( ! isFocused() )
@@ -242,15 +228,7 @@ void PickPlugin::focusChanged(inf::ViewerPtr viewer)
       inf::ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
-
-      // The button numbers in mPickBtn are zero-based, but we would like
-      // them to be one-based in the status panel display.
-      std::vector<int> btns(mPickBtn.getButtons().size());
-      IncValue inc;
-      std::transform(mPickBtn.getButtons().begin(),
-                     mPickBtn.getButtons().end(), btns.begin(), inc);
-
-      status_panel_data->mRemoveControlTexts(btns, mPickText);
+      status_panel_data->mRemoveControlText(mPickBtn.toString(), mPickText);
    }
 }
 

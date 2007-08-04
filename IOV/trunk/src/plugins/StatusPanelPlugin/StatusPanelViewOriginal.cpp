@@ -1,6 +1,8 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
 #include <sstream>
+#include <algorithm>
+#include <iterator>
 #include <boost/bind.hpp>
 
 #include <OpenSG/OSGGroup.h>
@@ -195,28 +197,14 @@ void StatusPanelViewOriginal::updatePanelScene()
    {
       if ( ! (*i).first.empty() && ! (*i).second.empty() )
       {
-         std::stringstream key_stream;
-         for ( unsigned int j = 0; j < (*i).first.size(); ++j )
-         {
-            key_stream << (*i).first[j];
-            if ( j + 1 < (*i).first.size() )
-            {
-               key_stream << "+";
-            }
-         }
+         std::ostringstream cmd_stream;
+         std::copy((*i).second.begin(), (*i).second.end(),
+                   std::ostream_iterator<std::string>(cmd_stream,  "; "));
 
-         std::stringstream cmd_stream;
-         for ( unsigned int j = 0; j < (*i).second.size(); ++j )
-         {
-            cmd_stream << (*i).second[j];
-            if ( j + 1 < (*i).second.size() )
-            {
-               cmd_stream << "; ";
-            }
-         }
-
-         center_text_stream << key_stream.str() << ": " << cmd_stream.str()
-               << std::endl;
+         // Chop off the trailing "; " added by the ostream iterator.
+         std::string cmd_desc = cmd_stream.str();
+         cmd_desc = cmd_desc.substr(0, cmd_desc.size() - 2);
+         center_text_stream << (*i).first << ": " << cmd_desc << std::endl;
       }
    }
 

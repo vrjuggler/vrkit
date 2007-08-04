@@ -21,7 +21,7 @@
          <analog_name>VJAnalog3</analog_name>
       </iov_wand_interface>
       <model_swap_plugin name="Model Swap Plugin" version="1">
-         <control_button_num>1</control_button_num>
+         <control_button_num>1^</control_button_num>
          <units_to_meters>Meters</units_to_meters>
          <position>0.0</position>
          <position>10.0</position>
@@ -34,3 +34,4 @@
       </model_swap_plugin>
    </elements>
 </configuration>
+

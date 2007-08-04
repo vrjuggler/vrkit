@@ -92,8 +92,6 @@ protected:
 
    virtual void updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
-   std::vector<int> transformButtonVec(const std::vector<int>& btns);
-
    static std::string getElementType()
    {
       return std::string("wand_nav_plugin");

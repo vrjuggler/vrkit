@@ -10,6 +10,7 @@
 #include <IOV/WandInterfacePtr.h>
 #include <IOV/Plugin.h>
 #include <IOV/Plugin/NavPlugin.h>
+#include <IOV/Util/DigitalCommand.h>
 
 
 namespace inf
@@ -89,10 +90,10 @@ protected:
    float mVelocity;
    NavMode mNavMode;
 
-   int mForBtn;      /**< Button for forward motion. */
-   int mRevBtn;      /**< Button for reverse. */
-   int mRotateBtn;   /**< Button for rotate. */
-   int mModeBtn;     /**< Button for swapping mode. */
+   inf::DigitalCommand mForBtn;         /**< Button for forward motion. */
+   inf::DigitalCommand mRevBtn;         /**< Button for reverse. */
+   inf::DigitalCommand mRotateBtn;      /**< Button for rotate. */
+   inf::DigitalCommand mModeBtn;        /**< Button for swapping mode. */
 
    std::string mForwardText;
    std::string mReverseText;

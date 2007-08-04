@@ -6,7 +6,7 @@
 #include <IOV/Config.h>
 
 #include <string>
-#include <vector>
+#include <boost/function.hpp>
 
 #include <gadget/Type/Digital.h>
 #include <IOV/WandInterfacePtr.h>
@@ -16,10 +16,48 @@ namespace inf
 {
 
 /**
+ * @example "Example of configuring inf::DigitalCommand"
+ *
+ * The language of inf::DigitalCommand defines a boolean expression. Each
+ * digital button is identified by a zero-based integer, and its state is
+ * identified by an operator. Gadgeteer digital devices are in one of four
+ * states: off (-), on (+), toggle on (^), toggle off (v). Boolean operators
+ * are used to combine the button states. There are three such operators:
+ * and (&), inclusive or (|), and exclusive or (^). Parentheses can be used
+ * for (arbitrarily deep) grouping. The state of a button or a group can be
+ * negated using the ! operator.
+ *
+ * The following are examples of digital command configurations:
+ *   - 0-: Button 0 in the off state
+ *   - 1+: Butotn 1 in the on state
+ *   - 0^ | 2^: Buttons 0 and 2 are in the toggled on state
+ *   - !3+: Button 3 is not in the on state
+ *   - (1v | 2v) & 3+: Buttons 1 or 2 are in the toggled off state while
+ *     button 3 is in the on state
+ *   - 0- & !(1+ | 2+): Button 0 is in the off state and neither button 1 nor
+ *     button 2 is in the on state
+ *   - 3^ ^ 7^: Button 3 or button 7 is in the toggled on state but not both
+ *
+ * To disable the use of a digital command, configure it using the empty
+ * string.
+ *
+ * The button indexing is based on how the wand interface is configured. By
+ * default, the IOV wand interface has 6 buttons, but it can be configured to
+ * have any number. It is therefore very important to ensure that the digital
+ * device indices used in configuring a digital command are valid with
+ * respect to the wand button configuration.
+ *
+ * @see inf::WandInterface
+ */
+
+/**
  * This class represents a combination of one or more digital buttons
- * (identified by an integer index corresponding to a digital button defined by
- * inf::WandInterface) as a "command." The status of the buttons can be tested
- * to determine if this command is to be activated.
+ * (identified by an integer index corresponding to a digital button defined
+ * by inf::WandInterface) as a "command." A configuration string defines the
+ * "command" based on the state of one or more digitial devices. A digital
+ * command is in either the on (active) or the off (inactive) state. The state
+ * is determined by querying the state of the each of the digital devices
+ * associated with the command.
  *
  * @since 0.15.0
  *
@@ -31,111 +69,132 @@ public:
    /**
     * Constructs an unconfigured digital command object.
     *
-    * @see configButtons()
+    * @see configure()
     */
    DigitalCommand();
 
-   /**
-    * Constructs a digital command and configures it using the given string
-    * of button identifiers.
-    *
-    * @param buttonString The string that describes the buttons to use. The
-    *                     string must be a comma-separated list of integer
-    *                     identifiers. The integer identifiers must be in
-    *                     the range buttons supported by inf::WandInterface.
-    *
-    * @see configButtons()
-    */
-   DigitalCommand(const std::string& buttonString);
-
+   /** @name Configuration */
+   //@{
    /**
     * Configures the buttons to be utilized by this digital command.
     *
     * @post \c mButtonVec is populated with the integers extracted from
     *       \p buttonString.
     *
-    * @param buttonString The string that describes the buttons to use. The
-    *                     string must be a comma-separated list of integer
-    *                     identifiers. The integer identifiers must be in
-    *                     the range buttons supported by inf::WandInterface.
+    * @param buttonString The string that describes the button state for
+    *                     this digital command. This parameter is passed by
+    *                     copy on purpose.
+    * @param wandIf       The wand interface from which the buttons will be
+    *                     queried.
     *
     * @see inf::WandInterface
+    *
+    * @throw inf::Exception Thrown if a parse error occurs.
+    *
+    * @since 0.41.0
     */
-   void configButtons(std::string buttonString);
+   void configure(std::string buttonString, inf::WandInterfacePtr wandIf);
 
    /**
     * Determines whether this digital command object has had its buttons
     * configured. If this command object is not configured, then test() will
     * return false.
     *
-    * @see configButtons()
+    * @see configure()
     * @see test()
     */
-   bool isConfigured() const;
+   bool isConfigured() const
+   {
+      return ! mConfigString.empty() && ! mTestFunc.empty();
+   }
 
+   /**
+    * A synonym for isConfigured().
+    *
+    * @since 0.41.0
+    */
+   operator bool() const
+   {
+      return isConfigured();
+   }
+   //@}
+
+   /** @name State Test */
+   //@{
    /**
     * Determines whether this digital command is in the given state.
     *
-    * @param wandIf
-    * @param testState The state of a gadget::Digital object to be tested
-    *                  against the current state of this digital command.
-    */
-   bool test(inf::WandInterfacePtr wandIf,
-             const gadget::Digital::State testState);
-
-   /**
-    * Replaces the collection of buttons in this digital command with the
-    * given vector of button identifiers.
+    * @pre This digital command was configured successfully.
     *
-    * @pre The identifiers given in \p buttons must all be valid with respect
-    *      to the digital buttons provided by inf::WandInterface.
-    * @post \c mButtonVec is replaced by the conents of \p buttons.
-    *
-    * @param buttons A vector of integer identifiers corresponding to the
-    *                digital buttons provided by inf::WandInterface.
+    * @since 0.41.0
     */
-   void setButtons(const std::vector<int>& buttons)
+   bool test() const
    {
-      mButtonVec = buttons;
+      return mTestFunc();
    }
 
    /**
-    * Returns the button identifiers currently in use by this digital command.
+    * A synonym for test().
+    *
+    * @since 0.41.0
     */
-   const std::vector<int>& getButtons() const
+   bool operator()() const
    {
-      return mButtonVec;
+      return test();
    }
+   //@}
+
+   /**
+    * Returns the original boolean expression in string form of this digital
+    * command's configuration.
+    *
+    * @since 0.41.0
+    */
+   const std::string& getExpression() const
+   {
+      return mConfigString;
+   }
+
+   /**
+    * Provides a human-readable string form of this digital command.
+    *
+    * @note The intention of this method is to transform the boolean
+    *       expression string into something meaningful to the average user.
+    *       Doing this is rather non-trivial, but utilizing the abstract
+    *       syntax tree in configure() would be a start. At any rate, for now,
+    *       it just returns the original boolean expression used to configure
+    *       this digital command.
+    *
+    * @since 0.41.0
+    */
+   const std::string& toString() const
+   {
+      return getExpression();
+   }
+
+   /**
+    * Compares this digital command against the given digital command to
+    * determine if they are equivalent. Equivalency is defined as two digital
+    * commands that are in the active state at the same time.
+    *
+    * @since 0.41.0
+    */
+   bool operator==(const DigitalCommand& rhs) const;
 
 private:
    /**
-    * Performs an accumulated test of all the digital buttons in use by this
-    * digital command to determine if this command is active. For this command
-    * to be active, all the buttons in \c mButtonVec must be in the given
-    * state.
+    * Used for simple state tests such as the case of a disabled digital
+    * command. This always returns false.
     *
-    * @pre \p btn is a valid digital button identifier for \p wandIf.
-    *
-    * @param wandIf     The wand interface object holding the actual digital
-    *                   interfaces that will be queried.
-    * @param testState  The desired digital button state that will be tested.
-    * @param accumState The current accumulated state of the buttons that are
-    *                   in \p testState.
-    * @param btn        The button whose state will be tested and accumulated
-    *                   with previous tests.
-    *
-    * @note This method is designed to be used with std::accumulate() and
-    *       really does not make sense to be used on its own.
+    * @since 0.41.0
     */
-   static bool accumulateState(inf::WandInterfacePtr wandIf,
-                               const gadget::Digital::State testState,
-                               const bool accumState, const int btn);
+   static bool dummyTest()
+   {
+      return false;
+   }
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-   friend struct CallWrapper;
-#endif
-
-   std::vector<int> mButtonVec;
+   std::string              mConfigString;
+   boost::function<bool ()> mTestFunc;
 };
 
 }

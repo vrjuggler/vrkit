@@ -1,5 +1,10 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-03 patrick  Revamped inf::DigitalCommand to be fully configurable using
+                    button state expressions. All plug-ins currently using
+                    inf::DigitalCommand have been updated for this new
+                    capability.
+                    -- VERSION -- 0.41.0
 2007-08-02 dshipton Added inf::User::getInterocularDistance() for obtaining
                     the users eye separation with an optional scaling factor.
                     -- VERSION -- 0.40.2

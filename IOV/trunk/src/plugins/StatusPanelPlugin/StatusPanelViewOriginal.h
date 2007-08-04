@@ -30,7 +30,7 @@ public:
    
    StatusPanelViewOriginal();
    
-   typedef std::map<std::vector<int>, std::vector<std::string> > center_text_t;
+   typedef std::map<std::string, std::vector<std::string> > center_text_t;
    
    /** Initialize scene graph, fonts and everything else that is used. */
    void initialize(const float metersToAppUnits, StatusPanel* const panel);

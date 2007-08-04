@@ -6,7 +6,6 @@
 #include <boost/bind.hpp>
 #include <boost/assign/list_of.hpp>
 
-
 #include <IOV/Plugin/PluginConfig.h>
 #include <IOV/PluginCreator.h>
 #include <IOV/GrabSignalData.h>
@@ -123,47 +122,46 @@ void SignalGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
 
       // If choose button(s) is/are configured, we will update the status
       // panel to include that information.
-      if ( mChooseBtn.isConfigured() )
+      if ( mChooseBtn )
       {
-         bool has = false;
-         status_panel_data->mHasControlTexts(mChooseBtn.getButtons(), mChooseText, has);
+         bool has(false);
+         status_panel_data->mHasControlText(mChooseBtn.toString(),
+                                            mChooseText, has);
+
          if ( ! has )
          {
-            // The button numbers in mChooseBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            status_panel_data->mAddControlTexts(
-               transformButtonVec(mChooseBtn.getButtons()), mChooseText, 1
-            );
+            status_panel_data->mAddControlText(mChooseBtn.toString(),
+                                               mChooseText, 1);
          }
       }
 
       // If grab button(s) is/are configured, we will update the status
       // panel to include that information.
-      if ( mGrabBtn.isConfigured() )
+      if ( mGrabBtn )
       {
-         bool has = false;
-         status_panel_data->mHasControlTexts(mGrabBtn.getButtons(), mGrabText, has);
+         bool has(false);
+         status_panel_data->mHasControlText(mGrabBtn.toString(), mGrabText,
+                                            has);
+
          if ( ! has )
          {
-            // The button numbers in mGrabBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            status_panel_data->mAddControlTexts(transformButtonVec(mGrabBtn.getButtons()),
-                                 mGrabText, 1);
+            status_panel_data->mAddControlText(mGrabBtn.toString(),
+                                               mGrabText, 1);
          }
       }
+
       // If release button(s) is/are configured, we will update the status
       // panel to include that information.
-      if ( mReleaseBtn.isConfigured() )
+      if ( mReleaseBtn )
       {
-         bool has = false;
-         status_panel_data->mHasControlTexts(mReleaseBtn.getButtons(), mReleaseText, has);
+         bool has(false);
+         status_panel_data->mHasControlText(mReleaseBtn.toString(),
+                                            mReleaseText, has);
+
          if ( ! has )
          {
-            // The button numbers in mReleaseBtn are zero-based, but we
-            // would like them to be one-based in the status panel display.
-            status_panel_data->mAddControlTexts(
-               transformButtonVec(mReleaseBtn.getButtons()), mReleaseText, 1
-            );
+            status_panel_data->mAddControlText(mReleaseBtn.toString(),
+                                               mReleaseText, 1);
          }
       }
    }
@@ -173,27 +171,18 @@ void SignalGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
-      // The button numbers in mChooseBtn are zero-based, but we would like
-      // them to be one-based in the status panel display.
-      status_panel_data->mRemoveControlTexts(transformButtonVec(mChooseBtn.getButtons()),
-                              mChooseText);
-
-      // The button numbers in mGrabBtn are zero-based, but we would like
-      // them to be one-based in the status panel display.
-      status_panel_data->mRemoveControlTexts(transformButtonVec(mGrabBtn.getButtons()),
-                              mGrabText);
-
-      // The button numbers in mReleaseBtn are zero-based, but we would like
-      // them to be one-based in the status panel display.
-      status_panel_data->mRemoveControlTexts(transformButtonVec(mReleaseBtn.getButtons()),
-                              mReleaseText);
+      status_panel_data->mRemoveControlText(mChooseBtn.toString(),
+                                            mChooseText);
+      status_panel_data->mRemoveControlText(mGrabBtn.toString(), mGrabText);
+      status_panel_data->mRemoveControlText(mReleaseBtn.toString(),
+                                            mReleaseText);
    }
 }
 
 void SignalGrabStrategy::update(ViewerPtr viewer)
 {
    // The user wants to choose an object for later grabbing.
-   if ( mChooseBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+   if ( mChooseBtn() )
    {
       mGrabSignalData->choose();
    }
@@ -204,7 +193,7 @@ void SignalGrabStrategy::update(ViewerPtr viewer)
    {
       // Just test the state of the grab command. Testing the state of the
       // release command would give the same result in this case.
-      if ( mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      if ( mGrabBtn() )
       {
          // If the grab/release toggle has been activated, then we have to
          // look at mGrabbing to figure out which operation to perform.
@@ -226,12 +215,12 @@ void SignalGrabStrategy::update(ViewerPtr viewer)
    else
    {
       // The user has requested to grab the currently selected objects.
-      if ( mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      if ( mGrabBtn() )
       {
          grab();
       }
       // The user has requested to release grabbed objects.
-      else if ( mReleaseBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      else if ( mReleaseBtn() )
       {
          release();
       }
@@ -263,28 +252,18 @@ void SignalGrabStrategy::configure(jccl::ConfigElementPtr elt)
    const std::string grab_btn_prop("grab_button_nums");
    const std::string release_btn_prop("release_button_nums");
 
-   mChooseBtn.configButtons(elt->getProperty<std::string>(choose_btn_prop));
-   mGrabBtn.configButtons(elt->getProperty<std::string>(grab_btn_prop));
-   mReleaseBtn.configButtons(elt->getProperty<std::string>(release_btn_prop));
+   mChooseBtn.configure(elt->getProperty<std::string>(choose_btn_prop),
+                        mWandInterface);
+   mGrabBtn.configure(elt->getProperty<std::string>(grab_btn_prop),
+                      mWandInterface);
+   mReleaseBtn.configure(elt->getProperty<std::string>(release_btn_prop),
+                         mWandInterface);
 
    // Determine if grab and release are activated using the same button
    // sequence. This indicates that the grab/release operation is a toggle
    // and must be handled differently than if the two operations are
    // separate.
-   std::vector<int> grab_btns(mGrabBtn.getButtons());
-   std::vector<int> release_btns(mReleaseBtn.getButtons());
-   std::sort(grab_btns.begin(), grab_btns.end());
-   std::sort(release_btns.begin(), release_btns.end());
-
-   if ( grab_btns.size() == release_btns.size() &&
-        std::equal(grab_btns.begin(), grab_btns.end(), release_btns.begin()) )
-   {
-      mGrabReleaseToggle = true;
-   }
-   else
-   {
-      mGrabReleaseToggle = false;
-   }
+   mGrabReleaseToggle = mGrabBtn == mReleaseBtn;
 }
 
 void SignalGrabStrategy::grab()
@@ -338,23 +317,6 @@ objectsReleased(const std::vector<SceneObjectPtr>& objs)
 
    mGrabbing = ! mGrabbedObjects.empty();
    mReleaseCallback(objs);
-}
-
-struct IncValue
-{
-   int operator()(int v)
-   {
-      return v + 1;
-   }
-};
-
-std::vector<int> SignalGrabStrategy::
-transformButtonVec(const std::vector<int>& btns)
-{
-   std::vector<int> result(btns.size());
-   IncValue inc;
-   std::transform(btns.begin(), btns.end(), result.begin(), inc);
-   return result;
 }
 
 }

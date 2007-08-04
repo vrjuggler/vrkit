@@ -76,10 +76,6 @@ SimpleNavPlugin::SimpleNavPlugin(const inf::plugin::Info& info)
    , mCanNavigate(false)
    , mVelocity(0.0f)
    , mNavMode(WALK)
-   , mForBtn(-1)
-   , mRevBtn(-1)
-   , mRotateBtn(-1)
-   , mModeBtn(-1)
    , mForwardText("Forward")
    , mReverseText("Reverse")
    , mRotateText("Rotate")
@@ -92,11 +88,11 @@ PluginPtr SimpleNavPlugin::init(ViewerPtr viewer)
 {
    const std::string plugin_path_prop("plugin_path");
    const std::string plugin_prop("plugin");
-   const std::string for_btn_prop("forward_button_num");
-   const std::string rev_btn_prop("reverse_button_num");
-   const std::string rot_btn_prop("rotate_button_num");
-   const std::string mode_btn_prop("nav_mode_button_num");
-   const int unsigned req_cfg_version(1);
+   const std::string for_btn_prop("forward_button_nums");
+   const std::string rev_btn_prop("reverse_button_nums");
+   const std::string rot_btn_prop("rotate_button_nums");
+   const std::string mode_btn_prop("nav_mode_button_nums");
+   const int unsigned req_cfg_version(2);
 
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
@@ -122,10 +118,14 @@ PluginPtr SimpleNavPlugin::init(ViewerPtr viewer)
    }
 
    // Get the button for navigation
-   mForBtn = elt->getProperty<int>(for_btn_prop);
-   mRevBtn = elt->getProperty<int>(rev_btn_prop);
-   mRotateBtn = elt->getProperty<int>(rot_btn_prop);
-   mModeBtn = elt->getProperty<int>(mode_btn_prop);
+   mForBtn.configure(elt->getProperty<std::string>(for_btn_prop),
+                     mWandInterface);
+   mRevBtn.configure(elt->getProperty<std::string>(rev_btn_prop),
+                     mWandInterface);
+   mRotateBtn.configure(elt->getProperty<std::string>(rot_btn_prop),
+                        mWandInterface);
+   mModeBtn.configure(elt->getProperty<std::string>(mode_btn_prop),
+                      mWandInterface);
 
    return shared_from_this();
 }
@@ -143,65 +143,81 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
    {
       mVelocity = 0.0f;
       
-      if ( mForBtn != -1 )
+      if ( mForBtn )
       {
-         status_panel_data->mRemoveControlText(mForBtn + 1, mForwardText);
+         status_panel_data->mRemoveControlText(mForBtn.toString(),
+                                               mForwardText);
       }
 
-      if ( mRevBtn != -1 )
+      if ( mRevBtn )
       {
-         status_panel_data->mRemoveControlText(mRevBtn + 1, mReverseText);
+         status_panel_data->mRemoveControlText(mRevBtn.toString(),
+                                               mReverseText);
       }
 
-      if ( mRotateBtn != -1 )
+      if ( mRotateBtn )
       {
-         status_panel_data->mRemoveControlText(mRotateBtn + 1, mRotateText);
+         status_panel_data->mRemoveControlText(mRotateBtn.toString(),
+                                               mRotateText);
       }
 
-      if ( mModeBtn != -1 )
+      if ( mModeBtn )
       {
-         status_panel_data->mRemoveControlText(mModeBtn + 1, mModeText);
+         status_panel_data->mRemoveControlText(mModeBtn.toString(),
+                                               mModeText);
       }
    }
    else
    {
-      if ( mForBtn != -1 )
+      if ( mForBtn )
       {
-         bool has = false;
-         status_panel_data->mHasControlText(mForBtn + 1, mForwardText, has);
+         bool has(false);
+         status_panel_data->mHasControlText(mForBtn.toString(), mForwardText,
+                                            has);
+
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mForBtn + 1, mForwardText, 1);
+            status_panel_data->mAddControlText(mForBtn.toString(),
+                                               mForwardText, 1);
          }
       }
 
-      if ( mRevBtn != -1 )
+      if ( mRevBtn )
       {
-         bool has = false;
-         status_panel_data->mHasControlText(mRevBtn + 1, mReverseText, has);
+         bool has(false);
+         status_panel_data->mHasControlText(mRevBtn.toString(), mReverseText,
+                                            has);
+
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mRevBtn + 1, mReverseText, 1);
+            status_panel_data->mAddControlText(mRevBtn.toString(),
+                                               mReverseText, 1);
          }
       }
 
-      if ( mRotateBtn != -1 )
+      if ( mRotateBtn )
       {
-         bool has = false;
-         status_panel_data->mHasControlText(mRotateBtn + 1, mRotateText, has);
+         bool has(false);
+         status_panel_data->mHasControlText(mRotateBtn.toString(),
+                                            mRotateText, has);
+
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mRotateBtn + 1, mRotateText, 1);
+            status_panel_data->mAddControlText(mRotateBtn.toString(),
+                                               mRotateText, 1);
          }
       }
 
-      if ( mModeBtn != -1 )
+      if ( mModeBtn )
       {
-         bool has = false;
-         status_panel_data->mHasControlText(mModeBtn + 1, mModeText, has);
+         bool has(false);
+         status_panel_data->mHasControlText(mModeBtn.toString(), mModeText,
+                                            has);
+
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mModeBtn + 1, mModeText, 1);
+            status_panel_data->mAddControlText(mModeBtn.toString(),
+                                               mModeText, 1);
          }
       }
    }
@@ -218,21 +234,12 @@ void SimpleNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
       const float inc_vel(0.005f);
       const float max_vel(0.5f);
 
-      gadget::DigitalInterface& accel_button =
-         mWandInterface->getButton(mForBtn);
-      gadget::DigitalInterface& deccel_button =
-         mWandInterface->getButton(mRevBtn);
-      gadget::DigitalInterface& rotate_button =
-         mWandInterface->getButton(mRotateBtn);
-      gadget::DigitalInterface& mode_button =
-         mWandInterface->getButton(mModeBtn);
-
       // Update velocity
-      if ( accel_button->getData() == gadget::Digital::ON )
+      if ( mForBtn() )
       {
          mVelocity += inc_vel;
       }
-      else if ( deccel_button->getData() == gadget::Digital::ON )
+      else if ( mRevBtn() )
       {
          mVelocity -= inc_vel;
       }
@@ -252,7 +259,7 @@ void SimpleNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
       }
 
       // Swap the navigation mode if the mode switching button was toggled on.
-      if ( mode_button->getData() == gadget::Digital::TOGGLE_ON )
+      if ( mModeBtn() )
       {
          mNavMode = (mNavMode == WALK ? FLY : WALK);
          IOV_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
@@ -261,11 +268,11 @@ void SimpleNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
 
       // If the accelerate button and the rotate button are pressed together,
       // then reset to the starting point translation and rotation.
-      if ( accel_button->getData() && rotate_button->getData() )
+      if ( mForBtn() && mRotateBtn() )
       {
          nav_state = RESET;
       }
-      else if ( rotate_button->getData() == gadget::Digital::ON )
+      else if ( mRotateBtn() )
       {
          nav_state = ROTATE;
       }

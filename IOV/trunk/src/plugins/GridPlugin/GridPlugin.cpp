@@ -106,7 +106,7 @@ void GridPlugin::update(inf::ViewerPtr viewer)
    {
       // Change the visiblity of all the grids of the activate/deactivate
       // button is toggled on.
-      if ( mActivateBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      if ( mActivateBtn() )
       {
          mGridsVisible = ! mGridsVisible;
          std::vector<inf::GridPtr>::iterator g;
@@ -117,7 +117,7 @@ void GridPlugin::update(inf::ViewerPtr viewer)
       }
 
       // Change the grid selection state if the cycle button has toggled on.
-      if ( mCycleBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      if ( mCycleBtn() )
       {
          if ( mSelectedGridIndex != -1 )
          {
@@ -204,14 +204,14 @@ void GridPlugin::update(inf::ViewerPtr viewer)
          }
          // If no sliding is being performed and the reset button is on, then
          // reset the position of the selected grid.
-         else if ( mResetBtn.test(mWandInterface, gadget::Digital::ON) )
+         else if ( mResetBtn() )
          {
             mGrids[mSelectedGridIndex]->reset();
          }
 
          // If the show/hide button has been toggled on, toggle the visible
          // state of the selected grid.
-         if ( mHideBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+         if ( mHideBtn() )
          {
             mGrids[mSelectedGridIndex]->setVisible(
                ! mGrids[mSelectedGridIndex]->isVisible()
@@ -255,97 +255,82 @@ void GridPlugin::focusChanged(inf::ViewerPtr viewer)
          mGrids[mSelectedGridIndex]->setSelected(false);
          mSelectedGridIndex = -1;
       }
-      
+
       if ( mActivateBtn.isConfigured() )
       {
-         // The button numbers in mActivateBtn are zero-based, but we would
-         // like them to be one-based in the status panel display.
-         std::vector<int> btns(
-            transformButtonVec(mActivateBtn.getButtons())
-         );
-         status_panel_data->mRemoveControlTexts(btns, mActivateText);
+         status_panel_data->mRemoveControlText(mActivateBtn.toString(),
+                                               mActivateText);
       }
 
       if ( mCycleBtn.isConfigured() )
       {
-         // The button numbers in mCycleBtn are zero-based, but we would
-         // like them to be one-based in the status panel display.
-         std::vector<int> btns(transformButtonVec(mCycleBtn.getButtons()));
-         status_panel_data->mRemoveControlTexts(btns, mCycleText);
+         status_panel_data->mRemoveControlText(mCycleBtn.toString(),
+                                               mCycleText);
       }
 
       if ( mHideBtn.isConfigured() )
       {
-         // The button numbers in mHideBtn are zero-based, but we would
-         // like them to be one-based in the status panel display.
-         std::vector<int> btns(transformButtonVec(mHideBtn.getButtons()));
-         status_panel_data->mRemoveControlTexts(btns, mHideText);
+         status_panel_data->mRemoveControlText(mHideBtn.toString(),
+                                               mHideText);
       }
 
       if ( mResetBtn.isConfigured() )
       {
-         // The button numbers in mResetBtn are zero-based, but we would
-         // like them to be one-based in the status panel display.
-         std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
-         status_panel_data->mRemoveControlTexts(btns, mResetText);
+         status_panel_data->mRemoveControlText(mResetBtn.toString(),
+                                               mResetText);
       }
    }
    else
    {
       if ( mActivateBtn.isConfigured() )
       {
-         // The button numbers in mActivateBtn are zero-based, but we would
-         // like them to be one-based in the status panel display.
-         std::vector<int> btns(
-            transformButtonVec(mActivateBtn.getButtons())
-         );
-         bool has = false;
-         status_panel_data->mHasControlTexts(btns, mActivateText, has);
+         bool has(false);
+         status_panel_data->mHasControlText(mActivateBtn.toString(),
+                                            mActivateText, has);
+
          if ( ! has )
          {
-            status_panel_data->mAddControlTexts(btns, mActivateText, 1);
+            status_panel_data->mAddControlText(mActivateBtn.toString(),
+                                               mActivateText, 1);
          }
       }
 
       if ( mCycleBtn.isConfigured() )
       {
-         // The button numbers in mCycleBtn are zero-based, but we would
-         // like them to be one-based in the status panel display.
-         std::vector<int> btns(transformButtonVec(mCycleBtn.getButtons()));
+         bool has(false);
+         status_panel_data->mHasControlText(mCycleBtn.toString(), mCycleText,
+                                            has);
 
-         bool has = false;
-         status_panel_data->mHasControlTexts(btns, mCycleText, has);
          if ( ! has )
          {
-            status_panel_data->mAddControlTexts(btns, mCycleText, 1);
+            status_panel_data->mAddControlText(mCycleBtn.toString(),
+                                               mCycleText, 1);
          }
       }
 
       if ( mHideBtn.isConfigured() )
       {
-         // The button numbers in mHideBtn are zero-based, but we would
-         // like them to be one-based in the status panel display.
-         std::vector<int> btns(transformButtonVec(mHideBtn.getButtons()));
+         bool has(false);
+         status_panel_data->mHasControlText(mHideBtn.toString(), mHideText,
+                                            has);
 
-         bool has = false;
-         status_panel_data->mHasControlTexts(btns, mHideText, has);
          if ( ! has )
          {
-            status_panel_data->mAddControlTexts(btns, mHideText, 1);
+            status_panel_data->mAddControlText(mHideBtn.toString(), mHideText,
+                                               1);
          }
       }
 
       if ( mResetBtn.isConfigured() )
       {
-         // The button numbers in mResetBtn are zero-based, but we would
-         // like them to be one-based in the status panel display.
-         std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
+         bool has(false);
+         status_panel_data->mHasControlText(mResetBtn.toString(), mResetText,
+                                            has);
 
-         bool has = false;
-         status_panel_data->mHasControlTexts(btns, mResetText, has);
          if ( ! has )
          {
-            status_panel_data->mAddControlTexts(btns, mResetText, 1);
+            status_panel_data->mAddControlText(mResetBtn.toString(),
+                                               mResetText, 1);
          }
       }
    }
@@ -373,10 +358,14 @@ void GridPlugin::configure(jccl::ConfigElementPtr elt)
    const std::string reset_btn_prop("reset_button_nums");
    const std::string grids_prop("grids");
 
-   mActivateBtn.configButtons(elt->getProperty<std::string>(activate_btn_prop));
-   mCycleBtn.configButtons(elt->getProperty<std::string>(cycle_btn_prop));
-   mHideBtn.configButtons(elt->getProperty<std::string>(hide_btn_prop));
-   mResetBtn.configButtons(elt->getProperty<std::string>(reset_btn_prop));
+   mActivateBtn.configure(elt->getProperty<std::string>(activate_btn_prop),
+                          mWandInterface);
+   mCycleBtn.configure(elt->getProperty<std::string>(cycle_btn_prop),
+                       mWandInterface);
+   mHideBtn.configure(elt->getProperty<std::string>(hide_btn_prop),
+                      mWandInterface);
+   mResetBtn.configure(elt->getProperty<std::string>(reset_btn_prop),
+                       mWandInterface);
 
    const unsigned int num_grids(elt->getNum(grids_prop));
 
@@ -396,22 +385,6 @@ void GridPlugin::configure(jccl::ConfigElementPtr elt)
                    << std::endl;
       }
    }
-}
-
-struct IncValue
-{
-   int operator()(int v)
-   {
-      return v + 1;
-   }
-};
-
-std::vector<int> GridPlugin::transformButtonVec(const std::vector<int>& btns)
-{
-   std::vector<int> result(btns.size());
-   IncValue inc;
-   std::transform(btns.begin(), btns.end(), result.begin(), inc);
-   return result;
 }
 
 }

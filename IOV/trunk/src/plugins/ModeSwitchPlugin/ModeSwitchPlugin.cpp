@@ -71,14 +71,6 @@ namespace
 
 const vpr::GUID mode_switch_status_id("8c0034da-b613-4bd0-9c30-f8c35f48ba1a");
 
-struct IncValue
-{
-   int operator()(int v)
-   {
-      return v + 1;
-   }
-};
-
 }
 
 namespace inf
@@ -153,7 +145,8 @@ PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
    );
 
    // Get the button for swapping
-   mSwitchButton.configButtons(elt->getProperty<std::string>(swap_button_prop));
+   mSwitchButton.configure(elt->getProperty<std::string>(swap_button_prop),
+                           mWandInterface);
 
    // Get mode names
    const unsigned int num_mode_names(elt->getNum(mode_names_prop));
@@ -275,7 +268,7 @@ void ModeSwitchPlugin::update(inf::ViewerPtr viewer)
 {
    if ( isFocused() )
    {
-      if ( mSwitchButton.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      if ( mSwitchButton() )
       {
          unsigned int new_mode(0);
          if ( mMaxMode != 0 )
@@ -371,24 +364,18 @@ void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
 
    StatusPanelDataPtr status_panel_data =
       viewer->getSceneObj()->getSceneData<StatusPanelData>();
-   
+
    status_panel_data->mSetHeaderTitle("Mode");
    status_panel_data->mSetCenterTitle("Controls");
    std::ostringstream stream;
    stream << mModeNames[modeNum];
    status_panel_data->mSetHeaderText(stream.str());
-   
-   // The button numbers in mSwitchButton are zero-based, but we would like
-   // them to be one-based in the status panel display.
-   std::vector<int> btns(mSwitchButton.getButtons().size());
-   std::transform(mSwitchButton.getButtons().begin(),
-                  mSwitchButton.getButtons().end(), btns.begin(),
-                  IncValue());
 
-   status_panel_data->mSetControlTexts(btns, "Switch Mode");
-   
+   status_panel_data->mSetControlText(mSwitchButton.toString(),
+                                      "Switch Mode");
+
    for ( unsigned int i = 0; i < mPlugins.size(); ++i )
-   {      
+   {
       PluginData plugin = mPlugins[i];
 
       // If found mode in active modes

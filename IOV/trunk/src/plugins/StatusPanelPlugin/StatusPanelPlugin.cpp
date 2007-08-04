@@ -231,39 +231,19 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
          &StatusPanel::setControlText, &mStatusPanel, _1, _2)
       );
    
-   status_panel_data->mSetControlTexts.connect(
-      boost::bind(
-         &StatusPanel::setControlTexts, &mStatusPanel, _1, _2)
-      );
-
    status_panel_data->mAddControlText.connect(
       boost::bind(
       &StatusPanel::addControlText, &mStatusPanel, _1, _2, _3)
       );
-   
-   status_panel_data->mAddControlTexts.connect(
-      boost::bind(
-         &StatusPanel::addControlTexts, &mStatusPanel, _1, _2, _3)
-      );
-      
+
    status_panel_data->mRemoveControlText.connect(
       boost::bind(
          &StatusPanel::removeControlText, &mStatusPanel, _1, _2)
-      );
-   
-   status_panel_data->mRemoveControlTexts.connect(
-      boost::bind(
-         &StatusPanel::removeControlTexts, &mStatusPanel, _1, _2)
       );
 
    status_panel_data->mHasControlText.connect(
       boost::bind(
          &StatusPanel::hasControlText, &mStatusPanel, _1, _2, _3)
-      );
-   
-   status_panel_data->mHasControlTexts.connect(
-      boost::bind(
-         &StatusPanel::hasControlTexts, &mStatusPanel, _1, _2, _3)
       );
 
    status_panel_data->mAddStatusMessage.connect(

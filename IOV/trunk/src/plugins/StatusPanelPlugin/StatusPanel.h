@@ -22,7 +22,7 @@ class StatusPanel
 public:
    StatusPanel();
    
-   typedef std::map<std::vector<int>, std::vector<std::string> > center_text_t;
+   typedef std::map<std::string, std::vector<std::string> > center_text_t;
 
    /** Sets the header title. */
    void setHeaderTitle(const std::string& txt);
@@ -37,39 +37,13 @@ public:
    void setHeaderText(const std::string& header);
 
    /**
-    * Sets the text description for the command identified by \p cmd.
-    * This overwrites whatever was previously in the buffer for the
-    * identified command.
-    *
-    * @since 0.10.0
-    */
-   void setControlText(const int cmd, const std::string& desc)
-   {
-      std::vector<int> cmds(1, cmd);
-      setControlTexts(cmds, desc);
-   }
-
-   /**
     * Sets the text description for the command identified by \p cmds.
     * This overwrites whatever was previously in the buffer for the
     * identified command.
     *
     * @since 0.10.0
     */
-   void setControlTexts(const std::vector<int>& cmds, const std::string& desc);
-
-   /**
-    * Adds the given text description ifor the command identified by \p cmd
-    * to this panel's control section.
-    *
-    * @since 0.10.0
-    */
-   void addControlText(const int cmd, const std::string& desc,
-                       const unsigned int priority = 1)
-   {
-      std::vector<int> cmds(1, cmd);
-      addControlTexts(cmds, desc, priority);
-   }
+   void setControlText(const std::string& cmdText, const std::string& desc);
 
    /**
     * Adds the given text description ifor the command identified by \p cmds
@@ -77,21 +51,8 @@ public:
     *
     * @since 0.10.0
     */
-   void addControlTexts(const std::vector<int>& cmds, const std::string& desc,
+   void addControlText(const std::string& cmds, const std::string& desc,
                        const unsigned int priority = 1);
-
-   /**
-    * Removes the given text description for the command identified by \cmd
-    * from this panel's control section.  If the given text is not associated
-    * with the identified command, this has no effect.
-    *
-    * @since 0.10.0
-    */
-   void removeControlText(const int cmd, const std::string& desc)
-   {
-      std::vector<int> cmds(1, cmd);
-      removeControlTexts(cmds, desc);
-   }
 
    /**
     * Removes the given text description for the command identified by \cmds
@@ -100,7 +61,7 @@ public:
     *
     * @since 0.10.0
     */
-   void removeControlTexts(const std::vector<int>& cmds,
+   void removeControlText(const std::string& cmdText,
                           const std::string& desc);
 
    /**
@@ -108,26 +69,17 @@ public:
     *
     * @since 0.10.0
     */
-   void hasControlText(const int cmd, const std::string& desc, bool& flag)
-   {
-      std::vector<int> cmds(1, cmd);
-      hasControlTexts(cmds, desc, flag);
-   }
-
-   /**
-    * Determines if the named line contains the given text.
-    *
-    * @since 0.10.0
-    */
-   void hasControlTexts(const std::vector<int>& cmds, const std::string& desc, bool& flag)
+   void hasControlText(const std::string& cmdText, const std::string& desc,
+                       bool& flag)
    {
       flag = false;
 
-      if ( mCenterText.count(cmds) != 0 )
+      if ( mCenterText.count(cmdText) != 0 )
       {
-         std::vector<std::string>& vec = mCenterText[cmds];
+         std::vector<std::string>& vec = mCenterText[cmdText];
          flag = std::find(vec.begin(), vec.end(), desc) != vec.end();
       }
+
       mChangeSignal();
    }
 

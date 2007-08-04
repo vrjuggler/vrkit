@@ -109,7 +109,7 @@ PluginPtr WidgetPlugin::init(inf::ViewerPtr viewer)
    else
    {
       // XXX: Default
-      mSelectBtn.configButtons("0");
+      mSelectBtn.configure("0^", mWandInterface);
    }
 
    mWidgetData = scene->getSceneData<WidgetData>();
@@ -181,8 +181,7 @@ void WidgetPlugin::update(inf::ViewerPtr viewer)
 
       // If we are intersecting an object but not grabbing it and the grab
       // button has just been pressed, grab the intersected object.
-      if ( mIntersecting && ! mWidgetPressed &&
-           mSelectBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      if ( mIntersecting && ! mWidgetPressed && mSelectBtn() )
       {
          mWidgetPressed = true;
 
@@ -190,8 +189,7 @@ void WidgetPlugin::update(inf::ViewerPtr viewer)
       }
       // If we are grabbing an object and the grab button has just been
       // pressed again, release the grabbed object.
-      else if ( mWidgetPressed &&
-                mSelectBtn.test(mWandInterface, gadget::Digital::TOGGLE_OFF) )
+      else if ( mWidgetPressed && mSelectBtn() )
       {
          mWidgetPressed = false;
 
@@ -416,24 +414,10 @@ void WidgetPlugin::configure(jccl::ConfigElementPtr elt)
    const std::string activate_btn_prop("activate_button_nums");
    const std::string activate1_btn_prop("activate1_button_nums");
 
-   mSelectBtn.configButtons(elt->getProperty<std::string>(activate_btn_prop));
-   mSelect1Btn.configButtons(elt->getProperty<std::string>(activate1_btn_prop));
-}
-
-struct IncValue
-{
-   int operator()(int v)
-   {
-      return v + 1;
-   }
-};
-
-std::vector<int> WidgetPlugin::transformButtonVec(const std::vector<int>& btns)
-{
-   std::vector<int> result(btns.size());
-   IncValue inc;
-   std::transform(btns.begin(), btns.end(), result.begin(), inc);
-   return result;
+   mSelectBtn.configure(elt->getProperty<std::string>(activate_btn_prop),
+                        mWandInterface);
+   mSelect1Btn.configure(elt->getProperty<std::string>(activate1_btn_prop),
+                         mWandInterface);
 }
 
 }

@@ -142,48 +142,46 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
 
       // If choose button(s) is/are configured, we will update the status
       // panel to include that information.
-      if ( mChooseBtn.isConfigured() )
+      if ( mChooseBtn )
       {
-         bool has = false;
-         status_panel_data->mHasControlTexts(mChooseBtn.getButtons(), mChooseText, has);
+         bool has(false);
+         status_panel_data->mHasControlText(mChooseBtn.toString(),
+                                            mChooseText, has);
+
          if ( ! has )
          {
-            // The button numbers in mChooseBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            status_panel_data->mAddControlTexts(
-               transformButtonVec(mChooseBtn.getButtons()), mChooseText, 1
-            );
+            status_panel_data->mAddControlText(mChooseBtn.toString(),
+                                               mChooseText, 1);
          }
       }
 
       // If grab button(s) is/are configured, we will update the status
       // panel to include that information.
-      if ( mGrabBtn.isConfigured() )
+      if ( mGrabBtn )
       {
-         bool has = false;
-         status_panel_data->mHasControlTexts(mGrabBtn.getButtons(), mGrabText, has);
+         bool has(false);
+         status_panel_data->mHasControlText(mGrabBtn.toString(), mGrabText,
+                                            has);
+
          if ( ! has )
          {
-            // The button numbers in mGrabBtn are zero-based, but we would
-            // like them to be one-based in the status panel display.
-            status_panel_data->mAddControlTexts(transformButtonVec(mGrabBtn.getButtons()),
-                                 mGrabText, 1);
+            status_panel_data->mAddControlText(mGrabBtn.toString(),
+                                               mGrabText, 1);
          }
       }
 
       // If release button(s) is/are configured, we will update the status
       // panel to include that information.
-      if ( mReleaseBtn.isConfigured() )
+      if ( mReleaseBtn )
       {
          bool has = false;
-         status_panel_data->mHasControlTexts(mReleaseBtn.getButtons(), mReleaseText, has);
+         status_panel_data->mHasControlText(mReleaseBtn.toString(),
+                                            mReleaseText, has);
+
          if ( ! has )
          {
-            // The button numbers in mReleaseBtn are zero-based, but we
-            // would like them to be one-based in the status panel display.
-            status_panel_data->mAddControlTexts(
-               transformButtonVec(mReleaseBtn.getButtons()), mReleaseText, 1
-            );
+            status_panel_data->mAddControlText(mReleaseBtn.toString(),
+                                               mReleaseText, 1);
          }
       }
    }
@@ -193,21 +191,13 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
-      // The button numbers in mChooseBtn are zero-based, but we would like
-      // them to be one-based in the status panel display.
-      status_panel_data->mRemoveControlTexts(transformButtonVec(mChooseBtn.getButtons()),
-                              mChooseText);
+      status_panel_data->mRemoveControlText(mChooseBtn.toString(),
+                                            mChooseText);
 
-      // The button numbers in mGrabBtn are zero-based, but we would like
-      // them to be one-based in the status panel display.
-      status_panel_data->mRemoveControlTexts(transformButtonVec(mGrabBtn.getButtons()),
-                              mGrabText);
+      status_panel_data->mRemoveControlText(mGrabBtn.toString(), mGrabText);
 
-      // The button numbers in mReleaseBtn are zero-based, but we would like
-      // them to be one-based in the status panel display.
-      status_panel_data->mRemoveControlTexts(transformButtonVec(mReleaseBtn.getButtons()),
-                              mReleaseText);
-   
+      status_panel_data->mRemoveControlText(mReleaseBtn.toString(),
+                                            mReleaseText);
    }
 }
 
@@ -217,8 +207,7 @@ void MultiObjectGrabStrategy::update(ViewerPtr viewer)
    {
       // The user has requested to add mCurIsectObject to the collection of
       // objects selected for later grabbing.
-      if ( mCurIsectObject && mCurIsectObject->isGrabbable() &&
-           mChooseBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      if ( mCurIsectObject && mCurIsectObject->isGrabbable() && mChooseBtn() )
       {
          std::vector<SceneObjectPtr>::iterator o =
             std::find(mChosenObjects.begin(), mChosenObjects.end(),
@@ -248,7 +237,7 @@ void MultiObjectGrabStrategy::update(ViewerPtr viewer)
       }
       // The user has requested to grab all the selected objects (those in
       // mChosenObjects).
-      else if ( mGrabBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+      else if ( mGrabBtn() )
       {
          // If mChosenObjects is not empty, those objects are the ones that
          // we will grab.
@@ -278,8 +267,7 @@ void MultiObjectGrabStrategy::update(ViewerPtr viewer)
    }
    // If we are grabbing an object and the release button has just been
    // pressed, then release the grabbed object.
-   else if ( mGrabbing &&
-             mReleaseBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+   else if ( mGrabbing && mReleaseBtn() )
    {
       // We no longer care about grabbable state changes because
       // mGrabbedObjects is about to be emptied.
@@ -322,31 +310,16 @@ void MultiObjectGrabStrategy::configure(jccl::ConfigElementPtr elt)
    const std::string grab_btn_prop("grab_button_nums");
    const std::string release_btn_prop("release_button_nums");
 
-   mChooseBtn.configButtons(elt->getProperty<std::string>(choose_btn_prop));
-   mGrabBtn.configButtons(elt->getProperty<std::string>(grab_btn_prop));
-   mReleaseBtn.configButtons(elt->getProperty<std::string>(release_btn_prop));
-}
-
-struct IncValue
-{
-   int operator()(int v)
-   {
-      return v + 1;
-   }
-};
-
-std::vector<int> MultiObjectGrabStrategy::
-transformButtonVec(const std::vector<int>& btns)
-{
-   std::vector<int> result(btns.size());
-   IncValue inc;
-   std::transform(btns.begin(), btns.end(), result.begin(), inc);
-   return result;
+   mChooseBtn.configure(elt->getProperty<std::string>(choose_btn_prop),
+                        mWandInterface);
+   mGrabBtn.configure(elt->getProperty<std::string>(grab_btn_prop),
+                      mWandInterface);
+   mReleaseBtn.configure(elt->getProperty<std::string>(release_btn_prop),
+                         mWandInterface);
 }
 
 inf::Event::ResultType MultiObjectGrabStrategy::
-objectIntersected(SceneObjectPtr obj,
-                  const gmtl::Point3f& pnt)
+objectIntersected(SceneObjectPtr obj, const gmtl::Point3f& pnt)
 {
    if ( ! mGrabbing )
    {

@@ -140,16 +140,6 @@ private:
     */
    void configure(jccl::ConfigElementPtr elt);
 
-   /**
-    * Transforms the given vector of zero-based button IDs to one-based IDs.
-    *
-    * @param btns A vector of zero-based button IDs to be transformed to use
-    *             one-based IDs.
-    *
-    * @return A vector of one-based integers based on \p btns is returned.
-    */
-   std::vector<int> transformButtonVec(const std::vector<int>& btns);
-
    inf::WandInterfacePtr mWandInterface;
 
    /** @name Digital Buttons */

@@ -46,30 +46,29 @@ void StatusPanel::setHeaderText(const std::string& header)
    mChangeSignal();
 }
 
-void StatusPanel::setControlTexts(const std::vector<int>& cmds,
+void StatusPanel::setControlText(const std::string& cmdText,
                                  const std::string& desc)
 {
-   mCenterText[cmds].clear();
-   mCenterText[cmds].push_back(desc);
+   mCenterText[cmdText].clear();
+   mCenterText[cmdText].push_back(desc);
    mChangeSignal();
 }
 
-void StatusPanel::addControlTexts(const std::vector<int>& cmds,
+void StatusPanel::addControlText(const std::string& cmdText,
                                  const std::string& desc,
-                                 const unsigned int priority)
+                                 const unsigned int)
 {
    // XXX: I don't know how to make a robust priority queue that allows
    // iteration.
-   boost::ignore_unused_variable_warning(priority);
-   mCenterText[cmds].push_back(desc);
+   mCenterText[cmdText].push_back(desc);
    mChangeSignal();
 }
 
-void StatusPanel::removeControlTexts(const std::vector<int>& cmds,
+void StatusPanel::removeControlText(const std::string& cmdText,
                                     const std::string& desc)
 {
    std::vector<std::string>::iterator i;
-   std::vector<std::string>& vec = mCenterText[cmds];
+   std::vector<std::string>& vec = mCenterText[cmdText];
    vec.erase(std::remove(vec.begin(), vec.end(), desc), vec.end());
 }
 

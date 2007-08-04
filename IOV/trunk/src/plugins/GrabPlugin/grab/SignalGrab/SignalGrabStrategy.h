@@ -88,8 +88,6 @@ private:
    void objectsReleased(const std::vector<SceneObjectPtr>& objs);
    //@}
 
-   std::vector<int> transformButtonVec(const std::vector<int>& btns);
-
    GrabSignalDataPtr mGrabSignalData;
 
    WandInterfacePtr mWandInterface;

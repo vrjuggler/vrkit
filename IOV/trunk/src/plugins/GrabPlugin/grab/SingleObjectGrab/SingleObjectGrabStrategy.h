@@ -76,8 +76,6 @@ private:
 
    void configure(jccl::ConfigElementPtr elt);
 
-   std::vector<int> transformButtonVec(const std::vector<int>& btns);
-
    /**
     * Responds to object intersection signals.
     *

@@ -114,10 +114,11 @@ namespace inf
              << " found:" << elt->getVersion();
          throw PluginException(msg.str(), IOV_LOCATION);
       }
-      
+
       // Get the button for swapping
-      mSwapButton.configButtons(elt->getProperty<std::string>(button_tkn));
-      
+      mSwapButton.configure(elt->getProperty<std::string>(button_tkn),
+                            mWandInterface);
+
       // Get the scaling factor
       float to_meters_scalar = elt->getProperty<float>(units_to_meters_tkn);
       
@@ -193,7 +194,7 @@ namespace inf
    {
       if ( isFocused() )
       {
-         if ( mSwapButton.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+         if ( mSwapButton() )
          {
             unsigned int num_models = mSwitchNode->getNChildren();
             unsigned int cur_model = mSwitchCore->getChoice();
