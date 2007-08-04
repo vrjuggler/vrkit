@@ -193,7 +193,7 @@ if not sca_util.hasHelpFlag():
       print "WARNING: Cannot build IOV without Boost.Signals"
 
    if "win32" == platform:
-      opt_env.Append(CPPFLAGS = ["/wd4251","/wd4275",])
+      opt_env.Append(CPPFLAGS = ["/wd4103", "/wd4251", "/wd4275"])
 
    # ----- FOR EACH VARIANT ----- #
    for combo in variant_helper.iterate(locals(), base_bldr, opt_env):
