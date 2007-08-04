@@ -41,6 +41,7 @@ if platform == 'win32':
 
 iov_lib_name = 'iov'+shared_lib_suffix
 iov_lib = env.SharedLibrary(iov_lib_name, src_files)
+Export('iov_lib')
 
 # Install the library, headers, and definitions
 env.Install(inst_paths['lib'], iov_lib)
