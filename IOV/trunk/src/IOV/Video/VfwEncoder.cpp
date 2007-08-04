@@ -96,7 +96,7 @@ EncoderPtr VfwEncoder::init(const std::string& filename, const std::string& code
    //mCodecId = mmioFOURCC('D','I','V','X');
 
    mAviDC = CreateCompatibleDC(NULL);
-   if(mAviDC==NULL)	
+   if(mAviDC==NULL)
    {
       throw std::exception("Unable to create compatible DC");
    }
@@ -158,7 +158,7 @@ EncoderPtr VfwEncoder::init(const std::string& filename, const std::string& code
    {
       std::cout << "CRES: " << cres << std::endl;
       buildAndThrowAviError(cres);
-      // One reason this error might occur is if you are using a Codec that is not 
+      // One reason this error might occur is if you are using a Codec that is not
       // available on your system. Check the mmioFOURCC() code you are using and make
       // sure you have that codec installed properly on your machine.
       throw std::exception("Unable to create compressed stream: Check your codec options.");
@@ -180,7 +180,7 @@ EncoderPtr VfwEncoder::init(const std::string& filename, const std::string& code
    if(FAILED(AVIStreamSetFormat(mCompressedVideoStream,0,(LPVOID)&bmpInfo, bmpInfo.bmiHeader.biSize)))
    {
       // One reason this error might occur is if your bitmap does not meet the Codec requirements.
-      // For example, 
+      // For example,
       //   your bitmap is 32bpp while the Codec supports only 16 or 24 bpp; Or
       //   your bitmap is 274 * 258 size, while the Codec supports only sizes that are powers of 2; etc...
       // Possible solution to avoid this is: make your bitmap suit the codec requirements,
@@ -226,7 +226,6 @@ void VfwEncoder::SetErrorMessage(LPCTSTR lpszErrorMessage)
 {
    _tcsncpy(mErrorMsg, lpszErrorMessage, __countof(mErrorMsg)-1);
 }
-	
 
 void VfwEncoder::writeFrame(int width, int height, vpr::Uint8* data)
 {

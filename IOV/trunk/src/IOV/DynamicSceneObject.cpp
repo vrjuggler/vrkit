@@ -121,7 +121,7 @@ SceneObjectPtr DynamicSceneObject::getChild(const unsigned int childIndex)
 }
 
 OSG::Action::ResultE DynamicSceneObject::enter(OSG::NodePtr& node)
-{   
+{
    if(node->getCore()->getType().isDerivedFrom(OSG::Transform::getClassType()))
    {
       OSG::TransformNodePtr parent_node(node);
@@ -136,8 +136,8 @@ OSG::Action::ResultE DynamicSceneObject::enter(OSG::NodePtr& node)
       std::cout << "Adding node: " << node_str << std::endl;
       */
       return OSG::Action::Skip;
-   }   
-   return OSG::Action::Continue; 
+   }
+   return OSG::Action::Continue;
 }
 
 std::vector<SceneObjectPtr> DynamicSceneObject::getChildren()
@@ -148,11 +148,11 @@ std::vector<SceneObjectPtr> DynamicSceneObject::getChildren()
    mChildren.clear();
 
    // Traverse over all children.
-   OSG::traverse(getRoot()->getMFChildren()->getValues(), 
+   OSG::traverse(getRoot()->getMFChildren()->getValues(),
                  OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<OSG::Action::ResultE,
                                                           DynamicSceneObject,
                                                           OSG::NodePtr>(
-                                                          this, 
+                                                          this,
                                                           &DynamicSceneObject::enter));
    }
    return mChildren;

@@ -23,37 +23,33 @@ namespace inf
 {
 
 class StatusPanel;
-   
+
 class StatusPanelViewOriginal
-{   
+{
 public:
-   
    StatusPanelViewOriginal();
-   
+
    typedef std::map<std::string, std::vector<std::string> > center_text_t;
-   
+
    /** Initialize scene graph, fonts and everything else that is used. */
    void initialize(const float metersToAppUnits, StatusPanel* const panel);
-   
+
    OSG::NodeRefPtr getPanelRoot()
-   { 
-      return mRootPanelNode; 
+   {
+      return mRootPanelNode;
    }
-   
+
    /** Set the panel to dirty.  Next update will rebuild. */
    void setDirty();
-   
+
    /** Update the status panel if it is needed. */
    void update();
-   
+
    void setWidthHeight(const float w, const float h, const float borderWidth=0.0f);
 
 protected:
-   
    void updatePanelScene();
-   
-protected:
-         
+
    inf::UiBuilder        mBuilder;
    bool                  mIsDirty;     /**< When true, we need a rebuild of the panel. */
 
@@ -64,7 +60,7 @@ protected:
    OSG::GeometryRefPtr   mTextGeomCore;
 
    inf::UiBuilder::Font* mFont;
-   
+
    float mMetersToAppUnits;
 
    /** Panel sizes are in OpenSG units.
@@ -96,10 +92,10 @@ protected:
 
    OSG::ClipPlaneChunkPtr mClipRight;
    OSG::ClipPlaneChunkPtr mClipBottom;
-   
+
    StatusPanel* mStatusPanel;
 };
-   
+
 }
 
 

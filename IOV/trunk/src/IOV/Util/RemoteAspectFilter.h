@@ -45,7 +45,7 @@ public:
    void addChangedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback);
    void addCreatedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback);
    void addDestroyedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback);
-   
+
    /**
     * Registers callback functions with RemoteAspect for all field containers.
     *
@@ -68,7 +68,7 @@ protected:
    callback_map_t mChangedCallbacks;
    callback_map_t mCreatedCallbacks;
    callback_map_t mDestroyedCallbacks;
-   
+
    int    mNodes;
    int    mTransforms;
    int    mGeometries;

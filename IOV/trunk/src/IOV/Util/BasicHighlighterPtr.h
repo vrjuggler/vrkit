@@ -10,7 +10,7 @@ namespace inf
 {
    class BasicHighlighter;
    typedef boost::shared_ptr<BasicHighlighter> BasicHighlighterPtr;
-   typedef boost::weak_ptr<BasicHighlighter> BasicHighlighterWeakPtr;   
+   typedef boost::weak_ptr<BasicHighlighter> BasicHighlighterWeakPtr;
 }
 
 #endif

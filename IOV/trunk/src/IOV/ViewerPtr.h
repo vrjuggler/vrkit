@@ -5,12 +5,12 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+
 namespace inf
 {
    class Viewer;
    typedef boost::shared_ptr<Viewer> ViewerPtr;
-   typedef boost::weak_ptr<Viewer> ViewerWeakPtr;   
+   typedef boost::weak_ptr<Viewer> ViewerWeakPtr;
 }
 
 #endif
-

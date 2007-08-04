@@ -123,7 +123,7 @@ PickPlugin::objectIntersected(inf::SceneObjectPtr obj,
       mIntersectSound.trigger();
       mIntersecting = true;
    }
-   
+
    return inf::Event::CONTINUE;
 }
 

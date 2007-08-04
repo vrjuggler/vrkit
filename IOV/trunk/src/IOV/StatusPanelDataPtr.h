@@ -10,7 +10,7 @@ namespace inf
 {
    class StatusPanelData;
    typedef boost::shared_ptr<StatusPanelData> StatusPanelDataPtr;
-   typedef boost::weak_ptr<StatusPanelData> StatusPanelDataWeakPtr;   
+   typedef boost::weak_ptr<StatusPanelData> StatusPanelDataWeakPtr;
 }
 
 #endif /*_INF_STATUS_PANEL_DATA_PTR_H_*/

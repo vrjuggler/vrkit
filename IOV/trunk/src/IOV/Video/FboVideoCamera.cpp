@@ -112,7 +112,6 @@ FboVideoCameraPtr FboVideoCamera::init()
       mRightTexture->setInternalFormat(GL_RGBA8);
    OSG::endEditCP(mRightTexture);
 
-   
    OSG::SolidBackgroundPtr bg = OSG::SolidBackground::create();
    OSG::beginEditCP(bg);
       bg->setColor(OSG::Color3f(0, 0, 0));
@@ -262,7 +261,7 @@ void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
       OSG::beginEditCP(mFboVP);
         mFboVP->getTextures()[0] = mLeftTexture;
       OSG::endEditCP(mFboVP);
-      
+
       camera_pos = camPos;
       offset.setTranslate(-mEyeOffset, 0.0f, 0.0f);
       camera_pos.multLeft(offset);

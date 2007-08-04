@@ -10,7 +10,7 @@ namespace inf
 {
    class EventSoundPlayer;
    typedef boost::shared_ptr<EventSoundPlayer> EventSoundPlayerPtr;
-   typedef boost::weak_ptr<EventSoundPlayer> EventSoundPlayerWeakPtr;   
+   typedef boost::weak_ptr<EventSoundPlayer> EventSoundPlayerWeakPtr;
 }
 
 #endif

@@ -10,7 +10,7 @@ namespace inf
 {
    class SignalContainerBase;
    typedef boost::shared_ptr<SignalContainerBase> SignalContainerBasePtr;
-   typedef boost::weak_ptr<SignalContainerBase> SignalContainerBaseWeakPtr;   
+   typedef boost::weak_ptr<SignalContainerBase> SignalContainerBaseWeakPtr;
 }
 
 #endif /*_INF_SIGNAL_CONTAINER_BASE_PTR_H_*/

@@ -129,7 +129,7 @@ private:
     * @post \c mInitXform is set to a transformation matrix based on
     *       \p cornerPos and \p rot. \c mRoot is initialized and has
     *       \c mGridNode and \c mPlaneNode as its children. \c mGridNode and
-    *       \c mPlanenode are initialized. 
+    *       \c mPlanenode are initialized.
     *
     * @param width       The total width of the rendered grid in feet.
     * @param height      The total height of the rendered grid in feet.

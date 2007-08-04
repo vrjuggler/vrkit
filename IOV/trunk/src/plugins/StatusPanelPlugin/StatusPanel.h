@@ -21,15 +21,15 @@ class StatusPanel
 {
 public:
    StatusPanel();
-   
+
    typedef std::map<std::string, std::vector<std::string> > center_text_t;
 
    /** Sets the header title. */
    void setHeaderTitle(const std::string& txt);
-   
+
    /** Sets the center title. */
    void setCenterTitle(const std::string& txt);
-   
+
    /** Sets the bottom title. */
    void setBottomTitle(const std::string& txt);
 
@@ -85,45 +85,45 @@ public:
 
    /** Add another message to the status panel. */
    void addStatusMessage(const std::string& msg);
-   
+
    /** Gets the header title. */
    const std::string& getHeaderTitle()
    {
       return mHeaderTitle;
    }
-   
+
    /** Gets the center title. */
    const std::string& getCenterTitle()
    {
       return mCenterTitle;
    }
-   
+
    /** Gets the bottom title. */
    const std::string& getBottomTitle()
    {
       return mBottomTitle;
    }
-   
+
    /** Gets the header text. */
    const std::string& getHeaderText()
    {
       return mHeaderText;
    }
-   
+
    /** Gets the center text. */
    const center_text_t& getCenterText()
    {
       return mCenterText;
    }
-   
+
    /** Gets the status lines. */
    const std::deque<std::string> getStatusLines()
    {
       return mStatusLines;
    }
-   
+
    typedef boost::signal<void ()> signal_t;
-   
+
    inf::SignalProxy<signal_t> statusPanelChanged()
    {
       return inf::SignalProxy<signal_t>(mChangeSignal);
@@ -140,7 +140,6 @@ public:  // Configuration params //
    void setStatusHistorySize(const unsigned int size);
 
 protected:
-   
    std::string    mHeaderTitle;     /**< Header title */
    std::string    mCenterTitle;     /**< Center title */
    std::string    mBottomTitle;     /**< Bottom title */
@@ -150,7 +149,7 @@ protected:
    center_text_t mCenterText;       /**< Center text */
    std::deque<std::string> mStatusLines;  /**< Status lines */
    unsigned int mStatusHistorySize; /**< Number of status lines to keep around. */
-   
+
    signal_t mChangeSignal;          /**< Change signal */
 };
 

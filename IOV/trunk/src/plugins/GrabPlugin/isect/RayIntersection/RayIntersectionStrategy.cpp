@@ -78,7 +78,7 @@ OSG::Action::ResultE geometryEnter(OSG::CNodePtr& node, OSG::Action* action)
       boost::polymorphic_downcast<OSG::Geometry*>(n->getCore().getCPtr());
 
    OSG::TriangleIterator it;
-    
+
    for ( it = core->beginTriangles(); it != core->endTriangles(); ++it )
    {
       OSG::Real32 t;
@@ -90,8 +90,8 @@ OSG::Action::ResultE geometryEnter(OSG::CNodePtr& node, OSG::Action* action)
          ia->setHit(t, n, it.getIndex(), norm);
       }
    }
-    
-   return OSG::Action::Continue; 
+
+   return OSG::Action::Continue;
 }
 
 }

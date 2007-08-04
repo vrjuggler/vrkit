@@ -10,7 +10,7 @@ namespace inf
 {
    class GrabSignalData;
    typedef boost::shared_ptr<GrabSignalData> GrabSignalDataPtr;
-   typedef boost::weak_ptr<GrabSignalData> GrabSignalDataWeakPtr;   
+   typedef boost::weak_ptr<GrabSignalData> GrabSignalDataWeakPtr;
 }
 
 #endif /*_INF_GRAB_SIGNAL_DATA_PTR_H_*/

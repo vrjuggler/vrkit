@@ -213,13 +213,13 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    // Connect StatusPanel methods to StatusPanelData signals
    StatusPanelDataPtr status_panel_data =
       scene_obj->getSceneData<StatusPanelData>();
-   
+
    status_panel_data->mSetHeaderTitle.connect(
       boost::bind(&StatusPanel::setHeaderTitle, &mStatusPanel, _1));
-   
+
    status_panel_data->mSetCenterTitle.connect(
       boost::bind(&StatusPanel::setCenterTitle, &mStatusPanel, _1));
-   
+
    status_panel_data->mSetBottomTitle.connect(
       boost::bind(&StatusPanel::setBottomTitle, &mStatusPanel, _1));
 
@@ -230,7 +230,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
       boost::bind(
          &StatusPanel::setControlText, &mStatusPanel, _1, _2)
       );
-   
+
    status_panel_data->mAddControlText.connect(
       boost::bind(
       &StatusPanel::addControlText, &mStatusPanel, _1, _2, _3)
@@ -248,13 +248,12 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
 
    status_panel_data->mAddStatusMessage.connect(
       boost::bind(&StatusPanel::addStatusMessage, &mStatusPanel, _1));
-      
+
    status_panel_data->mSetWidthHeight.connect(
       boost::bind(&StatusPanelViewOriginal::setWidthHeight, &mStatusPanelView, _1, _2, _3));
 
    status_panel_data->mSetStatusHistorySize.connect(
       boost::bind(&StatusPanel::setStatusHistorySize, &mStatusPanel, _1));
-   
 
    return shared_from_this();
 }

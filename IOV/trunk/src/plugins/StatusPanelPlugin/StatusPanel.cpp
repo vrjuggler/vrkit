@@ -17,7 +17,7 @@ StatusPanel::StatusPanel()
    mBottomTitle = "Status";
 
    mHeaderText  = "Header\nText";
-   
+
    mStatusHistorySize = 20;
 }
 

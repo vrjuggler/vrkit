@@ -12,7 +12,7 @@ def makePlugins(srcDir, instDir):
    plugin_dirs = [d for d in os.listdir(srcDir) if (os.path.isdir(pj(srcDir, d)) and not d.startswith('.'))]
    for plugin_name in plugin_dirs:
       makePlugin(srcDir, plugin_name, instDir)
-   
+
 def makePlugin(srcDir, pluginName, instDir):
    plugin_srcs = glob.glob(pj(srcDir, pluginName, '*.cpp'))
 
@@ -53,7 +53,7 @@ def makePlugin(srcDir, pluginName, instDir):
    if 0 == variant_pass:
       if len(def_files) > 0:
          def_files = \
-            [d.replace(sca_util.getFullSrcPath(env), '.') for d in def_files] 
+            [d.replace(sca_util.getFullSrcPath(env), '.') for d in def_files]
          env.Install(inst_paths['definitions'], def_files)
 
    cur_dir = pj(srcDir, pluginName)

@@ -9,7 +9,7 @@ namespace inf
 {
    class DynamicSceneObject;
    typedef boost::shared_ptr<DynamicSceneObject> DynamicSceneObjectPtr;
-   typedef boost::weak_ptr<DynamicSceneObject> DynamicSceneObjectWeakPtr;   
+   typedef boost::weak_ptr<DynamicSceneObject> DynamicSceneObjectWeakPtr;
 }
 
 #endif

@@ -78,7 +78,7 @@ public:
 
    int minValue()
    { return mMinValue; }
-   
+
    void setIncrement(const int inc)
    { mIncrement = inc; }
 

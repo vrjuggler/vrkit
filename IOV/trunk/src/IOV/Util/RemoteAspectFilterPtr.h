@@ -10,7 +10,7 @@ namespace inf
 {
    class RemoteAspectFilter;
    typedef boost::shared_ptr<RemoteAspectFilter> RemoteAspectFilterPtr;
-   typedef boost::weak_ptr<RemoteAspectFilter> RemoteAspectFilterWeakPtr;   
+   typedef boost::weak_ptr<RemoteAspectFilter> RemoteAspectFilterWeakPtr;
 }
 
 #endif

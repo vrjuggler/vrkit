@@ -10,7 +10,7 @@ namespace inf
 {
    class SignalRepository;
    typedef boost::shared_ptr<SignalRepository> SignalRepositoryPtr;
-   typedef boost::weak_ptr<SignalRepository> SignalRepositoryWeakPtr;   
+   typedef boost::weak_ptr<SignalRepository> SignalRepositoryWeakPtr;
 }
 
 #endif /*_INF_SIGNAL_REPOSITORY_PTR_H_*/

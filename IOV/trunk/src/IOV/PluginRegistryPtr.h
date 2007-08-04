@@ -10,7 +10,7 @@ namespace inf
 {
    class PluginRegistry;
    typedef boost::shared_ptr<PluginRegistry> PluginRegistryPtr;
-   typedef boost::weak_ptr<PluginRegistry> PluginRegistryWeakPtr;   
+   typedef boost::weak_ptr<PluginRegistry> PluginRegistryWeakPtr;
 }
 
 #endif

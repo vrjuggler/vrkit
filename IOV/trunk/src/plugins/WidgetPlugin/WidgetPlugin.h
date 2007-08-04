@@ -168,7 +168,7 @@ private:
    boost::signals::connection mIsectConnection;
    boost::signals::connection mDeIsectConnection;
    //@}
-   
+
    WidgetDataPtr mWidgetData;
    boost::signals::connection mMovedConnection;
    SceneObjectPtr mSelectedObject;

@@ -10,7 +10,7 @@ namespace inf
 {
    class RegistryEntry;
    typedef boost::shared_ptr<RegistryEntry> RegistryEntryPtr;
-   typedef boost::weak_ptr<RegistryEntry> RegistryEntryWeakPtr;   
+   typedef boost::weak_ptr<RegistryEntry> RegistryEntryWeakPtr;
 }
 
 #endif

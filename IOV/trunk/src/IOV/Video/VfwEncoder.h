@@ -55,16 +55,16 @@ protected:
     * dwCodec: FourCC of the Video Codec to be used for compression
     * dwFrameRate: The Frames Per Second (FPS) setting to be used for the movie
     * The default Codec used here is MPG4. To use a different codec, pass its Fourcc
-    * value as the input parameter for dwCodec. 
+    * value as the input parameter for dwCodec.
     * For example,
     * pass mmioFOURCC('D','I','V','X') to use DIVX codec, or
     * pass mmioFOURCC('I','V','5','0') to use IV50 codec etc...
-    *  
-    * Also, you can pass just 0 to avoid the codecs altogether. In that case, Frames 
+    *
+    * Also, you can pass just 0 to avoid the codecs altogether. In that case, Frames
     * would be saved as they are without any compression; However, the output movie file
     * size would be very huge in that case.
-    *  
-    * Finally, make sure you have the codec installed on the machine before 
+    *
+    * Finally, make sure you have the codec installed on the machine before
     * passing its Fourcc here.
     */
    VfwEncoder();
@@ -110,7 +110,7 @@ private:
    AVICOMPRESSOPTIONS   mCompressOptions;
    AVISTREAMINFO        mStreamInfo;
    vpr::Uint32          mFrameRate;             /**< Frames Per Second Rate (FPS) */
-   vpr::Uint32          mCodecId;         // Video Codec FourCC	
+   vpr::Uint32          mCodecId;         // Video Codec FourCC
    std::string          mFilename; // Holds the Output Movie File Name
    TCHAR                mErrorMsg[MAX_PATH];   // Holds the Last Error Message, if any
 };

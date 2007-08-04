@@ -30,11 +30,11 @@ public:
    {
       /* Do nothing. */ ;
    }
-   
+
    virtual std::string getDescription();
-   
+
    /** Initialize and configure the plugin.
-    * 
+    *
     */
    virtual PluginPtr init(inf::ViewerPtr viewer);
 
@@ -48,7 +48,7 @@ public:
    {
       ::operator delete(p);
    }
-   
+
 protected:
    /**
     * Deletes this object.  This is an implementation of the pure virtual
@@ -59,7 +59,7 @@ protected:
       delete this;
    }
 }; // ModelLoaderPlugin
-   
+
 }  // namespace inf
 
 #endif

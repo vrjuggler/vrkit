@@ -8,7 +8,7 @@
 
 namespace inf
 {
-   
+
 struct CoredNodePred
 {
    typedef bool result_type;

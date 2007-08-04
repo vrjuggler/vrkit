@@ -5,11 +5,12 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+
 namespace inf
 {
    class StaticSceneObject;
    typedef boost::shared_ptr<StaticSceneObject> StaticSceneObjectPtr;
-   typedef boost::weak_ptr<StaticSceneObject> StaticSceneObjectWeakPtr;   
+   typedef boost::weak_ptr<StaticSceneObject> StaticSceneObjectWeakPtr;
 }
 
 #endif

@@ -10,8 +10,7 @@ namespace inf
 {
    class Grid;
    typedef boost::shared_ptr<Grid> GridPtr;
-   typedef boost::weak_ptr<Grid> GridWeakPtr;   
+   typedef boost::weak_ptr<Grid> GridWeakPtr;
 }
 
 #endif
-

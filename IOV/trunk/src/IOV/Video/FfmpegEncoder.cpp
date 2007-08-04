@@ -101,7 +101,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
                                const vpr::Uint32 width, const vpr::Uint32 height,
                                const vpr::Uint32 framesPerSecond)
 {
-   std::cout << "Creating a encoder. file: " << filename 
+   std::cout << "Creating a encoder. file: " << filename
       << " w: " << width << " h: " << height << std::endl;
    try
    {
@@ -410,8 +410,8 @@ void FfmpegEncoder::openVideo(AVCodec* codec)
    mVideoOutBuffer = NULL;
    if (!(mFormatContext->oformat->flags & AVFMT_RAWPICTURE))
    {
-      // allocate output buffer 
-      // XXX: API change will be done 
+      // allocate output buffer
+      // XXX: API change will be done
       // buffers passed into lav* can be allocated any way you prefer,
       // as long as they're aligned enough for the architecture, and
       // they're freed appropriately (such as using av_free for buffers

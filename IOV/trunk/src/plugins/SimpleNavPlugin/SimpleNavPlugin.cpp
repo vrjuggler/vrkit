@@ -142,7 +142,7 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
    if ( ! mCanNavigate )
    {
       mVelocity = 0.0f;
-      
+
       if ( mForBtn )
       {
          status_panel_data->mRemoveControlText(mForBtn.toString(),

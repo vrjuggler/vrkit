@@ -131,7 +131,7 @@ computeMove(inf::ViewerPtr viewer, SceneObjectPtr obj,
    gmtl::invert(obj_M_pobj, pobj_M_obj);
 
    OSG::Matrix world_xform;
-   
+
    vprASSERT(obj->getRoot() != OSG::NullFC);
 
    // If we have no parent then we want to use the identity.
@@ -150,7 +150,7 @@ computeMove(inf::ViewerPtr viewer, SceneObjectPtr obj,
 
    gmtl::Matrix44f rot_only = vp_M_wand;
    //gmtl::setTrans(rot_only, gmtl::Vec3f(0.0f, 0.0f, 0.0f));
-   
+
    //return m_wand_M_vp * vp_M_wand * curObjPos;
    //return rot_only * old_rot_only * curObjPos;
    //return vp_M_wand * m_wand_M_vp * curObjPos;
@@ -160,7 +160,7 @@ computeMove(inf::ViewerPtr viewer, SceneObjectPtr obj,
    gmtl::Quatf new_rot = gmtl::makeRot<gmtl::Quatf>(vp_M_wand);
    gmtl::Matrix44f orot = gmtl::makeRot<gmtl::Matrix44f>(mRotation);
    gmtl::Matrix44f nrot = gmtl::makeRot<gmtl::Matrix44f>(new_rot);
-   
+
    std::cout << "vp_M_pobj\n" << vp_M_pobj << std::endl;
    std::cout << "m_pobj_M_obj\n" << obj_data.m_pobj_M_obj << std::endl;
    std::cout << "nrot\n" << nrot << std::endl;

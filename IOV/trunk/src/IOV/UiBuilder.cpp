@@ -118,7 +118,7 @@ void UiBuilder::resetGeomGeo(OSG::GeometryPtr geom)
    OSG::endEditCP(geom);
 }
 
-OSG::GeometryPtr UiBuilder::buildSphere(const OSG::UInt16 depth, const OSG::Real32 radius, 
+OSG::GeometryPtr UiBuilder::buildSphere(const OSG::UInt16 depth, const OSG::Real32 radius,
                                         const OSG::Color3f& color, const float alpha)
 {
    // Geometry fields returned are:
@@ -133,7 +133,7 @@ OSG::GeometryPtr UiBuilder::buildSphere(const OSG::UInt16 depth, const OSG::Real
    OSG::createSingleIndex(geom);
    OSG::calcVertexTangents(geom);
    OSG::Color4f used_color(color.red(), color.green(), color.blue(), alpha);
-   
+
    OSG::GeoPositions3fPtr verts = OSG::GeoPositions3fPtr::dcast(geom->getPositions());
    OSG::GeoColors4fPtr colors = OSG::GeoColors4f::create();
    OSG::GeoColors4f::StoredFieldType* mfc = colors->getFieldPtr();

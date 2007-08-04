@@ -48,7 +48,7 @@ public:
 
    /** Get status panel for direct usage. */
    StatusPanel& getPanel();
-   
+
    /**
     * Sets the visibility of the StatusPanel scenegraph.
     *

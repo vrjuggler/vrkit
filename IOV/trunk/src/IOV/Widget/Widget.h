@@ -23,7 +23,7 @@
 namespace inf
 {
 
-class IOV_CLASS_API Widget : boost::noncopyable, 
+class IOV_CLASS_API Widget : boost::noncopyable,
                              public StaticSceneObject
 {
 protected:

@@ -378,7 +378,7 @@ public:
    /**
     * Removes the specified highlight material from the sub-tree rooted at the
     * given node.
-    * 
+    *
     * @param node The root of the sub-tree from which the identified material
     *             will be removed.
     * @param id   The ID of the highlight material to be removed from the

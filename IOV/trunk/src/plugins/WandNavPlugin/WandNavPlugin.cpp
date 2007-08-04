@@ -166,7 +166,7 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    {
       setAcceleration(accel);
    }
-   
+
    if ( decel > 0.0f )
    {
       setDeceleration(decel);
@@ -203,20 +203,20 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
 }
 
 void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
-{   
+{
    inf::ScenePtr scene = viewer->getSceneObj();
    StatusPanelDataPtr status_panel_data =
       scene->getSceneData<StatusPanelData>();
 
    // We can only navigate when we have focus.
    mCanNavigate = isFocused();
-   
+
    status_panel_data->mSetHeaderTitle("test");
 
    if ( ! mCanNavigate )
-   {      
+   {
       mVelocity = 0.0f;
-      
+
       if ( mForwardBtn.isConfigured() )
       {
          status_panel_data->mRemoveControlText(mForwardBtn.toString(),
@@ -249,22 +249,21 @@ void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
    }
    else
    {
-      
       if ( mForwardBtn.isConfigured() )
-      {         
+      {
          bool has(false);
          status_panel_data->mHasControlText(mForwardBtn.toString(),
                                             mForwardText, has);
 
          if ( ! has )
-         {            
+         {
             status_panel_data->mAddControlText(mForwardBtn.toString(),
                                                mForwardText, 1);
          }
       }
 
       if ( mReverseBtn.isConfigured() )
-      {         
+      {
          bool has(false);
          status_panel_data->mHasControlText(mReverseBtn.toString(),
                                             mReverseText, has);
@@ -277,7 +276,7 @@ void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
       }
 
       if ( mRotateBtn.isConfigured() )
-      {         
+      {
          bool has(false);
          status_panel_data->mHasControlText(mRotateBtn.toString(),
                                             mRotateText, has);
@@ -290,7 +289,7 @@ void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
       }
 
       if ( mModeBtn.isConfigured() )
-      {         
+      {
          bool has(false);
          status_panel_data->mHasControlText(mModeBtn.toString(), mModeText,
                                             has);

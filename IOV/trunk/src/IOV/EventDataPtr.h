@@ -10,7 +10,7 @@ namespace inf
 {
    class EventData;
    typedef boost::shared_ptr<EventData> EventDataPtr;
-   typedef boost::weak_ptr<EventData> EventDataWeakPtr;   
+   typedef boost::weak_ptr<EventData> EventDataWeakPtr;
 }
 
 #endif /*_INF_EVENT_DATA_PTR_H_*/

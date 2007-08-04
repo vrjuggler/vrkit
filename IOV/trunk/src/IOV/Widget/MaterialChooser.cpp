@@ -82,9 +82,9 @@ Event::ResultType MaterialChooser::onScrolled(int value)
 Event::ResultType MaterialChooser::onButtonClicked(unsigned int index)
 {
    OSG::MaterialPtr selected_material;
-   
+
    std::string mat_str("<NULL>");
-   
+
    int current_row = mScrollBar->value();
    unsigned int mat_index = (current_row*3) + index;
 
@@ -101,7 +101,7 @@ Event::ResultType MaterialChooser::onButtonClicked(unsigned int index)
          mat_str = mat_name;
       }
    }
-   
+
    std::cout << "Selected material: " << mat_str << std::endl;
    mMaterialSelectedSignal(selected_material);
    return Event::CONTINUE;
@@ -144,7 +144,7 @@ void MaterialChooser::materialsChanged()
 void MaterialChooser::setWidthHeight(const float w, const float h, const float borderWidth)
 {
    Frame::setWidthHeight(w, h, borderWidth);
-   
+
    mSpacing = mWidth * 0.025;
    float hdiam = (mWidth - mSpacing*(mHNum+1))/mHNum;
    float vdiam = (mHeight - mSpacing*(mVNum+1))/mVNum;

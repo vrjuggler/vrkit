@@ -599,7 +599,7 @@ int main(int argc, char* argv[])
    // Start it up
     mgr->showAll();
 
-    std::cout << "Near: " << mgr->getCamera()->getNear() << " Far: " << mgr->getCamera()->getFar() << std::endl;    
+    std::cout << "Near: " << mgr->getCamera()->getNear() << " Far: " << mgr->getCamera()->getFar() << std::endl;
     mgr->getCamera()->setNear(1.0);
     mgr->getCamera()->setFar(40.0f);
     std::cout << "Near: " << mgr->getCamera()->getNear() << " Far: " << mgr->getCamera()->getFar() << std::endl;

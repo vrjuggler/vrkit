@@ -47,9 +47,9 @@ public:
    void resetGeomGeo(OSG::GeometryPtr geom);
 
    /** Build a sphere.
-    * 
+    *
     */
-   OSG::GeometryPtr buildSphere(const OSG::UInt16 depth, const OSG::Real32 radius, 
+   OSG::GeometryPtr buildSphere(const OSG::UInt16 depth, const OSG::Real32 radius,
                                 const OSG::Color3f& color, const float alpha);
 
    /** Build a rectangle.

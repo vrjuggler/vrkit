@@ -19,7 +19,7 @@
             <enum label="Meters" value="1.0" />
             <enum label="Millimeters" value="0.001" />
          </enumeration>
-      </property>       
+      </property>
       <property valuetype="configelement" variable="true" name="viewpoints">
          <help>Select list of predefined viewpoints.</help>
          <value label="Viewpoint" />
@@ -45,7 +45,7 @@
             <enum label="Meters" value="1.0" />
             <enum label="Millimeters" value="0.001" />
          </enumeration>
-      </property>       
+      </property>
       <property valuetype="configelement" variable="true" name="viewpoints">
          <help>Select list of predefined viewpoints.</help>
          <value label="Viewpoint" />

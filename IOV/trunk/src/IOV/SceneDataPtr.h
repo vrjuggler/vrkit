@@ -9,7 +9,7 @@ namespace inf
 {
    class SceneData;
    typedef boost::shared_ptr<SceneData> SceneDataPtr;
-   typedef boost::weak_ptr<SceneData> SceneDataWeakPtr;   
+   typedef boost::weak_ptr<SceneData> SceneDataWeakPtr;
 }
 
 #endif

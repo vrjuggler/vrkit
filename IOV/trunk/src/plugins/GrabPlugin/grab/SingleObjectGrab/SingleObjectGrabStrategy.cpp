@@ -259,7 +259,7 @@ objectIntersected(SceneObjectPtr obj, const gmtl::Point3f& pnt)
    {
       return inf::Event::DONE;
    }
-   
+
    return inf::Event::CONTINUE;
 }
 

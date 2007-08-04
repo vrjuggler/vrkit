@@ -342,8 +342,6 @@ void OpenSgViewer::init()
       model_xform.node()->addChild(model_root);
    OSG::endEditCP(model_xform);
 
-
-   
    // --- Light setup --- //
    // - Add directional light for scene
    // - Create a beacon for it and connect to that beacon

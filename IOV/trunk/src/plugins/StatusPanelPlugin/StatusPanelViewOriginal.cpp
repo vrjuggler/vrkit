@@ -34,26 +34,26 @@ StatusPanelViewOriginal::StatusPanelViewOriginal()
    mBorderColor.setValuesRGB(1, 1, 1);
    mTitleColor.setValuesRGB(1, 0.5, 0);
    mTextColor.setValuesRGB(1, 1, 1);
-   
+
    mDrawDebug = false;
 }
 
 void StatusPanelViewOriginal::initialize(const float metersToAppUnits, StatusPanel* const panel)
 {
    mStatusPanel = panel;
-   
+
    mStatusPanel->statusPanelChanged().connect(
          boost::bind(&StatusPanelViewOriginal::setDirty, this));
-   
+
    mMetersToAppUnits = metersToAppUnits;
-   
+
    const float feet_to_app_units(0.3048f * mMetersToAppUnits);
 
    mPanWidth = 10.0f * feet_to_app_units;
    mPanHeight = 15.0f * feet_to_app_units;
    mBorderWidth = 0.4f * feet_to_app_units;
    mBorderDepth = 0.2f * feet_to_app_units;
-   
+
    mRootPanelNode = OSG::Node::create();
    mPanelGeomNode = OSG::Node::create();
    mPanelGeomCore = mBuilder.createGeomGeo();

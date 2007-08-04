@@ -10,7 +10,7 @@ namespace inf
 {
    class WidgetData;
    typedef boost::shared_ptr<WidgetData> WidgetDataPtr;
-   typedef boost::weak_ptr<WidgetData> WidgetDataWeakPtr;   
+   typedef boost::weak_ptr<WidgetData> WidgetDataWeakPtr;
 }
 
 #endif

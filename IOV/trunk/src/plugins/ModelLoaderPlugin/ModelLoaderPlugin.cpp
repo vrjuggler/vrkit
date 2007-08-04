@@ -73,23 +73,23 @@ namespace inf
    {
       return PluginPtr(new ModelLoaderPlugin(info));
    }
-   
+
    std::string ModelLoaderPlugin::getDescription()
    {
       return std::string("Model Loader Plugin");
    }
-   
+
    PluginPtr ModelLoaderPlugin::init(inf::ViewerPtr viewer)
-   {      
+   {
       const std::string plugin_tkn("model_loader_plugin");
       const std::string units_to_meters_tkn("units_to_meters");
       const std::string position_tkn("position");
       const std::string rotation_tkn("rotation");
       const std::string models_tkn("models");
       const std::string path_tkn("path");
-      
+
       const unsigned int req_cfg_version(1);
-      
+
       jccl::ConfigElementPtr elt = viewer->getConfiguration().getConfigElement(plugin_tkn);
 
       if(!elt)
@@ -99,10 +99,10 @@ namespace inf
                 << "Looking for type: " << plugin_tkn;
          throw PluginException(ex_msg.str(), IOV_LOCATION);
       }
-   
+
       // -- Read configuration -- //
       vprASSERT(elt->getID() == plugin_tkn);
-   
+
       // Check for correct version of plugin configuration
       if(elt->getVersion() < req_cfg_version)
       {
@@ -111,14 +111,14 @@ namespace inf
              << " found:" << elt->getVersion();
          throw PluginException(msg.str(), IOV_LOCATION);
       }
-      
+
       // Get the scaling factor
       float to_meters_scalar = elt->getProperty<float>(units_to_meters_tkn);
-      
+
       // Get the paths to all the models, load them, and add them to the scene
       inf::ScenePtr scene = viewer->getSceneObj();
       OSG::TransformNodePtr scene_xform_root = scene->getTransformRoot();
-      
+
       OSG::beginEditCP(scene_xform_root);
          const unsigned int num_models(elt->getNum(models_tkn));
          for( unsigned int i = 0; i < num_models; ++i )
@@ -138,41 +138,41 @@ namespace inf
                xt *= to_meters_scalar;
                yt *= to_meters_scalar;
                zt *= to_meters_scalar;
-         
+
                float xr = model_elt->getProperty<float>(rotation_tkn, 0);
                float yr = model_elt->getProperty<float>(rotation_tkn, 1);
                float zr = model_elt->getProperty<float>(rotation_tkn, 2);
-         
+
                gmtl::Coord3fXYZ coord;
                coord.pos().set(xt,yt,zt);
                coord.rot().set(gmtl::Math::deg2Rad(xr),
                                   gmtl::Math::deg2Rad(yr),
                                   gmtl::Math::deg2Rad(zr));
-         
+
                gmtl::Matrix44f xform_mat = gmtl::make<gmtl::Matrix44f>(coord); // Set at T*R
                OSG::Matrix xform_mat_osg;
                gmtl::set(xform_mat_osg, xform_mat);
-               
+
                OSG::NodeRefPtr xform_node(OSG::Node::create());
                OSG::TransformRefPtr xform_core(OSG::Transform::create());
-               
+
                OSG::beginEditCP(xform_core);
                   xform_core->setMatrix(xform_mat_osg);
                OSG::endEditCP(xform_core);
-               
+
                OSG::beginEditCP(xform_node);
                   xform_node->setCore(xform_core);
                   xform_node->addChild(model_node);
                OSG::endEditCP(xform_node);
-               
+
                scene_xform_root.node()->addChild(xform_node);
             }
          }
       OSG::endEditCP(scene_xform_root);
-      
-      return shared_from_this(); 
+
+      return shared_from_this();
    }
-   
+
    void ModelLoaderPlugin::update(inf::ViewerPtr)
    {
       /* Do nothing. */ ;
