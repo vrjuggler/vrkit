@@ -27,7 +27,11 @@ if boost_options.isAvailable():
 
    appname = 'iov_app'
    iov_app_name = appname + runtime_suffix
-   iov_app_prog = viewerEnv.Program(iov_app_name, ['iov_app.cpp',])
+   iov_app_srcs = ['iov_app.cpp']
+   if platform == 'win32':
+      iov_app_srcs.append(viewerEnv.RES('iov_app.rc'))
+
+   iov_app_prog = viewerEnv.Program(iov_app_name, iov_app_srcs)
    viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), iov_app_prog)
 
    # Only install *.jdef files on first pass.
