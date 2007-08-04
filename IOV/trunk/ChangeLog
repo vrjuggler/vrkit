@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-04 patrick  Updated the Viewpoints Plug-in to use inf::DigitalCommand.
+                    -- VERSION -- 0.41.1
 2007-08-03 patrick  Revamped inf::DigitalCommand to be fully configurable using
                     button state expressions. All plug-ins currently using
                     inf::DigitalCommand have been updated for this new

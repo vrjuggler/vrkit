@@ -33,7 +33,7 @@
 namespace
 {
    const std::string vp_plugin_elt_tkn("viewpoints_plugin");
-   const std::string vp_control_button_num_tkn("control_button_num");
+   const std::string vp_control_command_exp_tkn("control_command_exp");
    const std::string vp_viewpoints_tkn("viewpoints");
    const std::string vp_units_to_meters_tkn("units_to_meters");
 
@@ -87,7 +87,7 @@ PluginPtr ViewpointsPlugin::create(const inf::plugin::Info& info)
 
 PluginPtr ViewpointsPlugin::init(inf::ViewerPtr viewer)
 {
-   const unsigned int req_cfg_version(1);
+   const unsigned int req_cfg_version(2);
 
    // Get the wand interface
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
@@ -115,8 +115,11 @@ PluginPtr ViewpointsPlugin::init(inf::ViewerPtr viewer)
       throw PluginException(msg.str(), IOV_LOCATION);
    }
 
-   // Get the control button to use
-   mControlBtnNum = elt->getProperty<int>(vp_control_button_num_tkn);
+   // Get the control button(s) to use.
+   mControlCmd.configure(
+      elt->getProperty<std::string>(vp_control_command_exp_tkn),
+      mWandInterface
+   );
 
    float to_meters_scalar = elt->getProperty<float>(vp_units_to_meters_tkn);
 
@@ -174,12 +177,8 @@ void ViewpointsPlugin::update(inf::ViewerPtr viewer)
 {
    if ( isFocused() )
    {
-      gadget::DigitalInterface& control_button =
-         mWandInterface->getButton(mControlBtnNum);
-
       // If we have viewpoints and the button has been pressed
-      if ( ! mViewpoints.empty() &&
-           control_button->getData() == gadget::Digital::TOGGLE_ON )
+      if ( ! mViewpoints.empty() && mControlCmd() )
       {
          vprASSERT(mNextViewpoint < mViewpoints.size());
          Viewpoint vp = mViewpoints[mNextViewpoint];

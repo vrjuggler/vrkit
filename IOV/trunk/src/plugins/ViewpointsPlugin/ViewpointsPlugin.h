@@ -12,6 +12,8 @@
 
 #include <IOV/Plugin.h>
 #include <IOV/WandInterfacePtr.h>
+#include <IOV/Util/DigitalCommand.h>
+
 
 namespace inf
 {
@@ -26,7 +28,6 @@ class ViewpointsPlugin
 protected:
    ViewpointsPlugin(const inf::plugin::Info& info)
       : Plugin(info)
-      , mControlBtnNum(-1)
       , mNextViewpoint(0)
    {;}
 
@@ -73,7 +74,7 @@ protected:
 
 private:
    WandInterfacePtr        mWandInterface;      /**< Ptr to the wand interface to use. */
-   int                     mControlBtnNum;      /**< The index of the control button. */
+   inf::DigitalCommand     mControlCmd;         /**< The control digital command. */
    unsigned                mNextViewpoint;      /**< The next viewpoint to switch to. */
    std::vector<Viewpoint>  mViewpoints;         /**< The predefined viewpoints. */
 };

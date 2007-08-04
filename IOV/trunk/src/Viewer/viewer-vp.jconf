@@ -50,8 +50,8 @@
          <reset_button_nums>0+ &amp; 1+</reset_button_nums>
          <initial_mode>Walk</initial_mode>
       </wand_nav_plugin>
-      <viewpoints_plugin name="ViewpointsPlugin" version="1">
-         <control_button_num>1</control_button_num>
+      <viewpoints_plugin name="Viewpoints Plug-in" version="2">
+         <control_command_exp>1^</control_command_exp>
          <units_to_meters>1.0</units_to_meters>
          <viewpoints>
             <viewpoints_vp name="Position 1" version="1">
