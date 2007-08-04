@@ -34,24 +34,24 @@ static inf::PluginCreator<inf::Plugin> sPluginCreator(
 extern "C"
 {
 
-   /** @name Plug-in Entry Points */
+/** @name Plug-in Entry Points */
 //@{
 IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-   IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-   vpr::Uint32& minorVer)
-   {
-      majorVer = INF_PLUGIN_API_MAJOR;
-      minorVer = INF_PLUGIN_API_MINOR;
-   }
+IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                               vpr::Uint32& minorVer)
+{
+   majorVer = INF_PLUGIN_API_MAJOR;
+   minorVer = INF_PLUGIN_API_MINOR;
+}
 
-   IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
-   {
-      return &sPluginCreator;
-   }
+IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+{
+   return &sPluginCreator;
+}
 //@}
 }
 
@@ -64,18 +64,19 @@ namespace inf
 namespace
 {
 
-   const std::string status_panel_elt_tkn("status_panel_plugin");
-   const std::string initial_size_prop("initial_size");
-   const std::string initial_pos_prop("initial_pos");
-   const std::string initial_rot_prop("initial_rot");
-
+const std::string status_panel_elt_tkn("status_panel_plugin");
+const std::string initial_size_prop("initial_size");
+const std::string initial_pos_prop("initial_pos");
+const std::string initial_rot_prop("initial_rot");
 
 class StatusOutputter
 {
 public:
    StatusOutputter(inf::StatusPanelPluginPtr p)
       : mStatusPlugin(p)
-   {;}
+   {
+      /* Do nothing. */ ;
+   }
 
    void operator() (const std::string& msg)
    {
@@ -128,9 +129,10 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    mPanelXformNode = OSG::TransformNodePtr::create();
 
    // XXX: Read the configuration
-   jccl::ConfigElementPtr elt = viewer->getConfiguration().getConfigElement(status_panel_elt_tkn);
+   jccl::ConfigElementPtr elt =
+      viewer->getConfiguration().getConfigElement(status_panel_elt_tkn);
 
-   if(elt)
+   if ( elt )
    {
       vprASSERT(elt->getID() == status_panel_elt_tkn);
 
@@ -193,18 +195,17 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
       viewer->getSceneObj()->getSceneData<SignalRepository>();
 
    typedef boost::signal<void (bool)> sig_type;
-   std::string sig_name("Toggle Status Panel Visibility");
+   const std::string sig_name("Toggle Status Panel Visibility");
 
-   if( ! sig_repos->hasSignal(sig_name) )
+   if ( ! sig_repos->hasSignal(sig_name) )
    {
-      sig_repos->addSignal(sig_name,
-			   SignalContainer<sig_type>::create());
+      sig_repos->addSignal(sig_name, SignalContainer<sig_type>::create());
    }
 
    // Connect new signal to slot after SwitchNode creation
    mVisConn = sig_repos->getSignal<sig_type>(sig_name)->connect(
       boost::bind(&inf::StatusPanelPlugin::setVisibility, this, _1)
-      );
+   );
 
    // Register with status
    StatusOutputter status_outputter(shared_from_this());
@@ -215,45 +216,49 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
       scene_obj->getSceneData<StatusPanelData>();
 
    status_panel_data->mSetHeaderTitle.connect(
-      boost::bind(&StatusPanel::setHeaderTitle, &mStatusPanel, _1));
+      boost::bind(&StatusPanel::setHeaderTitle, &mStatusPanel, _1)
+   );
 
    status_panel_data->mSetCenterTitle.connect(
-      boost::bind(&StatusPanel::setCenterTitle, &mStatusPanel, _1));
+      boost::bind(&StatusPanel::setCenterTitle, &mStatusPanel, _1)
+   );
 
    status_panel_data->mSetBottomTitle.connect(
-      boost::bind(&StatusPanel::setBottomTitle, &mStatusPanel, _1));
+      boost::bind(&StatusPanel::setBottomTitle, &mStatusPanel, _1)
+   );
 
    status_panel_data->mSetHeaderText.connect(
-      boost::bind(&StatusPanel::setHeaderText, &mStatusPanel, _1));
+      boost::bind(&StatusPanel::setHeaderText, &mStatusPanel, _1)
+   );
 
    status_panel_data->mSetControlText.connect(
-      boost::bind(
-         &StatusPanel::setControlText, &mStatusPanel, _1, _2)
-      );
+      boost::bind(&StatusPanel::setControlText, &mStatusPanel, _1, _2)
+   );
 
    status_panel_data->mAddControlText.connect(
-      boost::bind(
-      &StatusPanel::addControlText, &mStatusPanel, _1, _2, _3)
-      );
+      boost::bind(&StatusPanel::addControlText, &mStatusPanel, _1, _2, _3)
+   );
 
    status_panel_data->mRemoveControlText.connect(
-      boost::bind(
-         &StatusPanel::removeControlText, &mStatusPanel, _1, _2)
-      );
+      boost::bind(&StatusPanel::removeControlText, &mStatusPanel, _1, _2)
+   );
 
    status_panel_data->mHasControlText.connect(
-      boost::bind(
-         &StatusPanel::hasControlText, &mStatusPanel, _1, _2, _3)
-      );
+      boost::bind(&StatusPanel::hasControlText, &mStatusPanel, _1, _2, _3)
+   );
 
    status_panel_data->mAddStatusMessage.connect(
-      boost::bind(&StatusPanel::addStatusMessage, &mStatusPanel, _1));
+      boost::bind(&StatusPanel::addStatusMessage, &mStatusPanel, _1)
+   );
 
    status_panel_data->mSetWidthHeight.connect(
-      boost::bind(&StatusPanelViewOriginal::setWidthHeight, &mStatusPanelView, _1, _2, _3));
+      boost::bind(&StatusPanelViewOriginal::setWidthHeight, &mStatusPanelView,
+                  _1, _2, _3)
+   );
 
    status_panel_data->mSetStatusHistorySize.connect(
-      boost::bind(&StatusPanel::setStatusHistorySize, &mStatusPanel, _1));
+      boost::bind(&StatusPanel::setStatusHistorySize, &mStatusPanel, _1)
+   );
 
    return shared_from_this();
 }
@@ -276,7 +281,6 @@ void StatusPanelPlugin::setVisibility(bool visible)
       }
    OSG::endEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
 }
-
 
 void StatusPanelPlugin::destroy()
 {

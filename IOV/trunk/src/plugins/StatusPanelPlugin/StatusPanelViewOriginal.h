@@ -45,7 +45,8 @@ public:
    /** Update the status panel if it is needed. */
    void update();
 
-   void setWidthHeight(const float w, const float h, const float borderWidth=0.0f);
+   void setWidthHeight(const float w, const float h,
+                       const float borderWidth = 0.0f);
 
 protected:
    void updatePanelScene();
@@ -63,11 +64,13 @@ protected:
 
    float mMetersToAppUnits;
 
-   /** Panel sizes are in OpenSG units.
-    * Everything else is in normalized percentages or discrete num of's (ie. num lines).
-    * Thus all real sizes are derived based on the panel size set.
+   /**
+    * Panel sizes are in OpenSG units.
+    * Everything else is in normalized percentages or discrete num of's (i.e.,
+    * num lines). Thus all real sizes are derived based on the panel size set.
     * This "should" make it possible to resize the panel and get good results.
     */
+   //@{
    float    mPanWidth, mPanHeight;  /**< Panel size in OpenSG units. */
    float    mBorderWidth;           /**< Width of the border in real units. */
    float    mBorderDepth;           /**< Depth of the border in real units. */
@@ -79,7 +82,7 @@ protected:
    float    mStatusHeight;          /**< Size of the status section (percentage). */
 
    float    mStatusTextHeight;      /**< Fixed height (in OpenSG coords) of status text. */
-
+   //@}
 
    // Colors/theming
    OSG::Color3f   mBgColor;         /**< Color of the background. */
