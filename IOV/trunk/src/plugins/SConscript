@@ -42,7 +42,9 @@ def makePlugin(srcDir, pluginName, instDir):
       # On Windows, we only want to install the .dll file for the plug-in
       # case.
       if platform == 'win32':
-         plugin_env.Depends(plugin_lib, iov_lib)
+         plugin_env.Depends(plugin_lib,
+                            os.path.join(inst_paths['lib'],
+                                         'iov%s.lib' % shared_lib_suffix))
          plugin_lib = [p for p in plugin_lib if str(p).endswith('.dll')]
 
       plugin_env.Install(inst_dir, plugin_lib)
