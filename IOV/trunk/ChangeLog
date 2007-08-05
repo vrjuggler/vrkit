@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-04 patrick  Removed the implicit conversion to bool for
+                    inf::DigitalCommand (introduced in 0.41.0).
+                    -- VERSION -- 0.41.2
 2007-08-04 patrick  Updated the Viewpoints Plug-in to use inf::DigitalCommand.
                     -- VERSION -- 0.41.1
 2007-08-03 patrick  Revamped inf::DigitalCommand to be fully configurable using

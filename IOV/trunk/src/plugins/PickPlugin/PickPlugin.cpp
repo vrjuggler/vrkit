@@ -209,7 +209,7 @@ void PickPlugin::focusChanged(inf::ViewerPtr viewer)
 {
    // If we have focus and our grab/release button is configured, we
    // will update the status panel to include our command.
-   if ( isFocused() && mPickBtn )
+   if ( isFocused() && mPickBtn.isConfigured() )
    {
       inf::ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =

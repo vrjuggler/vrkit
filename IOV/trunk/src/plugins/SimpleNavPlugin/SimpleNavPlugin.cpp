@@ -143,25 +143,25 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
    {
       mVelocity = 0.0f;
 
-      if ( mForBtn )
+      if ( mForBtn.isConfigured() )
       {
          status_panel_data->mRemoveControlText(mForBtn.toString(),
                                                mForwardText);
       }
 
-      if ( mRevBtn )
+      if ( mRevBtn.isConfigured() )
       {
          status_panel_data->mRemoveControlText(mRevBtn.toString(),
                                                mReverseText);
       }
 
-      if ( mRotateBtn )
+      if ( mRotateBtn.isConfigured() )
       {
          status_panel_data->mRemoveControlText(mRotateBtn.toString(),
                                                mRotateText);
       }
 
-      if ( mModeBtn )
+      if ( mModeBtn.isConfigured() )
       {
          status_panel_data->mRemoveControlText(mModeBtn.toString(),
                                                mModeText);
@@ -169,7 +169,7 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
    }
    else
    {
-      if ( mForBtn )
+      if ( mForBtn.isConfigured() )
       {
          bool has(false);
          status_panel_data->mHasControlText(mForBtn.toString(), mForwardText,
@@ -182,7 +182,7 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
          }
       }
 
-      if ( mRevBtn )
+      if ( mRevBtn.isConfigured() )
       {
          bool has(false);
          status_panel_data->mHasControlText(mRevBtn.toString(), mReverseText,
@@ -195,7 +195,7 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
          }
       }
 
-      if ( mRotateBtn )
+      if ( mRotateBtn.isConfigured() )
       {
          bool has(false);
          status_panel_data->mHasControlText(mRotateBtn.toString(),
@@ -208,7 +208,7 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
          }
       }
 
-      if ( mModeBtn )
+      if ( mModeBtn.isConfigured() )
       {
          bool has(false);
          status_panel_data->mHasControlText(mModeBtn.toString(), mModeText,

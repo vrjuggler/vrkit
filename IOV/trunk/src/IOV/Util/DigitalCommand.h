@@ -107,16 +107,6 @@ public:
    {
       return ! mConfigString.empty() && ! mTestFunc.empty();
    }
-
-   /**
-    * A synonym for isConfigured().
-    *
-    * @since 0.41.0
-    */
-   operator bool() const
-   {
-      return isConfigured();
-   }
    //@}
 
    /** @name State Test */

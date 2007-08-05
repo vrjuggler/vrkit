@@ -142,7 +142,7 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
 
       // If choose button(s) is/are configured, we will update the status
       // panel to include that information.
-      if ( mChooseBtn )
+      if ( mChooseBtn.isConfigured() )
       {
          bool has(false);
          status_panel_data->mHasControlText(mChooseBtn.toString(),
@@ -157,7 +157,7 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
 
       // If grab button(s) is/are configured, we will update the status
       // panel to include that information.
-      if ( mGrabBtn )
+      if ( mGrabBtn.isConfigured() )
       {
          bool has(false);
          status_panel_data->mHasControlText(mGrabBtn.toString(), mGrabText,
@@ -172,7 +172,7 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
 
       // If release button(s) is/are configured, we will update the status
       // panel to include that information.
-      if ( mReleaseBtn )
+      if ( mReleaseBtn.isConfigured() )
       {
          bool has = false;
          status_panel_data->mHasControlText(mReleaseBtn.toString(),
