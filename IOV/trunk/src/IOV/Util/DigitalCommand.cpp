@@ -234,8 +234,9 @@ private:
 class indent
 {
 public:
-   indent(const unsigned int level)
+   indent(const unsigned int level, const std::string& indentText = "   ")
       : mLevel(level)
+      , mIndentText(indentText)
    {
       /* Do nothing. */ ;
    }
@@ -245,15 +246,21 @@ public:
       return mLevel;
    }
 
+   const std::string& text() const
+   {
+      return mIndentText;
+   }
+
 private:
    const unsigned int mLevel;
+   const std::string  mIndentText;
 };
 
 std::ostream& operator<<(std::ostream& out, const indent& i)
 {
    for ( unsigned int j = 0; j < i.level(); ++j )
    {
-      out << "   ";
+      out << i.text();
    }
 
    return out;
@@ -457,7 +464,11 @@ void DigitalCommand::configure(std::string buttonString,
    }
    else
    {
-      throw inf::Exception("Parse error", IOV_LOCATION);
+      std::ostringstream msg_stream;
+      msg_stream << "Parse error: " << buttonString << std::endl
+                 << "             "
+                 << indent(info.stop - buttonString.c_str(), "-") << "^";
+      throw inf::Exception(msg_stream.str(), IOV_LOCATION);
    }
 }
 
