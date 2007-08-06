@@ -14,7 +14,8 @@
 #include <IOV/PluginPtr.h>
 
 #define INF_PLUGIN_API_MAJOR    2
-#define INF_PLUGIN_API_MINOR    0
+#define INF_PLUGIN_API_MINOR    1
+
 
 namespace inf
 {
@@ -185,30 +186,7 @@ public:
       }
    }
 
-#if defined(WIN32) || defined(WIN64)
-   /**
-    * Overlaod delete so that we can delete our memory correctly.  This is
-    * necessary for DLLs on Win32 to release memory from the correct memory
-    * space.  All subclasses must overload delete similarly.
-    */
-   void operator delete(void* p)
-   {
-      if ( NULL != p )
-      {
-         Plugin* plugin_ptr = static_cast<Plugin*>(p);
-         plugin_ptr->destroy();
-      }
-   }
-#endif
-
 protected:
-   /**
-    * Subclasses must implement this so that dynamically loaded plug-ins
-    * delete themselves in the correct memory space.  This uses a template
-    * pattern.
-    */
-   virtual void destroy() = 0;
-
    Plugin(const inf::plugin::Info& info);
 
    virtual void focusChanged(inf::ViewerPtr viewer)

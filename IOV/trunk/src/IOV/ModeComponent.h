@@ -15,7 +15,7 @@
 #include <IOV/ModeComponentPtr.h>
 
 #define INF_MODE_COMPONENT_API_MAJOR    2
-#define INF_MODE_COMPONENT_API_MINOR    0
+#define INF_MODE_COMPONENT_API_MINOR    1
 
 
 namespace inf
@@ -155,22 +155,6 @@ public:
       return mActive;
    }
 
-#if defined(VPR_OS_Windows)
-   /**
-    * Overlaod delete so that we can delete our memory correctly.  This is
-    * necessary for DLLs on Windows to release memory from the correct memory
-    * space.  All subclasses must overload delete similarly.
-    */
-   void operator delete(void* p)
-   {
-      if ( NULL != p )
-      {
-         ModeComponent* component_ptr = static_cast<ModeComponent*>(p);
-         component_ptr->destroy();
-      }
-   }
-#endif
-
 protected:
    /**
     * Constructor.
@@ -178,13 +162,6 @@ protected:
     * @post \c mActive is false.
     */
    ModeComponent(const inf::plugin::Info& info);
-
-   /**
-    * Subclasses must implement this so that dynamically loaded plug-ins
-    * delete themselves in the correct memory space.  This uses a template
-    * pattern.
-    */
-   virtual void destroy() = 0;
 
    /**
     * Template method for activating this mode component. This is called

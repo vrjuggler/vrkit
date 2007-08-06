@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-06 patrick  Removed pure virtual destroy() method from the plug-in base
+                    classes.
+                    -- VERSION -- 0.42.0
 2007-08-04 patrick  Removed the implicit conversion to bool for
                     inf::DigitalCommand (introduced in 0.41.0).
                     -- VERSION -- 0.41.2

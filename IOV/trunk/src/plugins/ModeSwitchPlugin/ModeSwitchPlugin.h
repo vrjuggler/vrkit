@@ -68,15 +68,6 @@ public:
 
    virtual void contextClose(inf::ViewerPtr viewer);
 
-   /**
-    * Invokes the global scope delete operator.  This is required for proper
-    * releasing of memory in DLLs on Win32.
-    */
-   void operator delete(void* p)
-   {
-      ::operator delete(p);
-   }
-
 private:
    void registerModule(vpr::LibraryPtr module, inf::ViewerPtr viewer);
 
@@ -84,15 +75,6 @@ private:
    * Switch to the given mode. Activates and deactivates the plugins needed.
    */
    void switchToMode(const int unsigned modeNum, inf::ViewerPtr viewer);
-
-   /**
-    * Deletes this object.  This is an implementation of the pure virtual
-    * inf::Plugin::destroy() method.
-    */
-   virtual void destroy()
-   {
-      delete this;
-   }
 
    static std::string getElementType()
    {

@@ -59,15 +59,6 @@ public:
     */
    void setVisibility(bool visible);
 
-   /**
-    * Invokes the global scope delete operator.  This is required for proper
-    * releasing of memory in DLLs on Win32.
-    */
-   void operator delete(void* p)
-   {
-      ::operator delete(p);
-   }
-
 protected:
    StatusPanel			mStatusPanel;        /**< The status panel we are using. */
    StatusPanelViewOriginal	mStatusPanelView;    /**< The status panel view that we are using. */
@@ -76,8 +67,6 @@ protected:
 
    boost::signals::connection mOutputConn;
    boost::signals::connection mVisConn;		/**< Visibility connection object. */
-
-   virtual void destroy();
 };
 
 }

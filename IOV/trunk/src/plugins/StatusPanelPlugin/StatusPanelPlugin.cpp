@@ -282,9 +282,4 @@ void StatusPanelPlugin::setVisibility(bool visible)
    OSG::endEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
 }
 
-void StatusPanelPlugin::destroy()
-{
-   delete this;
-}
-
 } // namespace inf

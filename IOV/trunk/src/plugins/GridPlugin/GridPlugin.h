@@ -58,25 +58,7 @@ public:
     */
    virtual void update(inf::ViewerPtr viewer);
 
-   /**
-    * Invokes the global scope delete operator.  This is required for proper
-    * releasing of memory in DLLs on Win32.
-    */
-   void operator delete(void* p)
-   {
-      ::operator delete(p);
-   }
-
 protected:
-   /**
-    * Deletes this object.  This is an implementation of the pure virtual
-    * inf::Plugin::destroy() method.
-    */
-   virtual void destroy()
-   {
-      delete this;
-   }
-
    /**
     * Updates the state of the status panel (if it is in use) based on the
     * new focused state of this plug-in.

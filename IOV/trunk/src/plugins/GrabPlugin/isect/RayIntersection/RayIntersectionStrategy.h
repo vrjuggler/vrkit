@@ -61,25 +61,6 @@ public:
 
    void initGeom();
 
-   /**
-    * Invokes the global scope delete operator.  This is required for proper
-    * releasing of memory in DLLs on Windows.
-    */
-   void operator delete(void* p)
-   {
-      ::operator delete(p);
-   }
-
-protected:
-   /**
-    * Deletes this object.  This is an implementation of the pure virtual
-    * inf::IntersectionStrategy::destroy() method.
-    */
-   virtual void destroy()
-   {
-      delete this;
-   }
-
 private:
    static std::string getElementType()
    {

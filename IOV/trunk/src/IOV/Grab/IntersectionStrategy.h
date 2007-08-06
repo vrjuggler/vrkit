@@ -17,7 +17,7 @@
 #include <vector>
 
 #define INF_ISECT_STRATEGY_PLUGIN_API_MAJOR 2
-#define INF_ISECT_STRATEGY_PLUGIN_API_MINOR 0
+#define INF_ISECT_STRATEGY_PLUGIN_API_MINOR 1
 
 
 namespace inf
@@ -117,31 +117,7 @@ public:
       findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
                        gmtl::Point3f& intersectPoint) = 0;
 
-#if defined(WIN32) || defined(WIN64)
-   /**
-    * Overlaod delete so that we can delete our memory correctly. This is
-    * necessary for DLLs on Windows to release memory from the correct memory
-    * space. All subclasses must overload delete similarly.
-    */
-   void operator delete(void* p)
-   {
-      if ( NULL != p )
-      {
-         IntersectionStrategy* strategy_ptr =
-            static_cast<IntersectionStrategy*>(p);
-         strategy_ptr->destroy();
-      }
-   }
-#endif
-
 protected:
-   /**
-    * Subclasses must implement this so that dynamically loaded plug-ins
-    * delete themselves in the correct memory space. This uses the Template
-    * Method Pattern.
-    */
-   virtual void destroy() = 0;
-
    /**
     * Constructor. This does nothing.
     */
