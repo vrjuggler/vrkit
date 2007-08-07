@@ -15,6 +15,8 @@
 
 #include <IOV/Video/EncoderPtr.h>
 
+#include <set>
+
 namespace inf
 {
 
@@ -77,13 +79,19 @@ public:
       return mRecording;
    }
 
+   std::set<std::string> getAvailableCodecs() const
+   {
+      return mCodecSet;
+   }
+
 private:
    typedef std::vector<std::string> encoder_list_t;
    typedef std::map<std::string, encoder_list_t> codec_map_t;
+   typedef std::set<std::string> codec_set_t;
    typedef boost::function<EncoderPtr ()> encoder_create_t;
    typedef std::map<std::string, encoder_create_t> creator_map_t;
 
-   bool                 mRecording;     /**< Wether we are currently recording. */
+   bool                 mRecording;     /**< Whether we are currently recording. */
    bool                 mStereo;
    bool                 mUseFbo;        /**< If we are using a FBO or the default pixel buffer. */
    OSG::ImagePtr        mImage;         /**< Image to hold the pixel data while encoding. */
@@ -91,6 +99,7 @@ private:
    EncoderPtr           mEncoder;       /**< Encoder that can write encode and write movie. */
    codec_map_t          mCodecMap;      /**< Map of codec_name to a list of encoders. */
    creator_map_t        mCreatorMap;    /**< Map of encoder names to encoder creators. */
+   codec_set_t		mCodecSet;	/**< Set of all codecs available. */
 };
 
 }

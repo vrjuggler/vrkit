@@ -35,6 +35,7 @@
         itr != ENCODER ## cl.end(); ++itr)                      \
    {                                                            \
       mCodecMap[*itr].push_back(ENCODER ## name);               \
+      mCodecSet.insert(*itr);					\
    }
 
 namespace
