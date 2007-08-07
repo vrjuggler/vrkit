@@ -61,6 +61,8 @@ public:
 
    void setCodec(const std::string& codec);
 
+   const std::set<std::string>& getAvailableCodecs() const;
+
    void setStereo(const bool stereo);
 
    void setInterocularDistance(const OSG::Real32 interocular);

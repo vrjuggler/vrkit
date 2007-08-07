@@ -79,7 +79,7 @@ public:
       return mRecording;
    }
 
-   std::set<std::string> getAvailableCodecs() const
+   const std::set<std::string>& getAvailableCodecs() const
    {
       return mCodecSet;
    }

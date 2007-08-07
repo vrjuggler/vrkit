@@ -156,6 +156,12 @@ void FboVideoCamera::setCodec(const std::string& codec)
    mCodec = codec;
 }
 
+const std::set<std::string>& FboVideoCamera::getAvailableCodecs() const
+{
+   return mVideoGrabber->getAvailableCodecs();
+}
+
+
 void FboVideoCamera::setStereo(const bool stereo)
 {
    mStereo = stereo;
