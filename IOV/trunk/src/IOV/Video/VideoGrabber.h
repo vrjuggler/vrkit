@@ -79,6 +79,11 @@ public:
       return mRecording;
    }
 
+   /**
+    * Returns the current set of available codes.
+    *
+    * @since 0.42.1
+    */
    const std::set<std::string>& getAvailableCodecs() const
    {
       return mCodecSet;

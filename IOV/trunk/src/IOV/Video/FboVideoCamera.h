@@ -61,6 +61,11 @@ public:
 
    void setCodec(const std::string& codec);
 
+   /**
+    * Returns the current set of available codes.
+    *
+    * @since 0.42.1
+    */
    const std::set<std::string>& getAvailableCodecs() const;
 
    void setStereo(const bool stereo);
