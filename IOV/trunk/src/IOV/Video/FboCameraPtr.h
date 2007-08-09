@@ -8,9 +8,9 @@
 
 namespace inf
 {
-   class FboVideoCamera;
-   typedef boost::shared_ptr<FboVideoCamera> FboVideoCameraPtr;
-   typedef boost::weak_ptr<FboVideoCamera> FboVideoCameraWeakPtr;
+   class FboCamera;
+   typedef boost::shared_ptr<FboCamera> FboCameraPtr;
+   typedef boost::weak_ptr<FboCamera> FboCameraWeakPtr;
 }
 
 #endif

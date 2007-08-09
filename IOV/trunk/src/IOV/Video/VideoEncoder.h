@@ -11,7 +11,7 @@
 #include <OpenSG/OSGViewport.h>
 #include <OpenSG/OSGImage.h>
 
-#include <IOV/Video/VideoGrabberPtr.h>
+#include <IOV/Video/VideoEncoderPtr.h>
 
 #include <IOV/Video/EncoderPtr.h>
 
@@ -25,15 +25,15 @@ namespace inf
  *
  * @since 0.37
  */
-class IOV_CLASS_API VideoGrabber : public boost::enable_shared_from_this<VideoGrabber>
+class IOV_CLASS_API VideoEncoder : public boost::enable_shared_from_this<VideoEncoder>
 {
 protected:
-   VideoGrabber();
+   VideoEncoder();
 
 public:
-   static VideoGrabberPtr create();
+   static VideoEncoderPtr create();
 
-   virtual ~VideoGrabber();
+   virtual ~VideoEncoder();
 
    /**
     * Initialize the video grabber.
@@ -41,7 +41,7 @@ public:
     * @param viewport Viewport to grab image from.
     * @param filename Movie file to save data to.
     */
-   VideoGrabberPtr init(OSG::ViewportPtr viewport);
+   VideoEncoderPtr init(OSG::ViewportPtr viewport);
 
    /**
     * Called be viewer each frame to render scene into FBO.

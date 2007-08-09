@@ -5,7 +5,7 @@
 
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Video/Encoder.h>
-#include <IOV/Video/VideoGrabber.h>
+#include <IOV/Video/VideoEncoder.h>
 
 #ifndef GL_COLOR_ATTACHMENT0_EXT
 #   define GL_COLOR_ATTACHMENT0_EXT 0x8CE0
@@ -57,7 +57,7 @@ namespace
 namespace inf
 {
 
-VideoGrabber::VideoGrabber()
+VideoEncoder::VideoEncoder()
    : mRecording(false)
    , mUseFbo(false)
    , mImage(OSG::NullFC)
@@ -67,12 +67,12 @@ VideoGrabber::VideoGrabber()
    /* Do nothing. */ ;
 }
 
-VideoGrabberPtr VideoGrabber::create()
+VideoEncoderPtr VideoEncoder::create()
 {
-   return VideoGrabberPtr(new VideoGrabber);
+   return VideoEncoderPtr(new VideoEncoder);
 }
 
-VideoGrabber::~VideoGrabber()
+VideoEncoder::~VideoEncoder()
 {
    if (NULL != mEncoder.get())
    {
@@ -83,7 +83,7 @@ VideoGrabber::~VideoGrabber()
    mViewport = OSG::NullFC;
 }
 
-VideoGrabberPtr VideoGrabber::init(OSG::ViewportPtr viewport)
+VideoEncoderPtr VideoEncoder::init(OSG::ViewportPtr viewport)
 {
    mViewport = viewport;
 
@@ -107,7 +107,7 @@ VideoGrabberPtr VideoGrabber::init(OSG::ViewportPtr viewport)
    return shared_from_this();
 }
 
-void VideoGrabber::record(const std::string& filename, const std::string& codec,
+void VideoEncoder::record(const std::string& filename, const std::string& codec,
                           const OSG::UInt32 framesPerSecond, const bool stereo)
 {
    OSG::UInt32 source_width = ( mViewport->getPixelWidth() / 2 ) * 2;
@@ -159,13 +159,13 @@ void VideoGrabber::record(const std::string& filename, const std::string& codec,
    mRecording = true;
 }
 
-void VideoGrabber::pause()
+void VideoEncoder::pause()
 {
    OSG_ASSERT(NULL != mEncoder.get() && "Can't pause if we aren't recording.");
    mRecording = false;
 }
 
-void VideoGrabber::resume()
+void VideoEncoder::resume()
 {
    OSG_ASSERT(NULL != mEncoder.get() && "Can't resume if we aren't recording.");
    if (NULL != mEncoder.get())
@@ -174,7 +174,7 @@ void VideoGrabber::resume()
    }
 }
 
-void VideoGrabber::stop()
+void VideoEncoder::stop()
 {
    OSG_ASSERT(NULL != mEncoder.get() && "Can't stop if we aren't recording.");
    if (NULL != mEncoder.get())
@@ -185,7 +185,7 @@ void VideoGrabber::stop()
    mRecording = false;
 }
 
-void VideoGrabber::grabFrame(const bool leftEye)
+void VideoEncoder::grabFrame(const bool leftEye)
 {
    if (!mRecording)
    {
@@ -245,7 +245,7 @@ void VideoGrabber::grabFrame(const bool leftEye)
    glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
 }
 
-void VideoGrabber::writeFrame()
+void VideoEncoder::writeFrame()
 {
    if (!mRecording)
    {

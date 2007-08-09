@@ -12,13 +12,13 @@
 
 #include <vrj/Display/Projection.h>
 
-#include <IOV/Video/VideoGrabber.h>
-#include <IOV/Video/FboVideoCamera.h>
+#include <IOV/Video/VideoEncoder.h>
+#include <IOV/Video/FboCamera.h>
 
 namespace inf
 {
 
-FboVideoCamera::FboVideoCamera()
+FboCamera::FboCamera()
    : mFboVP(OSG::NullFC)
    , mVideoGrabber()
    , mTransform(OSG::NullFC)
@@ -39,21 +39,21 @@ FboVideoCamera::FboVideoCamera()
    , mPaused(false)
 {;}
 
-FboVideoCameraPtr FboVideoCamera::create()
+FboCameraPtr FboCamera::create()
 {
-   return FboVideoCameraPtr(new FboVideoCamera);
+   return FboCameraPtr(new FboCamera);
 }
 
-FboVideoCamera::~FboVideoCamera()
+FboCamera::~FboCamera()
 {
 }
 
-void FboVideoCamera::contextInit(OSG::WindowPtr window)
+void FboCamera::contextInit(OSG::WindowPtr window)
 {
    mFboVP->setParent(window);
 }
 
-FboVideoCameraPtr FboVideoCamera::init()
+FboCameraPtr FboCamera::init()
 {
    // Create a transform to contain the location and orientation of the camera.
    mTransform = OSG::Transform::create();
@@ -129,50 +129,50 @@ FboVideoCameraPtr FboVideoCamera::init()
    // This also generates the frame geometry around the captured scene.
    setSize(mWidth, mHeight);
 
-   mVideoGrabber = VideoGrabber::create()->init(mFboVP);
+   mVideoGrabber = VideoEncoder::create()->init(mFboVP);
 
    return shared_from_this();
 }
 
-void FboVideoCamera::setSceneRoot(OSG::NodePtr root)
+void FboCamera::setSceneRoot(OSG::NodePtr root)
 {
    OSG::beginEditCP(mFboVP);
       mFboVP->setRoot(root);
    OSG::endEditCP(mFboVP);
 }
 
-void FboVideoCamera::setFilename(const std::string& filename)
+void FboCamera::setFilename(const std::string& filename)
 {
    mFilename = filename;
 }
 
-void FboVideoCamera::setFramesPerSecond(const OSG::UInt32 framesPerSecond)
+void FboCamera::setFramesPerSecond(const OSG::UInt32 framesPerSecond)
 {
    mFps = framesPerSecond;
 }
 
-void FboVideoCamera::setCodec(const std::string& codec)
+void FboCamera::setCodec(const std::string& codec)
 {
    mCodec = codec;
 }
 
-const std::set<std::string>& FboVideoCamera::getAvailableCodecs() const
+const std::set<std::string>& FboCamera::getAvailableCodecs() const
 {
    return mVideoGrabber->getAvailableCodecs();
 }
 
 
-void FboVideoCamera::setStereo(const bool stereo)
+void FboCamera::setStereo(const bool stereo)
 {
    mStereo = stereo;
 }
 
-void FboVideoCamera::setInterocularDistance(const OSG::Real32 interocular)
+void FboCamera::setInterocularDistance(const OSG::Real32 interocular)
 {
    mEyeOffset = interocular / 2.0f;
 }
 
-void FboVideoCamera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
+void FboCamera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 {
    // Resize the viewport.
    OSG::beginEditCP(mFboVP);
@@ -206,14 +206,14 @@ void FboVideoCamera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
    generateDebugFrame();
 }
 
-void FboVideoCamera::setCameraPos(const OSG::Matrix camPos)
+void FboCamera::setCameraPos(const OSG::Matrix camPos)
 {
    OSG::beginEditCP(mTransform, OSG::Transform::MatrixFieldMask);
       mTransform->setMatrix(camPos);
    OSG::endEditCP(mTransform, OSG::Transform::MatrixFieldMask);
 }
 
-void FboVideoCamera::startRecording()
+void FboCamera::startRecording()
 {
    if ( ! isRecording() )
    {
@@ -222,7 +222,7 @@ void FboVideoCamera::startRecording()
    }
 }
 
-void FboVideoCamera::pause()
+void FboCamera::pause()
 {
    if( isRecording() && ! isPaused() )
    {
@@ -231,7 +231,7 @@ void FboVideoCamera::pause()
    }
 }
 
-void FboVideoCamera::resume()
+void FboCamera::resume()
 {
    if( isRecording() && isPaused() )
    {
@@ -240,7 +240,7 @@ void FboVideoCamera::resume()
    }
 }
 
-void FboVideoCamera::endRecording()
+void FboCamera::endRecording()
 {
    if( isRecording() )
    {
@@ -250,7 +250,7 @@ void FboVideoCamera::endRecording()
    }
 }
 
-void FboVideoCamera::setFov(const OSG::Real32 fov)
+void FboCamera::setFov(const OSG::Real32 fov)
 {
    OSG::beginEditCP(mFboCam);
       mFboCam->setFov(fov);
@@ -259,7 +259,7 @@ void FboVideoCamera::setFov(const OSG::Real32 fov)
    generateDebugFrame();
 }
 
-void FboVideoCamera::setNearFar(const OSG::Real32 nearVal,
+void FboCamera::setNearFar(const OSG::Real32 nearVal,
                                 const OSG::Real32 farVal)
 {
    OSG::beginEditCP(mFboCam);
@@ -268,7 +268,7 @@ void FboVideoCamera::setNearFar(const OSG::Real32 nearVal,
    OSG::endEditCP(mFboCam);
 }
 
-void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
+void FboCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
 {
    if (!isRecording())
    {
@@ -352,7 +352,7 @@ void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
    mVideoGrabber->writeFrame();
 }
 
-OSG::NodePtr FboVideoCamera::getDebugPlane() const
+OSG::NodePtr FboCamera::getDebugPlane() const
 {
    // Create material for left eye.
    OSG::SimpleMaterialPtr left_mat = OSG::SimpleMaterial::create();
@@ -427,7 +427,7 @@ OSG::NodePtr FboVideoCamera::getDebugPlane() const
 }
 
 // XXX: This has not been updated to behave correctly in stereo mode.
-void FboVideoCamera::generateDebugFrame()
+void FboCamera::generateDebugFrame()
 {
    // The size of the internal frame.
    OSG::Real32 frame_height = 2.0 * (OSG::osgtan(mFboCam->getFov()/2.0) * mFrameDist);

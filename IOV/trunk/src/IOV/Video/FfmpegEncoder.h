@@ -28,7 +28,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-//#include <ffmpeg/config.h>
 
 extern "C"
 {
@@ -163,9 +162,6 @@ private:
    unsigned int       mAudioOutBufferSize;
    int                audio_input_frame_size;
    int16_t*           mAudioSamples;
-   //float              mT;
-   //float              mTincr;
-   //float              mTincr2;
    unsigned char*    mVideoOutBuffer;
    unsigned int      mVideoOutBufferSize;
    unsigned int      mFrameCount;

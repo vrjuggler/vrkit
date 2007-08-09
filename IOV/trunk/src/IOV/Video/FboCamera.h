@@ -13,8 +13,8 @@
 #include <OpenSG/OSGTextureChunk.h>
 #include <OpenSG/OSGWindow.h>
 
-#include <IOV/Video/FboVideoCameraPtr.h>
-#include <IOV/Video/VideoGrabberPtr.h>
+#include <IOV/Video/FboCameraPtr.h>
+#include <IOV/Video/VideoEncoderPtr.h>
 
 namespace inf
 {
@@ -24,20 +24,20 @@ namespace inf
  *
  * @since 0.37
  */
-class IOV_CLASS_API FboVideoCamera : public boost::enable_shared_from_this<FboVideoCamera>
+class IOV_CLASS_API FboCamera : public boost::enable_shared_from_this<FboCamera>
 {
 protected:
-   FboVideoCamera();
+   FboCamera();
 
 public:
-   static FboVideoCameraPtr create();
+   static FboCameraPtr create();
 
-   virtual ~FboVideoCamera();
+   virtual ~FboCamera();
 
    /**
     * Initialize the FBO camera.
     */
-   FboVideoCameraPtr init();
+   FboCameraPtr init();
 
    /**
     * Called from the Viewer's context init so that we can set the
@@ -134,7 +134,7 @@ private:
 
 private:
    OSG::FBOViewportPtr                  mFboVP;         /**< FBOViewport that we use to render to an FBO. */
-   VideoGrabberPtr                      mVideoGrabber;
+   VideoEncoderPtr                      mVideoGrabber;
    OSG::RefPtr<OSG::TransformPtr>       mTransform;     /**< The location and orientation of the camera. */
    OSG::RefPtr<OSG::NodePtr>            mFrameRoot;     /**< The frame that surrounds the captured scene. */
    OSG::TextureChunkPtr                 mLeftTexture;   /**< Texture that the FBO renders into. */

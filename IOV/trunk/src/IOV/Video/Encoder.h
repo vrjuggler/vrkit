@@ -37,9 +37,6 @@ public:
    virtual vpr::Uint32 width() const = 0;
    virtual vpr::Uint32 height() const = 0;
    virtual void close();
-
-   //static codec_list_t getCodecs();
-   //static std::string getName();
 };
 
 }

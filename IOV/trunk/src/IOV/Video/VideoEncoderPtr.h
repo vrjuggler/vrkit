@@ -8,9 +8,9 @@
 
 namespace inf
 {
-   class VideoGrabber;
-   typedef boost::shared_ptr<VideoGrabber> VideoGrabberPtr;
-   typedef boost::weak_ptr<VideoGrabber> VideoGrabberWeakPtr;
+   class VideoEncoder;
+   typedef boost::shared_ptr<VideoEncoder> VideoEncoderPtr;
+   typedef boost::weak_ptr<VideoEncoder> VideoEncoderWeakPtr;
 }
 
 #endif
