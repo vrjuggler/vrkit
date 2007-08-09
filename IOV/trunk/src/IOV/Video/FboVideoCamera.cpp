@@ -252,7 +252,10 @@ void FboVideoCamera::endRecording()
 
 void FboVideoCamera::setFov(const OSG::Real32 fov)
 {
-   mFboCam->setFov(fov);
+   OSG::beginEditCP(mFboCam);
+      mFboCam->setFov(fov);
+   OSG::endEditCP(mFboCam);
+
    generateDebugFrame();
 }
 
