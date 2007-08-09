@@ -250,6 +250,21 @@ void FboVideoCamera::endRecording()
    }
 }
 
+void FboVideoCamera::setFov(const OSG::Real32 fov)
+{
+   mFboCam->setFov(fov);
+   generateDebugFrame();
+}
+
+void FboVideoCamera::setNearFar(const OSG::Real32 near, const OSG::Real32 far)
+{
+   OSG::beginEditCP(mFboCam);
+      mFboCam->setNear(near);
+      mFboCam->setFar(far);
+   OSG::endEditCP(mFboCam);
+}
+
+
 void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
 {
    if (!isRecording())

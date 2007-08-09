@@ -95,19 +95,9 @@ public:
    /**
     * Set the field of view for the camera.
     */
-   void setFov(const OSG::Real32 fov)
-   {
-      mFboCam->setFov(fov);
-      generateDebugFrame();
-   }
+   void setFov(const OSG::Real32 fov);
 
-   void setNearFar(const OSG::Real32 near, const OSG::Real32 far)
-   {
-      OSG::beginEdit(mFboCam);
-	 mFboCam->setNear(near);
-	 mFboCam->setFar(far);
-      OSG::endEdit(mFboCam);
-   }
+   void setNearFar(const OSG::Real32 near, const OSG::Real32 far);
 
    /**
     * Set the size of the FBO you want to use.
