@@ -54,15 +54,15 @@
 
 #include <IOV/Status.h>
 
-// Video VideoGrabber includes.
+// Video VideoEncoder includes.
 #include <OpenSG/OSGSimpleMaterial.h>
 #include <OpenSG/OSGTextureChunk.h>
 #include <OpenSG/OSGWindow.h>
 #include <OpenSG/OSGFBOViewport.h>
 #include <OpenSG/OSGMatrixUtility.h>
 #include <OpenSG/OSGImageFunctions.h>
-#include <IOV/Video/VideoGrabber.h>
-#include <IOV/Video/FboVideoCamera.h>
+#include <IOV/Video/VideoEncoder.h>
+#include <IOV/Video/FboCamera.h>
 
 
 #if __VJ_version < 2003002
@@ -179,7 +179,7 @@ protected:
    //@}
 
    bool                         mUseVidRec;
-   inf::FboVideoCameraPtr       mVideoCamera;
+   inf::FboCameraPtr       mVideoCamera;
    std::string			mVideoFileName;
 };
 
@@ -249,7 +249,7 @@ void OpenSgViewer::deallocate()
    if(mUseVidRec)
    {
       mVideoCamera->endRecording();
-      mVideoCamera = inf::FboVideoCameraPtr();
+      mVideoCamera = inf::FboCameraPtr();
    }
 }
 
@@ -417,11 +417,11 @@ void OpenSgViewer::init()
       addObject(model_obj);
    }
 
-   mVideoCamera = inf::FboVideoCameraPtr(); // Init when not using vidcam
+   mVideoCamera = inf::FboCameraPtr(); // Init when not using vidcam
 
    if(mUseVidRec)
    {
-      mVideoCamera = inf::FboVideoCamera::create()->init();
+      mVideoCamera = inf::FboCamera::create()->init();
       mVideoCamera->setFilename(mVideoFileName);
       mVideoCamera->startRecording();
 
