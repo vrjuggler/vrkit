@@ -52,6 +52,7 @@ To build on Windows, the following requirements must be met:
 
    * Use VR Juggler 2.2 or newer
    * Use Visual Studio .NET 2003 (Visual C++ 7.1) or newer
+   * Build only shared libraries
 
 Other specific requirements are detailed below.
 
@@ -60,11 +61,11 @@ Other specific requirements are detailed below.
 
 To force the use of Visual C++ 7.1, execute SCons as follows:
 
-   > scons MSVS_VERSION=7.1
+   > scons MSVS_VERSION=7.1 var_libtype=shared
 
 To force the use of Visual C++ 8.0, execute SCons as follows:
 
-   > scons MSVS_VERSION=8.0
+   > scons MSVS_VERSION=8.0 var_arch=ia32 var_libtype=shared
 
 64-bit Windows
 --------------
@@ -86,7 +87,7 @@ There are some things to be aware of:
 
 When running SCons, execute it as follows:
 
-   > scons MSVS_VERSION=8.0 var_arch=x64
+   > scons MSVS_VERSION=8.0 var_arch=x64 var_libtype=shared
 
 Building on Mac OS X
 ====================
