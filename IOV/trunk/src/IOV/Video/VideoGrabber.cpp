@@ -4,6 +4,7 @@
 #include <OpenSG/OSGFBOViewport.h>
 
 #include <IOV/Util/Exceptions.h>
+#include <IOV/Video/Encoder.h>
 #include <IOV/Video/VideoGrabber.h>
 
 #ifndef GL_COLOR_ATTACHMENT0_EXT
