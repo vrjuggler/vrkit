@@ -101,6 +101,14 @@ public:
       generateDebugFrame();
    }
 
+   void setNearFar(const OSG::Real32 near, const OSG::Real32 far)
+   {
+      OSG::beginEdit(mFboCam);
+	 mFboCam->setNear(near);
+	 mFboCam->setFar(far);
+      OSG::endEdit(mFboCam);
+   }
+
    /**
     * Set the size of the FBO you want to use.
     */
