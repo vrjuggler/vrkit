@@ -259,14 +259,14 @@ void FboVideoCamera::setFov(const OSG::Real32 fov)
    generateDebugFrame();
 }
 
-void FboVideoCamera::setNearFar(const OSG::Real32 near, const OSG::Real32 far)
+void FboVideoCamera::setNearFar(const OSG::Real32 nearVal,
+                                const OSG::Real32 farVal)
 {
    OSG::beginEditCP(mFboCam);
-      mFboCam->setNear(near);
-      mFboCam->setFar(far);
+      mFboCam->setNear(nearVal);
+      mFboCam->setFar(farVal);
    OSG::endEditCP(mFboCam);
 }
-
 
 void FboVideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
 {

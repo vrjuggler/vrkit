@@ -100,7 +100,7 @@ public:
    /**
     * Set the near and far plane for the camera.
     */
-   void setNearFar(const OSG::Real32 near, const OSG::Real32 far);
+   void setNearFar(const OSG::Real32 nearVal, const OSG::Real32 farVal);
 
    /**
     * Set the size of the FBO you want to use.
