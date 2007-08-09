@@ -97,6 +97,9 @@ public:
     */
    void setFov(const OSG::Real32 fov);
 
+   /**
+    * Set the near and far plane for the camera.
+    */
    void setNearFar(const OSG::Real32 near, const OSG::Real32 far);
 
    /**
