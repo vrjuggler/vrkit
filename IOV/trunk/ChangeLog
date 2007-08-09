@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-09 dshipton Added inf::FboVideoCamera::setNearFar().
+                    -- VERSION -- 0.42.2
 2007-08-06 patrick  Removed pure virtual destroy() method from the plug-in base
                     classes.
                     -- VERSION -- 0.42.0

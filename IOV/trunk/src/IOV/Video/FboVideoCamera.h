@@ -99,6 +99,8 @@ public:
 
    /**
     * Set the near and far plane for the camera.
+    *
+    * @since 0.42.2
     */
    void setNearFar(const OSG::Real32 nearVal, const OSG::Real32 farVal);
 
