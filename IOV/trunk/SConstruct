@@ -95,6 +95,7 @@ opts.AddOption(ffmpeg_options)
 
 # Create variant helper and builder
 variant_helper = sca_variants.VariantsHelper()
+variant_helper.variants["libtype"][0] = ["shared"]
 base_bldr = EnvironmentBuilder()
 variant_helper.addOptions(opts)
 base_bldr.addOptions(opts)

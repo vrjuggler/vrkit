@@ -61,11 +61,11 @@ Other specific requirements are detailed below.
 
 To force the use of Visual C++ 7.1, execute SCons as follows:
 
-   > scons MSVS_VERSION=7.1 var_libtype=shared
+   > scons MSVS_VERSION=7.1
 
-To force the use of Visual C++ 8.0, execute SCons as follows:
+To force the use of Visual C++ 8.0 (32-bit only), execute SCons as follows:
 
-   > scons MSVS_VERSION=8.0 var_arch=ia32 var_libtype=shared
+   > scons MSVS_VERSION=8.0 var_arch=ia32
 
 64-bit Windows
 --------------
@@ -87,7 +87,7 @@ There are some things to be aware of:
 
 When running SCons, execute it as follows:
 
-   > scons MSVS_VERSION=8.0 var_arch=x64 var_libtype=shared
+   > scons MSVS_VERSION=8.0 var_arch=x64
 
 Building on Mac OS X
 ====================
