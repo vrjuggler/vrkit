@@ -93,9 +93,9 @@ opts.AddOption(vrj_options)
 opts.AddOption(opensg_options)
 opts.AddOption(ffmpeg_options)
 
-# Create variant helper and builder
-variant_helper = sca_variants.VariantsHelper()
-variant_helper.variants["libtype"][0] = ["shared"]
+# Create variant helper and builder. We only vary on type (optimized/debug)
+# and architecture. This is because no static libraries are compiled.
+variant_helper = sca_variants.VariantsHelper(variantKeys = ["type", "arch"])
 base_bldr = EnvironmentBuilder()
 variant_helper.addOptions(opts)
 base_bldr.addOptions(opts)
@@ -170,7 +170,6 @@ if not sca_util.hasHelpFlag():
 
    print "Using prefix: ", inst_paths['base']
    print "types: ",    variant_helper.variants["type"] 
-   print "libtypes: ", variant_helper.variants["libtype"] 
    print "archs: ",    variant_helper.variants["arch"] 
 
    # XXX: Hack around SConsAddons.Options.OpenSG.OpenSG not letting us provide
