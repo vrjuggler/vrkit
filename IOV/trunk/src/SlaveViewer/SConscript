@@ -32,8 +32,7 @@ if boost_options.isAvailable():
       slave_viewer_srcs.append(viewerEnv.RES('slaveViewer.rc'))
 
    slave_viewer_prog = viewerEnv.Program(slave_viewer_name, slave_viewer_srcs)
-   viewerEnv.Install(pj(inst_paths['app_base'],'slaveViewer'),
-                     slave_viewer_prog)
+   viewerEnv.Install(inst_paths['bin'], slave_viewer_prog)
 
    # This only needs to be done when building against VR Juggler 2.1.21 or
    # newer.

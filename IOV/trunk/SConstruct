@@ -160,6 +160,7 @@ if not sca_util.hasHelpFlag():
    # - Note: this is used throughout the build to keep things consistent
    inst_paths = {}
    inst_paths['base'] = opt_env['prefix']
+   inst_paths['bin'] = pj(inst_paths['base'], 'bin')
    inst_paths['lib'] = pj(inst_paths['base'],'lib')
    inst_paths['lib_plugin'] = pj(inst_paths['lib'],'IOV','plugins')
    inst_paths['include'] = pj(inst_paths['base'],'include')

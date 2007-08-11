@@ -1,10 +1,9 @@
 #!python
 #
-import SConsAddons.Util       # Get the utils
+import SConsAddons.Util as sca_util      # Get the utils
 import sys, os, re, string, glob
 import os.path
 pj = os.path.join
-GetPlatform = SConsAddons.Util.GetPlatform;
 
 Import('*')
 
@@ -32,15 +31,18 @@ if boost_options.isAvailable():
       iov_app_srcs.append(viewerEnv.RES('iov_app.rc'))
 
    iov_app_prog = viewerEnv.Program(iov_app_name, iov_app_srcs)
-   viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), iov_app_prog)
+   viewerEnv.Install(inst_paths['bin'], iov_app_prog)
 
-   # Only install *.jdef files on first pass.
+   # Only install *.jdef and *.jconf files on first pass.
    if 0 == variant_pass:
-      jdef_files = ['iov_app.jdef',]
-      jconf_files = ['viewer-nav.jconf', 'viewer-vp.jconf']
+      jdef_files  = []
+      jconf_files = []
+      for path, dirs, files in sca_util.WalkBuildFromSource('.', viewerEnv):
+         jconf_files += [pj(path,f) for f in files if f.endswith('.jconf')]
+         jdef_files  += [pj(path,f) for f in files if f.endswith('.jdef')]
 
       viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jconf_files)
-      viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jdef_files)
+      viewerEnv.Install(inst_paths['definitions'], jdef_files)
 
    # This only needs to be done when building against VR Juggler 2.1.21 or
    # newer.
