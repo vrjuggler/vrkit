@@ -62,7 +62,7 @@
 #include <OpenSG/OSGMatrixUtility.h>
 #include <OpenSG/OSGImageFunctions.h>
 #include <IOV/Video/VideoEncoder.h>
-#include <IOV/Video/FboCamera.h>
+#include <IOV/Video/VideoCamera.h>
 
 
 #if __VJ_version < 2003002
@@ -179,7 +179,7 @@ protected:
    //@}
 
    bool                         mUseVidRec;
-   inf::FboCameraPtr       mVideoCamera;
+   inf::VideoCameraPtr          mVideoCamera;
    std::string			mVideoFileName;
 };
 
@@ -249,7 +249,7 @@ void OpenSgViewer::deallocate()
    if(mUseVidRec)
    {
       mVideoCamera->endRecording();
-      mVideoCamera = inf::FboCameraPtr();
+      mVideoCamera = inf::VideoCameraPtr();
    }
 }
 
@@ -417,11 +417,11 @@ void OpenSgViewer::init()
       addObject(model_obj);
    }
 
-   mVideoCamera = inf::FboCameraPtr(); // Init when not using vidcam
+   mVideoCamera = inf::VideoCameraPtr(); // Init when not using vidcam
 
    if(mUseVidRec)
    {
-      mVideoCamera = inf::FboCamera::create()->init();
+      mVideoCamera = inf::VideoCamera::create()->init();
       mVideoCamera->setFilename(mVideoFileName);
       mVideoCamera->startRecording();
 
@@ -438,10 +438,7 @@ void OpenSgViewer::init()
 
       // Ensure that this is called after anythin that effects getScene().
       // VR Juggler normally calls this each frame before rendering.
-      OSG::FBOViewportPtr fbo = mVideoCamera->getFboViewport();
-      OSG::beginEditCP(fbo);
-	 fbo->setRoot(getScene());
-      OSG::endEditCP(fbo);
+      mVideoCamera->setSceneRoot(getScene());
    }
 }
 

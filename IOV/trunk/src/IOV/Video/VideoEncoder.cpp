@@ -39,29 +39,18 @@
       mCodecSet.insert(*itr);					\
    }
 
-namespace
-{
-   bool checkGLError(const char* where)
-   {
-      GLenum errCode = 0;
-      if ((errCode = glGetError()) != GL_NO_ERROR)
-      {
-         const GLubyte *errString = gluErrorString(errCode);
-         FWARNING(("%s OpenGL Error: %s!\n", where, errString));
-      }
-
-      return errCode == GL_NO_ERROR;
-   }
-}
-
 namespace inf
 {
 
 VideoEncoder::VideoEncoder()
    : mRecording(false)
-   , mUseFbo(false)
    , mImage(OSG::NullFC)
-   , mViewport(OSG::NullFC)
+   , mStereo(false)
+   , mFilename("iov_movie.avi")
+   , mCodec("mpeg4")
+   , mFps(30)
+   , mWidth(512)
+   , mHeight(512)
    , mEncoder()
 {
    /* Do nothing. */ ;
@@ -80,17 +69,10 @@ VideoEncoder::~VideoEncoder()
       mEncoder = EncoderPtr();
    }
    mImage = OSG::NullFC;
-   mViewport = OSG::NullFC;
 }
 
-VideoEncoderPtr VideoEncoder::init(OSG::ViewportPtr viewport)
+VideoEncoderPtr VideoEncoder::init()
 {
-   mViewport = viewport;
-
-   if (mViewport->getType() == OSG::FBOViewport::getClassType())
-   {
-      mUseFbo = true;
-   }
 
 #ifdef IOV_WITH_FFMPEG
    REGISTER_ENCODER(FfmpegEncoder)
@@ -107,26 +89,24 @@ VideoEncoderPtr VideoEncoder::init(OSG::ViewportPtr viewport)
    return shared_from_this();
 }
 
-void VideoEncoder::record(const std::string& filename, const std::string& codec,
-                          const OSG::UInt32 framesPerSecond, const bool stereo)
+void VideoEncoder::record()
 {
-   OSG::UInt32 source_width = ( mViewport->getPixelWidth() / 2 ) * 2;
-   OSG::UInt32 source_height = ( mViewport->getPixelHeight() / 2 ) * 2;
+   OSG::UInt32 source_width = ( mWidth / 2 ) * 2;
+   OSG::UInt32 source_height = ( mHeight / 2 ) * 2;
 
    OSG::UInt32 image_width = source_width;
    OSG::UInt32 image_height = source_height;
 
-   mStereo = stereo;
    if (mStereo)
    {
       image_width *= 2;
    }
 
-   codec_map_t::const_iterator found = mCodecMap.find(codec);
+   codec_map_t::const_iterator found = mCodecMap.find(mCodec);
    if (mCodecMap.end() == found)
    {
       std::stringstream ss;
-      ss << "Can't find encoder for codec: " << codec;
+      ss << "Can't find encoder for codec: " << mCodec;
       throw inf::Exception(ss.str(), IOV_LOCATION);
    }
 
@@ -140,7 +120,7 @@ void VideoEncoder::record(const std::string& filename, const std::string& codec,
    vprASSERT(mCreatorMap.count(encoder_name) > 0 && "Must have the encoder.");
    // Create new encoder.
    encoder_create_t creator = mCreatorMap[encoder_name];
-   mEncoder = creator()->init(filename, codec, image_width, image_height, framesPerSecond);
+   mEncoder = creator()->init(mFilename, mCodec, image_width, image_height, mFps);
 
    // Create the image to store the pixel data in.
    mImage = OSG::Image::create();
@@ -185,6 +165,32 @@ void VideoEncoder::stop()
    mRecording = false;
 }
 
+void VideoEncoder::setFilename(const std::string& filename)
+{
+   mFilename = filename;
+}
+
+void VideoEncoder::setCodec(const std::string& codec)
+{
+   mCodec = codec;
+}
+
+void VideoEncoder::setSize(OSG::UInt32 width, OSG::UInt32 height)
+{
+   mWidth = width;
+   mHeight= height;
+}
+
+void VideoEncoder::setStereo(bool isStereo)
+{
+   mStereo = isStereo;
+}
+
+void VideoEncoder::setFramesPerSecond(OSG::UInt32 fps)
+{
+   mFps = fps;
+}
+/*
 void VideoEncoder::grabFrame(const bool leftEye)
 {
    if (!mRecording)
@@ -192,10 +198,10 @@ void VideoEncoder::grabFrame(const bool leftEye)
       return;
    }
 
-   OSG::UInt32 source_width = ( mViewport->getPixelWidth() / 2 ) * 2;
-   OSG::UInt32 source_height = ( mViewport->getPixelHeight() / 2 ) * 2;
+   OSG::UInt32 source_width = ( mWidth / 2 ) * 2;
+   OSG::UInt32 source_height = ( mHeight / 2 ) * 2;
 
-   OSG::UInt32 image_width = source_width;
+   SG::UInt32 image_width = source_width;
    OSG::UInt32 image_height = source_height;
 
    if (mStereo)
@@ -203,7 +209,7 @@ void VideoEncoder::grabFrame(const bool leftEye)
       image_width *= 2;
    }
 
-   // Tell the OpenGL driver the rouw length of the target image. This
+   // Tell the OpenGL driver the row length of the target image. This
    // will result in the driver getting the array indices with the
    // following formula. index = SP + (IR * RL) + IC.
    // Where:
@@ -244,13 +250,26 @@ void VideoEncoder::grabFrame(const bool leftEye)
    glPixelStorei(GL_PACK_ROW_LENGTH, 0);
    glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
 }
+*/
 
-void VideoEncoder::writeFrame()
+void VideoEncoder::writeFrame(OSG::ImagePtr left, OSG::ImagePtr right)
+{
+
+}
+
+void VideoEncoder::writeFrame(OSG::ImagePtr img)
 {
    if (!mRecording)
    {
       return;
    }
+
+   OSG::UInt32 source_width = ( mWidth / 2 ) * 2;
+   OSG::UInt32 source_height = ( mHeight / 2 ) * 2;
+
+   OSG::beginEditCP(mImage);
+      mImage->setSubData(0,0,0,source_width, source_height, 1, img->getData());
+   OSG::endEditCP(mImage);
 
    mEncoder->writeFrame(mEncoder->width(), mEncoder->height(), mImage->getData());
 }

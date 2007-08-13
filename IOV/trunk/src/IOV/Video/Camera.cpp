@@ -109,9 +109,19 @@ CameraPtr Camera::init()
 
    // Set the correct size of FBO.
    // This also generates the frame geometry around the captured scene.
-   setSize(mWidth, mHeight);
+   inf::Camera::setSize(mWidth, mHeight);
 
-   return (CameraPtr)this;
+   return shared_from_this();
+}
+
+OSG::UInt32 Camera::getWidth() const
+{
+   return mWidth;
+}
+
+OSG::UInt32 Camera::getHeight() const
+{
+   return mHeight;
 }
 
 void Camera::renderLeftEye(OSG::RenderAction* ra)
@@ -130,6 +140,9 @@ void Camera::renderRightEye(OSG::RenderAction* ra)
 
 void Camera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 {
+   mWidth = width;
+   mHeight = height;
+
    // Resize the debug texture.
    OSG::beginEditCP(mLeftImage);
       mLeftImage->set(OSG::Image::OSG_RGBA_PF, width, height);
@@ -147,7 +160,7 @@ void Camera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
    generateDebugFrame();
 }
 
-void Camera::setCameraPos(const OSG::Matrix camPos)
+void Camera::setPosition(const OSG::Matrix& camPos)
 {
    OSG::beginEditCP(mTransform, OSG::Transform::MatrixFieldMask);
       mTransform->setMatrix(camPos);
@@ -235,6 +248,46 @@ OSG::NodePtr Camera::getDebugPlane() const
       group_node->addChild(right_xform.node());
    OSG::endEditCP(group_node);
    return group_node;
+}
+
+void Camera::setWindow(OSG::WindowPtr window)
+{
+   mWindow = window;
+}
+
+OSG::NodePtr Camera::getFrame() const
+{
+   return mFrameRoot;
+}
+
+OSG::TextureChunkPtr Camera::getLeftTexture() const
+{
+   return mLeftTexture;
+}
+
+OSG::TextureChunkPtr Camera::getRightTexture() const
+{
+   return mRightTexture;
+}
+
+OSG::ImagePtr Camera::getLeftEyeImage() const
+{
+   return mLeftImage;
+}
+
+OSG::ImagePtr Camera::getRightEyeImage() const
+{
+   return mRightImage;
+}
+
+OSG::Real32 Camera::getFov() const
+{
+   return mCamera->getFov();
+}
+
+OSG::Real32 Camera::getAspect() const
+{
+   return mCamera->getAspect();
 }
 
 // XXX: This has not been updated to behave correctly in stereo mode.

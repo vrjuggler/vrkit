@@ -14,6 +14,8 @@
 
 #include <IOV/Video/VideoEncoder.h>
 #include <IOV/Video/VideoCamera.h>
+#include <IOV/Video/FboCamera.h>
+#include <IOV/Video/Camera.h>
 
 namespace inf
 {
@@ -23,13 +25,7 @@ VideoCamera::VideoCamera()
    , mVideoEncoder()
    , mTransform(OSG::NullFC)
    , mFrameRoot(OSG::NullFC)
-   , mWidth(512)
-   , mHeight(512)
-   , mFov(60.0)
    , mEyeOffset(0.5)
-   , mFilename("test.avi")
-   , mCodec("mpeg4")
-   , mFps(30)
    , mBorderSize(2.0)
    , mFrameDist(100.0)
    , mStereo(false)
@@ -67,13 +63,16 @@ VideoCameraPtr VideoCamera::init()
       mFrameRoot->setCore(mTransform);
    OSG::endEditCP(mFrameRoot);
 
+   mCamera = FboCamera::create()->init();
+   
+   assert(mCamera.get() != NULL);
+
    // Set the correct size of a video frame.
    // This also generates the frame geometry around the captured scene.
-   setSize(mWidth, mHeight);
-
-   mCamera = FboCamera::create()->init();
-
+   
    mVideoEncoder = VideoEncoder::create()->init();
+
+   setFrameSize(mCamera->getWidth(), mCamera->getHeight());
 
    return shared_from_this();
 }
@@ -205,7 +204,7 @@ void VideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
 
       mCamera->renderRightEye(ra);
 
-      mEncoder->writeFrame(mCamera->getLeftEyeImage(),
+      mVideoEncoder->writeFrame(mCamera->getLeftEyeImage(),
 			   mCamera->getRightEyeImage());
    }
    else
@@ -214,7 +213,7 @@ void VideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
 
       mCamera->renderLeftEye(ra);
 
-      mEncoder->writeFrame(mCamera->getLeftEyeImage());
+      mVideoEncoder->writeFrame(mCamera->getLeftEyeImage());
 
    }
 }

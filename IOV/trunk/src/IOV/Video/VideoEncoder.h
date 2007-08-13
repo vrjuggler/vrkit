@@ -38,23 +38,17 @@ public:
    /**
     * Initialize the video grabber.
     *
-    * @param viewport Viewport to grab image from.
-    * @param filename Movie file to save data to.
     */
-   VideoEncoderPtr init(OSG::ViewportPtr viewport);
+   VideoEncoderPtr init();
 
-   /**
-    * Called be viewer each frame to render scene into FBO.
-    */
-   void grabFrame(const bool leftEye = true);
+   void writeFrame(OSG::ImagePtr img);
 
-   void writeFrame();
+   void writeFrame(OSG::ImagePtr left, OSG::ImagePtr right);
 
    /**
     * Start recording movie to the given file.
     */
-   void record(const std::string& filename, const std::string& codec,
-               const OSG::UInt32 framesPerSecond = 60, const bool stereo = false);
+   void record();
 
    /**
     * Pause the recording.
@@ -89,6 +83,16 @@ public:
       return mCodecSet;
    }
 
+   void setFilename(const std::string& filename);
+
+   void setCodec(const std::string& codec);
+
+   void setStereo(bool isStereo);
+
+   void setSize(OSG::UInt32 width, OSG::UInt32 height);
+
+   void setFramesPerSecond(OSG::UInt32 fps);
+
 private:
    typedef std::vector<std::string> encoder_list_t;
    typedef std::map<std::string, encoder_list_t> codec_map_t;
@@ -97,10 +101,13 @@ private:
    typedef std::map<std::string, encoder_create_t> creator_map_t;
 
    bool                 mRecording;     /**< Whether we are currently recording. */
+   OSG::ImagePtr        mImage;		/**< Image to hold the pixel data while encoding. */
    bool                 mStereo;
-   bool                 mUseFbo;        /**< If we are using a FBO or the default pixel buffer. */
-   OSG::ImagePtr        mImage;         /**< Image to hold the pixel data while encoding. */
-   OSG::ViewportPtr     mViewport;      /**< Viewport that contains source frame buffer. */
+   std::string		mFilename;
+   std::string		mCodec;
+   OSG::UInt32		mFps;
+   OSG::UInt32		mWidth;
+   OSG::UInt32		mHeight;
    EncoderPtr           mEncoder;       /**< Encoder that can write encode and write movie. */
    codec_map_t          mCodecMap;      /**< Map of codec_name to a list of encoders. */
    creator_map_t        mCreatorMap;    /**< Map of encoder names to encoder creators. */

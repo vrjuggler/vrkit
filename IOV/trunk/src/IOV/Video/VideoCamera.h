@@ -9,6 +9,7 @@
 
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGWindow.h>
+#include <OpenSG/OSGRenderAction.h>
 
 #include <IOV/Video/CameraPtr.h>
 #include <IOV/Video/VideoEncoderPtr.h>
@@ -43,7 +44,7 @@ public:
     */
    void contextInit(OSG::WindowPtr window);
 
-   void setTravMask(const UInt32 value);
+   void setTravMask(const OSG::UInt32 value);
 
    void setSceneRoot(OSG::NodePtr root);
 
@@ -95,7 +96,7 @@ public:
    /**
     * Set the size of a video frame.
     */
-   void setSize(const OSG::UInt32 width, const OSG::UInt32 height);
+   void setFrameSize(const OSG::UInt32 width, const OSG::UInt32 height);
 
    /**
     * Get a debug node that contains a plane with the FBO texture

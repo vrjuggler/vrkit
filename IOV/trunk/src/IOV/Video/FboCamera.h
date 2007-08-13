@@ -21,7 +21,7 @@ namespace inf
  *
  * @since 0.37
  */
-class IOV_CLASS_API FboCamera : public inf::Camera, public boost::enable_shared_from_this<inf::FboCamera>
+class IOV_CLASS_API FboCamera : public inf::Camera
 {
 protected:
    FboCamera();
@@ -31,7 +31,7 @@ public:
 
    virtual ~FboCamera();
 
-   void contextInit(OSG::WindowPtr window);
+   void setWindow(OSG::WindowPtr window);
 
    CameraPtr init();
 
