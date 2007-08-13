@@ -423,6 +423,7 @@ void OpenSgViewer::init()
    {
       mVideoCamera = inf::VideoCamera::create()->init();
       mVideoCamera->setFilename(mVideoFileName);
+      mVideoCamera->setStereo(true);
       mVideoCamera->startRecording();
 
       OSG::NodePtr frame_root = mVideoCamera->getFrame();
