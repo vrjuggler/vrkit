@@ -203,9 +203,20 @@ void VideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
       setCameraPos(camera_pos);
 
       mCamera->renderRightEye(ra);
+      OSG::ImagePtr stereo_img = OSG::Image::create();
 
-      mVideoEncoder->writeFrame(mCamera->getLeftEyeImage(),
-			   mCamera->getRightEyeImage());
+      const OSG::UInt32 width = mCamera->getWidth();
+      const OSG::UInt32 height = mCamera->getHeight();
+
+      OSG::beginEditCP(stereo_img);
+	 stereo_img->set(OSG::Image::OSG_RGBA_PF, width * 2, height * 2);
+	 stereo_img->setSubData(0, 0, 0, width, height, 1,
+			        mCamera->getLeftEyeImage()->getData());
+	 stereo_img->setSubData(width, 0, 0, width, height, 1,
+			        mCamera->getRightEyeImage()->getData());
+      OSG::endEditCP(stereo_img);
+
+      mVideoEncoder->writeFrame(stereo_img);
    }
    else
    {

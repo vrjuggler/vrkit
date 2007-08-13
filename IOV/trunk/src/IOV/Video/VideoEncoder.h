@@ -43,8 +43,6 @@ public:
 
    void writeFrame(OSG::ImagePtr img);
 
-   void writeFrame(OSG::ImagePtr left, OSG::ImagePtr right);
-
    /**
     * Start recording movie to the given file.
     */

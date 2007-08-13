@@ -252,11 +252,6 @@ void VideoEncoder::grabFrame(const bool leftEye)
 }
 */
 
-void VideoEncoder::writeFrame(OSG::ImagePtr left, OSG::ImagePtr right)
-{
-
-}
-
 void VideoEncoder::writeFrame(OSG::ImagePtr img)
 {
    if (!mRecording)
@@ -264,11 +259,8 @@ void VideoEncoder::writeFrame(OSG::ImagePtr img)
       return;
    }
 
-   OSG::UInt32 source_width = ( mWidth / 2 ) * 2;
-   OSG::UInt32 source_height = ( mHeight / 2 ) * 2;
-
    OSG::beginEditCP(mImage);
-      mImage->setSubData(0,0,0,source_width, source_height, 1, img->getData());
+      img->reformat((OSG::Image::PixelFormat)mImage->getPixelFormat(), mImage);
    OSG::endEditCP(mImage);
 
    mEncoder->writeFrame(mEncoder->width(), mEncoder->height(), mImage->getData());
