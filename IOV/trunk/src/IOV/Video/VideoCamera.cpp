@@ -209,7 +209,7 @@ void VideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
       const OSG::UInt32 height = mCamera->getHeight();
 
       OSG::beginEditCP(stereo_img);
-	 stereo_img->set(OSG::Image::OSG_RGBA_PF, width * 2, height * 2);
+	 stereo_img->set(OSG::Image::OSG_RGBA_PF, width * 2, height);
 	 stereo_img->setSubData(0, 0, 0, width, height, 1,
 			        mCamera->getLeftEyeImage()->getData());
 	 stereo_img->setSubData(width, 0, 0, width, height, 1,
