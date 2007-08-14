@@ -137,6 +137,11 @@ public:
       mUseVidRec = true;
    }
 
+   void setVideoCodec(const std::string& codec)
+   {
+      mVideoCodec = codec;
+   }
+
 protected:
    void initGl();
 
@@ -147,6 +152,7 @@ protected:
       , mMatChooserWidth(1.0f)  // 1 foot wide
       , mMatChooserHeight(1.5f) // 1.5 feet tall
       , mUseVidRec(false)
+      , mVideoCodec("mpeg4")
    {
       /* Do nothing. */ ;
    }
@@ -181,6 +187,7 @@ protected:
    bool                         mUseVidRec;
    inf::VideoCameraPtr          mVideoCamera;
    std::string			mVideoFileName;
+   std::string			mVideoCodec;
 };
 
 void OpenSgViewer::contextInit()
@@ -423,7 +430,8 @@ void OpenSgViewer::init()
    {
       mVideoCamera = inf::VideoCamera::create()->init();
       mVideoCamera->setFilename(mVideoFileName);
-      mVideoCamera->setStereo(true);
+      mVideoCamera->setCodec(mVideoCodec);
+      mVideoCamera->setStereo(false);
       mVideoCamera->startRecording();
 
       OSG::NodePtr frame_root = mVideoCamera->getFrame();
@@ -575,6 +583,9 @@ int main(int argc, char* argv[])
          ("video-file,v",
           po::value<std::string>()->composing(),
           "File to save video to.")
+         ("video-codec,c",
+          po::value<std::string>()->composing(),
+          "Codec to encode video with.")
       ;
 
       po::options_description cmdline_options;
@@ -692,6 +703,13 @@ int main(int argc, char* argv[])
 	 std::cout << "Setting video file name!" << std::endl;
 	 std::string video_file = vm["video-file"].as<std::string>();
 	 app->setVideoFilename(video_file);
+      }
+
+      if (vm.count("video-codec") != 0)
+      {
+	 std::cout << "Setting video codec!" << std::endl;
+	 std::string video_codec = vm["video-codec"].as<std::string>();
+	 app->setVideoCodec(video_codec);
       }
 
       IOV_STATUS << "Starting the kernel." << std::endl;
