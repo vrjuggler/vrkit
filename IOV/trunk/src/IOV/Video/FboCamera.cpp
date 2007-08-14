@@ -87,6 +87,13 @@ void FboCamera::setSceneRoot(OSG::NodePtr root)
    OSG::endEditCP(mFboVP);
 }
 
+void FboCamera::setTravMask(const OSG::UInt32 value)
+{
+   OSG::beginEditCP(mFboVP);
+      mFboVP->setTravMask(value);
+   OSG::endEditCP(mFboVP);
+}
+
 void FboCamera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 { 
    if( OSG::NullFC != mFboVP)

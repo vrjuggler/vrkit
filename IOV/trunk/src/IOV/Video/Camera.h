@@ -88,6 +88,8 @@ public:
 
    virtual OSG::Real32 getAspect() const;
 
+   virtual void setTravMask(const OSG::UInt32 value) = 0;
+
    /**
     * Set the position of the camera.
     */
@@ -109,7 +111,6 @@ protected:
    OSG::PerspectiveCameraPtr            mCamera;        /**< Perspective camera for the FBO. */
    OSG::UInt32				mWidth;		/**< Width of the FBO. */
    OSG::UInt32				mHeight;	/**< Height of the FBO. */
-   OSG::Real32                          mFov;		/**< Field of view for the FBO cam. */
    OSG::WindowPtr			mWindow;
 };
 

@@ -41,6 +41,8 @@ public:
 
    void render(osg::RenderAction*);
 
+   void setTravMask(const OSG::UInt32 value);
+
    /**
     * Returns the FBOViewport.
     */

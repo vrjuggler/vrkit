@@ -109,6 +109,11 @@ void VideoCamera::setStereo(const bool stereo)
    mVideoEncoder->setStereo(stereo);
 }
 
+void VideoCamera::setTravMask(const OSG::UInt32 value)
+{
+   mCamera->setTravMask(value);
+}
+
 void VideoCamera::setInterocularDistance(const OSG::Real32 interocular)
 {
    mEyeOffset = interocular / 2.0f;
