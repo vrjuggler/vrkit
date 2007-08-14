@@ -93,7 +93,7 @@ public:
    void setFrameSize(const OSG::UInt32 width, const OSG::UInt32 height);
 
    /**
-    * Get a debug node that contains a plane with the FBO texture
+    * Get a debug node that contains a plane with the Camera's texture
     * applied to it.
     */
    OSG::NodePtr getDebugPlane() const;
