@@ -44,43 +44,40 @@ public:
     */
    void contextInit(OSG::WindowPtr window);
 
-   void setTravMask(const OSG::UInt32 value);
-
-   void setSceneRoot(OSG::NodePtr root);
-
-   void setFilename(const std::string& filename);
-
-   void setFramesPerSecond(const OSG::UInt32 framesPerSecond);
-
-   void setCodec(const std::string& codec);
-
    /**
     * Returns the current set of available codes.
     */
    const std::set<std::string>& getAvailableCodecs() const;
 
-   void setStereo(const bool stereo);
+   /**
+    * Set the codec that the encoder should use.
+    */
+   void setCodec(const std::string& codec);
 
-   void setInterocularDistance(const OSG::Real32 interocular);
-
-   void startRecording();
-
-   void pause();
-
-   void resume();
-
-   void endRecording();
-
-   bool isRecording() const;
-
-   bool isPaused() const;
-
-   void render(OSG::RenderAction* ra, const OSG::Matrix camPos);
+   /*
+    * Set the filename to record the video to.
+    */
+   void setFilename(const std::string& filename);
 
    /**
     * Set the field of view for the video camera.
     */
    void setFov(const OSG::Real32 fov);
+
+   /*
+    * Set the frames per second that should be recorded.
+    */
+   void setFramesPerSecond(const OSG::UInt32 framesPerSecond);
+
+   /**
+    * Set the size of a video frame.
+    */
+   void setFrameSize(const OSG::UInt32 width, const OSG::UInt32 height);
+
+   /**
+    * Set the interocular distance used for stereo rendering.
+    */
+   void setInterocularDistance(const OSG::Real32 interocular);
 
    /**
     * Set the near and far plane for the video camera.
@@ -88,9 +85,59 @@ public:
    void setNearFar(const OSG::Real32 nearVal, const OSG::Real32 farVal);
 
    /**
-    * Set the size of a video frame.
+    * Set the root of the scene graph to record.
     */
-   void setFrameSize(const OSG::UInt32 width, const OSG::UInt32 height);
+   void setSceneRoot(OSG::NodePtr root);
+
+   /**
+    * Set whether to record video in stereo.
+    */
+   void setStereo(const bool stereo);
+
+   /**
+    * Set the traversal mask for rendering if required.
+    */
+   void setTravMask(const OSG::UInt32 value);
+
+   /**
+    * Use the current configured settings to start recording video.
+    */
+   void startRecording();
+
+   /**
+    * End the current recording.
+    */
+   void endRecording();
+
+   /**
+    * Pause the current recording.
+    *
+    * @pre Recording has started.
+    */
+   void pause();
+
+   /**
+    * Resume recording.
+    *
+    * @pre Recording has started and was paused.
+    */
+   void resume();
+
+   /**
+    * Returns whether the video camera has started recording and has not
+    * ended.
+    */
+   bool isRecording() const;
+
+   /**
+    * Returns whether the video camera is recording and paused.
+    */
+   bool isPaused() const;
+
+   /*
+    * Renders the current frame given a RenderAction and camera position.
+    */
+   void render(OSG::RenderAction* ra, const OSG::Matrix camPos);
 
    /**
     * Get a debug node that contains a plane with the Camera's texture
