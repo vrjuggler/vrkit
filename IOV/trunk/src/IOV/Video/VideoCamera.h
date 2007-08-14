@@ -21,7 +21,7 @@ namespace inf
 /**
  * Records a scene with a camera and video encoder to a file.
  *
- * @since 0.42
+ * @since 0.43
  */
 class IOV_CLASS_API VideoCamera : public boost::enable_shared_from_this<VideoCamera>
 {

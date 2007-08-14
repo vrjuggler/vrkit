@@ -23,7 +23,7 @@ namespace inf
 /**
  * Base Camera class.
  *
- * @since 0.42
+ * @since 0.43
  */
 class IOV_CLASS_API Camera : public boost::enable_shared_from_this<inf::Camera>
 {
@@ -59,7 +59,6 @@ public:
    /**
     * Set the near and far plane for the camera.
     *
-    * @since 0.42.2
     */
    virtual void setNearFar(const OSG::Real32 nearVal, const OSG::Real32 farVal);
 
