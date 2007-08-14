@@ -97,6 +97,117 @@ void FfmpegEncoder::close()
    }
 }
 
+static void show_formats(void)
+{
+    AVInputFormat *ifmt;
+    AVOutputFormat *ofmt;
+    URLProtocol *up;
+    AVCodec *p, *p2;
+    const char *last_name;
+
+    printf("File formats:\n");
+    last_name= "000";
+    for(;;){
+        int decode=0;
+        int encode=0;
+        const char *name=NULL;
+        const char *long_name=NULL;
+
+        for(ofmt = ::first_oformat; ofmt != NULL; ofmt = ofmt->next) {
+            if((name == NULL || strcmp(ofmt->name, name)<0) &&
+                strcmp(ofmt->name, last_name)>0){
+                name= ofmt->name;
+                long_name= ofmt->long_name;
+                encode=1;
+            }
+        }
+        for(ifmt = first_iformat; ifmt != NULL; ifmt = ifmt->next) {
+            if((name == NULL || strcmp(ifmt->name, name)<0) &&
+                strcmp(ifmt->name, last_name)>0){
+                name= ifmt->name;
+                long_name= ifmt->long_name;
+                encode=0;
+            }
+            if(name && strcmp(ifmt->name, name)==0)
+                decode=1;
+        }
+        if(name==NULL)
+            break;
+        last_name= name;
+        if(encode)
+	{
+        printf(
+            " %s%s %-15s %s\n",
+            decode ? "D":" ",
+            encode ? "E":" ",
+            name,
+            long_name ? long_name:" ");
+	 }
+    }
+    printf("\n");
+
+    printf("Codecs:\n");
+    last_name= "000";
+    for(;;){
+        int decode=0;
+        int encode=0;
+        int cap=0;
+        const char *type_str;
+
+        p2=NULL;
+        for(p = first_avcodec; p != NULL; p = p->next)
+        {
+            if((p2==NULL || strcmp(p->name, p2->name)<0) && strcmp(p->name, last_name)>0)
+            {
+                p2= p;
+                decode= encode= cap=0;
+            }
+            if(p2 && strcmp(p->name, p2->name)==0)
+            {
+                if(p->decode)
+                   decode=1;
+                if(p->encode)
+                   encode=1;
+                cap |= p->capabilities;
+            }
+        }
+        if(p2==NULL)
+            break;
+        last_name= p2->name;
+
+        switch(p2->type) {
+        case CODEC_TYPE_VIDEO:
+            type_str = "V";
+            break;
+        case CODEC_TYPE_AUDIO:
+            type_str = "A";
+            break;
+        case CODEC_TYPE_SUBTITLE:
+            type_str = "S";
+            break;
+        default:
+            type_str = "?";
+            break;
+        }
+	if(encode)
+	{
+        printf(
+            " %s%s%s%s%s%s %s",
+            decode ? "D": (/*p2->decoder ? "d":*/" "),
+            encode ? "E":" ",
+            type_str,
+            cap & CODEC_CAP_DRAW_HORIZ_BAND ? "S":" ",
+            cap & CODEC_CAP_DR1 ? "D":" ",
+            cap & CODEC_CAP_TRUNCATED ? "T":" ",
+            p2->name);
+       /* if(p2->decoder && decode==0)
+            printf(" use %s for decoding", p2->decoder->name);*/
+        printf("\n");
+	}
+    }
+    printf("\n");
+}
+
 EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& codecName,
                                const vpr::Uint32 width, const vpr::Uint32 height,
                                const vpr::Uint32 framesPerSecond)
@@ -116,8 +227,8 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
 
       // XXX: Debug code to output all valid formats & codecs.
       //show_formats();
-
-      std::cout << "Trying to guess codec from filename: " << filename << std::endl;
+      
+      std::cout << "Trying to guess container format from filename: " << filename << std::endl;
       mFormatOut = guess_format(NULL, filename.c_str(), NULL);
 
       // If we can't guess the format from the filename, fallback on mpeg.
@@ -212,112 +323,6 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
    }
 
    return shared_from_this();
-}
-
-static void show_formats(void)
-{
-    AVInputFormat *ifmt;
-    AVOutputFormat *ofmt;
-    URLProtocol *up;
-    AVCodec *p, *p2;
-    const char *last_name;
-
-    printf("File formats:\n");
-    last_name= "000";
-    for(;;){
-        int decode=0;
-        int encode=0;
-        const char *name=NULL;
-        const char *long_name=NULL;
-
-        for(ofmt = ::first_oformat; ofmt != NULL; ofmt = ofmt->next) {
-            if((name == NULL || strcmp(ofmt->name, name)<0) &&
-                strcmp(ofmt->name, last_name)>0){
-                name= ofmt->name;
-                long_name= ofmt->long_name;
-                encode=1;
-            }
-        }
-        for(ifmt = first_iformat; ifmt != NULL; ifmt = ifmt->next) {
-            if((name == NULL || strcmp(ifmt->name, name)<0) &&
-                strcmp(ifmt->name, last_name)>0){
-                name= ifmt->name;
-                long_name= ifmt->long_name;
-                encode=0;
-            }
-            if(name && strcmp(ifmt->name, name)==0)
-                decode=1;
-        }
-        if(name==NULL)
-            break;
-        last_name= name;
-
-        printf(
-            " %s%s %-15s %s\n",
-            decode ? "D":" ",
-            encode ? "E":" ",
-            name,
-            long_name ? long_name:" ");
-    }
-    printf("\n");
-
-    printf("Codecs:\n");
-    last_name= "000";
-    for(;;){
-        int decode=0;
-        int encode=0;
-        int cap=0;
-        const char *type_str;
-
-        p2=NULL;
-        for(p = first_avcodec; p != NULL; p = p->next)
-        {
-            if((p2==NULL || strcmp(p->name, p2->name)<0) && strcmp(p->name, last_name)>0)
-            {
-                p2= p;
-                decode= encode= cap=0;
-            }
-            if(p2 && strcmp(p->name, p2->name)==0)
-            {
-                if(p->decode)
-                   decode=1;
-                if(p->encode)
-                   encode=1;
-                cap |= p->capabilities;
-            }
-        }
-        if(p2==NULL)
-            break;
-        last_name= p2->name;
-
-        switch(p2->type) {
-        case CODEC_TYPE_VIDEO:
-            type_str = "V";
-            break;
-        case CODEC_TYPE_AUDIO:
-            type_str = "A";
-            break;
-        case CODEC_TYPE_SUBTITLE:
-            type_str = "S";
-            break;
-        default:
-            type_str = "?";
-            break;
-        }
-        printf(
-            " %s%s%s%s%s%s %s",
-            decode ? "D": (/*p2->decoder ? "d":*/" "),
-            encode ? "E":" ",
-            type_str,
-            cap & CODEC_CAP_DRAW_HORIZ_BAND ? "S":" ",
-            cap & CODEC_CAP_DR1 ? "D":" ",
-            cap & CODEC_CAP_TRUNCATED ? "T":" ",
-            p2->name);
-       /* if(p2->decoder && decode==0)
-            printf(" use %s for decoding", p2->decoder->name);*/
-        printf("\n");
-    }
-    printf("\n");
 }
 
 // Add an audio output stream
@@ -416,7 +421,7 @@ void FfmpegEncoder::openVideo(AVCodec* codec)
       // as long as they're aligned enough for the architecture, and
       // they're freed appropriately (such as using av_free for buffers
       // allocated with av_malloc)
-      mVideoOutBufferSize = 200000;
+      mVideoOutBufferSize = width() * height();
       mVideoOutBuffer= (unsigned char*)av_malloc(mVideoOutBufferSize);
    }
 
