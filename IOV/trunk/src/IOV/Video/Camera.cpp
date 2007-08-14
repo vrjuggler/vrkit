@@ -29,7 +29,6 @@ Camera::Camera()
    , mCamera(OSG::NullFC)
    , mWidth(512)
    , mHeight(512)
-   , mFov(60.0)
 {;}
 
 Camera::~Camera()
@@ -63,15 +62,7 @@ CameraPtr Camera::init()
    // setup camera
    mCamera = OSG::PerspectiveCamera::create();
    OSG::beginEditCP(mCamera);
-      // If fov is in degrees, convert to radians first.
-      if (mFov > OSG::Pi)
-      {
-         mCamera->setFov(OSG::osgdegree2rad(mFov));
-      }
-      else
-      {
-         mCamera->setFov(mFov);
-      }
+      mCamera->setFov(OSG::osgdegree2rad(60.0));
       mCamera->setNear(0.01);
       mCamera->setFar(10000);
       mCamera->setBeacon(beacon);
