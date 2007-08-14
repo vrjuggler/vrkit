@@ -7,9 +7,11 @@
 
 #include <boost/enable_shared_from_this.hpp>
 
+#include <OpenSG/OSGImage.h>
 #include <OpenSG/OSGPerspectiveCamera.h>
-#include <OpenSG/OSGTransform.h>
+#include <OpenSG/OSGRenderAction.h>
 #include <OpenSG/OSGTextureChunk.h>
+#include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGWindow.h>
 
 #include <IOV/Video/CameraPtr.h>
