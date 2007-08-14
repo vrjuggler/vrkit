@@ -165,12 +165,12 @@ void VideoCamera::endRecording()
    }
 }
 
-void VideoCamera::isRecording() const
+bool VideoCamera::isRecording() const
 {
    return mRecording;
 }
 
-void VideoCamera::isPaused() const
+bool VideoCamera::isPaused() const
 {
    return mPaused;
 }
