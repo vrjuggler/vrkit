@@ -100,8 +100,6 @@ void FboCamera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 	 mFboVP->setStorageWidth(width);
 	 mFboVP->setStorageHeight(height);
       OSG::endEditCP(mFboVP);
-
-      generateDebugFrame();
    }
 }
 
