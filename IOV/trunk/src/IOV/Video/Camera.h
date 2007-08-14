@@ -7,7 +7,6 @@
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/OSGFBOViewport.h>
 #include <OpenSG/OSGPerspectiveCamera.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGTextureChunk.h>
