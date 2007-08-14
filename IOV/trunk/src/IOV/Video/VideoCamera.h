@@ -71,15 +71,9 @@ public:
 
    void endRecording();
 
-   bool isRecording()
-   {
-      return mRecording;
-   }
+   bool isRecording() const;
 
-   bool isPaused()
-   {
-      return mPaused;
-   }
+   bool isPaused() const;
 
    void render(OSG::RenderAction* ra, const OSG::Matrix camPos);
 
@@ -108,10 +102,7 @@ public:
     * Returns the root of the frame that surrounds what will be captured
     * in the video camera.
     */
-   OSG::NodePtr getFrame() const
-   {
-      return mFrameRoot;
-   }
+   OSG::NodePtr getFrame() const;
 
 private:
    void generateDebugFrame();

@@ -165,6 +165,16 @@ void VideoCamera::endRecording()
    }
 }
 
+void VideoCamera::isRecording() const
+{
+   return mRecording;
+}
+
+void VideoCamera::isPaused() const
+{
+   return mPaused;
+}
+
 void VideoCamera::setFov(const OSG::Real32 fov)
 {
    mCamera->setFov(fov);
@@ -292,6 +302,11 @@ OSG::NodePtr VideoCamera::getDebugPlane() const
       group_node->addChild(right_xform.node());
    OSG::endEditCP(group_node);
    return group_node;
+}
+
+OSG::NodePtr VideoCamera::getFrame() const
+{
+   return mFrameRoot;
 }
 
 // XXX: This has not been updated to behave correctly in stereo mode.
