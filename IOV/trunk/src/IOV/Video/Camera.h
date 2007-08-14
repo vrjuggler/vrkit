@@ -57,6 +57,11 @@ public:
    void setFov(const OSG::Real32 fov);
 
    /**
+    * Set aspect ratio for the camera.
+    */
+   void setAspect(const OSG::Real32 aspect);
+
+   /**
     * Set the near and far plane for the camera.
     *
     */

@@ -143,11 +143,6 @@ void Camera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
    OSG::beginEditCP(mRightImage);
       mRightImage->set(OSG::Image::OSG_RGBA_PF, width, height);
    OSG::endEditCP(mRightImage);
-
-   // We already compensated aspect ratio with the texture/fbo sizes
-   OSG::beginEditCP(mCamera);
-      mCamera->setAspect(width/height);
-   OSG::endEditCP(mCamera);
 }
 
 void Camera::setPosition(const OSG::Matrix& camPos)
@@ -155,6 +150,13 @@ void Camera::setPosition(const OSG::Matrix& camPos)
    OSG::beginEditCP(mTransform, OSG::Transform::MatrixFieldMask);
       mTransform->setMatrix(camPos);
    OSG::endEditCP(mTransform, OSG::Transform::MatrixFieldMask);
+}
+
+void Camera::setAspect(const OSG::Real32 aspect)
+{
+   OSG::beginEditCP(mCamera);
+      mCamera->setAspect(aspect);
+   OSG::endEditCP(mCamera);
 }
 
 void Camera::setFov(const OSG::Real32 fov)

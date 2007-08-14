@@ -175,6 +175,11 @@ bool VideoCamera::isPaused() const
    return mPaused;
 }
 
+void VideoCamera::setAspect(const OSG::Real32 aspect)
+{
+   mCamera->setAspect(aspect);
+}
+
 void VideoCamera::setFov(const OSG::Real32 fov)
 {
    mCamera->setFov(fov);

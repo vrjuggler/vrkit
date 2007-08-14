@@ -64,6 +64,11 @@ public:
     */
    void setFov(const OSG::Real32 fov);
 
+   /**
+    * Set the aspect ration for the video camera.
+    */
+   void setAspect(const OSG::Real32 aspect);
+
    /*
     * Set the frames per second that should be recorded.
     */
