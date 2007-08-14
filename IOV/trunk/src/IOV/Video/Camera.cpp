@@ -47,12 +47,6 @@ CameraPtr Camera::init()
       beacon->setCore(mTransform);
    OSG::endEditCP(beacon);
 
-   // Create the frame root.
-   mFrameRoot = OSG::Node::create();
-   OSG::beginEditCP(mFrameRoot);
-      mFrameRoot->setCore(mTransform);
-   OSG::endEditCP(mFrameRoot);
-
    // Create the FBO textures.
    mLeftTexture = OSG::TextureChunk::create();
    OSG::beginEditCP(mLeftTexture);
@@ -182,11 +176,6 @@ void Camera::setNearFar(const OSG::Real32 nearVal,
 void Camera::setWindow(OSG::WindowPtr window)
 {
    mWindow = window;
-}
-
-OSG::NodePtr Camera::getFrame() const
-{
-   return mFrameRoot;
 }
 
 OSG::TextureChunkPtr Camera::getLeftTexture() const
