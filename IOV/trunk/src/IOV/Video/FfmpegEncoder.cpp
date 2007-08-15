@@ -239,7 +239,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       }
       if (NULL == mFormatOut)
       {
-         throw VideoFfmpegEncoderException("Couldnt find suitable output format.");
+         throw VideoFfmpegEncoderException("Couldn't find suitable output format.");
       }
 
       std::cout << "Using format: " << mFormatOut->name << ": " << mFormatOut->long_name << std::endl;
