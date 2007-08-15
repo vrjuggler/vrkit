@@ -251,6 +251,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
          throw VideoFfmpegEncoderException("Memory error.");
       }
       mFormatContext->oformat = mFormatOut;
+      mFormatContext->max_delay = (int)(0.7 * AV_TIME_BASE);
       snprintf(mFormatContext->filename, sizeof(mFormatContext->filename), "%s", filename.c_str());
 
       // Add the audio and video streams using the default format codecs
@@ -361,7 +362,7 @@ void FfmpegEncoder::addVideoStream(const vpr::Uint32 width, const vpr::Uint32 he
    AVCodecContext* vcc = mVideoStream->codec;
    vcc->codec_id = codec->id;
    vcc->codec_type = CODEC_TYPE_VIDEO;
-
+   avcodec_get_context_defaults2(mVideoStream->codec, CODEC_TYPE_VIDEO);
    // put sample parameters
    vcc->bit_rate = 400000;
 
@@ -394,9 +395,7 @@ void FfmpegEncoder::addVideoStream(const vpr::Uint32 width, const vpr::Uint32 he
    }
 
    // Some formats want stream headers to be separate
-   if(!strcmp(mFormatContext->oformat->name, "mp4") ||
-      !strcmp(mFormatContext->oformat->name, "mov") ||
-      !strcmp(mFormatContext->oformat->name, "3gp"))
+   if(mFormatContext->oformat->flags & AVFMT_GLOBALHEADER)
    {
       vcc->flags |= CODEC_FLAG_GLOBAL_HEADER;
    }
@@ -434,6 +433,7 @@ void FfmpegEncoder::openVideo(AVCodec* codec)
    }
 
    mRgbFrame= avcodec_alloc_frame();
+   avcodec_get_frame_defaults(mRgbFrame);
    if (NULL == mRgbFrame)
    {
       throw VideoFfmpegEncoderException("Couldn't allocate rgb-picture.");
@@ -524,6 +524,7 @@ void FfmpegEncoder::closeAudio()
 AVFrame* FfmpegEncoder::allocFrame(int pixFormat, int width, int height)
 {
    AVFrame* picture = avcodec_alloc_frame();
+   avcodec_get_frame_defaults(picture);
    if (NULL == picture)
    {
       throw VideoFfmpegEncoderException("Error allocating frame.");
