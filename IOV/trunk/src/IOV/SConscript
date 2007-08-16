@@ -19,8 +19,7 @@ if ffmpeg_options.isAvailable():
    ffmpeg_options.apply(env)
 
 if "win32" == platform:
-   env.AppendUnique(CPPDEFINES = ['IOV_WITH_VFW',])
-   env.AppendUnique(LIBS = ['Vfw32.lib',])
+   env.Append(CPPDEFINES = ['IOV_WITH_VFW',])
 
 header_path = pj(inst_paths['include'],'IOV')
 
