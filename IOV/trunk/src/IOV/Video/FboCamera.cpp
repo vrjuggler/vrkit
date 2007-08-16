@@ -15,6 +15,10 @@
 #include <IOV/Video/VideoEncoder.h>
 #include <IOV/Video/FboCamera.h>
 
+#ifndef GL_COLOR_ATTACHMENT0_EXT
+#   define GL_COLOR_ATTACHMENT0_EXT 0x8CE0
+#endif
+
 namespace
 {
    bool checkGLError(const char* where)
