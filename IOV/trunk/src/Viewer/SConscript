@@ -33,6 +33,12 @@ if boost_options.isAvailable():
    iov_app_prog = viewerEnv.Program(iov_app_name, iov_app_srcs)
    viewerEnv.Install(inst_paths['bin'], iov_app_prog)
 
+   # On Windows, we need to ensure that we depend on the IOV lib.
+   if platform == 'win32':
+      viewerEnv.Depends(iov_app_prog,
+                         os.path.join(inst_paths['lib'],
+                                      'iov%s.lib' % shared_lib_suffix))
+
    # Only install *.jdef and *.jconf files on first pass.
    if 0 == variant_pass:
       jdef_files  = []

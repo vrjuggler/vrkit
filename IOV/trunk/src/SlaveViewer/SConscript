@@ -34,6 +34,12 @@ if boost_options.isAvailable():
    slave_viewer_prog = viewerEnv.Program(slave_viewer_name, slave_viewer_srcs)
    viewerEnv.Install(inst_paths['bin'], slave_viewer_prog)
 
+   # On Windows, we need to ensure that we depend on the IOV lib.
+   if platform == 'win32':
+      viewerEnv.Depends(slave_viewer_prog,
+                         os.path.join(inst_paths['lib'],
+                                      'iov%s.lib' % shared_lib_suffix))
+
    # This only needs to be done when building against VR Juggler 2.1.21 or
    # newer.
    if platform == 'darwin':
