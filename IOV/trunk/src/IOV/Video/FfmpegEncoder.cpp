@@ -111,12 +111,14 @@ static void show_formats(void)
         int encode=0;
         const char *name=NULL;
         const char *long_name=NULL;
+	const char *exts=NULL;
 
         for(ofmt = ::first_oformat; ofmt != NULL; ofmt = ofmt->next) {
             if((name == NULL || strcmp(ofmt->name, name)<0) &&
                 strcmp(ofmt->name, last_name)>0){
                 name= ofmt->name;
                 long_name= ofmt->long_name;
+		exts=ofmt->extensions;
                 encode=1;
             }
         }
@@ -136,10 +138,9 @@ static void show_formats(void)
         if(encode)
 	{
         printf(
-            " %s%s %-15s %s\n",
-            decode ? "D":" ",
-            encode ? "E":" ",
-            name,
+            "%-20s  %-15s %s\n",
+            exts,
+	    name,
             long_name ? long_name:" ");
 	 }
     }
@@ -222,7 +223,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       av_register_all();
 
       // XXX: Debug code to output all valid formats & codecs.
-      //show_formats();
+      show_formats();
       
       std::cout << "Trying to guess container format from filename: " << filename << std::endl;
       mFormatOut = guess_format(NULL, filename.c_str(), NULL);
