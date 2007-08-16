@@ -38,7 +38,7 @@ FfmpegEncoder::codec_list_t FfmpegEncoder::getCodecs()
    avcodec_register_all();
    av_register_all();
 
-   // Get a lost of all codecs.
+   // Get a list of all codecs.
    codec_list_t codecs;
    for (AVCodec* p = ::first_avcodec; p != NULL; p = p->next)
    {
@@ -235,7 +235,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       if (NULL == mFormatOut)
       {
          std::cout << "Could not deduce output format from file extension: using MPEG." << std::endl;
-         mFormatOut = guess_format("mpeg", NULL, NULL);
+         mFormatOut = guess_format("avi", NULL, NULL);
       }
       if (NULL == mFormatOut)
       {
@@ -262,6 +262,13 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       }
 
       AVCodec* codec = avcodec_find_encoder_by_name(codecName.c_str());
+
+      // Fall back to using the containers default format
+      if( NULL == codec )
+      {
+	 codec = avcodec_find_encoder(mFormatContext->oformat->codec_id);
+      }
+
       if (NULL == codec)
       {
          throw VideoFfmpegEncoderException("Couldn't find video encoder.");
@@ -630,7 +637,7 @@ void FfmpegEncoder::writeFrame(int width, int height, vpr::Uint8* data)
       pkt.data = (uint8_t *)mYuvFrame;
       pkt.size = sizeof(AVPicture);
 
-      status = av_write_frame(mFormatContext, &pkt);
+      status = av_interleaved_write_frame(mFormatContext, &pkt);
    }
    else
    {
@@ -653,7 +660,7 @@ void FfmpegEncoder::writeFrame(int width, int height, vpr::Uint8* data)
          pkt.size = out_size;
 
          // Write the compressed frame in the media file.
-         status = av_write_frame(mFormatContext, &pkt);
+         status = av_interleaved_write_frame(mFormatContext, &pkt);
       }
    }
 
