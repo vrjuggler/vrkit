@@ -23,7 +23,7 @@ VfwEncoder::VfwEncoder()
 
 EncoderPtr VfwEncoder::create()
 {
-   return VfwEncoderPtr(new VfwEncoder);
+   return EncoderPtr(new VfwEncoder);
 }
 
 void buildAndThrowAviError(const vpr::Uint32 errCode)

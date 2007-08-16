@@ -11,7 +11,7 @@
 #include <vpr/vprTypes.h>
 
 #include <IOV/Video/Encoder.h>
-#include <IOV/Video/VfwEncoderPtr.h>
+
 
 namespace inf
 {

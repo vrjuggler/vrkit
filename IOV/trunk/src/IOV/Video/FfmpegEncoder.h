@@ -9,8 +9,6 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <vpr/vprTypes.h>
-#include <IOV/Video/FfmpegEncoderPtr.h>
-
 
 // hack for ffmpeg - c++ issue
 #ifndef int64_t_C

@@ -30,7 +30,7 @@ const char* VideoFfmpegEncoderException::what(void) const throw()
 
 EncoderPtr FfmpegEncoder::create()
 {
-   return FfmpegEncoderPtr(new FfmpegEncoder);
+   return EncoderPtr(new FfmpegEncoder);
 }
 
 FfmpegEncoder::codec_list_t FfmpegEncoder::getCodecs()
