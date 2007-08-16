@@ -14,6 +14,11 @@
 #define STREAM_FRAME_RATE 25 // 25 images/s
 #define STREAM_PIX_FMT PIX_FMT_YUV420P // default pix_fmt
 
+typedef struct AVCodecTag {
+    int id;
+    unsigned int tag;
+} AVCodecTag;
+
 namespace inf
 {
 
@@ -112,6 +117,7 @@ static void show_formats(void)
         const char *name=NULL;
         const char *long_name=NULL;
 	const char *exts=NULL;
+	std::vector<std::string> code_tags;
 
         for(ofmt = ::first_oformat; ofmt != NULL; ofmt = ofmt->next) {
             if((name == NULL || strcmp(ofmt->name, name)<0) &&
@@ -119,7 +125,31 @@ static void show_formats(void)
                 name= ofmt->name;
                 long_name= ofmt->long_name;
 		exts=ofmt->extensions;
-                encode=1;
+		if(ofmt->codec_tag != NULL)
+	        {
+		   //char tmp_codec_tag[4];
+		   for(const AVCodecTag* tag = ofmt->codec_tag[0]; tag->id != CODEC_ID_NONE; tag++)
+		   {
+		     /*
+		     tmp_codec_tag[0] = tag->tag & 0xff;
+		     tmp_codec_tag[1] = (tag->tag >> 8) & 0xff;
+		     tmp_codec_tag[2] = (tag->tag >> 16) & 0xff;
+		     tmp_codec_tag[3] = (tag->tag >> 24) & 0xff;
+		     */
+		     AVCodec* current_codec = avcodec_find_encoder((CodecID)tag->id);
+		     if(current_codec != NULL)
+		     {
+			if(current_codec->type == CODEC_TYPE_VIDEO)
+			{
+			   code_tags.push_back(current_codec->name);
+			}
+		     }
+		   }
+		}
+		if(avcodec_find_encoder(ofmt->video_codec) != NULL)
+		{
+		  encode=1;
+	        }
             }
         }
         for(ifmt = first_iformat; ifmt != NULL; ifmt = ifmt->next) {
@@ -142,6 +172,10 @@ static void show_formats(void)
             exts,
 	    name,
             long_name ? long_name:" ");
+	   for(unsigned int i = 0; i < code_tags.size(); i++)
+	   {
+	       std::cout << "       " << code_tags[i] << std::endl;
+	   }
 	 }
     }
     printf("\n");
@@ -189,7 +223,7 @@ static void show_formats(void)
             type_str = "?";
             break;
         }
-	if(encode)
+	if(encode && p2->type == CODEC_TYPE_VIDEO)
 	{
         printf(
             " %s%s%s%s%s%s %s",

@@ -31,6 +31,7 @@ extern "C"
 {
 
 #include <ffmpeg/avformat.h>
+#include <ffmpeg/avcodec.h>
 #include <ffmpeg/swscale.h>
 
 }
