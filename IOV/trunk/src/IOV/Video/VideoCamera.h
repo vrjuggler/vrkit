@@ -167,6 +167,7 @@ private:
 private:
    CameraPtr		                mCamera;         /**< Camera used for rendering. */
    VideoEncoderPtr			mVideoEncoder;
+   OSG::ImagePtr			mStereoImageStorage; /**< Temp storage for stereo image concatenation. */
    OSG::RefPtr<OSG::TransformPtr>       mTransform;     /**< The location and orientation of the camera. */
    OSG::RefPtr<OSG::NodePtr>            mFrameRoot;     /**< The frame that surrounds the captured scene. */
    OSG::Real32                          mEyeOffset;	/**< Interocular distance / 2 for stereo. */

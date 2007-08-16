@@ -23,6 +23,7 @@ namespace inf
 VideoCamera::VideoCamera()
    : mCamera()
    , mVideoEncoder()
+   , mStereoImageStorage(OSG::NullFC)
    , mTransform(OSG::NullFC)
    , mFrameRoot(OSG::NullFC)
    , mEyeOffset(0.5)
@@ -62,6 +63,8 @@ VideoCameraPtr VideoCamera::init()
    OSG::beginEditCP(mFrameRoot);
       mFrameRoot->setCore(mTransform);
    OSG::endEditCP(mFrameRoot);
+
+   mStereoImageStorage = OSG::Image::create();
 
    mCamera = FboCamera::create()->init();
    
@@ -137,6 +140,14 @@ void VideoCamera::startRecording()
 {
    if ( ! isRecording() )
    {
+      if( mStereo )
+      {
+	 OSG::beginEditCP(mStereoImageStorage);
+	    mStereoImageStorage->set(OSG::Image::OSG_RGBA_PF,
+				     mCamera->getWidth() * 2,
+				     mCamera->getHeight());
+	 OSG::beginEditCP(mStereoImageStorage);
+      }
       mVideoEncoder->record();
       mRecording = true;
    }
@@ -223,20 +234,18 @@ void VideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
       setCameraPos(camera_pos);
 
       mCamera->renderRightEye(ra);
-      OSG::ImagePtr stereo_img = OSG::Image::create();
 
       const OSG::UInt32 width = mCamera->getWidth();
       const OSG::UInt32 height = mCamera->getHeight();
 
-      OSG::beginEditCP(stereo_img);
-	 stereo_img->set(OSG::Image::OSG_RGBA_PF, width * 2, height);
-	 stereo_img->setSubData(0, 0, 0, width, height, 1,
+      OSG::beginEditCP(mStereoImageStorage);
+	 mStereoImageStorage->setSubData(0, 0, 0, width, height, 1,
 			        mCamera->getLeftEyeImage()->getData());
-	 stereo_img->setSubData(width, 0, 0, width, height, 1,
+	 mStereoImageStorage->setSubData(width, 0, 0, width, height, 1,
 			        mCamera->getRightEyeImage()->getData());
-      OSG::endEditCP(stereo_img);
+      OSG::endEditCP(mStereoImageStorage);
 
-      mVideoEncoder->writeFrame(stereo_img);
+      mVideoEncoder->writeFrame(mStereoImageStorage);
    }
    else
    {
