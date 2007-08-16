@@ -79,7 +79,7 @@ void FfmpegEncoder::close()
       av_write_trailer(mFormatContext);
 
       // free the streams
-      for(int i = 0; i < mFormatContext->nb_streams; i++)
+      for(unsigned int i = 0; i < mFormatContext->nb_streams; i++)
       {
          av_freep(&mFormatContext->streams[i]->codec);
          av_freep(&mFormatContext->streams[i]);
@@ -101,7 +101,6 @@ static void show_formats(void)
 {
     AVInputFormat *ifmt;
     AVOutputFormat *ofmt;
-    URLProtocol *up;
     AVCodec *p, *p2;
     const char *last_name;
 
@@ -217,9 +216,6 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
    try
    {
       const vpr::Uint32 bitrate = 1400;
-      // XXX: Convert the codec string into codec.
-      const CodecID codecid = CODEC_ID_NONE;
-      const bool flip = true;
 
       // init avcodec && avformat
       avcodec_register_all();
@@ -266,7 +262,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       // Fall back to using the containers default format
       if( NULL == codec )
       {
-	 codec = avcodec_find_encoder(mFormatContext->oformat->codec_id);
+	 codec = avcodec_find_encoder(mFormatOut->video_codec);
       }
 
       if (NULL == codec)
