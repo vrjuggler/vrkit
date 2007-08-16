@@ -146,9 +146,10 @@ static void show_formats(void)
 		     }
 		   }
 		}
-		if(avcodec_find_encoder(ofmt->video_codec) != NULL)
+
+	        if (ofmt->video_codec != CODEC_ID_NONE)
 		{
-		  encode=1;
+		     encode=1;
 	        }
             }
         }
