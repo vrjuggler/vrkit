@@ -91,6 +91,13 @@ public:
 
    void setFramesPerSecond(OSG::UInt32 fps);
 
+   struct video_encoder_params_t
+   {
+      std::string	mEncoderName;
+      std::string	mContainerFormat;
+      std::string	mCodec;
+   };
+
 private:
    typedef std::vector<std::string> encoder_list_t;
    typedef std::map<std::string, encoder_list_t> codec_map_t;

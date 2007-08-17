@@ -126,6 +126,8 @@ void VideoEncoder::record()
    mImage = OSG::Image::create();
    OSG::beginEditCP(mImage);
 // Video for Windows wants bytes in BRG order. Ask the GL driver for them in that order.
+
+   //XXX: Do one call to mImage->set
 #if defined(IOV_WITH_VFW)
       mImage->set(OSG::Image::OSG_BGR_PF, 1);
 #else
