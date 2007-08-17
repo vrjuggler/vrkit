@@ -20,6 +20,22 @@ if ffmpeg_options.isAvailable():
 
 if "win32" == platform:
    env.Append(CPPDEFINES = ['IOV_WITH_VFW',])
+   # Add ATL paths to build.
+   vc_inst_dir = env['MSVS']['VCINSTALLDIR']
+   env.Append(CPPPATH = [pj(vc_inst_dir, 'atlmfc', 'include'),],
+              LIBPATH = [pj(vc_inst_dir, 'atlmfc', 'lib'),])
+
+   # Add the platform sdk for DirectShow.
+   psdk = env["platform_sdk"]
+   bc_path = pj(psdk, 'Samples', 'Multimedia', 'DirectShow', 'BaseClasses')
+
+   # XXX: Very simple test for platform SDK.
+   if os.path.exists(bc_path):
+      env.Append(CPPDEFINES = ['IOV_WITH_DIRECT_SHOW',])
+      env.AppendUnique(CPPPATH=[bc_path,],
+                       LIBPATH=[pj(bc_path,'WIN2000_RETAIL'),])
+
+      env.AppendUnique(LINKFLAGS=['/nodefaultlib:libcmt'])
 
 header_path = pj(inst_paths['include'],'IOV')
 

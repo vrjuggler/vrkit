@@ -86,6 +86,10 @@ opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.6.0",
 
 ffmpeg_options = SConsAddons.Options.FlagPollBasedOption.FlagPollBasedOption("AvFormat", "libavformat", "51.0.0", False, True)
 
+if "win32" == platform:
+   opts.Add("platform_sdk", "Microsoft Platform SDK location",
+      default=r"C:\Program Files\Microsoft Platform SDK")
+
 Export('boost_options','opensg_options', 'ffmpeg_options', 'vrj_options')
 
 opts.AddOption(boost_options)
