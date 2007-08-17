@@ -20,6 +20,7 @@ VfwEncoder::VfwEncoder()
    , mAviFile(NULL)
    , mAviDC(NULL)
 {
+   mName = VfwEncoder::getRealName();
 }
 
 EncoderPtr VfwEncoder::create()
