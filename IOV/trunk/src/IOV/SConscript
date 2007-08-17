@@ -32,9 +32,19 @@ if "win32" == platform:
 
    # XXX: Very simple test for platform SDK.
    if os.path.exists(bc_path):
-      env.Append(CPPDEFINES = ['IOV_WITH_DIRECT_SHOW',])
-      env.AppendUnique(CPPPATH=[bc_path,],
-                       LIBPATH=[pj(bc_path,'WIN2000_RETAIL'),])
+      env.Append(CPPDEFINES = ['IOV_WITH_DIRECT_SHOW'])
+
+      if combo['type'] == 'debugrt':
+         bc_libdir = 'WIN2000_DEBUG'
+      else:
+         bc_libdir = 'WIN2000_RETAIL'
+
+      psdk_libdir = pj(psdk, 'lib')
+      if combo['arch'] == 'x64':
+         psdk_libdir = pj(psdk_libdir, 'amd64')
+      env.AppendUnique(CPPPATH = [bc_path, pj(psdk, 'Include')],
+                       LIBPATH = [pj(bc_path, bc_libdir), psdk_libdir],
+                       LIBS = ['comsuppw.lib', 'strmiids.lib'])
 
 header_path = pj(inst_paths['include'],'IOV')
 
