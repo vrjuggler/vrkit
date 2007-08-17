@@ -24,20 +24,16 @@
 #endif
 
 #define REGISTER_ENCODER(ENCODER)                               \
-   std::string ENCODER ## name = ENCODER::getName();            \
-                                                                \
-   /* Register the creator. */                                  \
-   mCreatorMap[ENCODER ## name] = &ENCODER::create;             \
-                                                                \
-   /* Register each codec type. */                              \
-   ENCODER::codec_list_t ENCODER ## cl = ENCODER::getCodecs();  \
-   for (Encoder::codec_list_t::const_iterator itr =             \
-        ENCODER ## cl.begin();                                  \
-        itr != ENCODER ## cl.end(); ++itr)                      \
-   {                                                            \
-      mCodecMap[*itr].push_back(ENCODER ## name);               \
-      mCodecSet.insert(*itr);					\
-   }
+   EncoderPtr encoder = ENCODER::create()->init();		\
+   mEncoderMap[encoder->getName()] = encoder;			\
+							        \
+   Encoder::container_format_list_t enc_fmt_list =		\
+		  encoder->getSupportedContainersAndCodecs();	\
+   /* Register each container format list. */                   \
+   mVideoEncoderFormatList.insert(				\
+			   mVideoEncoderFormatList.end(),	\
+			   enc_fmt_list.begin(),		\
+			   enc_fmt_list.end());
 
 namespace inf
 {
@@ -65,7 +61,7 @@ VideoEncoder::~VideoEncoder()
 {
    if (NULL != mEncoder.get())
    {
-      mEncoder->close();
+      mEncoder->stopEncoding();
       mEncoder = EncoderPtr();
    }
    mImage = OSG::NullFC;
@@ -102,6 +98,7 @@ void VideoEncoder::record()
       image_width *= 2;
    }
 
+#if 0
    codec_map_t::const_iterator found = mCodecMap.find(mCodec);
    if (mCodecMap.end() == found)
    {
@@ -109,18 +106,26 @@ void VideoEncoder::record()
       ss << "Can't find encoder for codec: " << mCodec;
       throw inf::Exception(ss.str(), IOV_LOCATION);
    }
+#endif
 
    if (NULL != mEncoder.get())
    {
-      mEncoder->close();
+      mEncoder->stopEncoding();
    }
 
+#if 0
    // Get the first encoder.
    std::string encoder_name = (*found).second[0];
    vprASSERT(mCreatorMap.count(encoder_name) > 0 && "Must have the encoder.");
    // Create new encoder.
    encoder_create_t creator = mCreatorMap[encoder_name];
    mEncoder = creator()->init(mFilename, mCodec, image_width, image_height, mFps);
+#endif
+   // XXX check out vals
+   encoder_map_t::const_iterator vid_encoder = mEncoderMap.find(mVideoEncoderParams.mEncoderName);
+   mEncoder = (*vid_encoder).second;
+
+   //XXX set video encoder params
 
    // Create the image to store the pixel data in.
    mImage = OSG::Image::create();
@@ -161,7 +166,7 @@ void VideoEncoder::stop()
    OSG_ASSERT(NULL != mEncoder.get() && "Can't stop if we aren't recording.");
    if (NULL != mEncoder.get())
    {
-      mEncoder->close();
+      mEncoder->stopEncoding();
       mEncoder = EncoderPtr();
    }
    mRecording = false;
@@ -204,7 +209,7 @@ void VideoEncoder::writeFrame(OSG::ImagePtr img)
       img->reformat((OSG::Image::PixelFormat)mImage->getPixelFormat(), mImage);
    OSG::endEditCP(mImage);
 
-   mEncoder->writeFrame(mEncoder->width(), mEncoder->height(), mImage->getData());
+   mEncoder->writeFrame(mImage->getData());
 }
 
 }

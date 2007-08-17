@@ -13,7 +13,7 @@
 
 #include <IOV/Video/VideoEncoderPtr.h>
 
-#include <IOV/Video/EncoderPtr.h>
+#include <IOV/Video/Encoder.h>
 
 #include <set>
 
@@ -71,6 +71,7 @@ public:
       return mRecording;
    }
 
+#if 0
    /**
     * Returns the current set of available codes.
     *
@@ -80,6 +81,7 @@ public:
    {
       return mCodecSet;
    }
+#endif
 
    void setFilename(const std::string& filename);
 
@@ -99,11 +101,7 @@ public:
    };
 
 private:
-   typedef std::vector<std::string> encoder_list_t;
-   typedef std::map<std::string, encoder_list_t> codec_map_t;
-   typedef std::set<std::string> codec_set_t;
-   typedef boost::function<EncoderPtr ()> encoder_create_t;
-   typedef std::map<std::string, encoder_create_t> creator_map_t;
+   typedef std::map<std::string, EncoderPtr> encoder_map_t;
 
    bool                 mRecording;     /**< Whether we are currently recording. */
    OSG::ImagePtr        mImage;		/**< Image to hold the pixel data while encoding. */
@@ -114,9 +112,10 @@ private:
    OSG::UInt32		mWidth;
    OSG::UInt32		mHeight;
    EncoderPtr           mEncoder;       /**< Encoder that can write encode and write movie. */
-   codec_map_t          mCodecMap;      /**< Map of codec_name to a list of encoders. */
-   creator_map_t        mCreatorMap;    /**< Map of encoder names to encoder creators. */
-   codec_set_t		mCodecSet;	/**< Set of all codecs available. */
+
+   encoder_map_t			mEncoderMap;
+   video_encoder_params_t		mVideoEncoderParams;
+   Encoder::container_format_list_t	mVideoEncoderFormatList;
 };
 
 }
