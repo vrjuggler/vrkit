@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
+#include <algorithm>
+#include <boost/algorithm/string.hpp>
 #include <IOV/Video/FfmpegEncoder.h>
 #include <IOV/Util/Exceptions.h>
 
@@ -247,7 +249,63 @@ static void show_formats(void)
 
 EncoderPtr FfmpegEncoder::init()
 {
-   //XXX: Make the list of supported formats
+   // Get all types registered
+   avcodec_register_all();
+   av_register_all();
+
+   AVOutputFormat *out_fmt;
+   const char* last_name;
+   last_name = "000";
+   const char* fmt_name = NULL;
+   Encoder::codec_list_t allowable_codecs;
+
+   for( out_fmt = ::first_oformat; out_fmt != NULL; out_fmt = out_fmt->next )
+   {
+     if( ( fmt_name == NULL || strcmp(out_fmt->name, fmt_name) < 0 ) &&
+	 ( strcmp(out_fmt->name, last_name) > 0 ) )
+      {
+	 fmt_name = out_fmt->name;
+	 if( out_fmt->video_codec != CODEC_ID_NONE )
+	 {
+	    allowable_codecs.clear();
+	    if( out_fmt->codec_tag != NULL )
+	    {
+	       for(const AVCodecTag* tag = out_fmt->codec_tag[0]; tag->id != CODEC_ID_NONE; tag++)
+	       {
+		  AVCodec* current_codec = avcodec_find_encoder((CodecID)tag->id);
+		  if(current_codec != NULL)
+		  {
+		     if(current_codec->type == CODEC_TYPE_VIDEO)
+		     {
+			allowable_codecs.push_back(std::string(current_codec->name));
+		     }
+		  }
+	       }
+	    }
+
+	    Encoder::container_format_info_t new_format;
+
+	    new_format.mFormatName = std::string(fmt_name);
+	    new_format.mFormatLongName = std::string(out_fmt->long_name);
+
+	    std::string extensions(out_fmt->extensions);
+	    std::vector<std::string> extensions_vector;
+	    boost::algorithm::split( extensions_vector, extensions, boost::algorithm::is_any_of(","));
+	    new_format.mFileExtensions = extensions_vector;
+
+	    // Keep only unique codec names
+	    Encoder::codec_list_t::iterator new_end = 
+			std::unique( allowable_codecs.begin(), allowable_codecs.end() );
+	    allowable_codecs.erase(new_end, allowable_codecs.end());
+	    new_format.mCodecList = allowable_codecs;
+
+	    new_format.mEncoderName = getName();
+	    
+	    mContainerFormatInfoList.push_back(new_format);
+	 }
+      }
+   }
+
    return shared_from_this();
 }
 
@@ -264,7 +322,7 @@ void FfmpegEncoder::startEncoding()
       av_register_all();
 
       // XXX: Debug code to output all valid formats & codecs.
-      show_formats();
+      //show_formats();
 
       if( getContainerFormat() != "" )
       {
