@@ -111,8 +111,6 @@ DirectShowEncoder::DirectShowEncoder()
    , mGraphRegister(0)
 #endif
 {
-   mName = DirectShowEncoder::getRealName();
-
    // Initialize COM
    if(FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED)))
    {
@@ -138,7 +136,7 @@ EncoderPtr DirectShowEncoder::init()
    format_info.mFormatLongName = "Audio Video Interleave";
    format_info.mFileExtensions.push_back("avi");
    format_info.mCodecList = DirectShowEncoder::getCodecs();
-   format_info.mEncoderName = DirectShowEncoder::getRealName();
+   format_info.mEncoderName = DirectShowEncoder::getName();
 
    mContainerFormatInfoList.push_back(format_info);
 

@@ -25,7 +25,7 @@
 
 #define REGISTER_ENCODER(ENCODER)                               \
    EncoderPtr encoder_ ## ENCODER = ENCODER::create()->init();  \
-   mEncoderMap[encoder_ ## ENCODER->getName()] = encoder_ ## ENCODER;	\
+   mEncoderMap[ENCODER::getName()] = encoder_ ## ENCODER;	\
 							        \
    Encoder::container_format_list_t enc_fmt_list ## ENCODER =   \
 		  encoder_ ## ENCODER->getSupportedContainersAndCodecs();	\

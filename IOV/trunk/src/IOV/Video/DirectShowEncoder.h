@@ -82,7 +82,7 @@ public:
     */
    static codec_list_t getCodecs();
 
-   static std::string getRealName()
+   static std::string getName()
    {
       return "DirectShow Encoder";
    }

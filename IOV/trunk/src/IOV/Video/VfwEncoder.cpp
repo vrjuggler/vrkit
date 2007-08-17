@@ -20,7 +20,6 @@ VfwEncoder::VfwEncoder()
    , mAviFile(NULL)
    , mAviDC(NULL)
 {
-   mName = VfwEncoder::getRealName();
 }
 
 EncoderPtr VfwEncoder::create()
@@ -84,7 +83,7 @@ EncoderPtr VfwEncoder::init()
    format_info.mFormatLongName = "Audio Video Interleave";
    format_info.mFileExtensions.push_back("avi");
    format_info.mCodecList = VfwEncoder::getCodecs();
-   format_info.mEncoderName = VfwEncoder::getRealName();
+   format_info.mEncoderName = VfwEncoder::getName();
 
    mContainerFormatInfoList.push_back(format_info);
 

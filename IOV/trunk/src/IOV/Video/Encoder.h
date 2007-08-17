@@ -55,8 +55,6 @@ public:
 
    virtual EncoderPtr init() = 0;
 
-   std::string getName() const;
-
    Encoder::container_format_list_t getSupportedContainersAndCodecs() const;
 
    void setEncodingParameters(const encoder_parameters_t params);
@@ -79,7 +77,6 @@ protected:
    std::string	getFilename() const;
    vpr::Uint32	getFramesPerSecond() const;
 
-   std::string			mName;
    encoder_parameters_t		mEncoderParams;
    container_format_list_t	mContainerFormatInfoList;
 };

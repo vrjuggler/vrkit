@@ -74,7 +74,7 @@ protected:
       , mVideoOutBufferSize(0)
       , mFrameCount(0)
       , mFlipBeforeEncode(true)
-   {mName="FFmpegEncoder";}
+   {;}
 
 public:
    static EncoderPtr create();
@@ -86,6 +86,11 @@ public:
     *
     */
    EncoderPtr init();
+
+   static std::string getName()
+   {
+      return "FFmpegEncoder";
+   }
 
    /**
     * Open the video stream and start encoding.

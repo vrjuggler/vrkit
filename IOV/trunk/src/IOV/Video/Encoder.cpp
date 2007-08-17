@@ -31,11 +31,6 @@ OSG::Image::PixelFormat Encoder::getPixelFormat() const
    return OSG::Image::OSG_RGB_PF;
 }
 
-std::string Encoder::getName() const
-{
-   return mName;
-}
-
 std::string Encoder::getContainerFormat() const
 {
    return mEncoderParams.mContainerFormat;
