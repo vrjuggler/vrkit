@@ -434,10 +434,13 @@ void OpenSgViewer::init()
       //mVideoCamera->setStereo(true);
       inf::Encoder::container_format_list_t formats = mVideoCamera->getAvailableFormats();
       inf::VideoEncoder::video_encoder_format_t config;
+      //config.mEncoderName = "FFmpegEncoder";
+      //config.mContainerFormat = "avi";
+      //config.mCodec = "mpeg4";
+      // XXX: How to pick defaults?
       config.mEncoderName = formats[0].mEncoderName;
       config.mContainerFormat = formats[0].mFormatName;
-      // XXX: How to pick defaults?
-      //config.mCodec = formats[0].mCodecList[0];
+      config.mCodec = formats[0].mCodecList[0];
       mVideoCamera->setFormat(config);
 
       mVideoCamera->startRecording();
