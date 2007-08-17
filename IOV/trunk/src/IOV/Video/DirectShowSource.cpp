@@ -19,10 +19,13 @@
 
 #undef DS_LIB_RT_OPT
 
+#include <IOV/Video/DirectShowSource.h>
+
+// These have to be included after DirectShowSource.h to avoid interfering
+// with other uses of DEFINE_GUID() but before our use of DEFINE_GUID() to
+// ensure that CLSID_ByteSource is initialized.
 #include <ObjBase.h>
 #include <InitGuid.h>
-
-#include <IOV/Video/DirectShowSource.h>
 
 // {930C2C1F-A305-44fc-8D1C-99815D89D7C8}
 DEFINE_GUID(CLSID_ByteSource, 
@@ -226,7 +229,7 @@ HRESULT ByteStream::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PROPERTIES
    pProperties->cBuffers = 1;
    pProperties->cbBuffer = pvi->bmiHeader.biSizeImage;
 
-   ASSERT(pProperties->cbBuffer);
+   vprASSERT(pProperties->cbBuffer);
 
    // Ask the allocator to reserve us some sample memory, NOTE the function
    // can succeed (that is return NOERROR) but still not have allocated the
