@@ -430,9 +430,16 @@ void OpenSgViewer::init()
    {
       mVideoCamera = inf::VideoCamera::create()->init();
       mVideoCamera->setFilename(mVideoFileName);
-      mVideoCamera->setCodec(mVideoCodec);
       //mVideoCamera->setFrameSize(1024, 768);
       //mVideoCamera->setStereo(true);
+      inf::Encoder::container_format_list_t formats = mVideoCamera->getAvailableFormats();
+      inf::VideoEncoder::video_encoder_format_t config;
+      config.mEncoderName = formats[0].mEncoderName;
+      config.mContainerFormat = formats[0].mFormatName;
+      // XXX: How to pick defaults?
+      //config.mCodec = formats[0].mCodecList[0];
+      mVideoCamera->setFormat(config);
+
       mVideoCamera->startRecording();
 
       OSG::NodePtr frame_root = mVideoCamera->getFrame();

@@ -95,18 +95,15 @@ void VideoCamera::setFramesPerSecond(const OSG::UInt32 framesPerSecond)
    mVideoEncoder->setFramesPerSecond(framesPerSecond);
 }
 
-void VideoCamera::setCodec(const std::string& codec)
+void VideoCamera::setFormat(const VideoEncoder::video_encoder_format_t& format)
 {
-   mVideoEncoder->setCodec(codec);
+   mVideoEncoder->setFormat(format);
 }
 
-const std::set<std::string>& VideoCamera::getAvailableCodecs() const
+const Encoder::container_format_list_t& VideoCamera::getAvailableFormats() const
 {
-   //return mVideoEncoder->getAvailableCodecs();
-   std::set<std::string> s;
-   return s;
+   return mVideoEncoder->getAvailableFormats();
 }
-
 
 void VideoCamera::setStereo(const bool stereo)
 {

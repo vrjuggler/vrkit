@@ -12,7 +12,7 @@
 #include <OpenSG/OSGRenderAction.h>
 
 #include <IOV/Video/CameraPtr.h>
-#include <IOV/Video/VideoEncoderPtr.h>
+#include <IOV/Video/VideoEncoder.h>
 #include <IOV/Video/VideoCameraPtr.h>
 
 namespace inf
@@ -47,12 +47,12 @@ public:
    /**
     * Returns the current set of available codes.
     */
-   const std::set<std::string>& getAvailableCodecs() const;
+   const Encoder::container_format_list_t& getAvailableFormats() const;
 
    /**
     * Set the codec that the encoder should use.
     */
-   void setCodec(const std::string& codec);
+   void setFormat(const VideoEncoder::video_encoder_format_t& format);
 
    /*
     * Set the filename to record the video to.
