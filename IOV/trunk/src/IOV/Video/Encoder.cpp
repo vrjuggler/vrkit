@@ -38,7 +38,7 @@ std::string Encoder::getName() const
 
 std::string Encoder::getContainerFormat() const
 {
-   return mEncoderParams.mFormatName;
+   return mEncoderParams.mContainerFormat;
 }
 
 std::string Encoder::getCodec() const
