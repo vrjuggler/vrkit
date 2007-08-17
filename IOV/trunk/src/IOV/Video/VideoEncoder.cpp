@@ -24,16 +24,16 @@
 #endif
 
 #define REGISTER_ENCODER(ENCODER)                               \
-   EncoderPtr encoder = ENCODER::create()->init();		\
-   mEncoderMap[encoder->getName()] = encoder;			\
+   EncoderPtr encoder_ ## ENCODER = ENCODER::create()->init();  \
+   mEncoderMap[encoder_ ## ENCODER->getName()] = encoder_ ## ENCODER;	\
 							        \
-   Encoder::container_format_list_t enc_fmt_list =		\
-		  encoder->getSupportedContainersAndCodecs();	\
+   Encoder::container_format_list_t enc_fmt_list ## ENCODER =   \
+		  encoder_ ## ENCODER->getSupportedContainersAndCodecs();	\
    /* Register each container format list. */                   \
    mVideoEncoderFormatList.insert(				\
 			   mVideoEncoderFormatList.end(),	\
-			   enc_fmt_list.begin(),		\
-			   enc_fmt_list.end());
+			   enc_fmt_list ## ENCODER.begin(),     \
+			   enc_fmt_list ## ENCODER.end());
 
 namespace inf
 {
