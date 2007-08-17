@@ -16,11 +16,10 @@
 
 #include <strsafe.h>
 #include <dshow.h>
-#include <IOV/Video/dshowutil.h>
 #include <mtype.h>
 #include <wxdebug.h>
 #include <reftime.h>
-#pragma comment(lib, "ole32.lib")
+//#pragma comment(lib, "ole32.lib")
 #include <atlstr.h>
 
 // CUnknown

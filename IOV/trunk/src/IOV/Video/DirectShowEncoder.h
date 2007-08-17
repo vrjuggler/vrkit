@@ -15,7 +15,6 @@
 
 #include <strsafe.h>
 #include <dshow.h>
-#include <IOV/Video/dshowutil.h>
 #include <mtype.h>
 #include <wxdebug.h>
 #include <reftime.h>

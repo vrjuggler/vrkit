@@ -11,11 +11,88 @@
 namespace inf
 {
 
-//void f()
-//{
-//   createAbstract(ClassGraphBuilder2, NULL, 1);
-//   createConcrete(GraphBuilder, FilterGraph, NULL, 1);
-//}
+CComPtr<IPin> GetPin(CComPtr<IBaseFilter> filter, PIN_DIRECTION dir, int idx)
+{
+   CComPtr<IEnumPins> pEnum = NULL;
+   CComPtr<IPin> pin = NULL;
+
+   if (!filter)
+   { return E_POINTER; }
+
+   HRESULT hr;
+   if (FAILED(hr = filter->EnumPins(&pEnum)))
+   { return pin; }
+
+   ULONG num_found;
+   while(S_OK == pEnum->Next(1, &pin, &num_found))
+   {
+      PIN_DIRECTION pindir = (PIN_DIRECTION)3;
+      pin->QueryDirection(&pindir);
+      if(pindir == dir)
+      {
+         if(idx == 0)
+         {
+            // Return the pin's interface
+            return pin;
+         }
+         idx--;
+      } 
+      pin = NULL;
+   }
+   return pin;
+}
+
+CComPtr<IPin> getInPin(CComPtr<IBaseFilter> filter, int idx)
+{
+   return GetPin(filter, PINDIR_INPUT, idx);
+}
+
+CComPtr<IPin> getOutPin(CComPtr<IBaseFilter> filter, int idx)
+{
+   return GetPin(filter, PINDIR_OUTPUT, idx);
+}
+
+// Adds a DirectShow filter graph to the Running Object Table,
+// allowing GraphEdit to "spy" on a remote filter graph.
+DWORD addGraphToRot(IUnknown* graph) 
+{
+   DWORD regId;
+   CComPtr<IMoniker> moniker;
+   CComPtr<IRunningObjectTable> rot;
+
+   if (!graph)
+   { return E_POINTER; }
+
+   CHECK_RESULT(FAILED(GetRunningObjectTable(0, &rot)),
+      "Failed to get running object table.");
+
+   CHECK_RESULT(CreateItemMoniker(L"!", L"DirectShowEncoder", &moniker),
+      "Failed to create item moniker");
+
+   // Use the ROTFLAGS_REGISTRATIONKEEPSALIVE to ensure a strong reference
+   // to the object.  Using this flag will cause the object to remain
+   // registered until it is explicitly revoked with the Revoke() method.
+   //
+   // Not using this flag means that if GraphEdit remotely connects
+   // to this graph and then GraphEdit exits, this object registration 
+   // will be deleted, causing future attempts by GraphEdit to fail until
+   // this application is restarted or until the graph is registered again.
+   CHECK_RESULT(rot->Register(ROTFLAGS_REGISTRATIONKEEPSALIVE, graph, moniker, &regId),
+      "Failed to register graph with running object table.");
+
+   return regId;
+}
+
+// Removes a filter graph from the Running Object Table
+void RemoveGraphFromRot(DWORD regId)
+{
+   CComPtr<IRunningObjectTable> rot;
+
+   CHECK_RESULT(GetRunningObjectTable(0, &rot),
+      "Failed to get running object table.");
+
+   rot->Revoke(regId);
+}
 
 DirectShowEncoder::DirectShowEncoder()
    : mWidth(512)
@@ -89,13 +166,13 @@ EncoderPtr DirectShowEncoder::init(const std::string& filename, const std::strin
 
    CHECK_RESULT(mGraphBuilder->AddFilter(encoder, L"Encoder"), "Failed to add encoder");
 
-   CComPtr<IPin> encoder_in = GetInPin(encoder,0);
-   CComPtr<IPin> encoder_out = GetOutPin(encoder,0);
-   CComPtr<IPin> avimux_in = GetInPin(avi_mux,0);
+   CComPtr<IPin> encoder_in = getInPin(encoder,0);
+   CComPtr<IPin> encoder_out = getOutPin(encoder,0);
+   CComPtr<IPin> avimux_in = getInPin(avi_mux,0);
    CComPtr<IPin> byte_source_out = mByteSource->GetPin(0);
 
 #ifdef PREVIEW
-   CComPtr<IPin> tee_in = GetInPin(smart_tee, 0);
+   CComPtr<IPin> tee_in = getInPin(smart_tee, 0);
    CComPtr<IPin> tee_o1 = NULL;
    CComPtr<IPin> tee_o2 = NULL;
    smart_tee->FindPin(L"Preview", &tee_o1);
@@ -115,11 +192,7 @@ EncoderPtr DirectShowEncoder::init(const std::string& filename, const std::strin
    CHECK_RESULT(hr = mMediaController->Run(), "Failed to run DirectShow Error: ");
 
 #ifdef REGISTER_GRAPH
-   if (FAILED(AddGraphToRot(mGraphBuilder, &mGraphRegister)))
-   {
-      throw inf::Exception("Failed to register filter graph with ROT!", IOV_LOCATION);
-      mGraphRegister = 0;
-   }
+   mGraphRegister = addGraphToRot(mGraphBuilder);
 #endif
 
    return shared_from_this();
