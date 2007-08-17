@@ -1,3 +1,5 @@
+// Copyright (C) Infiscape Corporation 2005-2007
+
 #ifdef IOV_WITH_DIRECT_SHOW
 
 #ifndef _INF_DIRECT_SHOW_ENCODER_H_
