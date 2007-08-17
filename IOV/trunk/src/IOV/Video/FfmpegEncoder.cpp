@@ -254,17 +254,11 @@ EncoderPtr FfmpegEncoder::init()
    av_register_all();
 
    AVOutputFormat *out_fmt;
-   const char* last_name;
-   last_name = "000";
-   const char* fmt_name = NULL;
    Encoder::codec_list_t allowable_codecs;
-
    for( out_fmt = ::first_oformat; out_fmt != NULL; out_fmt = out_fmt->next )
    {
-     if( ( fmt_name == NULL || strcmp(out_fmt->name, fmt_name) < 0 ) &&
-	 ( strcmp(out_fmt->name, last_name) > 0 ) )
+      if(out_fmt->name != NULL)
       {
-	 fmt_name = out_fmt->name;
 	 if( out_fmt->video_codec != CODEC_ID_NONE )
 	 {
 	    allowable_codecs.clear();
@@ -284,14 +278,18 @@ EncoderPtr FfmpegEncoder::init()
 	    }
 
 	    Encoder::container_format_info_t new_format;
-
-	    new_format.mFormatName = std::string(fmt_name);
-	    new_format.mFormatLongName = std::string(out_fmt->long_name);
-
-	    std::string extensions(out_fmt->extensions);
-	    std::vector<std::string> extensions_vector;
-	    boost::algorithm::split( extensions_vector, extensions, boost::algorithm::is_any_of(","));
-	    new_format.mFileExtensions = extensions_vector;
+	    new_format.mFormatName = std::string(out_fmt->name);
+	    if( out_fmt->long_name != NULL )
+	    {
+	       new_format.mFormatLongName = std::string(out_fmt->long_name);
+	    }
+	    if( out_fmt->extensions != NULL )
+	    {
+	       std::string extensions(out_fmt->extensions);
+	       std::vector<std::string> extensions_vector;
+	       boost::algorithm::split( extensions_vector, extensions, boost::algorithm::is_any_of(","));
+	       new_format.mFileExtensions = extensions_vector;
+	    }
 
 	    // Keep only unique codec names
 	    Encoder::codec_list_t::iterator new_end = 
