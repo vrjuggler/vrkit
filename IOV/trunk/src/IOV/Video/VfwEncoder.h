@@ -24,28 +24,12 @@ public:
    /**
     * Takes care of creating the memory, streams, compression options etc. required for the movie
     */
-   virtual EncoderPtr init(const std::string& filename, const std::string& codec,
-                           const vpr::Uint32 width, const vpr::Uint32 height,
-                           const vpr::Uint32 framesPerSecond);
-   /**
-    * Takes care of releasing the memory and movie related handles
-    */
-   virtual void close();
+   virtual EncoderPtr init();
 
    /**
     * Sets the Error Message
     */
    void SetErrorMessage(LPCTSTR lpszErrMsg);
-
-   virtual vpr::Uint32 width() const
-   {
-      return mWidth;
-   }
-
-   virtual vpr::Uint32 height() const
-   {
-      return mHeight;
-   }
 
 protected:
    /**
@@ -75,12 +59,27 @@ public:
     */
    ~VfwEncoder();
 
+   /** @name Encoding interface. */
+   //@{
+   virtual void startEncoding();
+
+   /**
+    * Takes care of releasing the memory and movie related handles
+    */
+   virtual void stopEncoding();
+
    /**
     * Inserts the given bitmap bits into the movie as a new Frame at the end.
     * The width, height and bitsPerPixel are the width, height and bits per pixel
     * of the bitmap pointed to by the input pBits.
     */
-   void writeFrame(int width, int height, vpr::Uint8* data);
+   virtual void writeFrame(vpr::Uint8* data);
+
+   virtual OSG::Image::PixelFormat getPixelFormat()
+   {
+      return OSG::Image::OSG_BGR_PF;
+   }
+   //@}
 
    /**
     * Returns the last error message, if any.
@@ -94,7 +93,7 @@ public:
 
    static codec_list_t getCodecs();
 
-   static std::string getName()
+   static std::string getRealName()
    {
       return "VideoForWindowsEncoder";
    }
@@ -102,8 +101,6 @@ public:
 private:
    HDC                  mAviDC;
    vpr::Uint64          mFrameCount;	// Keeps track of the current Frame Index
-   vpr::Uint32          mWidth;
-   vpr::Uint32          mHeight;
    PAVIFILE             mAviFile;
    PAVISTREAM           mVideoStream;
    PAVISTREAM           mCompressedVideoStream;
@@ -111,7 +108,6 @@ private:
    AVISTREAMINFO        mStreamInfo;
    vpr::Uint32          mFrameRate;             /**< Frames Per Second Rate (FPS) */
    vpr::Uint32          mCodecId;         // Video Codec FourCC
-   std::string          mFilename; // Holds the Output Movie File Name
    TCHAR                mErrorMsg[MAX_PATH];   // Holds the Last Error Message, if any
 };
 

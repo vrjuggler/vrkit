@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <IOV/Video/VfwEncoder.h>
+#include <IOV/Util/Exceptions.h>
 
 #ifndef __countof
 #define __countof(x)	((sizeof(x)/sizeof(x[0])))
@@ -75,19 +76,31 @@ void buildAndThrowAviError(const vpr::Uint32 errCode)
    }
 }
 
-EncoderPtr VfwEncoder::init(const std::string& filename, const std::string& codec,
-                            const vpr::Uint32 width, const vpr::Uint32 height,
-                            const vpr::Uint32 framesPerSecond)
+EncoderPtr VfwEncoder::init()
 {
+   container_format_info_t format_info;
+   format_info.mFormatName = "AVI";
+   format_info.mFormatLongName = "Audio Video Interleave";
+   format_info.mFileExtensions.push_back("avi");
+   format_info.mCodecList = VfwEncoder::getCodecs();
+   format_info.mEncoderName = VfwEncoder::getRealName();
 
+   mContainerFormatInfoList.push_back(format_info);
+
+   return shared_from_this();
+}
+
+void VfwEncoder::startEncoding()
+{
    const vpr::Uint32 bitsPerPixel = 24;
    AVIFileInit();
-   mFilename = filename;
    int max_width = GetSystemMetrics(SM_CXSCREEN);
    int max_height = GetSystemMetrics(SM_CYSCREEN);
    //mCodecId = mmioFOURCC('M','P','G','2');
    //mCodecId = mmioFOURCC('X', 'V', 'I', 'D');
    //mCodecId = mmioFOURCC('M','P','G','4');
+   const std::string codec = getCodec();
+   vprASSERT(4 == codec.size() && "Video for Windows codecs must be 4 chars.");
    mCodecId = mmioFOURCC(codec[0], codec[1], codec[2], codec[3]);
    //to use IV50 codec etc...
    //mCodecId = mmioFOURCC('I','V','5','0');
@@ -101,19 +114,23 @@ EncoderPtr VfwEncoder::init(const std::string& filename, const std::string& code
       throw std::exception("Unable to create compatible DC");
    }
 
-   if(width > max_width)
+   if(getWidth() > max_width)
    {
-      max_width = width;
+      std::stringstream ss;
+      ss << "Can't encode at width: " << getWidth() << " max: " << max_width << std::endl;
+      throw inf::Exception(ss.str(), IOV_LOCATION);
    }
-   if(height > max_height)
+   if(getHeight() > max_height)
    {
-      max_height = height;
+      std::stringstream ss;
+      ss << "Can't encode at height: " << getHeight() << " max: " << max_width << std::endl;
+      throw inf::Exception(ss.str(), IOV_LOCATION);
    }
 
-   if(FAILED(AVIFileOpen(&mAviFile, mFilename.c_str(), OF_CREATE|OF_WRITE, NULL)))
+   if(FAILED(AVIFileOpen(&mAviFile, getFilename().c_str(), OF_CREATE|OF_WRITE, NULL)))
    {
       std::stringstream err_msg;
-      err_msg << "Unable to create movie file: " << mFilename;
+      err_msg << "Unable to create movie file: " << getFilename();
       throw std::exception(err_msg.str().c_str());
    }
 
@@ -121,10 +138,10 @@ EncoderPtr VfwEncoder::init(const std::string& filename, const std::string& code
    mStreamInfo.fccType = streamtypeVIDEO;
    mStreamInfo.fccHandler = mCodecId;
    mStreamInfo.dwScale = 1;
-   mStreamInfo.dwRate = framesPerSecond; // Frames Per Second;
+   mStreamInfo.dwRate = getFramesPerSecond(); // Frames Per Second;
    mStreamInfo.dwQuality = -1;				// Default Quality
-   mStreamInfo.dwSuggestedBufferSize = max_width*max_height*4;
-   SetRect(&mStreamInfo.rcFrame, 0, 0, width, height);
+   mStreamInfo.dwSuggestedBufferSize = getWidth() * getHeight() * 3;
+   SetRect(&mStreamInfo.rcFrame, 0, 0, getWidth(), getHeight());
    _tcscpy(mStreamInfo.szName, _T("Video Stream"));
 
    if(FAILED(AVIFileCreateStream(mAviFile,&mVideoStream,&mStreamInfo)))
@@ -164,14 +181,11 @@ EncoderPtr VfwEncoder::init(const std::string& filename, const std::string& code
       throw std::exception("Unable to create compressed stream: Check your codec options.");
    }
 
-   mWidth = width;
-   mHeight = height;
-
    BITMAPINFO bmpInfo;
    ZeroMemory(&bmpInfo,sizeof(BITMAPINFO));
    bmpInfo.bmiHeader.biPlanes = 1;
-   bmpInfo.bmiHeader.biWidth = width;
-   bmpInfo.bmiHeader.biHeight = height;
+   bmpInfo.bmiHeader.biWidth = getWidth();
+   bmpInfo.bmiHeader.biHeight = getHeight();
    bmpInfo.bmiHeader.biCompression = BI_RGB;
    bmpInfo.bmiHeader.biBitCount	= bitsPerPixel;
    bmpInfo.bmiHeader.biSize     = sizeof(BITMAPINFOHEADER);
@@ -187,17 +201,15 @@ EncoderPtr VfwEncoder::init(const std::string& filename, const std::string& code
       // or Choose a codec that is suitable for your bitmap.
       throw std::exception("Unable to set video stream format");
    }
-
-   return shared_from_this();
 }
 
 
 VfwEncoder::~VfwEncoder()
 {
-   close();
+   stopEncoding();
 }
 
-void VfwEncoder::close()
+void VfwEncoder::stopEncoding()
 {
    if(mAviDC)
    {
@@ -227,15 +239,15 @@ void VfwEncoder::SetErrorMessage(LPCTSTR lpszErrorMessage)
    _tcsncpy(mErrorMsg, lpszErrorMessage, __countof(mErrorMsg)-1);
 }
 
-void VfwEncoder::writeFrame(int width, int height, vpr::Uint8* data)
+void VfwEncoder::writeFrame(vpr::Uint8* data)
 {
    const int bitsPerPixel=24;
-   vpr::Uint32 dwSize = width * height * (bitsPerPixel/8);
+   vpr::Uint32 dwSize = getWidth() * getHeight() * (bitsPerPixel/8);
 
    if(FAILED(AVIStreamWrite(mCompressedVideoStream,mFrameCount++,1,data,dwSize,0,NULL,NULL)))
    {
       SetErrorMessage(_T("Unable to Write Video Stream to the output Movie File"));
-      close();
+      stopEncoding();
    }
 }
 
