@@ -433,6 +433,41 @@ void OpenSgViewer::init()
       //mVideoCamera->setFrameSize(1024, 768);
       //mVideoCamera->setStereo(true);
       inf::Encoder::container_format_list_t formats = mVideoCamera->getAvailableFormats();
+
+#if 1
+      // Debug code for printing out all choices. Should get relocated to Encoder?
+      std::cout << "Encoding Format Choices" << std::endl;
+      std::cout << formats.size() << " choices.." << std::endl;
+      std::cout << "-------------------------------------" << std::endl;
+      typedef inf::Encoder::container_format_list_t::const_iterator iter_type;
+      for(iter_type i = formats.begin(); i != formats.end(); ++i)
+      {
+	 std::cout << (*i).mFormatLongName << std::endl;
+	 std::cout << "  id         : " << (*i).mFormatName << std::endl;
+	 std::cout << "  encoder    : " << (*i).mEncoderName << std::endl;
+	 std::cout << "  codecs     :" << std::endl;
+	 if( 0 == (*i).mCodecList.size() )
+	 {
+	    std::cout << "               default" << std::endl;
+	 }
+	 else
+	 {
+	    for(inf::Encoder::codec_list_t::const_iterator j = (*i).mCodecList.begin();
+	        j != (*i).mCodecList.end(); ++j)
+	    {
+	       std::cout << "               " << (*j) << std::endl;
+	    }
+	 }
+	 std::cout << "  extensions :" << std::endl;
+	 for(std::vector<std::string>::const_iterator j = (*i).mFileExtensions.begin();
+	     j != (*i).mFileExtensions.end(); ++j)
+	 {
+	    std::cout << "               " << (*j) << std::endl;
+	 }
+      std::cout << "-------------------------------------" << std::endl;
+      }
+#endif
+
       inf::VideoEncoder::video_encoder_format_t config;
       //config.mEncoderName = "FFmpegEncoder";
       //config.mContainerFormat = "avi";
@@ -440,7 +475,7 @@ void OpenSgViewer::init()
       // XXX: How to pick defaults?
       config.mEncoderName = formats[0].mEncoderName;
       config.mContainerFormat = formats[0].mFormatName;
-      config.mCodec = formats[0].mCodecList[0];
+      config.mCodec = "";
       mVideoCamera->setFormat(config);
 
       mVideoCamera->startRecording();
