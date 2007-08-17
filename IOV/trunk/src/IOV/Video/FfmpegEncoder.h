@@ -74,7 +74,7 @@ protected:
       , mVideoOutBufferSize(0)
       , mFrameCount(0)
       , mFlipBeforeEncode(true)
-   {;}
+   {mName="FFmpegEncoder";}
 
 public:
    static EncoderPtr create();
@@ -84,33 +84,23 @@ public:
    /**
     * Initialize the video grabber.
     *
-    * @param filename Movie file to save data to.
     */
-   EncoderPtr init(const std::string& filename, const std::string& codec,
-                   const vpr::Uint32 width, const vpr::Uint32 height,
-                   const vpr::Uint32 framesPerSecond);
+   EncoderPtr init();
+
+   /**
+    * Open the video stream and start encoding.
+    */
+   virtual void startEncoding();
+
    /**
     * Close the video stream.
     */
-   virtual void close();
+   virtual void stopEncoding();
 
    /**
     * Encode a frame using the current RGB data.
     */
-   void writeFrame(int width, int height, vpr::Uint8* data);
-
-   virtual vpr::Uint32 width() const
-   { return mVideoStream->codec->width; }
-
-   virtual vpr::Uint32 height() const
-   { return mVideoStream->codec->height; }
-
-   static codec_list_t getCodecs();
-
-   static std::string getName()
-   {
-      return "FFmpegEncoder";
-   }
+   void writeFrame(vpr::Uint8* data);
 
 private:
    /**
@@ -121,8 +111,7 @@ private:
    /**
     * Add a video stream to the format context.
     */
-   void addVideoStream(const vpr::Uint32 width, const vpr::Uint32 height,
-                       const vpr::Uint32 fps, AVCodec* codec);
+   void addVideoStream(AVCodec* codec);
 
    /**
     * Add an audio stream to the format context.

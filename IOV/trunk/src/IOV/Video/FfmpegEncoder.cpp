@@ -38,6 +38,7 @@ EncoderPtr FfmpegEncoder::create()
    return EncoderPtr(new FfmpegEncoder);
 }
 
+#if 0
 FfmpegEncoder::codec_list_t FfmpegEncoder::getCodecs()
 {
    avcodec_register_all();
@@ -56,14 +57,15 @@ FfmpegEncoder::codec_list_t FfmpegEncoder::getCodecs()
 
    return codecs;
 }
+#endif
 
 
 FfmpegEncoder::~FfmpegEncoder()
 {
-   close();
+   stopEncoding();
 }
 
-void FfmpegEncoder::close()
+void FfmpegEncoder::stopEncoding()
 {
    // Close each codec.
    if (NULL != mVideoStream)
@@ -243,12 +245,16 @@ static void show_formats(void)
     printf("\n");
 }
 
-EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& codecName,
-                               const vpr::Uint32 width, const vpr::Uint32 height,
-                               const vpr::Uint32 framesPerSecond)
+EncoderPtr FfmpegEncoder::init()
 {
-   std::cout << "Creating a encoder. file: " << filename
-      << " w: " << width << " h: " << height << std::endl;
+
+   return shared_from_this();
+}
+
+void FfmpegEncoder::startEncoding()
+{
+   std::cout << "Creating a encoder. file: " << getFilename()
+      << " w: " << getWidth() << " h: " << getHeight() << std::endl;
    try
    {
       const vpr::Uint32 bitrate = 1400;
@@ -260,8 +266,8 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       // XXX: Debug code to output all valid formats & codecs.
       show_formats();
       
-      std::cout << "Trying to guess container format from filename: " << filename << std::endl;
-      mFormatOut = guess_format(NULL, filename.c_str(), NULL);
+      std::cout << "Trying to guess container format from filename: " << getFilename() << std::endl;
+      mFormatOut = guess_format(NULL, getFilename().c_str(), NULL);
 
       // If we can't guess the format from the filename, fallback on mpeg.
       if (NULL == mFormatOut)
@@ -284,7 +290,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       }
       mFormatContext->oformat = mFormatOut;
       mFormatContext->max_delay = (int)(0.7 * AV_TIME_BASE);
-      snprintf(mFormatContext->filename, sizeof(mFormatContext->filename), "%s", filename.c_str());
+      snprintf(mFormatContext->filename, sizeof(mFormatContext->filename), "%s", getFilename().c_str());
 
       // Add the audio and video streams using the default format codecs
       // and initialize the codecs.
@@ -293,7 +299,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
          throw inf::Exception("File format does not support video codec.", IOV_LOCATION);
       }
 
-      AVCodec* codec = avcodec_find_encoder_by_name(codecName.c_str());
+      AVCodec* codec = avcodec_find_encoder_by_name(getCodec().c_str());
 
       // Fall back to using the containers default format
       if( NULL == codec )
@@ -306,7 +312,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
          throw VideoFfmpegEncoderException("Couldn't find video encoder.");
       }
 
-      addVideoStream(width, height, framesPerSecond, codec);
+      addVideoStream(codec);
 
       // XXX:Don't add audio for now,
       /*
@@ -323,7 +329,7 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
          throw VideoFfmpegEncoderException("Invalid output format parameters.");
       }
 
-      dump_format(mFormatContext, 0, filename.c_str(), 1);
+      dump_format(mFormatContext, 0, getFilename().c_str(), 1);
 
       // Now that all the parameters are set, we can open the audio and
       // video codecs and allocate the necessary encode buffers.
@@ -343,9 +349,9 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       // Open the output file, if needed.
       if (!(mFormatOut->flags & AVFMT_NOFILE))
       {
-         if (url_fopen(&mFormatContext->pb, filename.c_str(), URL_WRONLY) < 0)
+         if (url_fopen(&mFormatContext->pb, getFilename().c_str(), URL_WRONLY) < 0)
          {
-            std::string err = "Could not open" + filename;
+            std::string err = "Could not open" + getFilename();
             throw VideoFfmpegEncoderException(err);
          }
       }
@@ -362,7 +368,6 @@ EncoderPtr FfmpegEncoder::init(const std::string& filename, const std::string& c
       throw;
    }
 
-   return shared_from_this();
 }
 
 // Add an audio output stream
@@ -385,9 +390,12 @@ void FfmpegEncoder::addAudioStream()
 }
 
 // Add a video output stream
-void FfmpegEncoder::addVideoStream(const vpr::Uint32 width, const vpr::Uint32 height,
-                                   const vpr::Uint32 fps, AVCodec* codec)
+void FfmpegEncoder::addVideoStream(AVCodec* codec)
 {
+   vpr::Uint32 width = getWidth();
+   vpr::Uint32 height = getHeight();
+   vpr::Uint32 fps = getFramesPerSecond();
+
    // Create a new video stream to write data to.
    mVideoStream = av_new_stream(mFormatContext, 0);
    if (NULL == mVideoStream)
@@ -459,7 +467,7 @@ void FfmpegEncoder::openVideo(AVCodec* codec)
       // as long as they're aligned enough for the architecture, and
       // they're freed appropriately (such as using av_free for buffers
       // allocated with av_malloc)
-      mVideoOutBufferSize = width() * height();
+      mVideoOutBufferSize = getWidth() * getHeight();
       mVideoOutBuffer= (unsigned char*)av_malloc(mVideoOutBufferSize);
    }
 
@@ -582,7 +590,7 @@ AVFrame* FfmpegEncoder::allocFrame(int pixFormat, int width, int height)
    return picture;
 }
 
-void FfmpegEncoder::writeFrame(int width, int height, vpr::Uint8* data)
+void FfmpegEncoder::writeFrame(vpr::Uint8* data)
 {
    double audio_pts, video_pts = 0.0;
 
@@ -611,7 +619,7 @@ void FfmpegEncoder::writeFrame(int width, int height, vpr::Uint8* data)
       return;
    }
 
-   avpicture_fill((AVPicture*)mRgbFrame, data, PIX_FMT_RGB24, width, height);
+   avpicture_fill((AVPicture*)mRgbFrame, data, PIX_FMT_RGB24, getWidth(), getHeight());
 
    // convert rgb to yuv420
    img_convert( (AVPicture*)(mYuvFrame), mVideoStream->codec->pix_fmt,
