@@ -5,8 +5,6 @@
 #include <algorithm>
 
 #include <vpr/Util/Assert.h>
-#include <IOV/Util/Exceptions.h>
-#include <IOV/Video/DirectShowSource.h>
 
 #if defined(IOV_DEBUG) && defined(_DEBUG)
 #   define DS_LIB_RT_OPT "d"
@@ -23,6 +21,8 @@
 
 #include <ObjBase.h>
 #include <InitGuid.h>
+
+#include <IOV/Video/DirectShowSource.h>
 
 // {930C2C1F-A305-44fc-8D1C-99815D89D7C8}
 DEFINE_GUID(CLSID_ByteSource, 

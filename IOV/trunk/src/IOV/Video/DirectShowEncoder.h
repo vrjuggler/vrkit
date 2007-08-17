@@ -7,38 +7,23 @@
 
 #include <IOV/Config.h>
 
+#include <atlbase.h>
+#include <strmif.h>     /* For IBaseFilter */
+#include <control.h>    /* For IMediaControl */
 #include <string>
+#include <vector>
 #include <vpr/vprTypes.h>
 
 #include <IOV/Video/Encoder.h>
-
-#include <atlbase.h>
-
-
-#include <strsafe.h>
-#include <dshow.h>
-#include <mtype.h>
-#include <wxdebug.h>
-#include <reftime.h>
-#include <atlstr.h>
-
-// CUnknown
-#include <combase.h>
-// For AutoLock
-#include <wxutil.h>
-#include <wxlist.h>
-#include <amfilter.h>
-
-#include <vector>
-#include <algorithm>
-
-#include <IOV/Video/DirectShowSource.h>
 
 // Register the graph so that we can look at it in graphedt.
 #define REGISTER_GRAPH
 
 namespace inf
 {
+
+class ByteSource;
+class ByteStream;
 
 class DirectShowEncoder : public Encoder
 {

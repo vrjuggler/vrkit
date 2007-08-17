@@ -2,11 +2,15 @@
 
 #ifdef IOV_WITH_DIRECT_SHOW
 
-#include <sstream>
-#include <IOV/Util/Exceptions.h>
-#include <IOV/Video/DirectShowEncoder.h>
-
 #include <comdef.h>
+#include <algorithm>
+#include <sstream>
+
+#include <vpr/Util/Assert.h>
+
+#include <IOV/Util/Exceptions.h>
+#include <IOV/Video/DirectShowSource.h>
+#include <IOV/Video/DirectShowEncoder.h>
 
 #define PREVIEW
 
@@ -254,7 +258,7 @@ void DirectShowEncoder::setAviOptions(IBaseFilter *ppf, InterleavingMode INTERLE
    CComPtr<IConfigAviMux>        avi_mux           = NULL;
    CComPtr<IConfigInterleaving>  interleaving  = NULL;
 
-   ASSERT(ppf);
+   vprASSERT(ppf);
    if (!ppf)
    {
       throw inf::Exception("Can't have NULL AVI Mux.", IOV_LOCATION);

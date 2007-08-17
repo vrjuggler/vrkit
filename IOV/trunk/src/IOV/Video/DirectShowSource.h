@@ -7,33 +7,20 @@
 
 #include <IOV/Config.h>
 
-//#include <streams.h>
-//#include <source.h>
-//#include <iostream>
-
-//#define DEBUG
-
 #include <atlbase.h>
-
-
-#include <strsafe.h>
-#include <dshow.h>
-#include <mtype.h>
-#include <wxdebug.h>
-#include <reftime.h>
-//#pragma comment(lib, "ole32.lib")
-#include <atlstr.h>
-
+#include <strmif.h>     /* Must be included before combase.h */
+#include <streams.h>    /* Ditto */
 // CUnknown
-#include <combase.h>
-// For AutoLock
-#include <wxutil.h>
-#include <wxlist.h>
-#include <amfilter.h>
+#include <combase.h>    /* Must be included before amfilter.h */
+#include <amfilter.h>   /* For DirectShow Base Classes types */
+
+#include <sstream>
+#include <vector>
+#include <typeinfo>
 
 #include <vpr/vprTypes.h>
 
-#include <vector>
+#include <IOV/Util/Exceptions.h>
 
 
 namespace inf
