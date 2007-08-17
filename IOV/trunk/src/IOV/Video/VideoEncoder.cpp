@@ -144,6 +144,8 @@ void VideoEncoder::record()
    // Fill in the image.
    mImage->set(mImage->getPixelFormat(), image_width, image_height);
 
+   mEncoder->startEncoding();
+
    mRecording = true;
 }
 
@@ -178,7 +180,7 @@ void VideoEncoder::setFilename(const std::string& filename)
    mFilename = filename;
 }
 
-void VideoEncoder::setFormat(const video_encoder_format_t format)
+void VideoEncoder::setFormat(const video_encoder_format_t& format)
 {
    mVideoEncoderParams = format;
 }

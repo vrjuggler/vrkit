@@ -96,7 +96,7 @@ public:
       std::string	mCodec;
    };
 
-   void setFormat(const video_encoder_format_t format);
+   void setFormat(const video_encoder_format_t& format);
 
 private:
    typedef std::map<std::string, EncoderPtr> encoder_map_t;
