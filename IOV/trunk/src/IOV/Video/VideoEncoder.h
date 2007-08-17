@@ -71,21 +71,17 @@ public:
       return mRecording;
    }
 
-#if 0
    /**
-    * Returns the current set of available codes.
+    * Returns the current set of available container formats
+    * with their supported codecs.
     *
-    * @since 0.42.1
     */
-   const std::set<std::string>& getAvailableCodecs() const
+   const Encoder::container_format_list_t& getAvailableFormats() const
    {
-      return mCodecSet;
+      return mVideoEncoderFormatList;
    }
-#endif
 
    void setFilename(const std::string& filename);
-
-   void setCodec(const std::string& codec);
 
    void setStereo(bool isStereo);
 
@@ -93,12 +89,14 @@ public:
 
    void setFramesPerSecond(OSG::UInt32 fps);
 
-   struct video_encoder_params_t
+   struct video_encoder_format_t
    {
       std::string	mEncoderName;
       std::string	mContainerFormat;
       std::string	mCodec;
    };
+
+   void setFormat(const video_encoder_format_t format);
 
 private:
    typedef std::map<std::string, EncoderPtr> encoder_map_t;
@@ -107,14 +105,13 @@ private:
    OSG::ImagePtr        mImage;		/**< Image to hold the pixel data while encoding. */
    bool                 mStereo;
    std::string		mFilename;
-   std::string		mCodec;
    OSG::UInt32		mFps;
    OSG::UInt32		mWidth;
    OSG::UInt32		mHeight;
    EncoderPtr           mEncoder;       /**< Encoder that can write encode and write movie. */
 
    encoder_map_t			mEncoderMap;
-   video_encoder_params_t		mVideoEncoderParams;
+   video_encoder_format_t		mVideoEncoderParams;
    Encoder::container_format_list_t	mVideoEncoderFormatList;
 };
 

@@ -113,19 +113,21 @@ void VideoEncoder::record()
       mEncoder->stopEncoding();
    }
 
-#if 0
-   // Get the first encoder.
-   std::string encoder_name = (*found).second[0];
-   vprASSERT(mCreatorMap.count(encoder_name) > 0 && "Must have the encoder.");
-   // Create new encoder.
-   encoder_create_t creator = mCreatorMap[encoder_name];
-   mEncoder = creator()->init(mFilename, mCodec, image_width, image_height, mFps);
-#endif
-   // XXX check out vals
+   vprASSERT(mEncoderMap.count(mVideoEncoderParams.mEncoderName) > 0 && "Must have the encoder.");
+
    encoder_map_t::const_iterator vid_encoder = mEncoderMap.find(mVideoEncoderParams.mEncoderName);
    mEncoder = (*vid_encoder).second;
 
-   //XXX set video encoder params
+   Encoder::encoder_parameters_t encoder_params;
+   encoder_params.mContainerFormat = mVideoEncoderParams.mContainerFormat;
+   encoder_params.mCodec = mVideoEncoderParams.mCodec;
+   encoder_params.mFilename = mFilename;
+   encoder_params.mWidth = image_width;
+   encoder_params.mHeight = image_height;
+   encoder_params.mFramesPerSecond = mFps;
+
+   mEncoder->setEncodingParameters(encoder_params);
+
 
    // Create the image to store the pixel data in.
    mImage = OSG::Image::create();
@@ -177,9 +179,9 @@ void VideoEncoder::setFilename(const std::string& filename)
    mFilename = filename;
 }
 
-void VideoEncoder::setCodec(const std::string& codec)
+void VideoEncoder::setFormat(const video_encoder_format_t format)
 {
-   mCodec = codec;
+   mVideoEncoderParams = format;
 }
 
 void VideoEncoder::setSize(OSG::UInt32 width, OSG::UInt32 height)
