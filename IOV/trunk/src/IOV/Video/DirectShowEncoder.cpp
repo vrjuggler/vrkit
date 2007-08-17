@@ -105,6 +105,13 @@ DirectShowEncoder::DirectShowEncoder()
    , mGraphRegister(0)
 #endif
 {
+   mName = DirectShowEncoder::getRealName();
+
+   // Initialize COM
+   if(FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED)))
+   {
+      throw inf::Exception("Could not initialize COM", IOV_LOCATION);
+   }
 }
 
 EncoderPtr DirectShowEncoder::create()
@@ -114,11 +121,25 @@ EncoderPtr DirectShowEncoder::create()
 
 DirectShowEncoder::~DirectShowEncoder()
 {
+   // XXX: Finished with COM
+   CoUninitialize();
 }
 
-EncoderPtr DirectShowEncoder::init(const std::string& filename, const std::string& codec,
-                                   const vpr::Uint32 width, const vpr::Uint32 height,
-                                   const vpr::Uint32 framesPerSecond)
+EncoderPtr DirectShowEncoder::init()
+{
+   container_format_info_t format_info;
+   format_info.mFormatName = "AVI";
+   format_info.mFormatLongName = "Audio Video Interleave";
+   format_info.mFileExtensions.push_back("avi");
+   format_info.mCodecList = DirectShowEncoder::getCodecs();
+   format_info.mEncoderName = DirectShowEncoder::getRealName();
+
+   mContainerFormatInfoList.push_back(format_info);
+
+   return shared_from_this();
+}
+
+void DirectShowEncoder::startEncoding()
 {
    HRESULT hr;
 
@@ -133,7 +154,7 @@ EncoderPtr DirectShowEncoder::init(const std::string& filename, const std::strin
    mByteSource->AddRef();
 
    // Create ByteStream to capture OpenGL.
-   mByteStream = ByteStream::create(mByteSource, width, height);
+   mByteStream = ByteStream::create(mByteSource, getWidth(), getHeight());
    mByteStream->AddRef();
    mByteSource->addPin(mByteStream);
 
@@ -149,7 +170,7 @@ EncoderPtr DirectShowEncoder::init(const std::string& filename, const std::strin
 
    CComPtr<IBaseFilter> avi_mux = NULL;
    // Use the help of CaptureGraph to build everything we need to write to the given file.
-   hr = capture_graph->SetOutputFileName(&MEDIASUBTYPE_Avi, _bstr_t(filename.c_str()), &avi_mux, NULL);
+   hr = capture_graph->SetOutputFileName(&MEDIASUBTYPE_Avi, _bstr_t(getFilename().c_str()), &avi_mux, NULL);
    setAviOptions(avi_mux, INTERLEAVE_NONE);
 
 #ifdef PREVIEW
@@ -194,13 +215,34 @@ EncoderPtr DirectShowEncoder::init(const std::string& filename, const std::strin
 #ifdef REGISTER_GRAPH
    mGraphRegister = addGraphToRot(mGraphBuilder);
 #endif
-
-   return shared_from_this();
 }
 
-void DirectShowEncoder::writeFrame(int width, int height, vpr::Uint8* data)
+void DirectShowEncoder::stopEncoding()
 {
-   mByteStream->grabFrame(width, height, data);
+   CHECK_RESULT(mMediaController->StopWhenReady(), "Failed to stop direct show.");
+
+#ifdef REGISTER_GRAPH
+   if (mGraphRegister)
+   {
+      RemoveGraphFromRot(mGraphRegister);
+      mGraphRegister = 0;
+   }
+#endif
+
+   // Clean up member data we don't need anymore.
+   mGraphBuilder = NULL;
+   mMediaController = NULL;
+
+   // Clean up our filter and source pin.
+   mByteSource->Release();
+   mByteSource = NULL;
+   mByteStream->Release();
+   mByteStream = NULL;
+}
+
+void DirectShowEncoder::writeFrame(vpr::Uint8* data)
+{
+   mByteStream->grabFrame(getWidth(), getHeight(), data);
 }
 
 #define PREVIEW
@@ -262,27 +304,8 @@ DirectShowEncoder::moniker_list_t DirectShowEncoder::getVideoMonikers()
    return monikers;
 }
 
-struct ComInit
-{
-   ComInit()
-   {
-      // Initialize COM
-      if(FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED)))
-      {
-         throw inf::Exception("Could not initialize COM", IOV_LOCATION);
-      }
-   }
-   ~ComInit()
-   {
-      // XXX: Finished with COM
-      CoUninitialize();
-   }
-};
-
 DirectShowEncoder::codec_list_t DirectShowEncoder::getCodecs()
 {
-   static ComInit com_init_hack;
-
    // Get a list of all video monikers so that we can grab the codec names.
    moniker_list_t monikers = getVideoMonikers();
    codec_list_t encoder_names;
@@ -362,25 +385,6 @@ CComPtr<IBaseFilter> DirectShowEncoder::getEncoder(const std::string name)
    }
    CComPtr<IBaseFilter> filter = NULL;
    return filter;
-}
-
-void DirectShowEncoder::close()
-{
-   CHECK_RESULT(mMediaController->StopWhenReady(), "Failed to stop direct show.");
-
-#ifdef REGISTER_GRAPH
-   if (mGraphRegister)
-   {
-      RemoveGraphFromRot(mGraphRegister);
-      mGraphRegister = 0;
-   }
-#endif
-
-   // Clean up our filter and source pin.
-   mByteSource->Release();
-   mByteSource = NULL;
-   mByteStream->Release();
-   mByteStream = NULL;
 }
 
 }

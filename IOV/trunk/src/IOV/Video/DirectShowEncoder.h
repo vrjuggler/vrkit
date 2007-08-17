@@ -56,13 +56,7 @@ public:
    /**
     * Takes care of creating the memory, streams, compression options etc. required for the movie
     */
-   virtual EncoderPtr init(const std::string& filename, const std::string& codec,
-                           const vpr::Uint32 width, const vpr::Uint32 height,
-                           const vpr::Uint32 framesPerSecond);
-   /**
-    * Takes care of releasing the memory and movie related handles
-    */
-   virtual void close();
+   virtual EncoderPtr init();
 
    virtual vpr::Uint32 width() const
    {
@@ -74,19 +68,34 @@ public:
       return mHeight;
    }
 
+   /** @name Encoding interface. */
+   //@{
+   virtual void startEncoding();
+
+   /**
+    * Takes care of releasing the memory and movie related handles
+    */
+   virtual void stopEncoding();
+
    /**
     * Inserts the given bitmap bits into the movie as a new Frame at the end.
     * The width, height and bitsPerPixel are the width, height and bits per pixel
     * of the bitmap pointed to by the input pBits.
     */
-   void writeFrame(int width, int height, vpr::Uint8* data);
+   virtual void writeFrame(vpr::Uint8* data);
+
+   virtual OSG::Image::PixelFormat getPixelFormat()
+   {
+      return OSG::Image::OSG_BGR_PF;
+   }
+   //@}
 
    /**
     * Return a list of valid codecs.
     */
    static codec_list_t getCodecs();
 
-   static std::string getName()
+   static std::string getRealName()
    {
       return "DirectShow Encoder";
    }
