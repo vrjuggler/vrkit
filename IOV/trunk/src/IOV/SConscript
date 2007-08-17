@@ -20,6 +20,7 @@ if ffmpeg_options.isAvailable():
 
 if "win32" == platform:
    env.Append(CPPDEFINES = ['IOV_WITH_VFW',])
+
    # Add ATL paths to build.
    vc_inst_dir = env['MSVS']['VCINSTALLDIR']
    env.Append(CPPPATH = [pj(vc_inst_dir, 'atlmfc', 'include'),],
@@ -34,8 +35,6 @@ if "win32" == platform:
       env.Append(CPPDEFINES = ['IOV_WITH_DIRECT_SHOW',])
       env.AppendUnique(CPPPATH=[bc_path,],
                        LIBPATH=[pj(bc_path,'WIN2000_RETAIL'),])
-
-      env.AppendUnique(LINKFLAGS=['/nodefaultlib:libcmt'])
 
 header_path = pj(inst_paths['include'],'IOV')
 

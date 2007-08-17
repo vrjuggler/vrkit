@@ -8,11 +8,15 @@
 
 #if defined(IOV_DEBUG) && defined(_DEBUG)
 #   define DS_LIB_RT_OPT "d"
+#   define CMT_RT_OPT "d"
 #else
 #   define DS_LIB_RT_OPT "e"
+#   define CMT_RT_OPT ""
 #endif
 
 #pragma comment(lib, "strmbas" DS_LIB_RT_OPT ".lib")
+#pragma comment(linker, "/nodefaultlib:libcmt" CMT_RT_OPT)
+
 #undef DS_LIB_RT_OPT
 
 #include <ObjBase.h>
