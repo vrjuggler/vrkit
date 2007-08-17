@@ -35,7 +35,7 @@ public:
 
    CameraPtr init();
 
-   void setSize(osg::UInt32, osg::UInt32);
+   void setSize(const osg::UInt32 width, const osg::UInt32 height);
 
    void setSceneRoot(OSG::NodePtr root);
 
