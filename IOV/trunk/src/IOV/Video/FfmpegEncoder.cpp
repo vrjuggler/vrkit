@@ -247,7 +247,7 @@ static void show_formats(void)
 
 EncoderPtr FfmpegEncoder::init()
 {
-
+   //XXX: Make the list of supported formats
    return shared_from_this();
 }
 
@@ -265,9 +265,17 @@ void FfmpegEncoder::startEncoding()
 
       // XXX: Debug code to output all valid formats & codecs.
       show_formats();
-      
-      std::cout << "Trying to guess container format from filename: " << getFilename() << std::endl;
-      mFormatOut = guess_format(NULL, getFilename().c_str(), NULL);
+
+      if( getContainerFormat() != "" )
+      {
+         mFormatOut = guess_format(getContainerFormat().c_str(), NULL, NULL);
+      }
+      if (NULL == mFormatOut)
+      {
+	 std::cout << "Container format invalid or not specified. Falling back to..." << std::endl;
+	 std::cout << "Trying to guess container format from filename: " << getFilename() << std::endl;
+	 mFormatOut = guess_format(NULL, getFilename().c_str(), NULL);
+      }
 
       // If we can't guess the format from the filename, fallback on mpeg.
       if (NULL == mFormatOut)
@@ -304,6 +312,7 @@ void FfmpegEncoder::startEncoding()
       // Fall back to using the containers default format
       if( NULL == codec )
       {
+	 std::cout << "Invalid codec specified for this container. Falling back to default." << std::endl;
 	 codec = avcodec_find_encoder(mFormatOut->video_codec);
       }
 
