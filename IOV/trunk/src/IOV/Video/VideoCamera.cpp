@@ -102,7 +102,9 @@ void VideoCamera::setCodec(const std::string& codec)
 
 const std::set<std::string>& VideoCamera::getAvailableCodecs() const
 {
-   return mVideoEncoder->getAvailableCodecs();
+   //return mVideoEncoder->getAvailableCodecs();
+   std::set<std::string> s;
+   return s;
 }
 
 
