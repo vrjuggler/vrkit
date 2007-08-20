@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-18 dshipton Further refactoring of the video capture interfaces.
+                    -- VERSION -- 0.44.0
+2007-08-17 aronb    Added support for OpenGL video caputre using DirectShow.
 2007-08-14 dshipton Refactored video classes into distinct pieces. VideoCamera
                     is the main class that users manipulate.
                     -- VERSION -- 0.43.0
