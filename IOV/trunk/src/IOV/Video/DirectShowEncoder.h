@@ -25,6 +25,13 @@ namespace inf
 class ByteSource;
 class ByteStream;
 
+/**
+ * Video encoder implementation for DirectShow. This class provides the link
+ * between OpenGL and DirectShow so that the OpenGL frame buffer can be used
+ * as input for a DirectShow filter graph.
+ *
+ * @since 0.44
+ */
 class DirectShowEncoder : public Encoder
 {
 public:

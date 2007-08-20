@@ -26,6 +26,26 @@
 namespace inf
 {
 
+/**
+ * Creates an instance of a COM interface type, provided as the template
+ * parameter.
+ *
+ * @param classID      The class identifier associated with the information
+ *                     that will be used to create the object.
+ * @param owner        The owner of the object to be created if it is to be
+ *                     created as part of an aggregate. Pass NULL to indicate
+ *                     that the object is not part of an aggregate.
+ * @param classContext The context in which the code creating the instance
+ *                     will run. Values come from the CLSCTX enumeration.
+ * @param iid          The interface identifier for the object to be created.
+ *
+ * @reutrn A newly created instance of \p IType is returned to the caller.
+ *
+ * @throw inf::Exception Thrown if an instance of the identified interface
+ *                       cannot be constructed.
+ *
+ * @since 0.44
+ */
 template<typename IType>
 CComPtr<IType> make(REFCLSID classID, LPUNKNOWN owner,
                     const DWORD classContext, REFIID iid)
@@ -42,6 +62,21 @@ CComPtr<IType> make(REFCLSID classID, LPUNKNOWN owner,
    return obj;
 }
 
+/**
+ * Queries the interface of the given object to provide an alternate means for
+ * communicating with it. The returned object implements the interface being
+ * queried.
+ *
+ * @param obj The object whose interfaces will be queried.
+ * @param iid The identifer of the interface being requested from \p obj.
+ *
+ * @return A COM pointer implementing \p IType is returned to the caller.
+ *
+ * @throw inf::Exception Thrown if the desired interface is not supported by
+ *                       \p obj.
+ *
+ * @since 0.44
+ */
 template<typename IType, typename CType>
 CComPtr<IType> query(CComPtr<CType> obj, REFIID iid)
 {
@@ -49,23 +84,78 @@ CComPtr<IType> query(CComPtr<CType> obj, REFIID iid)
    if ( FAILED(obj->QueryInterface(iid, reinterpret_cast<void**>(&inf))) )
    {
       std::ostringstream msg_stream;
-      msg_stream << "Failed to query interface "
-                 << typeid(IType).name();
+      msg_stream << "Failed to query interface " << typeid(IType).name();
       throw inf::Exception(msg_stream.str(), IOV_LOCATION);
    }
 
    return inf;
 }
 
+/**
+ * @name Helper Macros
+ *
+ * These macros provide simpler access to inf::make<T>(), inf::query<T>(), and
+ * common operations performed in Windows programming.
+ *
+ * @since 0.44
+ */
+//@{
+/**
+ * Creates an instance of the given abstract type. The abstract type is passed
+ * in as the first parameter to the macro. This type has corresponding class
+ * and interface identifiers. For example, consider the interface
+ * \c ISomeInterface with class ID \c CLSID_SomeInterface and interface ID
+ * \c IID_ISomeInterface. This macro is then used as follows:
+ *
+ * \code
+ * CComPtr<ISomeInterface> obj = createAbstract(SomeInterface, NULL,
+ *                                              CLSCTX_INPROC_SERVER);
+ * \endcode
+ *
+ * @see inf::make<T>()
+ */
 #define createAbstract(type, owner, classContext) \
    (make<I ## type>(CLSID_ ## type, owner, classContext, IID_I ## type))
 
+/**
+ * Creates an instance of a concrete implementation of an interface. The base
+ * interface type is passed in as the first parameter to the macro, and the
+ * concrete implementation type is passed in as the second. The interface type
+ * has an interface identifer, and the concrete type has a class identifier.
+ * For example, consider the interface \c ISomeInterface implemented by a
+ * class \c CMyClass. The interface has the ID \c IID_ISomeInterface, and the
+ * implementation has the class ID \c CLSID_CMyClass. This macro is then used
+ * as follows:
+ *
+ * \code
+ * CComPtr<ISomeInterface> obj = createConcrete(SomeInterface, CMyClass, NULL,
+ *                                              CLSCTX_INPROC_SERVER);
+ * \endcode
+ *
+ * @see inf::make<T>()
+ */
 #define createConcrete(ifType, classType, owner, classContext) \
    (make<ifType>(CLSID_ ## classType, owner, classContext, IID_ ## ifType))
 
+/**
+ * Wraps a call to inf::query<T>() by filling in the template parameter and
+ * the interface identifier for the abstract interface. The abstract type is
+ * passed in as the first parameter to the macro. For example, consider the
+ * interface \c ISomeInterface with class ID interface ID
+ * \c IID_ISomeInterface. This macro is then used as follows:
+ *
+ * \code
+ * CComPtr<ISomeInterface> obj2 = query(obj1, SomeInterface);
+ * \endcode
+ *
+ * @see inf::query<T>()
+ */
 #define query(obj, ifType) \
    (query<ifType>(obj, IID_ ## ifType))
 
+/**
+ * Translates the use of FAILED() into an inf::Exception.
+ */
 #define CHECK_RESULT(op, msg)                   \
    if ( FAILED(op) )                            \
    {                                            \
@@ -75,10 +165,17 @@ CComPtr<IType> query(CComPtr<CType> obj, REFIID iid)
 #define RETURN_FAILED(op)       \
    if (FAILED(hr = op))         \
    { return hr; }
+//@}
 
 typedef CComPtr<class ByteSource> ByteSourcePtr;
 typedef CComPtr<class ByteStream> ByteStreamPtr;
 
+/**
+ * Provides a filter accepting an array of bytes as input to a DirectShow
+ * filter graph.
+ *
+ * @since 0.44
+ */
 class ByteSource : public CBaseFilter
 {
 protected:
@@ -141,6 +238,13 @@ private:
    CCritSec             mLock;          /**< Critical section lock. */
 };
 
+/**
+ * Provides an output pin for inf::ByteSource. This is where the work of
+ * translating the array of bytes (typically from an OpenGL frame buffer) is
+ * done.
+ *
+ * @since 0.44
+ */
 class ByteStream : public CBaseOutputPin
 {
 protected:
