@@ -52,16 +52,6 @@ public:
     */
    virtual EncoderPtr init();
 
-   virtual vpr::Uint32 width() const
-   {
-      return mWidth;
-   }
-
-   virtual vpr::Uint32 height() const
-   {
-      return mHeight;
-   }
-
    /** @name Encoding interface. */
    //@{
    virtual void startEncoding();
@@ -104,9 +94,6 @@ protected:
    void setAviOptions(IBaseFilter *ppf, InterleavingMode INTERLEAVE_MODE);
 
 private:
-   vpr::Uint32          mWidth;
-   vpr::Uint32          mHeight;
-
    CComPtr<IGraphBuilder> mGraphBuilder;
    CComPtr<IMediaControl> mMediaController;
    ByteSource* mByteSource;

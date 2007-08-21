@@ -104,9 +104,7 @@ void RemoveGraphFromRot(DWORD regId)
 }
 
 DirectShowEncoder::DirectShowEncoder()
-   : mWidth(512)
-   , mHeight(512)
-   , mGraphBuilder(NULL)
+   : mGraphBuilder(NULL)
    , mMediaController(NULL)
    , mByteSource(NULL)
    , mByteStream(NULL)
