@@ -69,13 +69,15 @@ public:
 
 protected:
 
-   /* Helper functions into the encoder param struct.*/
-   std::string getContainerFormat() const;
-   std::string getCodec() const;
+   /** Helper functions into the encoder param struct. */
+   //@{
+   const std::string& getContainerFormat() const;
+   const std::string& getCodec() const;
    vpr::Uint32 getWidth() const;
    vpr::Uint32 getHeight() const;
-   std::string getFilename() const;
+   const std::string& getFilename() const;
    vpr::Uint32 getFramesPerSecond() const;
+   //}
 
    encoder_parameters_t         mEncoderParams;
    container_format_list_t      mContainerFormatInfoList;

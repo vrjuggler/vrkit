@@ -31,12 +31,12 @@ OSG::Image::PixelFormat Encoder::getPixelFormat() const
    return OSG::Image::OSG_RGB_PF;
 }
 
-std::string Encoder::getContainerFormat() const
+const std::string& Encoder::getContainerFormat() const
 {
    return mEncoderParams.mContainerFormat;
 }
 
-std::string Encoder::getCodec() const
+const std::string& Encoder::getCodec() const
 {
    return mEncoderParams.mCodec;
 }
@@ -51,7 +51,7 @@ vpr::Uint32 Encoder::getHeight() const
    return mEncoderParams.mHeight;
 }
 
-std::string Encoder::getFilename() const
+const std::string& Encoder::getFilename() const
 {
    return mEncoderParams.mFilename;
 }
