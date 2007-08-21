@@ -81,7 +81,8 @@ private:
    /**
     * Allocate a new movie frame.
     */
-   AVFrame* allocFrame(int pixFormat, int width, int height);
+   AVFrame* allocFrame(const int pixFormat, const int width,
+                       const int height);
 
    /**
     * Add a video stream to the format context.

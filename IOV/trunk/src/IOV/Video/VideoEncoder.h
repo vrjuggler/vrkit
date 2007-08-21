@@ -66,7 +66,7 @@ public:
    /**
     * Returns if we are recording.
     */
-   bool isRecording()
+   bool isRecording() const
    {
       return mRecording;
    }
@@ -85,7 +85,7 @@ public:
 
    void setStereo(bool isStereo);
 
-   void setSize(OSG::UInt32 width, OSG::UInt32 height);
+   void setSize(const OSG::UInt32 width, const OSG::UInt32 height);
 
    void setFramesPerSecond(OSG::UInt32 fps);
 

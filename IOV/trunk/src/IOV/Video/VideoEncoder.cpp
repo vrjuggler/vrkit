@@ -185,7 +185,7 @@ void VideoEncoder::setFormat(const video_encoder_format_t& format)
    mVideoEncoderParams = format;
 }
 
-void VideoEncoder::setSize(OSG::UInt32 width, OSG::UInt32 height)
+void VideoEncoder::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 {
    mWidth = width;
    mHeight= height;

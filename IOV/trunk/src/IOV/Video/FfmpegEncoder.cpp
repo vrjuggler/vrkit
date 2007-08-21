@@ -671,7 +671,8 @@ void FfmpegEncoder::closeAudio()
    mAudioStream = NULL;
 }
 
-AVFrame* FfmpegEncoder::allocFrame(int pixFormat, int width, int height)
+AVFrame* FfmpegEncoder::allocFrame(const int pixFormat, const int width,
+                                   const int height)
 {
    AVFrame* picture = avcodec_alloc_frame();
    avcodec_get_frame_defaults(picture);
