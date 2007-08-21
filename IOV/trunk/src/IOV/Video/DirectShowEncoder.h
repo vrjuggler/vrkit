@@ -98,7 +98,7 @@ public:
 
 protected:
    static moniker_list_t getVideoMonikers();
-   static CComPtr<IBaseFilter> getEncoder(const std::string name);
+   static CComPtr<IBaseFilter> getEncoder(const std::string& name);
    static void printPins(CComPtr<IBaseFilter> filter);
 
    void setAviOptions(IBaseFilter *ppf, InterleavingMode INTERLEAVE_MODE);

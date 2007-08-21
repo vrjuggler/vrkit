@@ -57,7 +57,7 @@ public:
 
    Encoder::container_format_list_t getSupportedContainersAndCodecs() const;
 
-   void setEncodingParameters(const encoder_parameters_t params);
+   void setEncodingParameters(const encoder_parameters_t& params);
 
    virtual void startEncoding() = 0;
 

@@ -366,7 +366,7 @@ void DirectShowEncoder::printPins(CComPtr<IBaseFilter> filter)
    }
 }
 
-CComPtr<IBaseFilter> DirectShowEncoder::getEncoder(const std::string name)
+CComPtr<IBaseFilter> DirectShowEncoder::getEncoder(const std::string& name)
 {
    HRESULT hr;
    moniker_list_t monikers = getVideoMonikers();

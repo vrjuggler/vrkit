@@ -21,7 +21,7 @@ Encoder::container_format_list_t Encoder::getSupportedContainersAndCodecs() cons
    return mContainerFormatInfoList;
 }
 
-void Encoder::setEncodingParameters(const encoder_parameters_t params)
+void Encoder::setEncodingParameters(const encoder_parameters_t& params)
 {
    mEncoderParams = params;
 }
