@@ -3,6 +3,7 @@
 #include <sstream>
 #include <OpenSG/OSGFBOViewport.h>
 
+#include <IOV/Status.h>
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Video/Encoder.h>
 #include <IOV/Video/VideoEncoder.h>
@@ -23,17 +24,16 @@
 #   include <IOV/Video/DirectShowEncoder.h>
 #endif
 
-#define REGISTER_ENCODER(ENCODER)                               \
-   EncoderPtr encoder_ ## ENCODER = ENCODER::create()->init();  \
-   mEncoderMap[ENCODER::getName()] = encoder_ ## ENCODER;	\
-							        \
-   Encoder::container_format_list_t enc_fmt_list ## ENCODER =   \
-		  encoder_ ## ENCODER->getSupportedContainersAndCodecs();	\
-   /* Register each container format list. */                   \
-   mVideoEncoderFormatList.insert(				\
-			   mVideoEncoderFormatList.end(),	\
-			   enc_fmt_list ## ENCODER.begin(),     \
-			   enc_fmt_list ## ENCODER.end());
+#define REGISTER_ENCODER(ENCODER)                                       \
+   EncoderPtr encoder_ ## ENCODER = ENCODER::create()->init();          \
+   mEncoderMap[ENCODER::getName()] = encoder_ ## ENCODER;               \
+                                                                        \
+   Encoder::container_format_list_t enc_fmt_list ## ENCODER =           \
+      encoder_ ## ENCODER->getSupportedContainersAndCodecs();           \
+   /* Register each container format list. */                           \
+   mVideoEncoderFormatList.insert(mVideoEncoderFormatList.end(),        \
+                                  enc_fmt_list ## ENCODER.begin(),      \
+                                  enc_fmt_list ## ENCODER.end());
 
 namespace inf
 {
@@ -68,17 +68,40 @@ VideoEncoder::~VideoEncoder()
 
 VideoEncoderPtr VideoEncoder::init()
 {
-
 #ifdef IOV_WITH_FFMPEG
-   REGISTER_ENCODER(FfmpegEncoder)
+   try
+   {
+      REGISTER_ENCODER(FfmpegEncoder)
+   }
+   catch (inf::Exception& ex)
+   {
+      IOV_STATUS << "Failed to register FFmpeg encoder:\n" << ex.what()
+                 << std::endl;
+   }
 #endif
 
 #ifdef IOV_WITH_VFW
-   REGISTER_ENCODER(VfwEncoder)
+   try
+   {
+      REGISTER_ENCODER(VfwEncoder)
+   }
+   catch (inf::Exception& ex)
+   {
+      IOV_STATUS << "Failed to register VFW encoder:\n" << ex.what()
+                 << std::endl;
+   }
 #endif
 
 #ifdef IOV_WITH_DIRECT_SHOW
-   REGISTER_ENCODER(DirectShowEncoder)
+   try
+   {
+      REGISTER_ENCODER(DirectShowEncoder)
+   }
+   catch (inf::Exception& ex)
+   {
+      IOV_STATUS << "Failed to register DirectShow encoder:\n" << ex.what()
+                 << std::endl;
+   }
 #endif
 
    return shared_from_this();
