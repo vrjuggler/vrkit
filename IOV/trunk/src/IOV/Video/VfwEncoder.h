@@ -95,7 +95,7 @@ public:
 
    static std::string getName()
    {
-      return "VideoForWindowsEncoder";
+      return "Video For Windows Encoder";
    }
 
 private:
