@@ -34,21 +34,21 @@ public:
 
    struct container_format_info_t
    {
-      std::string		mFormatName;
-      std::string 		mFormatLongName;
-      std::vector<std::string>	mFileExtensions;
-      codec_list_t 		mCodecList;
-      std::string		mEncoderName;
+      std::string               mFormatName;
+      std::string               mFormatLongName;
+      std::vector<std::string>  mFileExtensions;
+      codec_list_t              mCodecList;
+      std::string               mEncoderName;
    };
 
    struct encoder_parameters_t
    {
-      std::string	mContainerFormat;
-      std::string	mCodec;
-      std::string	mFilename;
-      vpr::Uint32	mWidth;
-      vpr::Uint32	mHeight;
-      vpr::Uint32	mFramesPerSecond;
+      std::string mContainerFormat;
+      std::string mCodec;
+      std::string mFilename;
+      vpr::Uint32 mWidth;
+      vpr::Uint32 mHeight;
+      vpr::Uint32 mFramesPerSecond;
    };
 
    typedef std::vector<container_format_info_t> container_format_list_t;
@@ -70,15 +70,15 @@ public:
 protected:
 
    /* Helper functions into the encoder param struct.*/
-   std::string	getContainerFormat() const;
-   std::string	getCodec() const;
-   vpr::Uint32	getWidth() const;
-   vpr::Uint32	getHeight() const;
-   std::string	getFilename() const;
-   vpr::Uint32	getFramesPerSecond() const;
+   std::string getContainerFormat() const;
+   std::string getCodec() const;
+   vpr::Uint32 getWidth() const;
+   vpr::Uint32 getHeight() const;
+   std::string getFilename() const;
+   vpr::Uint32 getFramesPerSecond() const;
 
-   encoder_parameters_t		mEncoderParams;
-   container_format_list_t	mContainerFormatInfoList;
+   encoder_parameters_t         mEncoderParams;
+   container_format_list_t      mContainerFormatInfoList;
 };
 
 }
