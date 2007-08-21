@@ -44,20 +44,7 @@ private:
 class IOV_CLASS_API FfmpegEncoder : public Encoder
 {
 protected:
-   FfmpegEncoder()
-      : mFormatContext(NULL)
-      , mFormatOut(NULL)
-      , mVideoStream(NULL)
-      , mAudioStream(NULL)
-      , mYuvFrame(NULL)
-      , mRgbFrame(NULL)
-      , mAudioOutBuffer(NULL)
-      , mAudioOutBufferSize(0)
-      , mVideoOutBuffer(NULL)
-      , mVideoOutBufferSize(0)
-      , mFrameCount(0)
-      , mFlipBeforeEncode(true)
-   {;}
+   FfmpegEncoder();
 
 public:
    static EncoderPtr create();

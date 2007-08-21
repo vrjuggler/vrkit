@@ -56,6 +56,23 @@ const char* VideoFfmpegEncoderException::what(void) const throw()
 { return s.c_str(); }
 
 
+FfmpegEncoder::FfmpegEncoder()
+   : mFormatContext(NULL)
+   , mFormatOut(NULL)
+   , mVideoStream(NULL)
+   , mAudioStream(NULL)
+   , mYuvFrame(NULL)
+   , mRgbFrame(NULL)
+   , mAudioOutBuffer(NULL)
+   , mAudioOutBufferSize(0)
+   , mVideoOutBuffer(NULL)
+   , mVideoOutBufferSize(0)
+   , mFrameCount(0)
+   , mFlipBeforeEncode(true)
+{
+   /* Do nothing. */ ;
+}
+
 EncoderPtr FfmpegEncoder::create()
 {
    return EncoderPtr(new FfmpegEncoder);
