@@ -109,16 +109,8 @@ VideoEncoderPtr VideoEncoder::init()
 
 void VideoEncoder::record()
 {
-   OSG::UInt32 source_width = ( mWidth / 2 ) * 2;
-   OSG::UInt32 source_height = ( mHeight / 2 ) * 2;
-
-   OSG::UInt32 image_width = source_width;
-   OSG::UInt32 image_height = source_height;
-
-   if (mStereo)
-   {
-      image_width *= 2;
-   }
+   const OSG::UInt32 image_width(mStereo ? mWidth * 2 : mWidth);
+   const OSG::UInt32 image_height(mHeight);
 
 #if 0
    codec_map_t::const_iterator found = mCodecMap.find(mCodec);
