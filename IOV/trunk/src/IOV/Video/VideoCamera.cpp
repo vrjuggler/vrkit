@@ -130,7 +130,7 @@ void VideoCamera::setFrameSize(const OSG::UInt32 width, const OSG::UInt32 height
    generateDebugFrame(); //XXX
 }
 
-void VideoCamera::setCameraPos(const OSG::Matrix camPos)
+void VideoCamera::setCameraPos(const OSG::Matrix& camPos)
 {
    mCamera->setPosition(camPos);
 }

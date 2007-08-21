@@ -162,7 +162,7 @@ private:
    /**
     * Set the position of the camera.
     */
-   void setCameraPos(const OSG::Matrix camPos);
+   void setCameraPos(const OSG::Matrix& camPos);
 
 private:
    CameraPtr		                mCamera;         /**< Camera used for rendering. */
