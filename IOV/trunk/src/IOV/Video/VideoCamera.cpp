@@ -141,11 +141,11 @@ void VideoCamera::startRecording()
    {
       if( mStereo )
       {
-	 OSG::beginEditCP(mStereoImageStorage);
-	    mStereoImageStorage->set(OSG::Image::OSG_RGBA_PF,
-				     mCamera->getWidth() * 2,
-				     mCamera->getHeight());
-	 OSG::beginEditCP(mStereoImageStorage);
+         OSG::beginEditCP(mStereoImageStorage);
+            mStereoImageStorage->set(OSG::Image::OSG_RGBA_PF,
+                                     mCamera->getWidth() * 2,
+                                     mCamera->getHeight());
+         OSG::beginEditCP(mStereoImageStorage);
       }
       mVideoEncoder->record();
       mRecording = true;
@@ -238,10 +238,13 @@ void VideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix& camPos)
       const OSG::UInt32 height = mCamera->getHeight();
 
       OSG::beginEditCP(mStereoImageStorage);
-	 mStereoImageStorage->setSubData(0, 0, 0, width, height, 1,
-			        mCamera->getLeftEyeImage()->getData());
-	 mStereoImageStorage->setSubData(width, 0, 0, width, height, 1,
-			        mCamera->getRightEyeImage()->getData());
+         mStereoImageStorage->setSubData(
+            0, 0, 0, width, height, 1, mCamera->getLeftEyeImage()->getData()
+         );
+         mStereoImageStorage->setSubData(
+            width, 0, 0, width, height, 1,
+            mCamera->getRightEyeImage()->getData()
+         );
       OSG::endEditCP(mStereoImageStorage);
 
       mVideoEncoder->writeFrame(mStereoImageStorage);

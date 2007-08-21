@@ -165,12 +165,12 @@ private:
    void setCameraPos(const OSG::Matrix& camPos);
 
 private:
-   CameraPtr		                mCamera;         /**< Camera used for rendering. */
-   VideoEncoderPtr			mVideoEncoder;
-   OSG::ImagePtr			mStereoImageStorage; /**< Temp storage for stereo image concatenation. */
+   CameraPtr                            mCamera;         /**< Camera used for rendering. */
+   VideoEncoderPtr                      mVideoEncoder;
+   OSG::ImagePtr                        mStereoImageStorage; /**< Temp storage for stereo image concatenation. */
    OSG::RefPtr<OSG::TransformPtr>       mTransform;     /**< The location and orientation of the camera. */
    OSG::RefPtr<OSG::NodePtr>            mFrameRoot;     /**< The frame that surrounds the captured scene. */
-   OSG::Real32                          mEyeOffset;	/**< Interocular distance / 2 for stereo. */
+   OSG::Real32                          mEyeOffset;     /**< Interocular distance / 2 for stereo. */
    OSG::Real32                          mBorderSize;    /**< The width of the frame geometry. */
    OSG::Real32                          mFrameDist;     /**< The distance between the camera and the frame. */
    bool                                 mStereo;        /**< If this camera should render/record in stereo. */
