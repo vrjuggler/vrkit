@@ -2,16 +2,37 @@
 
 #ifdef IOV_WITH_FFMPEG
 
+// hack for ffmpeg - c++ issue
+#ifndef int64_t_C
+#define int64_t_C(c)     (c ## LL)
+#define uint64_t_C(c)    (c ## ULL)
+#endif
+
+#include <stdint.h>
+#ifndef INT64_C
+#define INT64_C(c)      (c ## LL)
+#define UINT64_C(c)     (c ## ULL)
+#endif
+
 #include <string>
-#include <exception>
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
-#include <IOV/Video/FfmpegEncoder.h>
+
+extern "C"
+{
+
+#include <ffmpeg/avformat.h>
+#include <ffmpeg/avcodec.h>
+#include <ffmpeg/swscale.h>
+
+}
+
 #include <IOV/Util/Exceptions.h>
+#include <IOV/Video/FfmpegEncoder.h>
 
 #define STREAM_FRAME_RATE 25 // 25 images/s
 #define STREAM_PIX_FMT PIX_FMT_YUV420P // default pix_fmt

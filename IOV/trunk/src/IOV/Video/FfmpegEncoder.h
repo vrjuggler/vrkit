@@ -7,36 +7,19 @@
 
 #include <IOV/Config.h>
 
+#include <string>
+#include <exception>
 #include <boost/enable_shared_from_this.hpp>
 #include <vpr/vprTypes.h>
 
-// hack for ffmpeg - c++ issue
-#ifndef int64_t_C
-#define int64_t_C(c)     (c ## LL)
-#define uint64_t_C(c)    (c ## ULL)
-#endif
-
-#include <stdint.h>
-#ifndef INT64_C
-#define INT64_C(c)      (c ## LL)
-#define UINT64_C(c)     (c ## ULL)
-#endif
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-
-extern "C"
-{
-
-#include <ffmpeg/avformat.h>
-#include <ffmpeg/avcodec.h>
-#include <ffmpeg/swscale.h>
-
-}
-
 #include <IOV/Video/Encoder.h>
+
+
+struct AVFrame;
+struct AVCodec;
+struct AVFormatContext;
+struct AVOutputFormat;
+struct AVStream;
 
 namespace inf
 {
