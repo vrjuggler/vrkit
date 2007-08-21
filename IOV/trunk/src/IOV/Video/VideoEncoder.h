@@ -5,17 +5,14 @@
 
 #include <IOV/Config.h>
 
-#include <boost/function.hpp>
+#include <map>
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/OSGViewport.h>
 #include <OpenSG/OSGImage.h>
 
 #include <IOV/Video/VideoEncoderPtr.h>
-
 #include <IOV/Video/Encoder.h>
 
-#include <set>
 
 namespace inf
 {

@@ -1,7 +1,6 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
 #include <sstream>
-#include <OpenSG/OSGFBOViewport.h>
 
 #include <IOV/Status.h>
 #include <IOV/Util/Exceptions.h>
