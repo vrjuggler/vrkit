@@ -13,7 +13,8 @@
 #include <IOV/Video/DirectShowSource.h>
 #include <IOV/Video/DirectShowEncoder.h>
 
-#define PREVIEW
+// Uncomment to display a movie preview window while recording.
+//#define PREVIEW
 
 namespace inf
 {
@@ -271,8 +272,6 @@ void DirectShowEncoder::writeFrame(vpr::Uint8* data)
 {
    mByteStream->grabFrame(getWidth(), getHeight(), data);
 }
-
-#define PREVIEW
 
 void DirectShowEncoder::setAviOptions(IBaseFilter* ppf,
                                       InterleavingMode INTERLEAVE_MODE)
