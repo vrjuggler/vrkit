@@ -196,8 +196,16 @@ void DirectShowEncoder::startEncoding()
                 "Failed to add renderer!");
 #endif
 
-   CComPtr<IBaseFilter> encoder =
-      getEncoder("Microsoft MPEG-4  VKI  Codec V3");
+   CComPtr<IBaseFilter> encoder = getEncoder(getCodec());
+
+   if ( ! encoder )
+   {
+      std::ostringstream msg_stream;
+      msg_stream << "Failed to get COM encoder object for codec '"
+                 << getCodec() << "'";
+      throw inf::Exception(msg_stream.str(), IOV_LOCATION);
+   }
+
    CHECK_RESULT(mGraphBuilder->AddFilter(encoder, L"Encoder"),
                 "Failed to add encoder");
 
