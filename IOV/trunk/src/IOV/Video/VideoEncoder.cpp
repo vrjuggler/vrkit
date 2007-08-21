@@ -117,13 +117,15 @@ void VideoEncoder::record()
    encoder_map_t::const_iterator vid_encoder = mEncoderMap.find(mVideoEncoderParams.mEncoderName);
    mEncoder = (*vid_encoder).second;
 
-   Encoder::encoder_parameters_t encoder_params;
-   encoder_params.mContainerFormat = mVideoEncoderParams.mContainerFormat;
-   encoder_params.mCodec = mVideoEncoderParams.mCodec;
-   encoder_params.mFilename = mFilename;
-   encoder_params.mWidth = image_width;
-   encoder_params.mHeight = image_height;
-   encoder_params.mFramesPerSecond = mFps;
+   Encoder::encoder_parameters_t encoder_params =
+      {
+         mVideoEncoderParams.mContainerFormat,
+         mVideoEncoderParams.mCodec,
+         mFilename,
+         image_width,
+         image_height,
+         mFps
+      };
 
    mEncoder->setEncodingParameters(encoder_params);
 
