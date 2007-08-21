@@ -142,7 +142,7 @@ public:
    /*
     * Renders the current frame given a RenderAction and camera position.
     */
-   void render(OSG::RenderAction* ra, const OSG::Matrix camPos);
+   void render(OSG::RenderAction* ra, const OSG::Matrix& camPos);
 
    /**
     * Get a debug node that contains a plane with the Camera's texture

@@ -206,7 +206,7 @@ void VideoCamera::setNearFar(const OSG::Real32 nearVal,
    mCamera->setNearFar(nearVal, farVal);
 }
 
-void VideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix camPos)
+void VideoCamera::render(OSG::RenderAction* ra, const OSG::Matrix& camPos)
 {
    if (!isRecording() || isPaused() )
    {
