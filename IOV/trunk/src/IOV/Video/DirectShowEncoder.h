@@ -91,7 +91,8 @@ protected:
    static CComPtr<IBaseFilter> getEncoder(const std::string& name);
    static void printPins(CComPtr<IBaseFilter> filter);
 
-   void setAviOptions(IBaseFilter *ppf, InterleavingMode INTERLEAVE_MODE);
+   void setAviOptions(CComPtr<IBaseFilter> filter,
+                      const InterleavingMode mode);
 
 private:
    CComPtr<IGraphBuilder> mGraphBuilder;

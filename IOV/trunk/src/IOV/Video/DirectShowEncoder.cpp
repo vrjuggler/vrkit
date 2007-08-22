@@ -19,22 +19,27 @@
 namespace inf
 {
 
-CComPtr<IPin> GetPin(CComPtr<IBaseFilter> filter, PIN_DIRECTION dir, int idx)
+CComPtr<IPin> getPin(CComPtr<IBaseFilter> filter, const PIN_DIRECTION dir,
+                     int idx)
 {
-   CComPtr<IEnumPins> pEnum = NULL;
+   if ( ! filter )
+   {
+      return E_POINTER;
+   }
+
+   CComPtr<IEnumPins> enum_pins = NULL;
    CComPtr<IPin> pin = NULL;
 
-   if (!filter)
-   { return E_POINTER; }
-
    HRESULT hr;
-   if (FAILED(hr = filter->EnumPins(&pEnum)))
-   { return pin; }
+   if ( FAILED(hr = filter->EnumPins(&enum_pins)) )
+   {
+      return pin;
+   }
 
    ULONG num_found;
-   while(S_OK == pEnum->Next(1, &pin, &num_found))
+   while ( S_OK == enum_pins->Next(1, &pin, &num_found) )
    {
-      PIN_DIRECTION pindir = (PIN_DIRECTION)3;
+      PIN_DIRECTION pindir = static_cast<PIN_DIRECTION>(3);
       pin->QueryDirection(&pindir);
       if(pindir == dir)
       {
@@ -43,39 +48,41 @@ CComPtr<IPin> GetPin(CComPtr<IBaseFilter> filter, PIN_DIRECTION dir, int idx)
             // Return the pin's interface
             return pin;
          }
-         idx--;
+         --idx;
       } 
       pin = NULL;
    }
    return pin;
 }
 
-CComPtr<IPin> getInPin(CComPtr<IBaseFilter> filter, int idx)
+CComPtr<IPin> getInPin(CComPtr<IBaseFilter> filter, const int idx)
 {
-   return GetPin(filter, PINDIR_INPUT, idx);
+   return getPin(filter, PINDIR_INPUT, idx);
 }
 
-CComPtr<IPin> getOutPin(CComPtr<IBaseFilter> filter, int idx)
+CComPtr<IPin> getOutPin(CComPtr<IBaseFilter> filter, const int idx)
 {
-   return GetPin(filter, PINDIR_OUTPUT, idx);
+   return getPin(filter, PINDIR_OUTPUT, idx);
 }
 
 // Adds a DirectShow filter graph to the Running Object Table,
 // allowing GraphEdit to "spy" on a remote filter graph.
-DWORD addGraphToRot(IUnknown* graph) 
+DWORD addGraphToRunningObjTable(IUnknown* graph) 
 {
+   if ( ! graph )
+   {
+      return E_POINTER;
+   }
+
    DWORD regId;
    CComPtr<IMoniker> moniker;
    CComPtr<IRunningObjectTable> rot;
 
-   if (!graph)
-   { return E_POINTER; }
-
    CHECK_RESULT(FAILED(GetRunningObjectTable(0, &rot)),
-      "Failed to get running object table.");
+                "Failed to get running object table.");
 
    CHECK_RESULT(CreateItemMoniker(L"!", L"DirectShowEncoder", &moniker),
-      "Failed to create item moniker");
+                "Failed to create item moniker");
 
    // Use the ROTFLAGS_REGISTRATIONKEEPSALIVE to ensure a strong reference
    // to the object.  Using this flag will cause the object to remain
@@ -94,12 +101,12 @@ DWORD addGraphToRot(IUnknown* graph)
 }
 
 // Removes a filter graph from the Running Object Table
-void RemoveGraphFromRot(DWORD regId)
+void removeGraphFromRunningObjTable(const DWORD regId)
 {
    CComPtr<IRunningObjectTable> rot;
 
    CHECK_RESULT(GetRunningObjectTable(0, &rot),
-      "Failed to get running object table.");
+                "Failed to get running object table.");
 
    rot->Revoke(regId);
 }
@@ -133,6 +140,9 @@ DirectShowEncoder::~DirectShowEncoder()
 
 EncoderPtr DirectShowEncoder::init()
 {
+   // TODO: Support ASF (MEDIASUBTYPE_Asf) and other container formats that
+   // can be handled by DirectShow. Figuring out what those other formats are
+   // seems to be the hardest part.
    container_format_info_t format_info;
    format_info.mFormatName = "AVI";
    format_info.mFormatLongName = "Audio Video Interleave";
@@ -240,7 +250,7 @@ void DirectShowEncoder::startEncoding()
    CHECK_RESULT(mMediaController->Run(), "Failed to run DirectShow Error!");
 
 #ifdef REGISTER_GRAPH
-   mGraphRegister = addGraphToRot(mGraphBuilder);
+   mGraphRegister = addGraphToRunningObjTable(mGraphBuilder);
 #endif
 }
 
@@ -252,7 +262,7 @@ void DirectShowEncoder::stopEncoding()
 #ifdef REGISTER_GRAPH
    if (mGraphRegister)
    {
-      RemoveGraphFromRot(mGraphRegister);
+      removeGraphFromRunningObjTable(mGraphRegister);
       mGraphRegister = 0;
    }
 #endif
@@ -273,26 +283,25 @@ void DirectShowEncoder::writeFrame(vpr::Uint8* data)
    mByteStream->grabFrame(getWidth(), getHeight(), data);
 }
 
-void DirectShowEncoder::setAviOptions(IBaseFilter* ppf,
-                                      InterleavingMode INTERLEAVE_MODE)
+void DirectShowEncoder::setAviOptions(CComPtr<IBaseFilter> filter,
+                                      const InterleavingMode mode)
 {
-   vprASSERT(ppf);
-   if (!ppf)
+   vprASSERT(filter);
+   if ( ! filter )
    {
       throw inf::Exception("Can't have NULL AVI Mux.", IOV_LOCATION);
    }
 
    // QI for interface AVI Muxer
-   CComPtr<IConfigAviMux> avi_mux = query(CComPtr<IBaseFilter>(ppf),
-                                          IConfigAviMux);
+   CComPtr<IConfigAviMux> avi_mux = query(filter, IConfigAviMux);
    CHECK_RESULT(avi_mux->SetOutputCompatibilityIndex(TRUE),
                 "avi_mux->SetOutputCompatibilityIndex failed.");
 
    // QI for interface Interleaving
-   CComPtr<IConfigInterleaving> interleaving =
-      query(CComPtr<IBaseFilter>(ppf), IConfigInterleaving);
+   CComPtr<IConfigInterleaving> interleaving = query(filter,
+                                                     IConfigInterleaving);
    // put the interleaving mode (full, none, half)
-   CHECK_RESULT(interleaving->put_Mode(INTERLEAVE_MODE),
+   CHECK_RESULT(interleaving->put_Mode(mode),
                 "interleaving->put_Mode failed.");
 } 
 
@@ -301,7 +310,7 @@ DirectShowEncoder::moniker_list_t DirectShowEncoder::getVideoMonikers()
    moniker_list_t monikers;
 
    CComPtr<IEnumMoniker> enum_moniker = NULL;
-   CComPtr<IMoniker> pMoniker = NULL;
+   CComPtr<IMoniker> moniker = NULL;
 
    CComPtr<ICreateDevEnum> sys_dev_enum =
       createConcrete(ICreateDevEnum, SystemDeviceEnum, NULL,
@@ -310,10 +319,10 @@ DirectShowEncoder::moniker_list_t DirectShowEncoder::getVideoMonikers()
    // S_FALSE means nothing in this category.
    if (S_OK == sys_dev_enum->CreateClassEnumerator(CLSID_VideoCompressorCategory, &enum_moniker, 0))
    {
-      while (S_OK == enum_moniker->Next(1, &pMoniker, NULL))
+      while ( S_OK == enum_moniker->Next(1, &moniker, NULL) )
       {
-         monikers.push_back(pMoniker);
-         pMoniker = NULL;
+         monikers.push_back(moniker);
+         moniker = NULL;
       }
    }
 
@@ -330,12 +339,12 @@ DirectShowEncoder::codec_list_t DirectShowEncoder::getCodecs()
    typedef moniker_list_t::iterator iter_type;
    for ( iter_type m = monikers.begin(); m != monikers.end(); ++m )
    {
-      CComPtr<IPropertyBag> pPropBag = NULL;
+      CComPtr<IPropertyBag> prop_bag = NULL;
       (*m)->BindToStorage(0, 0, IID_IPropertyBag,
-                          reinterpret_cast<void**>(&pPropBag));
+                          reinterpret_cast<void**>(&prop_bag));
       VARIANT var;
       VariantInit(&var);
-      if (SUCCEEDED(pPropBag->Read(L"FriendlyName", &var, 0)))
+      if ( SUCCEEDED(prop_bag->Read(L"FriendlyName", &var, 0)) )
       {
          std::string name = _bstr_t(var.bstrVal);
          encoder_names.push_back(name);
@@ -363,10 +372,10 @@ void DirectShowEncoder::printPins(CComPtr<IBaseFilter> filter)
    CComPtr<IPin> pin;
    while (pins->Next(1, &pin, &n) == S_OK)
    {
-      PIN_INFO pi;
-      pin->QueryPinInfo(&pi);
-      std::cout << "pin: " << _bstr_t(pi.achName) << std::endl;
-      QueryPinInfoReleaseFilter(pi);
+      PIN_INFO pin_info;
+      pin->QueryPinInfo(&pin_info);
+      std::cout << "pin: " << _bstr_t(pin_info.achName) << std::endl;
+      QueryPinInfoReleaseFilter(pin_info);
       pin = NULL;
    }
 }
@@ -379,12 +388,12 @@ CComPtr<IBaseFilter> DirectShowEncoder::getEncoder(const std::string& name)
    typedef moniker_list_t::iterator iter_type;
    for ( iter_type m = monikers.begin(); m != monikers.end(); ++m )
    {
-      CComPtr<IPropertyBag> pPropBag = NULL;
+      CComPtr<IPropertyBag> prop_bag = NULL;
       (*m)->BindToStorage(0, 0, IID_IPropertyBag,
-                          reinterpret_cast<void**>(&pPropBag));
+                          reinterpret_cast<void**>(&prop_bag));
       VARIANT var;
       VariantInit(&var);
-      hr = pPropBag->Read(L"FriendlyName", &var, 0);
+      hr = prop_bag->Read(L"FriendlyName", &var, 0);
       if (SUCCEEDED(hr))
       {
          std::string enc_name = _bstr_t(var.bstrVal);
