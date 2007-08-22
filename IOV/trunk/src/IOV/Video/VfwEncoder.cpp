@@ -92,6 +92,8 @@ EncoderPtr VfwEncoder::init()
 
 void VfwEncoder::startEncoding()
 {
+   mFrameCount = 0;
+
    const vpr::Uint32 bitsPerPixel = 24;
    AVIFileInit();
    int max_width = GetSystemMetrics(SM_CXSCREEN);
