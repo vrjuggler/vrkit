@@ -78,7 +78,7 @@ DWORD addGraphToRunningObjTable(IUnknown* graph)
    CComPtr<IMoniker> moniker;
    CComPtr<IRunningObjectTable> rot;
 
-   CHECK_RESULT(FAILED(GetRunningObjectTable(0, &rot)),
+   CHECK_RESULT(GetRunningObjectTable(0, &rot),
                 "Failed to get running object table.");
 
    CHECK_RESULT(CreateItemMoniker(L"!", L"DirectShowEncoder", &moniker),
