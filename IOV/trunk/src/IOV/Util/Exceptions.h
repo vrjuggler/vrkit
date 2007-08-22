@@ -111,7 +111,7 @@ public:
 
    std::string getExceptionName()
    {
-      return "infi::PluginInterfaceException";
+      return "inf::PluginInterfaceException";
    }
 };
 
@@ -128,7 +128,7 @@ public:
 
    std::string getExceptionName()
    {
-      return "infi::PluginTypeNameException";
+      return "inf::PluginTypeNameException";
    }
 };
 
@@ -145,7 +145,7 @@ public:
 
    std::string getExceptionName()
    {
-      return "infi::PluginDependencyException";
+      return "inf::PluginDependencyException";
    }
 };
 
