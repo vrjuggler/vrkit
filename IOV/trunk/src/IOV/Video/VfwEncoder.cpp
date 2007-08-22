@@ -250,12 +250,16 @@ void VfwEncoder::writeFrame(vpr::Uint8* data)
    }
 
    const int bitsPerPixel=24;
-   vpr::Uint32 dwSize = getWidth() * getHeight() * (bitsPerPixel/8);
+   const vpr::Uint32 size = getWidth() * getHeight() * (bitsPerPixel/8);
 
-   if(FAILED(AVIStreamWrite(mCompressedVideoStream,mFrameCount++,1,data,dwSize,0,NULL,NULL)))
+   const HRESULT result = AVIStreamWrite(mCompressedVideoStream,
+                                         mFrameCount++, 1, data, size, 0,
+                                         NULL, NULL);
+
+   if ( FAILED(result) )
    {
       SetErrorMessage(_T("Unable to Write Video Stream to the output Movie File"));
-      stopEncoding();
+      buildAndThrowAviError(result);
    }
 }
 
