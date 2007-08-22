@@ -149,6 +149,77 @@ public:
    }
 };
 
+/**
+ * Base recording exception type. All exception types associated with video
+ * capture should derive from this class.
+ *
+ * @see inf::VideoCamera
+ * @see inf::VideoEncoder
+ * @see inf::Encoder
+ *
+ * @since 0.45.1
+ */
+class IOV_CLASS_API RecordingException : public Exception
+{
+public:
+   RecordingException(const std::string& msg, const std::string& location)
+      throw ();
+
+   virtual ~RecordingException() throw ();
+
+   std::string getExceptionName()
+   {
+      return "inf::RecordingException";
+   }
+};
+
+/**
+ * Exception thrown if an attempt is made to record OpenGL frames with an
+ * invalid encoder configuration.
+ *
+ * @see inf::VideoCamera
+ * @see inf::VideoEncoder
+ *
+ * @since 0.45.1
+ */
+class IOV_CLASS_API InvalidRecordingConfigException
+   : public RecordingException
+{
+public:
+   InvalidRecordingConfigException(const std::string& msg,
+                                   const std::string& location) throw ();
+
+   virtual ~InvalidRecordingConfigException() throw ();
+
+   std::string getExceptionName()
+   {
+      return "inf::InvalidRecordingConfigException";
+   }
+};
+
+/**
+ * Exception thrown if an attempt is made to record OpenGL frames with bad
+ * data.
+ *
+ * @see inf::VideoCamera
+ * @see inf::VideoEncoder
+ *
+ * @since 0.45.1
+ */
+class IOV_CLASS_API BadRecordingDataException : public RecordingException
+{
+public:
+   BadRecordingDataException(const std::string& msg,
+                             const std::string& location) throw ();
+
+   virtual ~BadRecordingDataException() throw ();
+
+   std::string getExceptionName()
+   {
+      return "inf::BadRecordingDataException";
+   }
+};
+
 }
 
 

@@ -130,4 +130,44 @@ PluginDependencyException::~PluginDependencyException() throw ()
    /* Do nothing. */ ;
 }
 
+RecordingException::RecordingException(const std::string& msg,
+                                       const std::string& location)
+   throw ()
+   : Exception(msg, location)
+{
+   /* Do nothing. */ ;
+}
+
+RecordingException::~RecordingException() throw ()
+{
+   /* Do nothing. */ ;
+}
+
+InvalidRecordingConfigException::
+InvalidRecordingConfigException(const std::string& msg,
+                                const std::string& location)
+   throw ()
+   : RecordingException(msg, location)
+{
+   /* Do nothing. */ ;
+}
+
+InvalidRecordingConfigException::~InvalidRecordingConfigException() throw ()
+{
+   /* Do nothing. */ ;
+}
+
+BadRecordingDataException::
+BadRecordingDataException(const std::string& msg, const std::string& location)
+   throw ()
+   : RecordingException(msg, location)
+{
+   /* Do nothing. */ ;
+}
+
+BadRecordingDataException::~BadRecordingDataException() throw ()
+{
+   /* Do nothing. */ ;
+}
+
 }

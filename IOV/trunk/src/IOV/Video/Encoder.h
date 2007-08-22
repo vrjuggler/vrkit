@@ -59,10 +59,18 @@ public:
 
    void setEncodingParameters(const encoder_parameters_t& params);
 
+   /**
+    * @throw inf::RecordingException
+    *           Thrown if starting recording fails.
+    */
    virtual void startEncoding() = 0;
 
    virtual void stopEncoding() = 0;
 
+   /**
+    * @throw inf::RecordingException
+    *           Thrown if writing the given frame data fails.
+    */
    virtual void writeFrame(vpr::Uint8* data) = 0;
 
    virtual OSG::Image::PixelFormat getPixelFormat() const;

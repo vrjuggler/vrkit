@@ -34,45 +34,45 @@ void buildAndThrowAviError(const vpr::Uint32 errCode)
       case AVIERR_OK:
          return;
       case AVIERR_UNSUPPORTED:
-         throw std::exception("AVIERR_UNSUPPORTED");
+         throw inf::Exception("AVIERR_UNSUPPORTED", IOV_LOCATION);
       case AVIERR_BADFORMAT:
-         throw std::exception("AVIERR_BADFORMAT");
+         throw inf::Exception("AVIERR_BADFORMAT", IOV_LOCATION);
       case AVIERR_MEMORY:
-         throw std::exception("AVIERR_MEMORY");
+         throw inf::Exception("AVIERR_MEMORY", IOV_LOCATION);
       case AVIERR_INTERNAL:
-         throw std::exception("AVIERR_INTERNAL");
+         throw inf::Exception("AVIERR_INTERNAL", IOV_LOCATION);
       case AVIERR_BADFLAGS:
-         throw std::exception("AVIERR_BADFLAGS");
+         throw inf::Exception("AVIERR_BADFLAGS", IOV_LOCATION);
       case AVIERR_BADPARAM:
-         throw std::exception("AVIERR_BADPARAM");
+         throw inf::Exception("AVIERR_BADPARAM", IOV_LOCATION);
       case AVIERR_BADSIZE:
-         throw std::exception("AVIERR_BADSIZE");
+         throw inf::Exception("AVIERR_BADSIZE", IOV_LOCATION);
       case AVIERR_BADHANDLE:
-         throw std::exception("AVIERR_BADHANDLE");
+         throw inf::Exception("AVIERR_BADHANDLE", IOV_LOCATION);
       case AVIERR_FILEREAD:
-         throw std::exception("AVIERR_FILEREAD");
+         throw inf::Exception("AVIERR_FILEREAD", IOV_LOCATION);
       case AVIERR_FILEWRITE:
-         throw std::exception("AVIERR_FILEWRITE");
+         throw inf::Exception("AVIERR_FILEWRITE", IOV_LOCATION);
       case AVIERR_FILEOPEN:
-         throw std::exception("AVIERR_FILEOPEN");
+         throw inf::Exception("AVIERR_FILEOPEN", IOV_LOCATION);
       case AVIERR_COMPRESSOR:
-         throw std::exception("AVIERR_COMPRESSOR");
+         throw inf::Exception("AVIERR_COMPRESSOR", IOV_LOCATION);
       case AVIERR_NOCOMPRESSOR:
-         throw std::exception("AVIERR_NOCOMPRESSOR");
+         throw inf::Exception("AVIERR_NOCOMPRESSOR", IOV_LOCATION);
       case AVIERR_READONLY:
-         throw std::exception("AVIERR_READONLY");
+         throw inf::Exception("AVIERR_READONLY", IOV_LOCATION);
       case AVIERR_NODATA:
-         throw std::exception("AVIERR_NODATA");
+         throw inf::Exception("AVIERR_NODATA", IOV_LOCATION);
       case AVIERR_BUFFERTOOSMALL:
-         throw std::exception("AVIERR_BUFFERTOOSMALL");
+         throw inf::Exception("AVIERR_BUFFERTOOSMALL", IOV_LOCATION);
       case AVIERR_CANTCOMPRESS:
-         throw std::exception("AVIERR_CANTCOMPRESS");
+         throw inf::Exception("AVIERR_CANTCOMPRESS", IOV_LOCATION);
       case AVIERR_USERABORT:
-         throw std::exception("AVIERR_USERABORT");
+         throw inf::Exception("AVIERR_USERABORT", IOV_LOCATION);
       case AVIERR_ERROR:
-         throw std::exception("AVIERR_ERROR");
+         throw inf::Exception("AVIERR_ERROR", IOV_LOCATION);
       default:
-         throw std::exception("AVIERR_UNKOWN_ERROR");
+         throw inf::Exception("AVIERR_UNKOWN_ERROR", IOV_LOCATION);
    }
 }
 
@@ -101,8 +101,15 @@ void VfwEncoder::startEncoding()
    //mCodecId = mmioFOURCC('M','P','G','2');
    //mCodecId = mmioFOURCC('X', 'V', 'I', 'D');
    //mCodecId = mmioFOURCC('M','P','G','4');
-   const std::string codec = getCodec();
-   vprASSERT(4 == codec.size() && "Video for Windows codecs must be 4 chars.");
+   const std::string& codec = getCodec();
+
+   if ( 4 != codec.size() )
+   {
+      throw inf::InvalidRecordingConfigException(
+         "Video for Windows codecs must be 4 chars.", IOV_LOCATION
+      );
+   }
+
    mCodecId = mmioFOURCC(codec[0], codec[1], codec[2], codec[3]);
    //to use IV50 codec etc...
    //mCodecId = mmioFOURCC('I','V','5','0');
@@ -119,21 +126,21 @@ void VfwEncoder::startEncoding()
    if(getWidth() > max_width)
    {
       std::stringstream ss;
-      ss << "Can't encode at width: " << getWidth() << " max: " << max_width << std::endl;
-      throw inf::Exception(ss.str(), IOV_LOCATION);
+      ss << "Can't encode at width: " << getWidth() << " max: " << max_width;
+      throw inf::RecordingException(ss.str(), IOV_LOCATION);
    }
    if(getHeight() > max_height)
    {
       std::stringstream ss;
-      ss << "Can't encode at height: " << getHeight() << " max: " << max_width << std::endl;
-      throw inf::Exception(ss.str(), IOV_LOCATION);
+      ss << "Can't encode at height: " << getHeight() << " max: " << max_width;
+      throw inf::RecordingException(ss.str(), IOV_LOCATION);
    }
 
    if(FAILED(AVIFileOpen(&mAviFile, getFilename().c_str(), OF_CREATE|OF_WRITE, NULL)))
    {
       std::stringstream err_msg;
       err_msg << "Unable to create movie file: " << getFilename();
-      throw std::exception(err_msg.str().c_str());
+      throw inf::RecordingException(err_msg.str(), IOV_LOCATION);
    }
 
    ZeroMemory(&mStreamInfo,sizeof(AVISTREAMINFO));
@@ -148,7 +155,9 @@ void VfwEncoder::startEncoding()
 
    if(FAILED(AVIFileCreateStream(mAviFile,&mVideoStream,&mStreamInfo)))
    {
-      throw std::exception("Unable to create video stream in movie file.");
+      throw inf::RecordingException(
+         "Unable to create video stream in movie file.", IOV_LOCATION
+      );
    }
 
    ZeroMemory(&mCompressOptions,sizeof(AVICOMPRESSOPTIONS));
@@ -159,28 +168,39 @@ void VfwEncoder::startEncoding()
    //mCompressOptions.dwBytesPerSecond=1000/8;
    //mCompressOptions.dwQuality=100;
 
-   vpr::Int32 cres = AVIMakeCompressedStream(&mCompressedVideoStream,mVideoStream,&mCompressOptions,NULL);
+   const HRESULT cres = AVIMakeCompressedStream(&mCompressedVideoStream,
+                                                mVideoStream,
+                                                &mCompressOptions, NULL);
+
    if (AVIERR_NOCOMPRESSOR == cres)
    {
-      throw std::exception("A suitable compressor cannot be found.");
+      throw inf::InvalidRecordingConfigException(
+         "A suitable compressor cannot be found.", IOV_LOCATION
+      );
    }
    else if (AVIERR_MEMORY == cres)
    {
-      throw std::exception("There is not enough memory to complete the operation.");
+      throw inf::RecordingException(
+         "There is not enough memory to complete the operation.", IOV_LOCATION
+      );
    }
    else if (AVIERR_UNSUPPORTED == cres)
    {
       // This error might be returned if you try to compress data that is not audio or video.
-      throw std::exception("Compression is not supported for this type of data.");
+      throw inf::BadRecordingDataException(
+         "Compression is not supported for this type of data.", IOV_LOCATION
+      );
    }
    else if (AVIERR_OK != cres)
    {
-      std::cout << "CRES: " << cres << std::endl;
       buildAndThrowAviError(cres);
       // One reason this error might occur is if you are using a Codec that is not
       // available on your system. Check the mmioFOURCC() code you are using and make
       // sure you have that codec installed properly on your machine.
-      throw std::exception("Unable to create compressed stream: Check your codec options.");
+      throw inf::InvalidRecordingConfigException(
+         "Unable to create compressed stream: Check your codec options.",
+         IOV_LOCATION
+      );
    }
 
    vprASSERT(mCompressedVideoStream != NULL &&
