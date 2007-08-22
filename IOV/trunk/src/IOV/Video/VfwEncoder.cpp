@@ -181,6 +181,9 @@ void VfwEncoder::startEncoding()
       throw std::exception("Unable to create compressed stream: Check your codec options.");
    }
 
+   vprASSERT(mCompressedVideoStream != NULL &&
+             "We should have a compressed video stream at this point");
+
    BITMAPINFO bmpInfo;
    ZeroMemory(&bmpInfo,sizeof(BITMAPINFO));
    bmpInfo.bmiHeader.biPlanes = 1;
@@ -241,6 +244,11 @@ void VfwEncoder::SetErrorMessage(LPCTSTR lpszErrorMessage)
 
 void VfwEncoder::writeFrame(vpr::Uint8* data)
 {
+   if ( NULL == mCompressedVideoStream )
+   {
+      return;
+   }
+
    const int bitsPerPixel=24;
    vpr::Uint32 dwSize = getWidth() * getHeight() * (bitsPerPixel/8);
 
