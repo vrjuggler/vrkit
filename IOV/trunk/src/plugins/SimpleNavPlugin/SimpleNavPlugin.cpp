@@ -145,79 +145,77 @@ void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
 
       if ( mForBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mForBtn.toString(),
-                                               mForwardText);
+         status_panel_data->removeControlText(mForBtn.toString(),
+                                              mForwardText);
       }
 
       if ( mRevBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mRevBtn.toString(),
-                                               mReverseText);
+         status_panel_data->removeControlText(mRevBtn.toString(),
+                                              mReverseText);
       }
 
       if ( mRotateBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mRotateBtn.toString(),
-                                               mRotateText);
+         status_panel_data->removeControlText(mRotateBtn.toString(),
+                                              mRotateText);
       }
 
       if ( mModeBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mModeBtn.toString(),
-                                               mModeText);
+         status_panel_data->removeControlText(mModeBtn.toString(), mModeText);
       }
    }
    else
    {
       if ( mForBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mForBtn.toString(), mForwardText,
-                                            has);
+         const bool has =
+            status_panel_data->hasControlText(mForBtn.toString(),
+                                              mForwardText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mForBtn.toString(),
-                                               mForwardText, 1);
+            status_panel_data->addControlText(mForBtn.toString(),
+                                              mForwardText, 1);
          }
       }
 
       if ( mRevBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mRevBtn.toString(), mReverseText,
-                                            has);
+         const bool has =
+            status_panel_data->hasControlText(mRevBtn.toString(),
+                                              mReverseText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mRevBtn.toString(),
-                                               mReverseText, 1);
+            status_panel_data->addControlText(mRevBtn.toString(),
+                                              mReverseText, 1);
          }
       }
 
       if ( mRotateBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mRotateBtn.toString(),
-                                            mRotateText, has);
+         const bool has =
+            status_panel_data->hasControlText(mRotateBtn.toString(),
+                                              mRotateText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mRotateBtn.toString(),
-                                               mRotateText, 1);
+            status_panel_data->addControlText(mRotateBtn.toString(),
+                                              mRotateText, 1);
          }
       }
 
       if ( mModeBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mModeBtn.toString(), mModeText,
-                                            has);
+         const bool has =
+            status_panel_data->hasControlText(mModeBtn.toString(), mModeText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mModeBtn.toString(),
-                                               mModeText, 1);
+            status_panel_data->addControlText(mModeBtn.toString(), mModeText,
+                                              1);
          }
       }
    }

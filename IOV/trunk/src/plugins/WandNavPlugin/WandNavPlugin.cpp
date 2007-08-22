@@ -211,7 +211,7 @@ void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
    // We can only navigate when we have focus.
    mCanNavigate = isFocused();
 
-   status_panel_data->mSetHeaderTitle("test");
+   status_panel_data->setHeaderTitle("test");
 
    if ( ! mCanNavigate )
    {
@@ -219,98 +219,97 @@ void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
 
       if ( mForwardBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mForwardBtn.toString(),
-                                               mForwardText);
+         status_panel_data->removeControlText(mForwardBtn.toString(),
+                                              mForwardText);
       }
 
       if ( mReverseBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mReverseBtn.toString(),
-                                               mReverseText);
+         status_panel_data->removeControlText(mReverseBtn.toString(),
+                                              mReverseText);
       }
 
       if ( mRotateBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mRotateBtn.toString(),
-                                               mRotateText);
+         status_panel_data->removeControlText(mRotateBtn.toString(),
+                                              mRotateText);
       }
 
       if ( mModeBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mModeBtn.toString(),
-                                               mModeText);
+         status_panel_data->removeControlText(mModeBtn.toString(),
+                                              mModeText);
       }
 
       if ( mResetBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mResetBtn.toString(),
-                                               mResetText);
+         status_panel_data->removeControlText(mResetBtn.toString(),
+                                              mResetText);
       }
    }
    else
    {
       if ( mForwardBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mForwardBtn.toString(),
-                                            mForwardText, has);
+         const bool has =
+            status_panel_data->hasControlText(mForwardBtn.toString(),
+                                              mForwardText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mForwardBtn.toString(),
-                                               mForwardText, 1);
+            status_panel_data->addControlText(mForwardBtn.toString(),
+                                              mForwardText, 1);
          }
       }
 
       if ( mReverseBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mReverseBtn.toString(),
-                                            mReverseText, has);
+         const bool has =
+            status_panel_data->hasControlText(mReverseBtn.toString(),
+                                              mReverseText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mReverseBtn.toString(),
-                                               mReverseText, 1);
+            status_panel_data->addControlText(mReverseBtn.toString(),
+                                              mReverseText, 1);
          }
       }
 
       if ( mRotateBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mRotateBtn.toString(),
-                                            mRotateText, has);
+         const bool has =
+            status_panel_data->hasControlText(mRotateBtn.toString(),
+                                              mRotateText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mRotateBtn.toString(),
-                                               mRotateText, 1);
+            status_panel_data->addControlText(mRotateBtn.toString(),
+                                              mRotateText, 1);
          }
       }
 
       if ( mModeBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mModeBtn.toString(), mModeText,
-                                            has);
+         const bool has =
+            status_panel_data->hasControlText(mModeBtn.toString(), mModeText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mModeBtn.toString(),
-                                               mModeText, 1);
+            status_panel_data->addControlText(mModeBtn.toString(), mModeText,
+                                              1);
          }
       }
 
       if ( mResetBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mResetBtn.toString(), mResetText,
-                                            has);
+         const bool has =
+            status_panel_data->hasControlText(mResetBtn.toString(),
+                                              mResetText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mResetBtn.toString(),
-                                               mResetText, 1);
+            status_panel_data->addControlText(mResetBtn.toString(),
+                                              mResetText, 1);
          }
       }
    }

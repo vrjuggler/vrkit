@@ -144,14 +144,14 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
       // panel to include that information.
       if ( mChooseBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mChooseBtn.toString(),
-                                            mChooseText, has);
+         const bool has =
+            status_panel_data->hasControlText(mChooseBtn.toString(),
+                                              mChooseText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mChooseBtn.toString(),
-                                               mChooseText, 1);
+            status_panel_data->addControlText(mChooseBtn.toString(),
+                                              mChooseText, 1);
          }
       }
 
@@ -159,14 +159,13 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
       // panel to include that information.
       if ( mGrabBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mGrabBtn.toString(), mGrabText,
-                                            has);
+         const bool has =
+            status_panel_data->hasControlText(mGrabBtn.toString(), mGrabText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mGrabBtn.toString(),
-                                               mGrabText, 1);
+            status_panel_data->addControlText(mGrabBtn.toString(), mGrabText,
+                                              1);
          }
       }
 
@@ -174,14 +173,14 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
       // panel to include that information.
       if ( mReleaseBtn.isConfigured() )
       {
-         bool has = false;
-         status_panel_data->mHasControlText(mReleaseBtn.toString(),
-                                            mReleaseText, has);
+         const bool has =
+            status_panel_data->hasControlText(mReleaseBtn.toString(),
+                                              mReleaseText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mReleaseBtn.toString(),
-                                               mReleaseText, 1);
+            status_panel_data->addControlText(mReleaseBtn.toString(),
+                                              mReleaseText, 1);
          }
       }
    }
@@ -191,13 +190,11 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
-      status_panel_data->mRemoveControlText(mChooseBtn.toString(),
-                                            mChooseText);
-
-      status_panel_data->mRemoveControlText(mGrabBtn.toString(), mGrabText);
-
-      status_panel_data->mRemoveControlText(mReleaseBtn.toString(),
-                                            mReleaseText);
+      status_panel_data->removeControlText(mChooseBtn.toString(),
+                                           mChooseText);
+      status_panel_data->removeControlText(mGrabBtn.toString(), mGrabText);
+      status_panel_data->removeControlText(mReleaseBtn.toString(),
+                                           mReleaseText);
    }
 }
 

@@ -215,48 +215,48 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    StatusPanelDataPtr status_panel_data =
       scene_obj->getSceneData<StatusPanelData>();
 
-   status_panel_data->mSetHeaderTitle.connect(
+   status_panel_data->setHeaderTitle.connect(
       boost::bind(&StatusPanel::setHeaderTitle, &mStatusPanel, _1)
    );
 
-   status_panel_data->mSetCenterTitle.connect(
+   status_panel_data->setCenterTitle.connect(
       boost::bind(&StatusPanel::setCenterTitle, &mStatusPanel, _1)
    );
 
-   status_panel_data->mSetBottomTitle.connect(
+   status_panel_data->setBottomTitle.connect(
       boost::bind(&StatusPanel::setBottomTitle, &mStatusPanel, _1)
    );
 
-   status_panel_data->mSetHeaderText.connect(
+   status_panel_data->setHeaderText.connect(
       boost::bind(&StatusPanel::setHeaderText, &mStatusPanel, _1)
    );
 
-   status_panel_data->mSetControlText.connect(
+   status_panel_data->setControlText.connect(
       boost::bind(&StatusPanel::setControlText, &mStatusPanel, _1, _2)
    );
 
-   status_panel_data->mAddControlText.connect(
+   status_panel_data->addControlText.connect(
       boost::bind(&StatusPanel::addControlText, &mStatusPanel, _1, _2, _3)
    );
 
-   status_panel_data->mRemoveControlText.connect(
+   status_panel_data->removeControlText.connect(
       boost::bind(&StatusPanel::removeControlText, &mStatusPanel, _1, _2)
    );
 
-   status_panel_data->mHasControlText.connect(
-      boost::bind(&StatusPanel::hasControlText, &mStatusPanel, _1, _2, _3)
+   status_panel_data->hasControlText.connect(
+      boost::bind(&StatusPanel::hasControlText, &mStatusPanel, _1, _2)
    );
 
-   status_panel_data->mAddStatusMessage.connect(
+   status_panel_data->addStatusMessage.connect(
       boost::bind(&StatusPanel::addStatusMessage, &mStatusPanel, _1)
    );
 
-   status_panel_data->mSetWidthHeight.connect(
+   status_panel_data->setWidthHeight.connect(
       boost::bind(&StatusPanelViewOriginal::setWidthHeight, &mStatusPanelView,
                   _1, _2, _3)
    );
 
-   status_panel_data->mSetStatusHistorySize.connect(
+   status_panel_data->setStatusHistorySize.connect(
       boost::bind(&StatusPanel::setStatusHistorySize, &mStatusPanel, _1)
    );
 

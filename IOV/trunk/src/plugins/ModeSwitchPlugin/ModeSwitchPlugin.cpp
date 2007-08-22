@@ -365,14 +365,14 @@ void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
    StatusPanelDataPtr status_panel_data =
       viewer->getSceneObj()->getSceneData<StatusPanelData>();
 
-   status_panel_data->mSetHeaderTitle("Mode");
-   status_panel_data->mSetCenterTitle("Controls");
+   status_panel_data->setHeaderTitle("Mode");
+   status_panel_data->setCenterTitle("Controls");
    std::ostringstream stream;
    stream << mModeNames[modeNum];
-   status_panel_data->mSetHeaderText(stream.str());
+   status_panel_data->setHeaderText(stream.str());
 
-   status_panel_data->mSetControlText(mSwitchButton.toString(),
-                                      "Switch Mode");
+   status_panel_data->setControlText(mSwitchButton.toString(),
+                                     "Switch Mode");
 
    for ( unsigned int i = 0; i < mPlugins.size(); ++i )
    {

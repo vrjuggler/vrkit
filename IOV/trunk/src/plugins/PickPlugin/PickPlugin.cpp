@@ -221,12 +221,12 @@ void PickPlugin::focusChanged(inf::ViewerPtr viewer)
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
-      bool has(false);
-      status_panel_data->mHasControlText(mPickBtn.toString(), mPickText, has);
+      const bool has =
+         status_panel_data->hasControlText(mPickBtn.toString(), mPickText);
 
       if ( ! has )
       {
-         status_panel_data->mAddControlText(mPickBtn.toString(), mPickText, 1);
+         status_panel_data->addControlText(mPickBtn.toString(), mPickText, 1);
       }
    }
    else if ( ! isFocused() )
@@ -234,7 +234,7 @@ void PickPlugin::focusChanged(inf::ViewerPtr viewer)
       inf::ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
-      status_panel_data->mRemoveControlText(mPickBtn.toString(), mPickText);
+      status_panel_data->removeControlText(mPickBtn.toString(), mPickText);
    }
 }
 

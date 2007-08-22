@@ -69,18 +69,21 @@ public:
     *
     * @since 0.10.0
     */
-   void hasControlText(const std::string& cmdText, const std::string& desc,
-                       bool& flag)
+   bool hasControlText(const std::string& cmdText, const std::string& desc)
+      const
    {
-      flag = false;
+      bool flag(false);
 
       if ( mCenterText.count(cmdText) != 0 )
       {
-         std::vector<std::string>& vec = mCenterText[cmdText];
+         const std::vector<std::string>& vec =
+            (*mCenterText.find(cmdText)).second;
          flag = std::find(vec.begin(), vec.end(), desc) != vec.end();
       }
 
       mChangeSignal();
+
+      return flag;
    }
 
    /** Add another message to the status panel. */

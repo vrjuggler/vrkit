@@ -39,44 +39,38 @@ public:
       void (const std::string&, const std::string&, const unsigned int)
    > set_cmd_string_uint_t;
    typedef boost::signal<
-      void (const std::string&, const std::string&, bool&)
+      bool (const std::string&, const std::string&)
    > has_cmd_string_t;
    typedef boost::signal<
       void (const float, const float, const float)
    > set_float3_t;
    typedef boost::signal<void (const unsigned int)> set_uint_t;
 
-   set_string_t mSetHeaderTitle;
-   set_string_t mSetCenterTitle;
-   set_string_t mSetBottomTitle;
+   set_string_t setHeaderTitle;
+   set_string_t setCenterTitle;
+   set_string_t setBottomTitle;
 
-   set_string_t mSetHeaderText;
+   set_string_t setHeaderText;
 
-   set_cmd_string_t mSetControlText;
+   set_cmd_string_t setControlText;
 
-   set_cmd_string_uint_t mAddControlText;
+   set_cmd_string_uint_t addControlText;
 
-   set_cmd_string_t mRemoveControlText;
+   set_cmd_string_t removeControlText;
 
-   has_cmd_string_t mHasControlText;
+   has_cmd_string_t hasControlText;
 
-   set_string_t mAddStatusMessage;
+   set_string_t addStatusMessage;
 
-   set_float3_t mSetWidthHeight;
+   set_float3_t setWidthHeight;
 
-   set_uint_t mSetStatusHistorySize;
-
-   void test()
-   {
-      std::cerr << "test";
-   }
+   set_uint_t setStatusHistorySize;
 
 protected:
    StatusPanelData()
    {
       /* Do nothing. */;
    }
-
 };
 
 } // end inf

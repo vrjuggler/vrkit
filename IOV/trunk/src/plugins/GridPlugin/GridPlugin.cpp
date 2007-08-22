@@ -258,79 +258,77 @@ void GridPlugin::focusChanged(inf::ViewerPtr viewer)
 
       if ( mActivateBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mActivateBtn.toString(),
-                                               mActivateText);
+         status_panel_data->removeControlText(mActivateBtn.toString(),
+                                              mActivateText);
       }
 
       if ( mCycleBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mCycleBtn.toString(),
-                                               mCycleText);
+         status_panel_data->removeControlText(mCycleBtn.toString(),
+                                              mCycleText);
       }
 
       if ( mHideBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mHideBtn.toString(),
-                                               mHideText);
+         status_panel_data->removeControlText(mHideBtn.toString(), mHideText);
       }
 
       if ( mResetBtn.isConfigured() )
       {
-         status_panel_data->mRemoveControlText(mResetBtn.toString(),
-                                               mResetText);
+         status_panel_data->removeControlText(mResetBtn.toString(),
+                                              mResetText);
       }
    }
    else
    {
       if ( mActivateBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mActivateBtn.toString(),
-                                            mActivateText, has);
+         const bool has =
+            status_panel_data->hasControlText(mActivateBtn.toString(),
+                                              mActivateText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mActivateBtn.toString(),
-                                               mActivateText, 1);
+            status_panel_data->addControlText(mActivateBtn.toString(),
+                                              mActivateText, 1);
          }
       }
 
       if ( mCycleBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mCycleBtn.toString(), mCycleText,
-                                            has);
+         const bool has =
+            status_panel_data->hasControlText(mCycleBtn.toString(),
+                                              mCycleText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mCycleBtn.toString(),
-                                               mCycleText, 1);
+            status_panel_data->addControlText(mCycleBtn.toString(),
+                                              mCycleText, 1);
          }
       }
 
       if ( mHideBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mHideBtn.toString(), mHideText,
-                                            has);
+         const bool has =
+            status_panel_data->hasControlText(mHideBtn.toString(), mHideText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mHideBtn.toString(), mHideText,
-                                               1);
+            status_panel_data->addControlText(mHideBtn.toString(), mHideText,
+                                              1);
          }
       }
 
       if ( mResetBtn.isConfigured() )
       {
-         bool has(false);
-         status_panel_data->mHasControlText(mResetBtn.toString(), mResetText,
-                                            has);
+         const bool has =
+            status_panel_data->hasControlText(mResetBtn.toString(),
+                                              mResetText);
 
          if ( ! has )
          {
-            status_panel_data->mAddControlText(mResetBtn.toString(),
-                                               mResetText, 1);
+            status_panel_data->addControlText(mResetBtn.toString(),
+                                              mResetText, 1);
          }
       }
    }
