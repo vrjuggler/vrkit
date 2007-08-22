@@ -86,10 +86,16 @@ PluginPtr PickPlugin::init(ViewerPtr viewer)
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
 
    // Connect the intersection signal to our slot.
-   mIsectConnection = mEventData->mObjectIntersectedSignal.connect(0, boost::bind(&PickPlugin::objectIntersected, this, _1, _2));
+   mIsectConnection =
+      mEventData->objectIntersected.connect(
+         0, boost::bind(&PickPlugin::objectIntersected, this, _1, _2)
+      );
 
    // Connect the de-intersection signal to our slot.
-   mDeIsectConnection = mEventData->mObjectDeintersectedSignal.connect(0, boost::bind(&PickPlugin::objectDeintersected, this, _1));
+   mDeIsectConnection =
+      mEventData->objectDeintersected.connect(
+         0, boost::bind(&PickPlugin::objectDeintersected, this, _1)
+      );
 
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
@@ -154,7 +160,7 @@ void PickPlugin::update(ViewerPtr)
          if (mIntersectedObj == mPickedObj)
          {
             std::cout << "Double click deselect" << std::endl;
-            mEventData->mObjectUnpickedSignal(mPickedObj);
+            mEventData->objectUnpicked(mPickedObj);
             mPickedObj = SceneObjectPtr();
             mPicking = false;
          }
@@ -163,7 +169,7 @@ void PickPlugin::update(ViewerPtr)
             if (mPickedObj != NULL)
             {
                std::cout << "New object selected, so deselect" << std::endl;
-               mEventData->mObjectUnpickedSignal(mPickedObj);
+               mEventData->objectUnpicked(mPickedObj);
                mPickedObj = SceneObjectPtr();
                mPicking = false;
             }
@@ -173,7 +179,7 @@ void PickPlugin::update(ViewerPtr)
             mPicking = true;
 
             // Send a select event.
-            mEventData->mObjectPickedSignal(mPickedObj);
+            mEventData->objectPicked(mPickedObj);
          }
       }
    }

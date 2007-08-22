@@ -47,7 +47,6 @@ public:
 
    virtual ~EventData();
 
-public:
    /**
     * The type for signals whose slots take a single argument of type
     * inf::SceneObjectPtr.
@@ -82,64 +81,81 @@ public:
    /** @name Signals */
    //@{
    /**
+    * Signal emitted when one or more objects are moved.
     *
-    * @since 0.29.0
+    * @since 0.45.0
     */
-   obj_move_action_t mObjectsMovedSignal;
+   obj_move_action_t objectsMoved;
+
+   typedef boost::signal<
+      Event::ResultType(SceneObjectPtr, const gmtl::Point3f&),
+      Event::ResultOperator
+   > obj_isect_action_t;
 
    /**
     * Signal emitted when an object is intersected. This is similar to a
     * mouse-over or mouse-enter event in traditional 2D windowing systems.
     *
-    * @since 0.19.0
+    * @since 0.45.0
     */
-   boost::signal<Event::ResultType (SceneObjectPtr, const gmtl::Point3f&),
-                 Event::ResultOperator> mObjectIntersectedSignal;
+   obj_isect_action_t objectIntersected;
 
    /**
     * Signal emitted when an object changes from being intersected to not being
     * intersected. This is similar to a mouse-exit event in traditional 2D
     * windowing systems.
     *
-    * @since 0.19.0
+    * @since 0.45.0
     */
-   basic_action_t mObjectDeintersectedSignal;
+   basic_action_t objectDeintersected;
 
    /**
     * Signal emitted when one or more objects are selected/grabbed.
     *
-    * @since 0.29.0
+    * @since 0.45.0
     */
-   multi_obj_action_t mObjectsSelectedSignal;
+   multi_obj_action_t objectsSelected;
 
    /**
     * Signal emitted when one or more selected/grabed objects are
     * de-selected/released.
     *
-    * @since 0.29.0
+    * @since 0.45.0
     */
-   multi_obj_action_t mObjectsDeselectedSignal;
+   multi_obj_action_t objectsDeselected;
 
    /**
     * Signal emitted when one or more objects are chosen to be grabbed later.
     * This may be emitted multiple times before mObjectsSelectedSignal is
     * emitted.
     *
-    * @since 0.30.4
+    * @since 0.45.0
     */
-   multi_obj_action_t mSelectionListExpandedSignal;
+   multi_obj_action_t selectionListExpanded;
 
    /**
     * Signal emitted when one or more objects are removed from the collection
     * of objects chosen to be grabbed later. This may be emitted multiple
     * times before mObjectsSelectedSignal is emitted.
     *
-    * @since 0.30.4
+    * @since 0.45.0
     */
-   multi_obj_action_t mSelectionListReducedSignal;
+   multi_obj_action_t selectionListReduced;
 
-   basic_action_t mObjectPickedSignal;
-   basic_action_t mObjectUnpickedSignal;
+   /**
+    * Signal emitted when an object is picked. Picking is different than
+    * selecting.
+    *
+    * @since 0.45.0
+    */
+   basic_action_t objectPicked;
+
+   /**
+    * Signal emitted when a picked object is "unpicked."
+    *
+    * @since 0.45.0
+    */
+   basic_action_t objectUnpicked;
    //@}
 };
 

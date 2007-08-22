@@ -183,7 +183,7 @@ void Viewer::preFrame()
                << inf::getName(mIntersectedObj->getRoot()) << std::endl
                << vprDEBUG_FLUSH;
 
-            mEventData->mObjectDeintersectedSignal(mIntersectedObj);
+            mEventData->objectDeintersected(mIntersectedObj);
          }
 
          // Change the intersected object to the one we found above.
@@ -200,7 +200,7 @@ void Viewer::preFrame()
                << inf::getName(mIntersectedObj->getRoot().get()) << std::endl
                << vprDEBUG_FLUSH;
 
-            mEventData->mObjectIntersectedSignal(mIntersectedObj, intersect_point);
+            mEventData->objectIntersected(mIntersectedObj, intersect_point);
          }
       }
    }

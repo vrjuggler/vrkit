@@ -58,11 +58,11 @@ inf::EventSoundPlayerPtr EventSoundPlayer::init(inf::ViewerPtr viewer)
       viewer->getSceneObj()->getSceneData<inf::EventData>();
 
    mIntersectSlotConnection =
-      event_data->mObjectIntersectedSignal.connect(
+      event_data->objectIntersected.connect(
          boost::bind(&EventSoundPlayer::objectIntersected, this)
       );
    mSelectSlotConnection =
-      event_data->mObjectsSelectedSignal.connect(
+      event_data->objectsSelected.connect(
          boost::bind(&EventSoundPlayer::objectsSelected, this)
       );
 

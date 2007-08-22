@@ -99,7 +99,7 @@ GrabPlugin::~GrabPlugin()
 PluginPtr GrabPlugin::init(ViewerPtr viewer)
 {
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
-   mEventData->mObjectsMovedSignal.connect(
+   mEventData->objectsMoved.connect(
       100, boost::bind(&GrabPlugin::defaultObjectsMovedSlot, this, _1)
    );
 
@@ -204,7 +204,7 @@ void GrabPlugin::update(ViewerPtr viewer)
          }
 
          // Send a move event.
-         mEventData->mObjectsMovedSignal(move_data);
+         mEventData->objectsMoved(move_data);
       }
    }
 }
@@ -367,7 +367,7 @@ void GrabPlugin::objectsGrabbed(inf::ViewerPtr viewer,
                              isectPoint, vp_M_wand_xform));
 
    // Emit the object selection signal.
-   mEventData->mObjectsSelectedSignal(objs);
+   mEventData->objectsSelected(objs);
 }
 
 void GrabPlugin::objectsReleased(inf::ViewerPtr viewer,
@@ -384,7 +384,7 @@ void GrabPlugin::objectsReleased(inf::ViewerPtr viewer,
                              objs));
 
    // Emit the de-select event for all the objects that were released.
-   mEventData->mObjectsDeselectedSignal(objs);
+   mEventData->objectsDeselected(objs);
 }
 
 }

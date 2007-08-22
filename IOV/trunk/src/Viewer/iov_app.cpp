@@ -291,7 +291,7 @@ void OpenSgViewer::init()
    mSoundPlayer = inf::EventSoundPlayer::create()->init(shared_from_this());
 
    inf::EventDataPtr event_data = getSceneObj()->getSceneData<inf::EventData>();
-   event_data->mObjectsMovedSignal.connect(
+   event_data->objectsMoved.connect(
       0, boost::bind(&OpenSgViewer::objectsMovedSlot, this, _1)
    );
 

@@ -81,21 +81,27 @@ PluginPtr WidgetPlugin::init(inf::ViewerPtr viewer)
    inf::ScenePtr scene = viewer->getSceneObj();
    EventDataPtr event_data = scene->getSceneData<inf::EventData>();
    mMovedConnection =
-      event_data->mObjectsMovedSignal.connect(
+      event_data->objectsMoved.connect(
          0, boost::bind(&WidgetPlugin::objectsMovedSlot, this, _1)
       );
    mMovedConnection.block();
 
    // Connect the intersection signal to our slot.
-   mIsectConnection = event_data->mObjectIntersectedSignal.connect(0, boost::bind(&WidgetPlugin::objectIntersected, this, _1, _2));
+   mIsectConnection =
+      event_data->objectIntersected.connect(
+         0, boost::bind(&WidgetPlugin::objectIntersected, this, _1, _2)
+      );
 
    // Connect the de-intersection signal to our slot.
-   mDeIsectConnection = event_data->mObjectDeintersectedSignal.connect(0, boost::bind(&WidgetPlugin::objectDeintersected, this, _1));
+   mDeIsectConnection =
+      event_data->objectDeintersected.connect(
+         0, boost::bind(&WidgetPlugin::objectDeintersected, this, _1)
+      );
 
-   event_data->mObjectsSelectedSignal.connect(
+   event_data->objectsSelected.connect(
       0, boost::bind(&WidgetPlugin::objectsSelected, this, _1, true)
    );
-   event_data->mObjectsDeselectedSignal.connect(
+   event_data->objectsDeselected.connect(
       0, boost::bind(&WidgetPlugin::objectsSelected, this, _1, false)
    );
 

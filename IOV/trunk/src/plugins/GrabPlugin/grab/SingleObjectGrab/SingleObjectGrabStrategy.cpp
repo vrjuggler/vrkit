@@ -94,14 +94,14 @@ init(ViewerPtr viewer, grab_callback_t grabCallback,
 
    // Connect the intersection signal to our slot.
    mIsectConnection =
-      event_data->mObjectIntersectedSignal.connect(
+      event_data->objectIntersected.connect(
          0, boost::bind(&SingleObjectGrabStrategy::objectIntersected, this,
                         _1, _2)
       );
 
    // Connect the de-intersection signal to our slot.
    mDeIsectConnection =
-      event_data->mObjectDeintersectedSignal.connect(
+      event_data->objectDeintersected.connect(
          0, boost::bind(&SingleObjectGrabStrategy::objectDeintersected,
                         this, _1)
       );

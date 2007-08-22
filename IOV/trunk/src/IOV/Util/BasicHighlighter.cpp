@@ -180,21 +180,21 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
 
    // Connect the intersection signal to our slot.
    mConnections.push_back(
-      event_data->mObjectIntersectedSignal.connect(
+      event_data->objectIntersected.connect(
          100, boost::bind(&BasicHighlighter::objectIntersected, this, _1, _2)
       )
    );
 
    // Connect the de-intersection signal to our slot.
    mConnections.push_back(
-      event_data->mObjectDeintersectedSignal.connect(
+      event_data->objectDeintersected.connect(
          100, boost::bind(&BasicHighlighter::objectDeintersected, this, _1)
       )
    );
 
    // Connect the selection list expansion signal to our slot.
    mConnections.push_back(
-      event_data->mSelectionListExpandedSignal.connect(
+      event_data->selectionListExpanded.connect(
          100,
          boost::bind(&BasicHighlighter::objectChoiceChanged, this, _1, true)
       )
@@ -202,7 +202,7 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
 
    // Connect the selection list reduction signal to our slot.
    mConnections.push_back(
-      event_data->mSelectionListReducedSignal.connect(
+      event_data->selectionListReduced.connect(
          100,
          boost::bind(&BasicHighlighter::objectChoiceChanged, this, _1, false)
       )
@@ -210,28 +210,28 @@ BasicHighlighterPtr BasicHighlighter::init(inf::ViewerPtr viewer)
 
    // Connect the selection signal to our slot.
    mConnections.push_back(
-      event_data->mObjectsSelectedSignal.connect(
+      event_data->objectsSelected.connect(
          100, boost::bind(&BasicHighlighter::objectsSelected, this, _1, true)
       )
    );
 
    // Connect the de-selection signal to our slot.
    mConnections.push_back(
-      event_data->mObjectsDeselectedSignal.connect(
+      event_data->objectsDeselected.connect(
          100, boost::bind(&BasicHighlighter::objectsSelected, this, _1, false)
       )
    );
 
-   // Connect the selection signal to our slot.
+   // Connect the pick signal to our slot.
    mConnections.push_back(
-      event_data->mObjectPickedSignal.connect(
+      event_data->objectPicked.connect(
          100, boost::bind(&BasicHighlighter::objectPicked, this, _1, true)
       )
    );;
 
-   // Connect the de-selection signal to our slot.
+   // Connect the un-pick signal to our slot.
    mConnections.push_back(
-      event_data->mObjectUnpickedSignal.connect(
+      event_data->objectUnpicked.connect(
          100, boost::bind(&BasicHighlighter::objectPicked, this, _1, false)
       )
    );
