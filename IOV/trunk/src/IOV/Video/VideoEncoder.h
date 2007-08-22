@@ -95,11 +95,18 @@ public:
 
    void setFormat(const video_encoder_format_t& format);
 
+   /**
+    * Returns the pixel format that is to be used by this encoder.
+    *
+    * @pre record() has been called so that there is an configured
+    *      inf::Encoder object held by this object.
+    */
+   OSG::Image::PixelFormat getPixelFormat() const;
+
 private:
    typedef std::map<std::string, EncoderPtr> encoder_map_t;
 
    bool                 mRecording;     /**< Whether we are currently recording. */
-   OSG::ImagePtr        mImage;		/**< Image to hold the pixel data while encoding. */
    bool                 mStereo;
    std::string		mFilename;
    OSG::UInt32		mFps;

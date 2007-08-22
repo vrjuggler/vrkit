@@ -90,10 +90,6 @@ CameraPtr Camera::init()
 
    mCurrentImage = mLeftImage;
 
-   // Set the correct size of FBO.
-   // This also generates the frame geometry around the captured scene.
-   inf::Camera::setSize(mWidth, mHeight);
-
    return shared_from_this();
 }
 
@@ -125,14 +121,16 @@ void Camera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 {
    mWidth = width;
    mHeight = height;
+}
 
-   // Resize the debug texture.
+void Camera::setPixelFormat(const OSG::Image::PixelFormat pixelFormat)
+{
    OSG::beginEditCP(mLeftImage);
-      mLeftImage->set(OSG::Image::OSG_RGBA_PF, width, height);
+      mLeftImage->set(pixelFormat, mWidth, mHeight);
    OSG::endEditCP(mLeftImage);
 
    OSG::beginEditCP(mRightImage);
-      mRightImage->set(OSG::Image::OSG_RGBA_PF, width, height);
+      mRightImage->set(pixelFormat, mWidth, mHeight);
    OSG::endEditCP(mRightImage);
 }
 

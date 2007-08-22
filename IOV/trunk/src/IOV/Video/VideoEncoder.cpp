@@ -41,7 +41,6 @@ namespace inf
 
 VideoEncoder::VideoEncoder()
    : mRecording(false)
-   , mImage(OSG::NullFC)
    , mStereo(false)
    , mFilename("iov_movie.avi")
    , mFps(30)
@@ -64,7 +63,6 @@ VideoEncoder::~VideoEncoder()
       mEncoder->stopEncoding();
       mEncoder = EncoderPtr();
    }
-   mImage = OSG::NullFC;
 }
 
 VideoEncoderPtr VideoEncoder::init()
@@ -144,24 +142,6 @@ void VideoEncoder::record()
       };
 
    mEncoder->setEncodingParameters(encoder_params);
-
-
-   // Create the image to store the pixel data in.
-   mImage = OSG::Image::create();
-   OSG::beginEditCP(mImage);
-// Video for Windows wants bytes in BRG order. Ask the GL driver for them in that order.
-
-   //XXX: Do one call to mImage->set
-#if defined(IOV_WITH_VFW)
-      mImage->set(OSG::Image::OSG_BGR_PF, 1);
-#else
-      mImage->set(OSG::Image::OSG_RGB_PF, 1);
-#endif
-   OSG::endEditCP(mImage);
-
-   // Fill in the image.
-   mImage->set(mImage->getPixelFormat(), image_width, image_height);
-
    mEncoder->startEncoding();
 
    mRecording = true;
@@ -203,6 +183,12 @@ void VideoEncoder::setFormat(const video_encoder_format_t& format)
    mVideoEncoderParams = format;
 }
 
+OSG::Image::PixelFormat VideoEncoder::getPixelFormat() const
+{
+   vprASSERT(mEncoder.get() != NULL);
+   return mEncoder->getPixelFormat();
+}
+
 void VideoEncoder::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 {
    mWidth = width;
@@ -226,11 +212,7 @@ void VideoEncoder::writeFrame(OSG::ImagePtr img)
       return;
    }
 
-   OSG::beginEditCP(mImage);
-      img->reformat((OSG::Image::PixelFormat)mImage->getPixelFormat(), mImage);
-   OSG::endEditCP(mImage);
-
-   mEncoder->writeFrame(mImage->getData());
+   mEncoder->writeFrame(img->getData());
 }
 
 }

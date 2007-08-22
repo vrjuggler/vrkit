@@ -72,6 +72,8 @@ public:
     */
    virtual void setSize(const OSG::UInt32 width, const OSG::UInt32 height);
 
+   void setPixelFormat(const OSG::Image::PixelFormat pixelFormat);
+
    virtual OSG::UInt32 getWidth() const;
 
    virtual OSG::UInt32 getHeight() const;

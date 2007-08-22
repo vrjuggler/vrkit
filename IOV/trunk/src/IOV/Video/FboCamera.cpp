@@ -77,10 +77,6 @@ CameraPtr FboCamera::init()
       mFboVP->getTextures().push_back(mLeftTexture);
    OSG::endEditCP(mFboVP);
 
-   // Set the correct size of FBO.
-   // This also generates the frame geometry around the captured scene.
-   inf::FboCamera::setSize(mWidth, mHeight);
-
    return cam_ptr;
 }
 
@@ -99,7 +95,7 @@ void FboCamera::setTravMask(const OSG::UInt32 value)
 }
 
 void FboCamera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
-{ 
+{
    if( OSG::NullFC != mFboVP)
    {
       Camera::setSize(width, height);

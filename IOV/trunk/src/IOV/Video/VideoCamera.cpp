@@ -75,8 +75,6 @@ VideoCameraPtr VideoCamera::init()
    
    mVideoEncoder = VideoEncoder::create()->init();
 
-   setFrameSize(mCamera->getWidth(), mCamera->getHeight());
-
    return shared_from_this();
 }
 
@@ -123,7 +121,6 @@ void VideoCamera::setInterocularDistance(const OSG::Real32 interocular)
 
 void VideoCamera::setFrameSize(const OSG::UInt32 width, const OSG::UInt32 height)
 {
-
    mCamera->setSize(width, height);
    mVideoEncoder->setSize(width, height);
 
@@ -139,15 +136,17 @@ void VideoCamera::startRecording()
 {
    if ( ! isRecording() )
    {
+      mVideoEncoder->record();
+      mCamera->setPixelFormat(mVideoEncoder->getPixelFormat());
+
       if( mStereo )
       {
          OSG::beginEditCP(mStereoImageStorage);
-            mStereoImageStorage->set(OSG::Image::OSG_RGBA_PF,
+            mStereoImageStorage->set(mVideoEncoder->getPixelFormat(),
                                      mCamera->getWidth() * 2,
                                      mCamera->getHeight());
          OSG::beginEditCP(mStereoImageStorage);
       }
-      mVideoEncoder->record();
       mRecording = true;
    }
 }
