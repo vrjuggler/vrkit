@@ -64,11 +64,6 @@ namespace inf
 namespace
 {
 
-const std::string status_panel_elt_tkn("status_panel_plugin");
-const std::string initial_size_prop("initial_size");
-const std::string initial_pos_prop("initial_pos");
-const std::string initial_rot_prop("initial_rot");
-
 class StatusOutputter
 {
 public:
@@ -128,13 +123,17 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
 
    mPanelXformNode = OSG::TransformNodePtr::create();
 
-   // XXX: Read the configuration
+   const std::string status_panel_elt_tkn("status_panel_plugin");
    jccl::ConfigElementPtr elt =
       viewer->getConfiguration().getConfigElement(status_panel_elt_tkn);
 
    if ( elt )
    {
       vprASSERT(elt->getID() == status_panel_elt_tkn);
+
+      const std::string initial_size_prop("initial_size");
+      const std::string initial_pos_prop("initial_pos");
+      const std::string initial_rot_prop("initial_rot");
 
       const float feet_to_app_units(0.3048f * viewer->getDrawScaleFactor());
 
