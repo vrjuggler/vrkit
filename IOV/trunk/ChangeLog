@@ -1,7 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
 2007-08-22 patrick  Renamed signal objects in inf::EventData to be more like
-                    method names.
+                    method names. Renamed signal objects in
+                    inf::StatusPanelData to be more like method names.
+                    -- VERSION -- 0.45.0
 2007-08-18 dshipton Further refactoring of the video capture interfaces.
                     -- VERSION -- 0.44.0
 2007-08-17 aronb    Added support for OpenGL video caputre using DirectShow.
