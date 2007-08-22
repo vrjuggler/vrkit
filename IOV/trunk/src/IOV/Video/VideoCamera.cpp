@@ -70,9 +70,6 @@ VideoCameraPtr VideoCamera::init()
    
    assert(mCamera.get() != NULL);
 
-   // Set the correct size of a video frame.
-   // This also generates the frame geometry around the captured scene.
-   
    mVideoEncoder = VideoEncoder::create()->init();
 
    return shared_from_this();
