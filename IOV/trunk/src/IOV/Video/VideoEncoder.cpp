@@ -212,7 +212,16 @@ void VideoEncoder::writeFrame(OSG::ImagePtr img)
       return;
    }
 
-   mEncoder->writeFrame(img->getData());
+   try
+   {
+      mEncoder->writeFrame(img->getData());
+   }
+   catch (std::exception& ex)
+   {
+      std::cerr << "Encoder failed to write frame; stopping encoding\n"
+                << ex.what() << std::endl;
+      mEncoder->stopEncoding();
+   }
 }
 
 }
