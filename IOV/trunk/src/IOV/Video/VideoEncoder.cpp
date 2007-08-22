@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+#include <vpr/Util/Assert.h>
+
 #include <IOV/Status.h>
 #include <IOV/Util/Exceptions.h>
 #include <IOV/Video/Encoder.h>
@@ -167,13 +169,13 @@ void VideoEncoder::record()
 
 void VideoEncoder::pause()
 {
-   OSG_ASSERT(NULL != mEncoder.get() && "Can't pause if we aren't recording.");
+   vprASSERT(NULL != mEncoder.get() && "Can't pause without an encoder.");
    mRecording = false;
 }
 
 void VideoEncoder::resume()
 {
-   OSG_ASSERT(NULL != mEncoder.get() && "Can't resume if we aren't recording.");
+   vprASSERT(NULL != mEncoder.get() && "Can't resume without an encoder.");
    if (NULL != mEncoder.get())
    {
       mRecording = true;
@@ -182,7 +184,7 @@ void VideoEncoder::resume()
 
 void VideoEncoder::stop()
 {
-   OSG_ASSERT(NULL != mEncoder.get() && "Can't stop if we aren't recording.");
+   vprASSERT(NULL != mEncoder.get() && "Can't stop without an encoder.");
    if (NULL != mEncoder.get())
    {
       mEncoder->stopEncoding();
