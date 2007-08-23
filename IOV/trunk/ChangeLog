@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-23 patrick  inf::VideoCamera now emits signals when the recording
+                    state changes.
+                    -- VERSION -- 0.45.2
 2007-08-22 patrick  Added new exception types for improved error reporting in
                     the use of inf::VideoCamera and friends.
                     -- VERSION -- 0.45.1

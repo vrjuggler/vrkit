@@ -7,9 +7,11 @@
 
 #include <map>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/signal.hpp>
 
 #include <OpenSG/OSGImage.h>
 
+#include <IOV/Util/SignalProxy.h>
 #include <IOV/Video/VideoEncoderPtr.h>
 #include <IOV/Video/Encoder.h>
 
@@ -103,7 +105,60 @@ public:
     */
    OSG::Image::PixelFormat getPixelFormat() const;
 
+   /** @name Signal Accessors */
+   //@{
+   typedef boost::signal<void ()> basic_signal_t;
+
+   /**
+    * Signal emitted when encoding starts.
+    *
+    * @since 0.45.2
+    */
+   SignalProxy<basic_signal_t> encodingStarted()
+   {
+      return SignalProxy<basic_signal_t>(mEncodingStarted);
+   }
+
+   /**
+    * Signal emitted when encoding is paused.
+    *
+    * @since 0.45.2
+    */
+   SignalProxy<basic_signal_t> encodingPaused()
+   {
+      return SignalProxy<basic_signal_t>(mEncodingPaused);
+   }
+
+   /**
+    * Signal emitted when encoding resumes.
+    *
+    * @since 0.45.2
+    */
+   SignalProxy<basic_signal_t> encodingResumed()
+   {
+      return SignalProxy<basic_signal_t>(mEncodingResumed);
+   }
+
+   /**
+    * Signal emitted when encoding stops.
+    *
+    * @since 0.45.2
+    */
+   SignalProxy<basic_signal_t> encodingStopped()
+   {
+      return SignalProxy<basic_signal_t>(mEncodingStopped);
+   }
+   //@}
+
 private:
+   /** @name Signal Objects */
+   //@{
+   basic_signal_t mEncodingStarted;
+   basic_signal_t mEncodingPaused;
+   basic_signal_t mEncodingResumed;
+   basic_signal_t mEncodingStopped;
+   //@}
+
    typedef std::map<std::string, EncoderPtr> encoder_map_t;
 
    bool                 mRecording;     /**< Whether we are currently recording. */

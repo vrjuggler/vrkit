@@ -145,12 +145,14 @@ void VideoEncoder::record()
    mEncoder->startEncoding();
 
    mRecording = true;
+   mEncodingStarted();
 }
 
 void VideoEncoder::pause()
 {
    vprASSERT(NULL != mEncoder.get() && "Can't pause without an encoder.");
    mRecording = false;
+   mEncodingPaused();
 }
 
 void VideoEncoder::resume()
@@ -159,6 +161,7 @@ void VideoEncoder::resume()
    if (NULL != mEncoder.get())
    {
       mRecording = true;
+      mEncodingResumed();
    }
 }
 
@@ -169,6 +172,7 @@ void VideoEncoder::stop()
    {
       mEncoder->stopEncoding();
       mEncoder = EncoderPtr();
+      mEncodingStopped();
    }
    mRecording = false;
 }
@@ -220,7 +224,7 @@ void VideoEncoder::writeFrame(OSG::ImagePtr img)
    {
       std::cerr << "Encoder failed to write frame; stopping encoding\n"
                 << ex.what() << std::endl;
-      mEncoder->stopEncoding();
+      stop();
    }
 }
 

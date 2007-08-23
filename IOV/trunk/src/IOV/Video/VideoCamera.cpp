@@ -1,5 +1,8 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
+#include <algorithm>
+#include <boost/bind.hpp>
+
 #include <OpenSG/OSGFrustumVolume.h>
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGGeoPropPtrs.h>
@@ -41,6 +44,8 @@ VideoCameraPtr VideoCamera::create()
 
 VideoCamera::~VideoCamera()
 {
+   std::for_each(mEncoderConnections.begin(), mEncoderConnections.end(),
+                 boost::bind(&boost::signals::connection::disconnect, _1));
 }
 
 void VideoCamera::contextInit(OSG::WindowPtr window)
@@ -71,6 +76,27 @@ VideoCameraPtr VideoCamera::init()
    assert(mCamera.get() != NULL);
 
    mVideoEncoder = VideoEncoder::create()->init();
+
+   mEncoderConnections.push_back(
+      mVideoEncoder->encodingStarted().connect(
+         boost::bind(&VideoCamera::encodingStarted, this)
+      )
+   );
+   mEncoderConnections.push_back(
+      mVideoEncoder->encodingPaused().connect(
+         boost::bind(&VideoCamera::encodingPaused, this)
+      )
+   );
+   mEncoderConnections.push_back(
+      mVideoEncoder->encodingResumed().connect(
+         boost::bind(&VideoCamera::encodingResumed, this)
+      )
+   );
+   mEncoderConnections.push_back(
+      mVideoEncoder->encodingStopped().connect(
+         boost::bind(&VideoCamera::encodingStopped, this)
+      )
+   );
 
    return shared_from_this();
 }
@@ -144,7 +170,6 @@ void VideoCamera::startRecording()
                                      mCamera->getHeight());
          OSG::beginEditCP(mStereoImageStorage);
       }
-      mRecording = true;
    }
 }
 
@@ -153,7 +178,6 @@ void VideoCamera::pause()
    if( isRecording() && ! isPaused() )
    {
       mVideoEncoder->pause();
-      mPaused = true;
    }
 }
 
@@ -162,7 +186,6 @@ void VideoCamera::resume()
    if( isRecording() && isPaused() )
    {
       mVideoEncoder->resume();
-      mPaused = false;
    }
 }
 
@@ -171,8 +194,6 @@ void VideoCamera::endRecording()
    if( isRecording() )
    {
       mVideoEncoder->stop();
-      mRecording = false;
-      mPaused = false;
    }
 }
 
@@ -435,6 +456,31 @@ void VideoCamera::generateDebugFrame()
       }
       mFrameRoot->addChild(frame);
    OSG::endEditCP(mFrameRoot);
+}
+
+void VideoCamera::encodingStarted()
+{
+   mRecordingStarted();
+   mRecording = true;
+}
+
+void VideoCamera::encodingPaused()
+{
+   mRecordingPaused();
+   mPaused = true;
+}
+
+void VideoCamera::encodingResumed()
+{
+   mRecordingResumed();
+   mPaused = false;
+}
+
+void VideoCamera::encodingStopped()
+{
+   mRecordingStopped();
+   mRecording = false;
+   mPaused    = false;
 }
 
 }

@@ -5,15 +5,20 @@
 
 #include <IOV/Config.h>
 
+#include <vector>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/signal.hpp>
+#include <boost/signals/connection.hpp>
 
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGWindow.h>
 #include <OpenSG/OSGRenderAction.h>
 
+#include <IOV/Util/SignalProxy.h>
 #include <IOV/Video/CameraPtr.h>
 #include <IOV/Video/VideoEncoder.h>
 #include <IOV/Video/VideoCameraPtr.h>
+
 
 namespace inf
 {
@@ -156,6 +161,59 @@ public:
     */
    OSG::NodePtr getFrame() const;
 
+   /** @name Signal Accessors */
+   //@{
+   typedef boost::signal<void ()> basic_signal_t;
+
+   /**
+    * Signal emitted when recording starts.
+    *
+    * @see inf::VideoEncoder::encodingStarted()
+    *
+    * @since 0.45.2
+    */
+   SignalProxy<basic_signal_t> recordingStarted()
+   {
+      return SignalProxy<basic_signal_t>(mRecordingStarted);
+   }
+
+   /**
+    * Signal emitted when recording is paused.
+    *
+    * @see inf::VideoEncoder::encodingPaused()
+    *
+    * @since 0.45.2
+    */
+   SignalProxy<basic_signal_t> recordingPaused()
+   {
+      return SignalProxy<basic_signal_t>(mRecordingPaused);
+   }
+
+   /**
+    * Signal emitted when recording resumes after being paused.
+    *
+    * @see inf::VideoEncoder::encodingResumed()
+    *
+    * @since 0.45.2
+    */
+   SignalProxy<basic_signal_t> recordingResumed()
+   {
+      return SignalProxy<basic_signal_t>(mRecordingResumed);
+   }
+
+   /**
+    * Signal emitted when recording stops.
+    *
+    * @see inf::VideoEncoder::encodingStopped()
+    *
+    * @since 0.45.2
+    */
+   SignalProxy<basic_signal_t> recordingStopped()
+   {
+      return SignalProxy<basic_signal_t>(mRecordingStopped);
+   }
+   //@}
+
 private:
    void generateDebugFrame();
 
@@ -164,7 +222,59 @@ private:
     */
    void setCameraPos(const OSG::Matrix& camPos);
 
-private:
+   /** @name Slots for inf::VideoEncoder Signals */
+   //@{
+   /**
+    * Slot for the "encodingStarted" signal emitted by inf::VideoEncoder.
+    * The "recordingStarted" signal is emitted by this object.
+    *
+    * @post \c mRecording is true. \c mPaused is false.
+    *
+    * @since 0.45.2
+    */
+   void encodingStarted();
+
+   /**
+    * Slot for the "encodingPaused" signal emitted by inf::VideoEncoder.
+    * The "recordingPaused" signal is emitted by this object.
+    *
+    * @post \c mPaused is true.
+    *
+    * @since 0.45.2
+    */
+   void encodingPaused();
+
+   /**
+    * Slot for the "encodingResumed" signal emitted by inf::VideoEncoder.
+    * The "recordingResumed" signal is emitted by this object.
+    *
+    * @post \c mPaused is false.
+    *
+    * @since 0.45.2
+    */
+   void encodingResumed();
+
+   /**
+    * Slot for the "encodingStopped" signal emitted by inf::VideoEncoder.
+    * The "recordingStopped" signal is emitted by this object.
+    *
+    * @post \c mRecording and \c mPaused are both false.
+    *
+    * @since 0.45.2
+    */
+   void encodingStopped();
+   //@}
+
+   /** @name Signal Objects */
+   //@{
+   basic_signal_t mRecordingStarted;
+   basic_signal_t mRecordingPaused;
+   basic_signal_t mRecordingResumed;
+   basic_signal_t mRecordingStopped;
+   //@}
+
+   std::vector<boost::signals::connection> mEncoderConnections;
+
    CameraPtr                            mCamera;         /**< Camera used for rendering. */
    VideoEncoderPtr                      mVideoEncoder;
    OSG::ImagePtr                        mStereoImageStorage; /**< Temp storage for stereo image concatenation. */
