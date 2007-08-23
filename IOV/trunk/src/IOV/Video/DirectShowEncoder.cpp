@@ -81,7 +81,13 @@ DWORD addGraphToRunningObjTable(IUnknown* graph)
    CHECK_RESULT(GetRunningObjectTable(0, &rot),
                 "Failed to get running object table.");
 
-   CHECK_RESULT(CreateItemMoniker(L"!", L"DirectShowEncoder", &moniker),
+   WCHAR graph_reg_str[128];
+   CHECK_RESULT(StringCchPrintfW(graph_reg_str, NUMELMS(graph_reg_str),
+                                 L"FilterGraph %08x pid %08x\0",
+                                 (DWORD_PTR)graph, GetCurrentProcessId()),
+                "Failed to create graph registration str.")
+
+   CHECK_RESULT(CreateItemMoniker(L"!", graph_reg_str, &moniker),
                 "Failed to create item moniker");
 
    // Use the ROTFLAGS_REGISTRATIONKEEPSALIVE to ensure a strong reference
