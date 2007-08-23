@@ -4,15 +4,17 @@
 #define _INF_DYNAMIC_SCENE_OBJECT_H_
 
 #include <IOV/Config.h>
-#include <IOV/DynamicSceneObjectPtr.h>
-#include <IOV/SceneObject.h>
+
+#include <vector>
+#include <boost/function.hpp>
 
 #include <OpenSG/OSGAction.h>
 #include <OpenSG/OSGDynamicVolume.h>
 #include <OpenSG/OSGTransform.h>
 
-#include <boost/enable_shared_from_this.hpp>
-#include <vector>
+#include <IOV/SceneObject.h>
+#include <IOV/DynamicSceneObjectPtr.h>
+
 
 namespace inf
 {
@@ -20,6 +22,11 @@ namespace inf
 /**
  * A scene object whose children and parent are determined on the fly when
  * they are requested.
+ *
+ * @note This class was refactored in version 0.46.0 to be much more general
+ *       than its previous incarnation, which only supported the node core
+ *       type OSG::Transform. The old version is now called
+ *       inf::DynamicSceneObjectTransform.
  *
  * @since 0.18.0
  */
@@ -38,15 +45,39 @@ public:
    }
 
    /**
-    * Initializes this dynamic scene object.
+    * Initializes this dynamic scene object. This object will be available for
+    * grab-and-move interaction if and only if the given scene graph node has
+    * a core of type OSG::Transform or if \p makeMoveable is true.
     *
-    * @param node The OpenSG node with a transform core that is the root of
-    *             the scene graph sub-tree represented by this dynamic scene
-    *             object.
+    * @post If \p makeMoveable is true, then \p node has a core of type
+    *       OSG::Transform. If \p node did not already have a core of that
+    *       type, then \p node has a single child whose children are core type
+    *       are that of \p node prior to invocation of this method.
+    *
+    * @param node         The OpenSG node with a transform core that is the
+    *                     root of the scene graph sub-tree represented by this
+    *                     dynamic scene object.
+    * @param predicate    The predicate (a callable that takes a single
+    *                     OSG::NodePtr parameter and returns a bool) that is
+    *                     used to determine the parent/child relationships of
+    *                     scene graph nodes on the fly. This same predicate
+    *                     is used for all descendent and ancestor discovery.
+    * @param makeMoveable Indicates whether this scene object and all
+    *                     dynamically discovered children should be made
+    *                     moveable. If true, then \p node will be examined to
+    *                     determine if it has a core of type OSG::Transform.
+    *                     If it does not, then a new core is created for it,
+    *                     and the old core is handed off to a new child of
+    *                     \p node that in turn has as its children the
+    *                     original children of \p node.
     *
     * @return This object is returned as a shared pointer.
+    *
+    * @since 0.46.0
     */
-   DynamicSceneObjectPtr init(OSG::TransformNodePtr node);
+   DynamicSceneObjectPtr init(OSG::NodePtr node,
+                              boost::function<bool (OSG::NodePtr)> predicate,
+                              const bool makeMoveable = true);
 
    /**
     * Return the dynamic volume that bounds the object.
@@ -165,14 +196,22 @@ public:
    virtual std::vector<SceneObjectPtr> getChildren();
    //@}
 
-protected:
+private:
    OSG::Action::ResultE enter(OSG::NodePtr& node);
 
-protected:
-   OSG::TransformNodePtr        mTransformNode; /**< Root transform node of scene object. */
-   std::vector<SceneObjectPtr>  mChildren;      /**< Children scene objects. */
+   OSG::NodeRefPtr      mRootNode;      /**< Root node of this scene object. */
+   OSG::TransformRefPtr mTransformCore;
+
+   /** @name Data for Child Discovery */
+   //@{
+   boost::function<bool (OSG::NodePtr)> isSceneObject;
+   bool                                 mMakeMoveable;
+   //@}
+
+   std::vector<SceneObjectPtr> mChildren;      /**< Child scene objects. */
 };
 
 }
+
 
 #endif

@@ -43,7 +43,7 @@
 #include <IOV/EventData.h>
 #include <IOV/User.h>
 #include <IOV/Scene.h>
-#include <IOV/DynamicSceneObject.h>
+#include <IOV/DynamicSceneObjectTransform.h>
 #include <IOV/StaticSceneObject.h>
 #include <IOV/WandInterface.h>
 #include <IOV/Util/BasicHighlighter.h>
@@ -410,7 +410,8 @@ void OpenSgViewer::init()
       }
       else if ( mSceneObjTypeName == "DynamicSceneObject" )
       {
-         model_obj = makeSceneObject<inf::DynamicSceneObject>(model_xform);
+         model_obj =
+            makeSceneObject<inf::DynamicSceneObjectTransform>(model_xform);
       }
       else
       {

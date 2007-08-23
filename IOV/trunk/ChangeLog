@@ -1,5 +1,10 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-23 patrick  Made inf::DynamicSceneObject's dynamic discovery of scene
+                    object parent/child relationships much more flexible. The
+                    old behavior that was limited to OSG::Transform node cores
+                    is now in inf::DynamicSceneObjectTransform.
+                    -- VERSION -- 0.46.0
 2007-08-23 patrick  inf::VideoCamera now emits signals when the recording
                     state changes.
                     -- VERSION -- 0.45.2
