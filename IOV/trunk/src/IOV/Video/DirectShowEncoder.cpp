@@ -122,6 +122,7 @@ DirectShowEncoder::DirectShowEncoder()
    , mMediaController(NULL)
    , mByteSource(NULL)
    , mByteStream(NULL)
+   , mRunning(false)
 #ifdef REGISTER_GRAPH
    , mGraphRegister(0)
 #endif
@@ -256,6 +257,7 @@ void DirectShowEncoder::startEncoding()
 #endif
 
    CHECK_RESULT(mMediaController->Run(), "Failed to run DirectShow Error!");
+   mRunning = true;
 
 #ifdef REGISTER_GRAPH
    mGraphRegister = addGraphToRunningObjTable(mGraphBuilder);
@@ -264,16 +266,19 @@ void DirectShowEncoder::startEncoding()
 
 void DirectShowEncoder::stopEncoding()
 {
-   CHECK_RESULT(mMediaController->StopWhenReady(),
-                "Failed to stop direct show.");
+   if ( mRunning )
+   {
+      CHECK_RESULT(mMediaController->StopWhenReady(),
+                   "Failed to stop DirectShow.");
 
 #ifdef REGISTER_GRAPH
-   if (mGraphRegister)
-   {
-      removeGraphFromRunningObjTable(mGraphRegister);
-      mGraphRegister = 0;
-   }
+      if ( mGraphRegister )
+      {
+         removeGraphFromRunningObjTable(mGraphRegister);
+         mGraphRegister = 0;
+      }
 #endif
+   }
 
    // Clean up member data we don't need anymore.
    mGraphBuilder = NULL;

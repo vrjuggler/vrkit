@@ -99,6 +99,7 @@ private:
    CComPtr<IMediaControl> mMediaController;
    ByteSource* mByteSource;
    ByteStream* mByteStream;
+   bool        mRunning;
 #ifdef REGISTER_GRAPH
    DWORD mGraphRegister;
 #endif
