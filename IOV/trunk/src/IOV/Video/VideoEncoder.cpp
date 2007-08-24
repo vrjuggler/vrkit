@@ -124,41 +124,45 @@ void VideoEncoder::record()
    if (NULL != mEncoder.get())
    {
       mEncoder->stopEncoding();
+      mEncoder = EncoderPtr();
    }
 
-   vprASSERT(mEncoderMap.count(mVideoEncoderParams.mEncoderName) > 0 && "Must have the encoder.");
+   if ( mEncoderMap.count(mVideoEncoderParams.mEncoderName) > 0 )
+   {
+      encoder_map_t::const_iterator vid_encoder =
+         mEncoderMap.find(mVideoEncoderParams.mEncoderName);
+      mEncoder = (*vid_encoder).second;
 
-   encoder_map_t::const_iterator vid_encoder = mEncoderMap.find(mVideoEncoderParams.mEncoderName);
-   mEncoder = (*vid_encoder).second;
+      Encoder::encoder_parameters_t encoder_params =
+         {
+            mVideoEncoderParams.mContainerFormat,
+            mVideoEncoderParams.mCodec,
+            mFilename,
+            image_width,
+            image_height,
+            mFps
+         };
 
-   Encoder::encoder_parameters_t encoder_params =
-      {
-         mVideoEncoderParams.mContainerFormat,
-         mVideoEncoderParams.mCodec,
-         mFilename,
-         image_width,
-         image_height,
-         mFps
-      };
+      mEncoder->setEncodingParameters(encoder_params);
+      mEncoder->startEncoding();
 
-   mEncoder->setEncodingParameters(encoder_params);
-   mEncoder->startEncoding();
-
-   mRecording = true;
-   mEncodingStarted();
+      mRecording = true;
+      mEncodingStarted();
+   }
 }
 
 void VideoEncoder::pause()
 {
-   vprASSERT(NULL != mEncoder.get() && "Can't pause without an encoder.");
-   mRecording = false;
-   mEncodingPaused();
+   if ( mRecording )
+   {
+      mRecording = false;
+      mEncodingPaused();
+   }
 }
 
 void VideoEncoder::resume()
 {
-   vprASSERT(NULL != mEncoder.get() && "Can't resume without an encoder.");
-   if (NULL != mEncoder.get())
+   if ( ! mRecording )
    {
       mRecording = true;
       mEncodingResumed();
@@ -167,8 +171,7 @@ void VideoEncoder::resume()
 
 void VideoEncoder::stop()
 {
-   vprASSERT(NULL != mEncoder.get() && "Can't stop without an encoder.");
-   if (NULL != mEncoder.get())
+   if ( mRecording )
    {
       mEncoder->stopEncoding();
       mEncoder = EncoderPtr();
