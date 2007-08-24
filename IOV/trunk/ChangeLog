@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-24 patrick  Added inf::CoreTypeSeqPredicate that allows compile-time
+                    construction of a sequence of OSG::NodeCore subclasses for
+                    use with inf::DynamicSceneObject.
+                    -- VERSION -- 0.46.1
 2007-08-23 patrick  Made inf::DynamicSceneObject's dynamic discovery of scene
                     object parent/child relationships much more flexible. The
                     old behavior that was limited to OSG::Transform node cores

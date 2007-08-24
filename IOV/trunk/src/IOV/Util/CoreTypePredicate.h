@@ -14,11 +14,21 @@ namespace inf
 {
 
 /**
- * A predicate designed for use with inf::DynamicSceneObject. This predicate
- * identifies node relationships based on the type of the node core. The
- * recognized core types are provided to the constructor of this class.
+ * A predicate designed for use with inf::DynamicSceneObject but surely usable
+ * in other contexts. This predicate identifies node relationships based on
+ * the type of the node core. The recognized core types are provided to the
+ * constructor of this class in an STL vector.
+ *
+ * In general, the types must be queried from the OpenSG Field Container
+ * Factory (OSG::FieldContainerFactory) at run time. This means that this
+ * class is most suitable for cases when the types to be queried are \em not
+ * known at compile time. For example, this predicate could be used in
+ * conjuction with configurable code that gets its types of interest at run
+ * time. In the case when the types of interest are known statically at
+ * compile time, use inf::CoreTypeSeqPredicate<T> instead.
  *
  * @see inf::DynamicSceneObject
+ * @see inf::CoreTypeSeqPredicate
  *
  * @since 0.46.0
  */

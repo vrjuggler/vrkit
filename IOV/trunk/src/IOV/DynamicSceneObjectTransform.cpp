@@ -1,8 +1,10 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
+#include <boost/mpl/vector.hpp>
+
 #include <OpenSG/OSGFieldContainerFactory.h>
 
-#include <IOV/Util/CoreTypePredicate.h>
+#include <IOV/Util/CoreTypeSeqPredicate.h>
 #include <IOV/DynamicSceneObjectTransform.h>
 
 
@@ -23,14 +25,9 @@ DynamicSceneObjectTransform::DynamicSceneObjectTransform()
 DynamicSceneObjectTransformPtr
 DynamicSceneObjectTransform::init(OSG::TransformNodePtr node)
 {
-   std::vector<OSG::FieldContainerType*> xform_type(
-      1,
-      OSG::FieldContainerFactory::the()->findType(
-         OSG::Transform::getClassTypeId()
-      )
-   );
+   typedef boost::mpl::vector<OSG::Transform> core_types;
 
-   CoreTypePredicate pred(xform_type);
+   CoreTypeSeqPredicate<core_types> pred;
    DynamicSceneObjectPtr myself = DynamicSceneObject::init(node, pred, true);
 
    return boost::dynamic_pointer_cast<DynamicSceneObjectTransform>(myself);
