@@ -19,6 +19,7 @@
 
 #undef DS_LIB_RT_OPT
 
+#include <IOV/Util/Exceptions.h>
 #include <IOV/Video/DirectShowSource.h>
 
 // These have to be included after DirectShowSource.h to avoid interfering
@@ -317,7 +318,10 @@ void ByteStream::grabFrame(const vpr::Uint32 width, const vpr::Uint32 height, vp
    // stop or an error if it's reporting an error.
    if(hr != S_OK)
    {
-      std::cout << "Deliver() returned " << hr << "; stopping" << std::endl;
+      std::ostringstream msg_stream;
+      msg_stream << "Failed to deliver media sample (error code " << hr
+                 << ")";
+      throw inf::BadRecordingDataException(msg_stream.str(), IOV_LOCATION);
    }
    //DeliverEndOfStream();
 }
