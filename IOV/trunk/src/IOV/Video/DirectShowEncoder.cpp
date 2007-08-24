@@ -243,11 +243,13 @@ void DirectShowEncoder::startEncoding()
    CHECK_RESULT(mGraphBuilder->Connect(tee_o2, encoder_in),
                 "Failed to connect desktop to AviMux!");
 #else
-   CHECK_RESULT(mGraphBuilder->Connect(byte_source_out, encoder_in),
-                "Failed to connect desktop to AviMux!");
+   CHECK_RESULT(
+      mGraphBuilder->Connect(byte_source_out, encoder_in),
+      "Failed to connect byte source output pin to encoder input pin!"
+   );
 #endif
    CHECK_RESULT(mGraphBuilder->Connect(encoder_out, avimux_in),
-                "Failed to connect desktop to AviMux!");
+                "Failed to connect encoder output pin to AviMux!");
 
 #ifdef PREVIEW
    mGraphBuilder->Render(tee_o1);
