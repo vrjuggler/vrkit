@@ -36,68 +36,91 @@ RemoteAspectFilterPtr RemoteAspectFilter::init(OSG::RemoteAspect* remoteAspect)
    mRemoteAspect = remoteAspect;
 
    // Setup the aspect callbacks
-   OSG::RemoteAspect::Functor changed = OSG::osgTypedMethodFunctor2ObjPtrCPtrRef < bool,
-       RemoteAspectFilter, OSG::FieldContainerPtr, OSG::RemoteAspect*> (this, &RemoteAspectFilter::changedFunction);
+   OSG::RemoteAspect::Functor changed =
+      OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
+         bool, RemoteAspectFilter, OSG::FieldContainerPtr, OSG::RemoteAspect*
+      >(this, &RemoteAspectFilter::changedFunction);
 
-   OSG::RemoteAspect::Functor destroyed = OSG::osgTypedMethodFunctor2ObjPtrCPtrRef < bool,
-       RemoteAspectFilter, OSG::FieldContainerPtr, OSG::RemoteAspect*> (this, &RemoteAspectFilter::destroyedFunction);
+   OSG::RemoteAspect::Functor destroyed =
+      OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
+         bool, RemoteAspectFilter, OSG::FieldContainerPtr, OSG::RemoteAspect*
+      >(this, &RemoteAspectFilter::destroyedFunction);
 
-   OSG::RemoteAspect::Functor created = OSG::osgTypedMethodFunctor2ObjPtrCPtrRef < bool,
-       RemoteAspectFilter, OSG::FieldContainerPtr, OSG::RemoteAspect*> (this, &RemoteAspectFilter::createdFunction);
+   OSG::RemoteAspect::Functor created =
+      OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
+         bool, RemoteAspectFilter, OSG::FieldContainerPtr, OSG::RemoteAspect*
+      >(this, &RemoteAspectFilter::createdFunction);
 
    // Register interest for all types
-   for(OSG::UInt32 i = 0; i < OSG::TypeFactory::the()->getNumTypes(); ++i)
+   const OSG::UInt32 type_count(OSG::TypeFactory::the()->getNumTypes());
+   for ( OSG::UInt32 i = 0; i < type_count; ++i )
    {
-       OSG::FieldContainerType* fct = OSG::FieldContainerFactory::the()->findType(i);
-       if(fct)
-       {
-          remoteAspect->registerChanged(*fct, changed);
-          remoteAspect->registerDestroyed(*fct, destroyed);
-          remoteAspect->registerCreated(*fct, created);
-       }
+      OSG::FieldContainerType* fct =
+         OSG::FieldContainerFactory::the()->findType(i);
+      if ( fct )
+      {
+         remoteAspect->registerChanged(*fct, changed);
+         remoteAspect->registerDestroyed(*fct, destroyed);
+         remoteAspect->registerCreated(*fct, created);
+      }
    }
 
    return shared_from_this();
 }
 
-void RemoteAspectFilter::addChangedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback)
+void RemoteAspectFilter::addChangedCallback(OSG::FieldContainerPtr fcp,
+                                            callback_t callback)
 {
    mChangedCallbacks.insert(callback_map_t::value_type(fcp, callback));
 }
 
-void RemoteAspectFilter::addCreatedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback)
+void RemoteAspectFilter::addCreatedCallback(OSG::FieldContainerPtr fcp,
+                                            callback_t callback)
 {
    mCreatedCallbacks.insert(callback_map_t::value_type(fcp, callback));
 }
 
-void RemoteAspectFilter::addDestroyedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback)
+void RemoteAspectFilter::addDestroyedCallback(OSG::FieldContainerPtr fcp,
+                                              callback_t callback)
 {
    mDestroyedCallbacks.insert(callback_map_t::value_type(fcp, callback));
 }
 
-/* */
-bool RemoteAspectFilter::createdFunction(OSG::FieldContainerPtr &fcp, OSG::RemoteAspect *)
+bool RemoteAspectFilter::createdFunction(OSG::FieldContainerPtr& fcp,
+                                         OSG::RemoteAspect*)
 {
-   if(OSG::Node::getClassType() == fcp->getType())
-   { mNodes++; }
-   if(OSG::Transform::getClassType() == fcp->getType())
-   { mTransforms++; }
-   if(OSG::Geometry::getClassType() == fcp->getType())
-   { mGeometries++; }
-   if (fcp->getType().isDerivedFrom(OSG::Material::getClassType()))
-   { mMaterials++; }
+   if ( OSG::Node::getClassType() == fcp->getType() )
+   {
+      ++mNodes;
+   }
+   else if ( OSG::Transform::getClassType() == fcp->getType() )
+   {
+      ++mTransforms;
+   }
+   else if ( OSG::Geometry::getClassType() == fcp->getType() )
+   {
+      ++mGeometries;
+   }
+   else if ( fcp->getType().isDerivedFrom(OSG::Material::getClassType()) )
+   {
+      ++mMaterials;
+   }
 
-   std::cout << "Created: " << fcp->getType().getName().str() << " " << fcp.getFieldContainerId() << std::endl;
-   std::cout << "   name: " << inf::getName(fcp) << std::endl;
+   std::cout << "Created: " << fcp->getType().getName() << " "
+             << fcp.getFieldContainerId() << std::endl
+             << "   name: " << inf::getName(fcp) << std::endl;
 
-   std::pair<callback_map_t::const_iterator, callback_map_t::const_iterator> range = mCreatedCallbacks.equal_range(fcp);
-   for (callback_map_t::const_iterator i = range.first; i != range.second; ++i)
+   typedef callback_map_t::const_iterator iter_type;
+   typedef std::pair<iter_type, iter_type> range_type;
+
+   range_type range = mCreatedCallbacks.equal_range(fcp);
+   for ( iter_type i = range.first; i != range.second; ++i )
    {
       (*i).second(fcp);
    }
 
    range = mCreatedCallbacks.equal_range(OSG::NullFC);
-   for (callback_map_t::const_iterator i = range.first; i != range.second; ++i)
+   for ( iter_type i = range.first; i != range.second; ++i )
    {
       (*i).second(fcp);
    }
@@ -107,52 +130,71 @@ bool RemoteAspectFilter::createdFunction(OSG::FieldContainerPtr &fcp, OSG::Remot
 
 /** \brief Default destroyed functor
  */
-bool RemoteAspectFilter::destroyedFunction(OSG::FieldContainerPtr &fcp, OSG::RemoteAspect *)
+bool RemoteAspectFilter::destroyedFunction(OSG::FieldContainerPtr& fcp,
+                                           OSG::RemoteAspect*)
 {
-   if(OSG::Node::getClassType() == fcp->getType())
-   { mNodes--; }
-   if(OSG::Transform::getClassType() == fcp->getType())
-   { mTransforms--; }
-   if(OSG::Geometry::getClassType() == fcp->getType())
-   { mGeometries--; }
-   if (fcp->getType().isDerivedFrom(OSG::Material::getClassType()))
-   { mMaterials--; }
-   std::cout << "Destroyed: " << fcp->getType().getName().str() << " " << fcp.getFieldContainerId() << std::endl;
-   std::cout << "   name: " << inf::getName(fcp) << std::endl;
+   if ( OSG::Node::getClassType() == fcp->getType() )
+   {
+      --mNodes;
+   }
+   else if ( OSG::Transform::getClassType() == fcp->getType() )
+   {
+      --mTransforms;
+   }
+   else if ( OSG::Geometry::getClassType() == fcp->getType() )
+   {
+      --mGeometries;
+   }
+   else if ( fcp->getType().isDerivedFrom(OSG::Material::getClassType()) )
+   {
+      --mMaterials;
+   }
 
-   std::pair<callback_map_t::const_iterator, callback_map_t::const_iterator> range = mDestroyedCallbacks.equal_range(fcp);
-   for (callback_map_t::const_iterator i = range.first; i != range.second; ++i)
+   std::cout << "Destroyed: " << fcp->getType().getName() << " "
+             << fcp.getFieldContainerId() << std::endl
+             << "   name: " << inf::getName(fcp) << std::endl;
+
+   typedef callback_map_t::const_iterator iter_type;
+   typedef std::pair<iter_type, iter_type> range_type;
+
+   range_type range = mDestroyedCallbacks.equal_range(fcp);
+   for ( iter_type i = range.first; i != range.second; ++i )
    {
       (*i).second(fcp);
    }
 
    range = mDestroyedCallbacks.equal_range(OSG::NullFC);
-   for (callback_map_t::const_iterator i = range.first; i != range.second; ++i)
+   for ( iter_type i = range.first; i != range.second; ++i )
    {
       (*i).second(fcp);
    }
 
-
    return true;
 }
 
-bool RemoteAspectFilter::changedFunction(OSG::FieldContainerPtr &fcp, OSG::RemoteAspect *)
+bool RemoteAspectFilter::changedFunction(OSG::FieldContainerPtr& fcp,
+                                         OSG::RemoteAspect*)
 {
-   std::cout << "Changed: " << fcp->getType().getName().str() << " " << fcp.getFieldContainerId() << std::endl;
-   std::cout << "   name: " << inf::getName(fcp) << std::endl;
+   std::cout << "Changed: " << fcp->getType().getName() << " "
+             << fcp.getFieldContainerId() << std::endl
+             << "   name: " << inf::getName(fcp) << std::endl;
 
-   std::pair<callback_map_t::const_iterator, callback_map_t::const_iterator> range = mChangedCallbacks.equal_range(fcp);
-   for (callback_map_t::const_iterator i = range.first; i != range.second; ++i)
+   typedef callback_map_t::const_iterator iter_type;
+   typedef std::pair<iter_type, iter_type> range_type;
+
+   range_type range = mChangedCallbacks.equal_range(fcp);
+   for ( iter_type i = range.first; i != range.second; ++i )
    {
       (*i).second(fcp);
    }
 
    range = mChangedCallbacks.equal_range(OSG::NullFC);
-   for (callback_map_t::const_iterator i = range.first; i != range.second; ++i)
+   for ( iter_type i = range.first; i != range.second; ++i )
    {
       (*i).second(fcp);
    }
 
    return true;
 }
+
 }

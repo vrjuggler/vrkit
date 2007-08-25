@@ -32,9 +32,11 @@ public:
 
    ~RemoteAspectFilter();
 
-   void addChangedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback);
-   void addCreatedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback);
-   void addDestroyedCallback(OSG::FieldContainerPtr fcp, boost::function< void (OSG::FieldContainerPtr)> callback);
+   typedef boost::function< void (OSG::FieldContainerPtr)> callback_t;
+
+   void addChangedCallback(OSG::FieldContainerPtr fcp, callback_t callback);
+   void addCreatedCallback(OSG::FieldContainerPtr fcp, callback_t callback);
+   void addDestroyedCallback(OSG::FieldContainerPtr fcp, callback_t callback);
 
    /**
     * Registers callback functions with RemoteAspect for all field containers.
@@ -45,15 +47,16 @@ public:
 
    /** @name OpenSG RemoteAspect callbacks */
    //@{
-   bool createdFunction(OSG::FieldContainerPtr &fcp, OSG::RemoteAspect *);
-   bool destroyedFunction(OSG::FieldContainerPtr &fcp, OSG::RemoteAspect *);
-   bool changedFunction(OSG::FieldContainerPtr &fcp, OSG::RemoteAspect *);
+   bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+   bool destroyedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+   bool changedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
    //@}
+
 protected:
    OSG::RemoteAspect* mRemoteAspect;
 
    //typedef std::hash_multimap<OSG::FieldContainerPtr, boost::function< void (const vpr::GUID&) >, vpr::GUID::hash> change_callback_map_t;
-   typedef std::multimap<OSG::FieldContainerPtr, boost::function< void (OSG::FieldContainerPtr) > > callback_map_t;
+   typedef std::multimap<OSG::FieldContainerPtr, callback_t> callback_map_t;
 
    callback_map_t mChangedCallbacks;
    callback_map_t mCreatedCallbacks;
@@ -63,7 +66,6 @@ protected:
    int    mTransforms;
    int    mGeometries;
    int    mMaterials;
-private:
 };
 
 }
