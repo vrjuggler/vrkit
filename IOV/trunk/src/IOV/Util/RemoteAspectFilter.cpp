@@ -1,28 +1,14 @@
 // Copyright (C) Infiscape Corporation 2005-2007
 
 #include <iostream>
-#include <boost/bind.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/exception.hpp>
-#include <boost/filesystem/operations.hpp>
 
-#include <OpenSG/OSGBlendChunk.h>
+#include <OpenSG/OSGGeometry.h>
+#include <OpenSG/OSGTransform.h>
+#include <OpenSG/OSGTypedFunctors.h>
 
-#include <vpr/vpr.h>
-#include <vpr/System.h>
-#include <vpr/Util/FileUtils.h>
-#include <jccl/Config/ConfigElement.h>
-
-#include <IOV/EventData.h>
-#include <IOV/SceneObject.h>
-#include <IOV/Viewer.h>
-#include <IOV/Util/Exceptions.h>
 #include <IOV/Util/OpenSGHelpers.h>
-
 #include <IOV/Util/RemoteAspectFilter.h>
 
-
-namespace fs = boost::filesystem;
 
 namespace inf
 {

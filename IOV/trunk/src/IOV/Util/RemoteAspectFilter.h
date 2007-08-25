@@ -3,24 +3,14 @@
 #ifndef _INF_REMOTE_ASPECT_FILTER_H_
 #define _INF_REMOTE_ASPECT_FILTER_H_
 
-#include <string>
-#include <vector>
+#include <map>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/signals/connection.hpp>
+#include <boost/function.hpp>
 
-#include <OpenSG/OSGColor.h>
 #include <OpenSG/OSGRemoteAspect.h>
-#include <OpenSG/OSGTypedFunctors.h>
 
-#include <jccl/Config/ConfigElementPtr.h>
-
-#include <IOV/ViewerPtr.h>
-#include <IOV/SceneObjectPtr.h>
-#include <IOV/GeometryHighlightTraverser.h>
 #include <IOV/Util/RemoteAspectFilterPtr.h>
 
-#include <boost/function.hpp>
 
 namespace inf
 {
