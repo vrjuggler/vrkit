@@ -32,7 +32,7 @@
 #endif
 
 #include <vrkit/Status.h>
-#include <vrkit/Plugin/Helpers.h>
+#include <vrkit/plugin/Helpers.h>
 
 
 namespace fs = boost::filesystem;
