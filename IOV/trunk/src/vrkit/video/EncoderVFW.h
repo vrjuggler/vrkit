@@ -22,10 +22,12 @@
 #ifndef _VRKIT_VIDEO_ENCODER_VFW_H_
 #define _VRKIT_VIDEO_ENCODER_VFW_H_
 
-#include <vrkit/Config.h>
-
+#include <windows.h>
 #include <vfw.h>
 #include <TChar.h>
+
+#include <vrkit/Config.h>
+
 #include <vpr/vprTypes.h>
 
 #include <vrkit/video/Encoder.h>
