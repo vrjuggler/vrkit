@@ -21,7 +21,7 @@
 #include <iterator>
 #include <algorithm>
 
-#include <vrkit/Plugin/Info.h>
+#include <vrkit/plugin/Info.h>
 
 
 namespace vrkit
