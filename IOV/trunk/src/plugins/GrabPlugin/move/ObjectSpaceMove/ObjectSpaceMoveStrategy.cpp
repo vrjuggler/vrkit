@@ -32,7 +32,7 @@
 #include <vrkit/SceneObject.h>
 #include <vrkit/Version.h>
 #include <vrkit/plugin/Creator.h>
-#include <vrkit/Plugin/Info.h>
+#include <vrkit/plugin/Info.h>
 
 #include "ObjectSpaceMoveStrategy.h"
 
