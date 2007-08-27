@@ -46,10 +46,11 @@ Recorder::Recorder()
    , mFrameRoot(OSG::NullFC)
    , mEyeOffset(0.5)
    , mBorderSize(2.0)
-   , mFrameDist(100.0)
+   , mFrameDist(50.0)
    , mStereo(false)
    , mRecording(false)
    , mPaused(false)
+   , mDrawScale(1.0)
 {
    ;
 }
@@ -90,7 +91,7 @@ RecorderPtr Recorder::init()
 
    // TODO: Do not hard code the use of CameraFBO.
    mCamera = CameraFBO::create()->init();
-   
+
    assert(mCamera.get() != NULL);
 
    mVideoEncoder = EncoderManager::create()->init();
@@ -336,6 +337,8 @@ OSG::NodePtr Recorder::getDebugPlane() const
    OSG::Matrix leftm, rightm;
    leftm.setTranslate(-2.5, 2.5, 0.0);
    rightm.setTranslate(2.5, 2.5, 0.0);
+   leftm.setScale(mDrawScale);
+   rightm.setScale(mDrawScale);
 
    // Create the transform nodes for each eye's geometry.
    OSG::TransformNodePtr left_xform = OSG::TransformNodePtr::create();
@@ -364,12 +367,33 @@ OSG::NodePtr Recorder::getFrame() const
    return mFrameRoot;
 }
 
+void VideoCamera::setDrawScaleFactor(float scale)
+{
+   mDrawScale = scale;
+   generateDebugFrame();
+}
+
+void VideoCamera::setDebugFrameBorderWidth(float value)
+{
+   mBorderSize = value;
+   generateDebugFrame();
+}
+
+void VideoCamera::setDebugFrameDistance(float value)
+{
+   mFrameDist = value;
+   generateDebugFrame();
+}
+
 // XXX: This has not been updated to behave correctly in stereo mode.
 void Recorder::generateDebugFrame()
 {
    // The size of the internal frame.
    OSG::Real32 frame_height = 2.0 * (OSG::osgtan(mCamera->getFov()/2.0) * mFrameDist);
    OSG::Real32 frame_width = frame_height * mCamera->getAspect();
+
+   std::cout << "height: " << frame_height << "  width: " << frame_width << std::endl;
+   std::cout << "scale: " << mDrawScale << std::endl;
 
    // =============
    // |           |
@@ -424,13 +448,22 @@ void Recorder::generateDebugFrame()
    OSG::Real32 xoffset = (frame_width/2.0) + (mBorderSize/2.0);
    OSG::Real32 yoffset = (frame_height/2.0) + (mBorderSize/2.0);
 
+   xoffset = xoffset * mDrawScale;
+   yoffset = yoffset * mDrawScale;
+   zoffset = zoffset * mDrawScale;
+
    // Create the xforms for each box.
    OSG::Matrix topm, bottomm, leftm, rightm;
+
+   topm.setScale(mDrawScale);
+   bottomm.setScale(mDrawScale);
+   leftm.setScale(mDrawScale);
+   rightm.setScale(mDrawScale);
+
    topm.setTranslate(0.0, yoffset, zoffset);
    bottomm.setTranslate(0.0, -yoffset, zoffset);
    leftm.setTranslate(-xoffset, 0.0, zoffset);
    rightm.setTranslate(xoffset, 0.0, zoffset);
-
 
    OSG::beginEditCP(top_xform);
    OSG::beginEditCP(bottom_xform);

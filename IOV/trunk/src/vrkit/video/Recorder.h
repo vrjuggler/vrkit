@@ -179,6 +179,21 @@ public:
    OSG::NodePtr getDebugPlane() const;
 
    /**
+    * Set the draw scale factor so we can generate correct visual aids
+    */
+   void setDrawScaleFactor(float scale);
+
+   /**
+    * Set the border width for the debug frame.
+    */
+   void setDebugFrameBorderWidth(float value);
+
+   /**
+    * Set the distance from the view the debug frame is.
+    */
+   void setDebugFrameDistance(float value);
+
+   /**
     * Returns the root of the frame that surrounds what will be captured
     * in the video camera.
     */
@@ -309,6 +324,7 @@ private:
    bool                                 mStereo;        /**< If this camera should render/record in stereo. */
    bool                                 mRecording;        /**< Whether the camera is recording. */
    bool                                 mPaused;        /**< Whether the camera is paused. */
+   float                                mDrawScale;   /**< Draw scale factor for the scene. */
 };
 
 }
