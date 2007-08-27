@@ -367,19 +367,19 @@ OSG::NodePtr Recorder::getFrame() const
    return mFrameRoot;
 }
 
-void VideoCamera::setDrawScaleFactor(float scale)
+void Recorder::setDrawScaleFactor(float scale)
 {
    mDrawScale = scale;
    generateDebugFrame();
 }
 
-void VideoCamera::setDebugFrameBorderWidth(float value)
+void Recorder::setDebugFrameBorderWidth(float value)
 {
    mBorderSize = value;
    generateDebugFrame();
 }
 
-void VideoCamera::setDebugFrameDistance(float value)
+void Recorder::setDebugFrameDistance(float value)
 {
    mFrameDist = value;
    generateDebugFrame();
