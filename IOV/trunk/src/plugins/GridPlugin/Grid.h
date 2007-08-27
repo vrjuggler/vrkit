@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_GRID_H_
-#define _INF_GRID_H_
+#ifndef _VRKIT_GRID_H_
+#define _VRKIT_GRID_H_
 
 #include <boost/enable_shared_from_this.hpp>
 
@@ -35,7 +35,7 @@
 #include "GridPtr.h"
 
 
-namespace inf
+namespace vrkit
 {
 
 class Grid : public boost::enable_shared_from_this<Grid>
@@ -60,8 +60,9 @@ public:
     * @param cfgElt A config element containing the parameters needed to
     *               initialize this grid fully.
     *
-    * @throw inf::PluginException is thrown if \p cfgElt contains bad data,
-    *        is out of date, or is otherwise unusable.
+    * @throw vrkit::PluginException
+    *           Thrown if \p cfgElt contains bad data, is out of date, or is
+    *           otherwise unusable.
     */
    GridPtr init(jccl::ConfigElementPtr cfgElt);
 
@@ -173,4 +174,4 @@ private:
 }
 
 
-#endif /* _INF_GRID_H_ */
+#endif /* _VRKIT_GRID_H_ */

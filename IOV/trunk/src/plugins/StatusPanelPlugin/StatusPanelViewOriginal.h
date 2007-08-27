@@ -16,10 +16,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_STATUS_PANEL_VIEW_ORIGINAL_H_
-#define _INF_STATUS_PANEL_VIEW_ORIGINAL_H_
+#ifndef _VRKIT_STATUS_PANEL_VIEW_ORIGINAL_H_
+#define _VRKIT_STATUS_PANEL_VIEW_ORIGINAL_H_
 
-#include <IOV/Config.h>
+#include <vrkit/Config.h>
 
 #include <vector>
 #include <string>
@@ -32,10 +32,10 @@
 #include <OpenSG/OSGColor.h>
 #include <OpenSG/OSGClipPlaneChunk.h>
 
-#include <IOV/UiBuilder.h>
+#include <vrkit/UiBuilder.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 class StatusPanel;
@@ -67,8 +67,8 @@ public:
 protected:
    void updatePanelScene();
 
-   inf::UiBuilder        mBuilder;
-   bool                  mIsDirty;     /**< When true, we need a rebuild of the panel. */
+   UiBuilder mBuilder;
+   bool      mIsDirty;     /**< When true, we need a rebuild of the panel. */
 
    OSG::NodeRefPtr       mRootPanelNode;
    OSG::NodeRefPtr       mPanelGeomNode;
@@ -76,7 +76,7 @@ protected:
    OSG::NodeRefPtr       mTextGeomNode;
    OSG::GeometryRefPtr   mTextGeomCore;
 
-   inf::UiBuilder::Font* mFont;
+   UiBuilder::Font* mFont;
 
    float mMetersToAppUnits;
 
@@ -118,4 +118,4 @@ protected:
 }
 
 
-#endif
+#endif /* _VRKIT_STATUS_PANEL_VIEW_ORIGINAL_H_ */

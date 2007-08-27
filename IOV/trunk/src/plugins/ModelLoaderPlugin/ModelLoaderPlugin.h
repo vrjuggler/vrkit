@@ -16,31 +16,33 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_MODEL_LOADER_PLUGIN_H_
-#define _INF_MODEL_LOADER_PLUGIN_H_
+#ifndef _VRKIT_MODEL_LOADER_PLUGIN_H_
+#define _VRKIT_MODEL_LOADER_PLUGIN_H_
+
+#include <vrkit/plugin/Config.h>
 
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 
-#include <IOV/Plugin/PluginConfig.h>
-#include <IOV/Plugin.h>
+#include <vrkit/viewer/Plugin.h>
 
-namespace inf
+
+namespace vrkit
 {
 
 class ModelLoaderPlugin
-   : public inf::Plugin
+   : public viewer::Plugin
    , public boost::enable_shared_from_this<ModelLoaderPlugin>
 {
 protected:
-   ModelLoaderPlugin(const inf::plugin::Info& info)
-      : Plugin(info)
+   ModelLoaderPlugin(const plugin::Info& info)
+      : viewer::Plugin(info)
    {
       /* Do nothing. */ ;
    }
 
 public:
-   static inf::PluginPtr create(const inf::plugin::Info& info);
+   static viewer::PluginPtr create(const plugin::Info& info);
 
    virtual ~ModelLoaderPlugin()
    {
@@ -52,11 +54,12 @@ public:
    /** Initialize and configure the plugin.
     *
     */
-   virtual PluginPtr init(inf::ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
-   virtual void update(inf::ViewerPtr viewer);
+   virtual void update(ViewerPtr viewer);
 }; // ModelLoaderPlugin
 
-}  // namespace inf
+}  // namespace vrkit
 
-#endif
+
+#endif /* _VRKIT_MODEL_LOADER_PLUGIN_H_ */

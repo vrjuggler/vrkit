@@ -8,7 +8,7 @@
          <plugin>StatusPanelPlugin</plugin>
          <isect_strategy>Point Intersection</isect_strategy>
       </infiscape_opensg_viewer>
-      <iov_wand_interface name="Wand Interface" version="1">
+      <vrkit_wand_interface name="Wand Interface" version="1">
          <position_name>VJWand</position_name>
          <digital_name>VJButton0</digital_name>
          <digital_name>VJButton1</digital_name>
@@ -20,7 +20,7 @@
          <analog_name>VJAnalog1</analog_name>
          <analog_name>VJAnalog2</analog_name>
          <analog_name>VJAnalog3</analog_name>
-      </iov_wand_interface>
+      </vrkit_wand_interface>
       <wand_nav_plugin name="Viewer Wand Nav" version="3">
          <max_velocity>5.0</max_velocity>
          <acceleration>0.05</acceleration>
@@ -165,11 +165,11 @@
          <initial_rot>0.0</initial_rot>
          <initial_rot>0.0</initial_rot>
       </status_panel_plugin>
-      <iov_grab_plugin name="Grab Plug-in" version="6">
+      <vrkit_grab_plugin name="Grab Plug-in" version="6">
          <grab_strategy>Single Object Grab</grab_strategy>
          <move_strategy>Slide Move</move_strategy>
          <move_strategy>Basic Move</move_strategy>
-      </iov_grab_plugin>
+      </vrkit_grab_plugin>
       <slide_move_strategy name="Slide Move Strategy" version="2">
          <analog_input>1</analog_input>
          <slide_target>Intersection Point</slide_target>
@@ -192,26 +192,26 @@
          <intersect_color>1.0</intersect_color>
          <intersect_color>1.0</intersect_color>
          <intersect_color>0.0</intersect_color>
-         <intersect_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.vs</intersect_shader>
-         <intersect_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.fs</intersect_shader>
+         <intersect_shader>${VRKIT_BASE_DIR}/share/vrkit/data/shaders/highlight.vs</intersect_shader>
+         <intersect_shader>${VRKIT_BASE_DIR}/share/vrkit/data/shaders/highlight.fs</intersect_shader>
          <intersect_shader_scale>1.0</intersect_shader_scale>
          <intersect_shader_exponent>1.0</intersect_shader_exponent>
          <choose_color>0.0</choose_color>
          <choose_color>1.0</choose_color>
          <choose_color>1.0</choose_color>
-         <choose_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.vs</choose_shader>
-         <choose_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.fs</choose_shader>
+         <choose_shader>${VRKIT_BASE_DIR}/share/vrkit/data/shaders/highlight.vs</choose_shader>
+         <choose_shader>${VRKIT_BASE_DIR}/share/vrkit/data/shaders/highlight.fs</choose_shader>
          <choose_shader_scale>1.0</choose_shader_scale>
          <choose_shader_exponent>1.0</choose_shader_exponent>
          <grab_color>1.0</grab_color>
          <grab_color>0.0</grab_color>
          <grab_color>1.0</grab_color>
-         <grab_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.vs</grab_shader>
-         <grab_shader>${IOV_BASE_DIR}/share/IOV/data/shaders/highlight.fs</grab_shader>
+         <grab_shader>${VRKIT_BASE_DIR}/share/vrkit/data/shaders/highlight.vs</grab_shader>
+         <grab_shader>${VRKIT_BASE_DIR}/share/vrkit/data/shaders/highlight.fs</grab_shader>
          <grab_shader_scale>1.0</grab_shader_scale>
          <grab_shader_exponent>1.0</grab_shader_exponent>
       </basic_highlighter>
-      <iov_app name="Basic Viewer Application" version="1">
+      <vrkit_app name="Basic Viewer Application" version="1">
          <enable_grabbing>true</enable_grabbing>
          <scene_object_type>StaticSceneObject</scene_object_type>
          <use_material_chooser>false</use_material_chooser>
@@ -223,7 +223,7 @@
          <chooser_initial_rotation>0.0</chooser_initial_rotation>
          <chooser_initial_rotation>0.0</chooser_initial_rotation>
          <chooser_initial_rotation>0.0</chooser_initial_rotation>
-      </iov_app>
+      </vrkit_app>
       <event_sound_player name="Event Sound Player" version="1">
          <intersect_sound_name>intersect</intersect_sound_name>
          <select_sound_name>select</select_sound_name>

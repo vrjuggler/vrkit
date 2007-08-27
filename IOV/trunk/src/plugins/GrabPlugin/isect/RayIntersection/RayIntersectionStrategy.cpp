@@ -33,28 +33,29 @@
 
 #include <jccl/Config/ConfigElement.h>
 
-#include <IOV/SignalRepository.h>
-#include <IOV/InterfaceTrader.h>
-#include <IOV/Plugin/PluginConfig.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/User.h>
-#include <IOV/Viewer.h>
-#include <IOV/WandInterface.h>
-#include <IOV/SceneObject.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
+#include <vrkit/plugin/Config.h>
+#include <vrkit/InterfaceTrader.h>
+#include <vrkit/User.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/SceneObject.h>
+#include <vrkit/Version.h>
+#include <vrkit/signal/Repository.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "RayIntersectionStrategy.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape.isect", "RayIntersectionStrategy",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::IntersectionStrategy> sPluginCreator(
-   boost::bind(&inf::RayIntersectionStrategy::create, sInfo)
+static vrkit::plugin::Creator<vrkit::isect::Strategy> sPluginCreator(
+   boost::bind(&vrkit::RayIntersectionStrategy::create, sInfo)
 );
 
 extern "C"
@@ -62,19 +63,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_ISECT_STRATEGY_PLUGIN_API_MAJOR;
-   minorVer = INF_ISECT_STRATEGY_PLUGIN_API_MINOR;
+   majorVer = VRKIT_ISECT_STRATEGY_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_ISECT_STRATEGY_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getIntersectionStrategyCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getIntersectionStrategyCreator()
 {
    return &sPluginCreator;
 }
@@ -112,12 +113,11 @@ OSG::Action::ResultE geometryEnter(OSG::CNodePtr& node, OSG::Action* action)
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-RayIntersectionStrategy::
-RayIntersectionStrategy(const inf::plugin::Info& info)
-   : inf::IntersectionStrategy(info)
+RayIntersectionStrategy::RayIntersectionStrategy(const plugin::Info& info)
+   : isect::Strategy(info)
    , mRayLength(20.0f)
    , mRayDiffuse(1.0f, 0.0f, 0.0f, 1.0f)
    , mRayAmbient(1.0f, 0.0f, 0.0f, 1.0f)
@@ -132,7 +132,7 @@ RayIntersectionStrategy::~RayIntersectionStrategy()
    mRayIsectConn.disconnect();
 }
 
-inf::IntersectionStrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
+isect::StrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
 {
    jccl::ConfigElementPtr cfg_elt =
       viewer->getConfiguration().getConfigElement(getElementType());
@@ -143,7 +143,7 @@ inf::IntersectionStrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
       {
          configure(cfg_elt);
       }
-      catch (inf::Exception& ex)
+      catch (Exception& ex)
       {
          std::cerr << ex.what() << std::endl;
       }
@@ -173,22 +173,22 @@ inf::IntersectionStrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
    OSG::endEditCP(decorator_root.node());
    setVisible(true);
 
-   // Register visibility signal with SignalRepository
-   inf::SignalRepositoryPtr sig_repos =
-      viewer->getSceneObj()->getSceneData<SignalRepository>();
+   // Register visibility signal with vrkit::signal::Repository.
+   signal::RepositoryPtr sig_repos =
+      viewer->getSceneObj()->getSceneData<signal::Repository>();
 
    typedef boost::signal<void (bool)> sig_type;
    std::string sig_name("Set Intersection Ray Visibility");
 
-   if( ! sig_repos->hasSignal(sig_name) )
+   if ( ! sig_repos->hasSignal(sig_name) )
    {
-      sig_repos->addSignal(sig_name,
-			   SignalContainer<sig_type>::create());
+      sig_repos->addSignal(sig_name, signal::Container<sig_type>::create());
    }
 
    // Connect new signal to slot after SwitchNode creation
-   mRayIsectConn = sig_repos->getSignal<sig_type>(sig_name)->connect(
-      boost::bind(&inf::RayIntersectionStrategy::setVisible, this, _1)
+   mRayIsectConn =
+      sig_repos->getSignal<sig_type>(sig_name)->connect(
+         boost::bind(&RayIntersectionStrategy::setVisible, this, _1)
       );
 
    return shared_from_this();
@@ -214,8 +214,8 @@ void RayIntersectionStrategy::update(ViewerPtr viewer)
    end_pt = start_pt + mSelectionRay.getDirection() * mRayLength;
 
    OSG::beginEditCP(mGeomPts);
-      mGeomPts->setValue(start_pt,0);
-      mGeomPts->setValue(  end_pt,1);
+      mGeomPts->setValue(start_pt, 0);
+      mGeomPts->setValue(  end_pt, 1);
    OSG::endEditCP(mGeomPts);
 }
 
@@ -308,20 +308,20 @@ findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
    mIntersectPoint = OSG::Pnt3f();
 
    // Traverse scene objects to find closest intersection.
-   SceneObjectTraverser::enter_func_t enter =
+   util::SceneObjectTraverser::enter_func_t enter =
       boost::bind(&RayIntersectionStrategy::enterFunc, this, _1);
-   SceneObjectTraverser::traverse(objs, enter);
+   util::SceneObjectTraverser::traverse(objs, enter);
 
    intersectPoint.set(mIntersectPoint.getValues());
    return mIntersectObj;
 }
 
-SceneObjectTraverser::Result RayIntersectionStrategy::
+util::SceneObjectTraverser::Result RayIntersectionStrategy::
 enterFunc(SceneObjectPtr obj)
 {
    if ( ! obj->canIntersect() )
    {
-      return SceneObjectTraverser::Continue;
+      return util::SceneObjectTraverser::Continue;
    }
 
    OSG::Matrix world_xform;
@@ -355,7 +355,8 @@ enterFunc(SceneObjectPtr obj)
    unsigned int num_hits;
    float enter_val, exit_val;
 
-   SceneObjectTraverser::Result result = SceneObjectTraverser::Skip;
+   util::SceneObjectTraverser::Result result =
+      util::SceneObjectTraverser::Skip;
 
    // Use a GMTL shell intersection test rather than the OpenSG volume
    // intersection test. Using the shell intersection provides better results
@@ -364,7 +365,7 @@ enterFunc(SceneObjectPtr obj)
    if ( gmtl::intersect(bbox, pick_ray, num_hits, enter_val, exit_val) )
    {
       // Intersected bounding volume so we must continue into children.
-      result = SceneObjectTraverser::Continue;
+      result = util::SceneObjectTraverser::Continue;
 
       const OSG::Line osg_pick_ray(
          OSG::Pnt3f(pick_ray.mOrigin.getData()),
@@ -446,7 +447,7 @@ void RayIntersectionStrategy::configure(jccl::ConfigElementPtr cfgElt)
           << "config element version is " << req_cfg_version
           << ", but element '" << cfgElt->getName() << "' is version "
           << cfgElt->getVersion();
-      throw inf::PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    const std::string ray_length_prop("ray_length");

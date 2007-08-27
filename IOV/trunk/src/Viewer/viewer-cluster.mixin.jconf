@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?org-vrjuggler-jccl-settings configuration.version="3.0"?>
-<configuration xmlns="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" name="/home/patrick/src/pro/IOV/src/Viewer/viewer-nav-cluster.jconf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.0/configuration http://www.vrjuggler.org/jccl/xsd/3.0/configuration.xsd">
+<configuration xmlns="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" name="/home/patrick/src/vrkit/src/Viewer/viewer-nav-cluster.jconf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.0/configuration http://www.vrjuggler.org/jccl/xsd/3.0/configuration.xsd">
    <elements>
-      <iov_cluster name="Viewer Cluster Settings" version="1">
+      <vrkit_cluster name="Viewer Cluster Settings" version="1">
          <listen_addr />
          <listen_port>34000</listen_port>
          <slave_count>0</slave_count>
-      </iov_cluster>
+      </vrkit_cluster>
    </elements>
 </configuration>
 

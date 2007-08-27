@@ -38,10 +38,11 @@ if boost_options.isAvailable():
    if platform == 'darwin':
       viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
-   # We use automatic linking against the Boost libraries and IOV on Windows.
+   # We use automatic linking against the Boost libraries and vrkit on
+   # Windows.
    if platform != 'win32':
       po_lib = boost_options.getFullLibName('program_options', viewerEnv)
-      viewerEnv.Prepend(LIBS = ['iov' + shared_lib_suffix, po_lib])
+      viewerEnv.Prepend(LIBS = ['vrkit' + shared_lib_suffix, po_lib])
 
    appname = 'slaveViewer'
    slave_viewer_name = appname + runtime_suffix
@@ -52,11 +53,11 @@ if boost_options.isAvailable():
    slave_viewer_prog = viewerEnv.Program(slave_viewer_name, slave_viewer_srcs)
    viewerEnv.Install(inst_paths['bin'], slave_viewer_prog)
 
-   # On Windows, we need to ensure that we depend on the IOV lib.
+   # On Windows, we need to ensure that we depend on the vrkit lib.
    if platform == 'win32':
       viewerEnv.Depends(slave_viewer_prog,
                          os.path.join(inst_paths['lib'],
-                                      'iov%s.lib' % shared_lib_suffix))
+                                      'vrkit%s.lib' % shared_lib_suffix))
 
    # This only needs to be done when building against VR Juggler 2.1.21 or
    # newer.

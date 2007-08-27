@@ -4,9 +4,9 @@
    <definition_version version="1" label="Mode Component Plug-in">
       <abstract>false</abstract>
       <help />
-      <category>/Infiscape/</category>
+      <category>/vrkit/</category>
       <property valuetype="string" variable="false" name="component_name">
-         <help>The name of a mode component plug-in to be loaded and used by the Infiscape Mode Harness plug-in.</help>
+         <help>The name of a mode component plug-in to be loaded and used by the vrkit Mode Harness plug-in.</help>
          <value label="Module Name" defaultvalue="" />
       </property>
       <property valuetype="string" variable="false" name="signal_id">
@@ -17,8 +17,8 @@
    </definition_version>
    <definition_version version="2" label="Mode Component Plug-in">
       <abstract>false</abstract>
-      <help>This is the definition of a mode component that will be managed by the IOV Mode Harness. Activation signals are defined that cause a named mode component to become active. Each mode component must have a unique name (as must all config elements), but multiple mode components can refer to the same plug-in type. A unique object will be created for each.</help>
-      <category>/Infiscape/</category>
+      <help>This is the definition of a mode component that will be managed by the vrkit Mode Harness. Activation signals are defined that cause a named mode component to become active. Each mode component must have a unique name (as must all config elements), but multiple mode components can refer to the same plug-in type. A unique object will be created for each.</help>
+      <category>/vrkit/</category>
       <property valuetype="string" variable="false" name="plugin">
          <help>The identifier of the plug-in type that will be instantiated for this mode component. This may include version information. The form is usually org.myorg.TypeName:major.minor (with the version number after the : being optional).</help>
          <value label="Plug-in Type Identifier" defaultvalue="" />

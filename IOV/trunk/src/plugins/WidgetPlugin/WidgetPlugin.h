@@ -16,45 +16,44 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_WIDGET_PLUGIN_H_
-#define _INF_WIDGET_PLUGIN_H_
+#ifndef _VRKIT_WIDGET_PLUGIN_H_
+#define _VRKIT_WIDGET_PLUGIN_H_
 
-#include <IOV/Plugin/PluginConfig.h>
+#include <vrkit/plugin/Config.h>
 
 #include <string>
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/signal.hpp>
 
+#include <gmtl/Matrix.h>
 #include <jccl/Config/ConfigElementPtr.h>
 
-#include <IOV/EventData.h>
-#include <IOV/Plugin.h>
-#include <IOV/ViewerPtr.h>
-#include <IOV/WandInterfacePtr.h>
-#include <IOV/Grab/IntersectionStrategy.h>
-#include <IOV/Util/DigitalCommand.h>
-#include <IOV/Util/Exceptions.h>
-#include <IOV/Widget/WidgetDataPtr.h>
-#include <IOV/Widget/WidgetPtr.h>
+#include <vrkit/ViewerPtr.h>
+#include <vrkit/WandInterfacePtr.h>
+#include <vrkit/WidgetPtr.h>
+#include <vrkit/scenedata/Event.h>
+#include <vrkit/scenedata/WidgetDataPtr.h>
+#include <vrkit/scenedata/EventData.h>
+#include <vrkit/viewer/Plugin.h>
+#include <vrkit/isect/Strategy.h>
+#include <vrkit/util/DigitalCommand.h>
 
-#include <IOV/Event.h>
-#include <gmtl/Matrix.h>
 
-namespace inf
+namespace vrkit
 {
 
 class WidgetPlugin
-   : public inf::Plugin
+   : public viewer::Plugin
    , public boost::enable_shared_from_this<WidgetPlugin>
 {
 protected:
-   WidgetPlugin(const inf::plugin::Info& info);
+   WidgetPlugin(const plugin::Info& info);
 
 public:
-   static inf::PluginPtr create(const inf::plugin::Info& info)
+   static viewer::PluginPtr create(const plugin::Info& info)
    {
-      return inf::PluginPtr(new WidgetPlugin(info));
+      return viewer::PluginPtr(new WidgetPlugin(info));
    }
 
    virtual ~WidgetPlugin()
@@ -64,10 +63,10 @@ public:
 
    virtual std::string getDescription()
    {
-      return std::string("WidgetPlugin");
+      return std::string("Widget Plug-in");
    }
 
-   virtual PluginPtr init(inf::ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
    /**
     * Updates the state of the widgets based on input from the wand interface.
@@ -77,7 +76,7 @@ public:
     *
     * @param viewer The VR Juggler application object.
     */
-   virtual void update(inf::ViewerPtr viewer);
+   virtual void update(ViewerPtr viewer);
 
 protected:
    /**
@@ -91,17 +90,16 @@ protected:
     *
     * @param viewer The VR Juggler application object.
     */
-   void focusChanged(inf::ViewerPtr viewer);
+   void focusChanged(ViewerPtr viewer);
 
-   inf::Event::ResultType
-      objectsSelected(const std::vector<inf::SceneObjectPtr>& objs,
-		      bool selected);
-   inf::Event::ResultType objectsMovedSlot(const EventData::moved_obj_list_t&);
+   event::ResultType objectsSelected(const std::vector<SceneObjectPtr>& objs,
+		                     bool selected);
+   event::ResultType objectsMovedSlot(const EventData::moved_obj_list_t&);
 
 private:
    static std::string getElementType()
    {
-      return std::string("iov_widget_plugin");
+      return std::string("vrkit_widget_plugin");
    }
 
    /**
@@ -113,8 +111,8 @@ private:
     * @param obj         The object associated with the intersection signal.
     * @param pnt         The intersection point.
     */
-   inf::Event::ResultType objectIntersected(inf::SceneObjectPtr obj,
-                                            const gmtl::Point3f& pnt);
+   event::ResultType objectIntersected(SceneObjectPtr obj,
+                                       const gmtl::Point3f& pnt);
 
    /**
     * Responds to object de-intersection signals. Our intersection highlight
@@ -124,7 +122,7 @@ private:
     *
     * @param obj         The object associated with the intersection signal.
     */
-   inf::Event::ResultType objectDeintersected(inf::SceneObjectPtr obj);
+   event::ResultType objectDeintersected(SceneObjectPtr obj);
 
    /**
     * Configures this plug-in.
@@ -133,17 +131,18 @@ private:
     *
     * @param elt The config element for this plug-in.
     *
-    * @throw inf::Exception is thrown if the given config element contains
-    *        bad data, is out of date, or is otherwise unusable.
+    * @throw vrkit::Exception
+    *           Thrown if the given config element contains bad data, is out
+    *           of date, or is otherwise unusable.
     */
    void configure(jccl::ConfigElementPtr elt);
 
-   inf::WandInterfacePtr mWandInterface;
+   WandInterfacePtr mWandInterface;
 
    /** @name Digital Buttons */
    //@{
-   inf::DigitalCommand mSelectBtn;    /**< Activate/deactivate all button */
-   inf::DigitalCommand mSelect1Btn;       /**< Cycle grid selection button */
+   util::DigitalCommand mSelectBtn;   /**< Activate/deactivate all button */
+   util::DigitalCommand mSelect1Btn;  /**< Cycle grid selection button */
    //@}
 
    /** @name Digital Button Command Descriptions */
@@ -175,4 +174,4 @@ private:
 }
 
 
-#endif /* _INF_GRID_PLUGIN_H_ */
+#endif /* _VRKIT_GRID_PLUGIN_H_ */

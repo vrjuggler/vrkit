@@ -32,7 +32,7 @@
 #include "StatusPanelViewOriginal.h"
 
 
-namespace inf
+namespace vrkit
 {
 
 StatusPanelViewOriginal::StatusPanelViewOriginal()
@@ -98,8 +98,8 @@ void StatusPanelViewOriginal::initialize(const float metersToAppUnits,
    mRootPanelNode->addChild(mPanelGeomNode);
    mRootPanelNode->addChild(mTextGeomNode);
 
-   mFont = new inf::UiBuilder::Font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
-   //mFont = new inf::UiBuilder::Font("MONO", OSG::TextFace::STYLE_PLAIN, 64);
+   mFont = new UiBuilder::Font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
+   //mFont = new UiBuilder::Font("MONO", OSG::TextFace::STYLE_PLAIN, 64);
 
    OSG::ChunkMaterialPtr text_mat =
       OSG::ChunkMaterialPtr::dcast(mTextGeomCore->getMaterial());

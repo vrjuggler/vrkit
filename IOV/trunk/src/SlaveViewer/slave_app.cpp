@@ -19,7 +19,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <exception>
 #include <typeinfo>
 #include <string>
@@ -27,14 +27,16 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <OpenSG/OSGBaseTypes.h>
+
 #include <vrj/Kernel/Kernel.h>
 
-#include <IOV/ExitCodes.h>
-#include <IOV/Slave/SlaveViewer.h>
+#include <vrkit/ExitCodes.h>
+#include <vrkit/slave/SlaveViewer.h>
 
-#define IOSV_VERSION_MAJOR 0
-#define IOSV_VERSION_MINOR 1
-#define IOSV_VERSION_PATCH 0
+#define SLAVE_VIEWER_VERSION_MAJOR 1
+#define SLAVE_VIEWER_VERSION_MINOR 0
+#define SLAVE_VIEWER_VERSION_PATCH 0
 
 
 namespace po = boost::program_options;
@@ -108,10 +110,12 @@ int main(int argc, char* argv[])
 
       if ( vm.count("version") > 0 )
       {
-         std::cout << "Infiscape Slave Viewer Application v"
-                   << IOSV_VERSION_MAJOR << "." << IOSV_VERSION_MINOR << "."
-                   << IOSV_VERSION_PATCH << std::endl
-                   << "\tCopyright (c) 2005 Infiscape Corporation"
+         std::cout << "vrkit Slave Viewer Application v"
+                   << SLAVE_VIEWER_VERSION_MAJOR << "."
+                   << SLAVE_VIEWER_VERSION_MINOR << "."
+                   << SLAVE_VIEWER_VERSION_PATCH << std::endl
+                   << "\tCopyright (c) 2005-2007 Allen Bierbaum, "
+                   << "Aron Bierbaum, Patrick Hartling, and Daniel Shipton"
                    << std::endl;
          return EXIT_SUCCESS;
       }
@@ -119,7 +123,7 @@ int main(int argc, char* argv[])
       if ( vm.count("addr") == 0 )
       {
          std::cout << "No address for master node given!" << std::endl;
-         return inf::EXIT_ERR_MISSING_ADDR;
+         return vrkit::EXIT_ERR_MISSING_ADDR;
       }
 
       vrj::Kernel* kernel  = vrj::Kernel::instance();
@@ -127,7 +131,7 @@ int main(int argc, char* argv[])
       if ( vm.count("jconf") == 0 )
       {
          std::cout << "No VR Juggler configuration files given!" << std::endl;
-         return inf::EXIT_ERR_MISSING_JCONF;
+         return vrkit::EXIT_ERR_MISSING_JCONF;
       }
       else
       {
@@ -175,8 +179,8 @@ int main(int argc, char* argv[])
          }
       }
 
-      inf::SlaveViewer* app = new inf::SlaveViewer(master_addr, root_name,
-                                                   trav_mask);
+      vrkit::SlaveViewer* app = new vrkit::SlaveViewer(master_addr, root_name,
+                                                       trav_mask);
 
       kernel->start();
       kernel->setApplication(app);
@@ -188,7 +192,7 @@ int main(int argc, char* argv[])
    {
       std::cout << ex.what() << std::endl;
       std::cout << visible << std::endl;
-      return inf::EXIT_ERR_EXCEPTION;
+      return vrkit::EXIT_ERR_EXCEPTION;
    }
 
    return EXIT_SUCCESS;

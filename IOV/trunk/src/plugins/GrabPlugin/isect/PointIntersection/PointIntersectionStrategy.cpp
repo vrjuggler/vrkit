@@ -23,28 +23,28 @@
 #include <gmtl/Matrix.h>
 #include <gmtl/External/OpenSGConvert.h>
 
-#include <IOV/InterfaceTrader.h>
-#include <IOV/Plugin/PluginConfig.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/User.h>
-#include <IOV/Viewer.h>
-#include <IOV/WandInterface.h>
-#include <IOV/SceneObject.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
-#include <IOV/Util/OpenSGHelpers.h>
+#include <vrkit/plugin/Config.h>
+#include <vrkit/InterfaceTrader.h>
+#include <vrkit/User.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/SceneObject.h>
+#include <vrkit/Version.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/util/OpenSGHelpers.h>
 
 #include "PointIntersectionStrategy.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape.isect", "PointIntersectionStrategy",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::IntersectionStrategy> sPluginCreator(
-   boost::bind(&inf::PointIntersectionStrategy::create, sInfo)
+static vrkit::plugin::Creator<vrkit::isect::Strategy> sPluginCreator(
+   boost::bind(&vrkit::PointIntersectionStrategy::create, sInfo)
 );
 
 extern "C"
@@ -52,19 +52,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_ISECT_STRATEGY_PLUGIN_API_MAJOR;
-   minorVer = INF_ISECT_STRATEGY_PLUGIN_API_MINOR;
+   majorVer = VRKIT_ISECT_STRATEGY_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_ISECT_STRATEGY_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getIntersectionStrategyCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getIntersectionStrategyCreator()
 {
    return &sPluginCreator;
 }
@@ -72,10 +72,10 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getIntersectionStrategyCreator()
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-inf::IntersectionStrategyPtr PointIntersectionStrategy::init(ViewerPtr)
+isect::StrategyPtr PointIntersectionStrategy::init(ViewerPtr)
 {
    return shared_from_this();
 }
@@ -95,7 +95,7 @@ findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
    mIntersectPoint = OSG::Pnt3f();
 
    // Traverse all the given scene objects to find the first intersection.
-   SceneObjectTraverser::traverse(
+   util::SceneObjectTraverser::traverse(
       objs, boost::bind(&PointIntersectionStrategy::enter, this, _1,
                         boost::cref(vp_M_wand_xform))
    );
@@ -108,12 +108,13 @@ findIntersection(ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
    return mIntersectObj;
 }
 
-SceneObjectTraverser::Result PointIntersectionStrategy::
+util::SceneObjectTraverser::Result PointIntersectionStrategy::
 enter(SceneObjectPtr obj, const gmtl::Matrix44f& vp_M_wand)
 {
    // The default behavior is to continue with the traversal. If obj cannot
    // be intersected, one or more of its children may allow intersection.
-   SceneObjectTraverser::Result result(SceneObjectTraverser::Continue);
+   util::SceneObjectTraverser::Result result =
+      util::SceneObjectTraverser::Continue;
 
    if ( obj->canIntersect() )
    {
@@ -150,7 +151,7 @@ enter(SceneObjectPtr obj, const gmtl::Matrix44f& vp_M_wand)
          // be intersected.
          if ( ! obj->hasChildren() )
          {
-            result = SceneObjectTraverser::Stop;
+            result = util::SceneObjectTraverser::Stop;
          }
       }
       // If there is no intersection with obj, then we do not need to search
@@ -158,7 +159,7 @@ enter(SceneObjectPtr obj, const gmtl::Matrix44f& vp_M_wand)
       // box.
       else
       {
-         result = SceneObjectTraverser::Skip;
+         result = util::SceneObjectTraverser::Skip;
       }
    }
 

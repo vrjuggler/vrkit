@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_POINT_INTERSECTION_STRATEGY_H_
-#define _INF_POINT_INTERSECTION_STRATEGY_H_
+#ifndef _VRKIT_POINT_INTERSECTION_STRATEGY_H_
+#define _VRKIT_POINT_INTERSECTION_STRATEGY_H_
 
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
@@ -25,21 +25,21 @@
 #include <gmtl/Point.h>
 #include <gmtl/Matrix.h>
 
-#include <IOV/ViewerPtr.h>
-#include <IOV/Util/SceneObjectTraverser.h>
-#include <IOV/Grab/IntersectionStrategy.h>
+#include <vrkit/ViewerPtr.h>
+#include <vrkit/util/SceneObjectTraverser.h>
+#include <vrkit/isect/Strategy.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 class PointIntersectionStrategy
-   : public IntersectionStrategy
+   : public isect::Strategy
    , public boost::enable_shared_from_this<PointIntersectionStrategy>
 {
 protected:
-   PointIntersectionStrategy(const inf::plugin::Info& info)
-      : inf::IntersectionStrategy(info)
+   PointIntersectionStrategy(const plugin::Info& info)
+      : isect::Strategy(info)
    {;}
 
 public:
@@ -51,19 +51,19 @@ public:
       return "PointIntersection";
    }
 
-   static IntersectionStrategyPtr create(const inf::plugin::Info& info)
+   static isect::StrategyPtr create(const plugin::Info& info)
    {
-      return IntersectionStrategyPtr(new PointIntersectionStrategy(info));
+      return isect::StrategyPtr(new PointIntersectionStrategy(info));
    }
 
-   virtual inf::IntersectionStrategyPtr init(ViewerPtr viewer);
+   virtual isect::StrategyPtr init(ViewerPtr viewer);
 
    virtual SceneObjectPtr findIntersection(ViewerPtr viewer,
       const std::vector<SceneObjectPtr>& objs, gmtl::Point3f& intersectPoint);
 
 private:
-   SceneObjectTraverser::Result enter(SceneObjectPtr obj,
-                                      const gmtl::Matrix44f& vp_M_wand);
+   util::SceneObjectTraverser::Result enter(SceneObjectPtr obj,
+                                            const gmtl::Matrix44f& vp_M_wand);
 
    /** @name Intersection Traversal Properties */
    //@{
@@ -74,4 +74,5 @@ private:
 
 }
 
-#endif /*_INF_POINT_INTERSECTION_STRATEGY_H_*/
+
+#endif /* _VRKIT_POINT_INTERSECTION_STRATEGY_H_ */

@@ -32,16 +32,16 @@
 #include <gmtl/Output.h>
 #include <gmtl/Generate.h>
 
-#include <IOV/Viewer.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/User.h>
-#include <IOV/InterfaceTrader.h>
-#include <IOV/WandInterface.h>
-#include <IOV/ViewPlatform.h>
-#include <IOV/Util/Exceptions.h>
-#include <IOV/Status.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/User.h>
+#include <vrkit/InterfaceTrader.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/ViewPlatform.h>
+#include <vrkit/Status.h>
+#include <vrkit/Version.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "ViewpointsPlugin.h"
 
@@ -60,12 +60,12 @@ namespace
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape", "ViewpointsPlugin",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::Plugin> sViewpointsPluginCreator(
-   boost::bind(&inf::ViewpointsPlugin::create, sInfo)
+static vrkit::plugin::Creator<vrkit::viewer::Plugin> sViewpointsPluginCreator(
+   boost::bind(&vrkit::ViewpointsPlugin::create, sInfo)
 );
 
 extern "C"
@@ -73,19 +73,19 @@ extern "C"
 
 /** @name Plug-in Entry points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_PLUGIN_API_MAJOR;
-   minorVer = INF_PLUGIN_API_MINOR;
+   majorVer = VRKIT_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 {
    return &sViewpointsPluginCreator;
 }
@@ -93,15 +93,15 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-PluginPtr ViewpointsPlugin::create(const inf::plugin::Info& info)
+viewer::PluginPtr ViewpointsPlugin::create(const plugin::Info& info)
 {
-   return PluginPtr(new ViewpointsPlugin(info));
+   return viewer::PluginPtr(new ViewpointsPlugin(info));
 }
 
-PluginPtr ViewpointsPlugin::init(inf::ViewerPtr viewer)
+viewer::PluginPtr ViewpointsPlugin::init(ViewerPtr viewer)
 {
    const unsigned int req_cfg_version(2);
 
@@ -109,26 +109,27 @@ PluginPtr ViewpointsPlugin::init(inf::ViewerPtr viewer)
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
 
-   jccl::ConfigElementPtr elt = viewer->getConfiguration().getConfigElement(vp_plugin_elt_tkn);
+   jccl::ConfigElementPtr elt =
+      viewer->getConfiguration().getConfigElement(vp_plugin_elt_tkn);
 
-   if(!elt)
+   if ( ! elt )
    {
       std::stringstream ex_msg;
       ex_msg << "Viewpoint plugin could not find its configuration.  "
              << "Looking for type: " << vp_plugin_elt_tkn;
-      throw PluginException(ex_msg.str(), IOV_LOCATION);
+      throw PluginException(ex_msg.str(), VRKIT_LOCATION);
    }
 
    // -- Read configuration -- //
    vprASSERT(elt->getID() == vp_plugin_elt_tkn);
 
    // Check for correct version of plugin configuration
-   if(elt->getVersion() < req_cfg_version)
+   if ( elt->getVersion() < req_cfg_version )
    {
       std::stringstream msg;
-      msg << "ModeSwitchPlugin: Configuration failed. Required cfg version: " << req_cfg_version
-          << " found:" << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      msg << "ViewpointPlugin: Configuration failed. Required cfg version: "
+          << req_cfg_version << " found:" << elt->getVersion();
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    // Get the control button(s) to use.
@@ -140,8 +141,8 @@ PluginPtr ViewpointsPlugin::init(inf::ViewerPtr viewer)
    float to_meters_scalar = elt->getProperty<float>(vp_units_to_meters_tkn);
 
    // Read in all the viewpoints
-   unsigned num_vps = elt->getNum(vp_viewpoints_tkn);
-   for(unsigned i=0;i<num_vps;i++)
+   unsigned int num_vps = elt->getNum(vp_viewpoints_tkn);
+   for ( unsigned int i = 0; i < num_vps; ++i )
    {
       jccl::ConfigElementPtr vp_elt =
          elt->getProperty<jccl::ConfigElementPtr>(vp_viewpoints_tkn, i);
@@ -158,9 +159,8 @@ PluginPtr ViewpointsPlugin::init(inf::ViewerPtr viewer)
       float zr = vp_elt->getProperty<float>(vp_rot_elt_tkn, 2);
 
       gmtl::Coord3fXYZ vp_coord;
-      vp_coord.pos().set(xt,yt,zt);
-      vp_coord.rot().set(gmtl::Math::deg2Rad(xr),
-                         gmtl::Math::deg2Rad(yr),
+      vp_coord.pos().set(xt, yt, zt);
+      vp_coord.rot().set(gmtl::Math::deg2Rad(xr), gmtl::Math::deg2Rad(yr),
                          gmtl::Math::deg2Rad(zr));
 
       Viewpoint vp;
@@ -189,7 +189,7 @@ PluginPtr ViewpointsPlugin::init(inf::ViewerPtr viewer)
 //    - Set it on the viewplatform
 //    - Get ready for the next location
 //
-void ViewpointsPlugin::update(inf::ViewerPtr viewer)
+void ViewpointsPlugin::update(ViewerPtr viewer)
 {
    if ( isFocused() )
    {
@@ -199,13 +199,14 @@ void ViewpointsPlugin::update(inf::ViewerPtr viewer)
          vprASSERT(mNextViewpoint < mViewpoints.size());
          Viewpoint vp = mViewpoints[mNextViewpoint];
 
-         IOV_STATUS << boost::format("Selecting new viewpoint: [%s] %s") % mNextViewpoint % vp.mName
-                    << std::endl;
+         VRKIT_STATUS
+            << boost::format("Selecting new viewpoint: [%s] %s") % mNextViewpoint % vp.mName
+            << std::endl;
 
          gmtl::Coord3fXYZ new_coord = gmtl::make<gmtl::Coord3fXYZ>(vp.mXform);
-         IOV_STATUS << "   New pos: " << new_coord << std::endl;
+         VRKIT_STATUS << "   New pos: " << new_coord << std::endl;
 
-         inf::ViewPlatform& viewplatform = viewer->getUser()->getViewPlatform();
+         ViewPlatform& viewplatform = viewer->getUser()->getViewPlatform();
          viewplatform.setCurPos(vp.mXform);
 
          mNextViewpoint += 1;
@@ -217,4 +218,4 @@ void ViewpointsPlugin::update(inf::ViewerPtr viewer)
    }
 }
 
-} // namespace inf
+} // namespace vrkit

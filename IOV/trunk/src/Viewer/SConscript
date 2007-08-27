@@ -37,25 +37,26 @@ if boost_options.isAvailable():
    if platform == 'darwin':
       viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
-   # We use automatic linking against the Boost libraries and IOV on Windows.
+   # We use automatic linking against the Boost libraries and vrkit on
+   # Windows.
    if platform != 'win32':
       po_lib = boost_options.getFullLibName('program_options', viewerEnv)
-      viewerEnv.Prepend(LIBS = ['iov' + shared_lib_suffix, po_lib])
+      viewerEnv.Prepend(LIBS = ['vrkit' + shared_lib_suffix, po_lib])
 
-   appname = 'iov_app'
-   iov_app_name = appname + runtime_suffix
-   iov_app_srcs = ['iov_app.cpp']
+   appname = 'vrkit_app'
+   vrkit_app_name = appname + runtime_suffix
+   vrkit_app_srcs = ['vrkit_app.cpp']
    if platform == 'win32':
-      iov_app_srcs.append(viewerEnv.RES('iov_app.rc'))
+      vrkit_app_srcs.append(viewerEnv.RES('vrkit_app.rc'))
 
-   iov_app_prog = viewerEnv.Program(iov_app_name, iov_app_srcs)
-   viewerEnv.Install(inst_paths['bin'], iov_app_prog)
+   vrkit_app_prog = viewerEnv.Program(vrkit_app_name, vrkit_app_srcs)
+   viewerEnv.Install(inst_paths['bin'], vrkit_app_prog)
 
-   # On Windows, we need to ensure that we depend on the IOV lib.
+   # On Windows, we need to ensure that we depend on the vrkit lib.
    if platform == 'win32':
-      viewerEnv.Depends(iov_app_prog,
+      viewerEnv.Depends(vrkit_app_prog,
                          os.path.join(inst_paths['lib'],
-                                      'iov%s.lib' % shared_lib_suffix))
+                                      'vrkit%s.lib' % shared_lib_suffix))
 
    # Only install *.jdef and *.jconf files on first pass.
    if 0 == variant_pass:
@@ -83,4 +84,4 @@ if boost_options.isAvailable():
                                              makeBundle(appname, viewerEnv))
             viewerEnv.Depends(release_target, appname)
 else:
-   print "WARNING: Cannot build iov_app without Boost.program_options"
+   print "WARNING: Cannot build vrkit_app without Boost.program_options"

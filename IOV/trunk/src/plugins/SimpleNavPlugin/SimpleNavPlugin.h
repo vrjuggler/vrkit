@@ -16,33 +16,32 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SIMPLE_NAV_PLUGIN_H
-#define SIMPLE_NAV_PLUGIN_H
+#ifndef _VRKIT_SIMPLE_NAV_PLUGIN_H_
+#define _VRKIT_SIMPLE_NAV_PLUGIN_H_
 
-#include <IOV/Plugin/PluginConfig.h>
+#include <vrkit/plugin/Config.h>
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <IOV/WandInterfacePtr.h>
-#include <IOV/Plugin.h>
-#include <IOV/Plugin/NavPlugin.h>
-#include <IOV/Util/DigitalCommand.h>
+#include <vrkit/WandInterfacePtr.h>
+#include <vrkit/nav/Strategy.h>
+#include <vrkit/util/DigitalCommand.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 class SimpleNavPlugin
-   : public NavPlugin
+   : public nav::Strategy
    , public boost::enable_shared_from_this<SimpleNavPlugin>
 {
 protected:
-   SimpleNavPlugin(const inf::plugin::Info& info);
+   SimpleNavPlugin(const plugin::Info& info);
 
 public:
-   static inf::PluginPtr create(const inf::plugin::Info& info)
+   static viewer::PluginPtr create(const plugin::Info& info)
    {
-      return inf::PluginPtr(new SimpleNavPlugin(info));
+      return viewer::PluginPtr(new SimpleNavPlugin(info));
    }
 
    virtual ~SimpleNavPlugin()
@@ -55,7 +54,7 @@ public:
       return std::string("Navigation");
    }
 
-   virtual PluginPtr init(ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
 protected:
    enum NavState
@@ -72,7 +71,7 @@ protected:
       FLY       /**< Fly mode */
    };
 
-   virtual void focusChanged(inf::ViewerPtr viewer);
+   virtual void focusChanged(ViewerPtr viewer);
 
    virtual void updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
@@ -88,10 +87,10 @@ protected:
    float mVelocity;
    NavMode mNavMode;
 
-   inf::DigitalCommand mForBtn;         /**< Button for forward motion. */
-   inf::DigitalCommand mRevBtn;         /**< Button for reverse. */
-   inf::DigitalCommand mRotateBtn;      /**< Button for rotate. */
-   inf::DigitalCommand mModeBtn;        /**< Button for swapping mode. */
+   util::DigitalCommand mForBtn;         /**< Button for forward motion. */
+   util::DigitalCommand mRevBtn;         /**< Button for reverse. */
+   util::DigitalCommand mRotateBtn;      /**< Button for rotate. */
+   util::DigitalCommand mModeBtn;        /**< Button for swapping mode. */
 
    std::string mForwardText;
    std::string mReverseText;
@@ -102,4 +101,4 @@ protected:
 }
 
 
-#endif
+#endif /* _VRKIT_SIMPLE_NAV_PLUGIN_H_ */

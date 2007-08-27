@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?org-vrjuggler-jccl-settings definition.version="3.1"?>
 <definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="status_panel_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
-   <definition_version version="1" label="Infiscape Status Panel Plug-In">
+   <definition_version version="1" label="vrkit Status Panel Plug-In">
       <abstract>false</abstract>
       <help />
-      <category>/Infiscape/</category>
+      <category>/vrkit/</category>
       <property valuetype="integer" variable="false" name="grab_button_num">
          <help />
          <value label="Grab Button Number" defaultvalue="-1" />
@@ -28,12 +28,12 @@
       </property>
       <upgrade_transform />
    </definition_version>
-   <definition_version version="2" label="Infiscape Status Panel Plug-In">
+   <definition_version version="2" label="vrkit Status Panel Plug-In">
       <abstract>false</abstract>
       <help />
-      <category>/Infiscape/</category>
+      <category>/vrkit/</category>
       <property valuetype="string" variable="false" name="grab_command_exp">
-         <help>Describe the button state that causes the Status Panel to be grabbed (and later released). The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the IOV wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the IOV wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <help>Describe the button state that causes the Status Panel to be grabbed (and later released). The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
          <value label="Grab Command Expression (UNUSED)" defaultvalue="" />
       </property>
       <property valuetype="float" variable="false" name="initial_size">

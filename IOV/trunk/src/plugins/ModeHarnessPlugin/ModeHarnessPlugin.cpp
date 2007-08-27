@@ -33,16 +33,16 @@
 
 #include <jccl/Config/ConfigElement.h>
 
-#include <IOV/SignalRepository.h>
-#include <IOV/ModeComponent.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/PluginRegistry.h>
-#include <IOV/Status.h>
-#include <IOV/TypedInitRegistryEntry.h>
-#include <IOV/Viewer.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
-#include <IOV/Plugin/Helpers.h>
+#include <vrkit/Status.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/Version.h>
+#include <vrkit/signal/Repository.h>
+#include <vrkit/mode/Component.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Registry.h>
+#include <vrkit/plugin/TypedInitRegistryEntry.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/plugin/Helpers.h>
 
 #include "ModeHarnessPlugin.h"
 
@@ -50,12 +50,12 @@
 using namespace boost::assign;
 namespace fs = boost::filesystem;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape", "ModeHarnessPlugin",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   boost::bind(&inf::ModeHarnessPlugin::create, sInfo)
+static vrkit::plugin::Creator<vrkit::viewer::Plugin> sPluginCreator(
+   boost::bind(&vrkit::ModeHarnessPlugin::create, sInfo)
 );
 
 extern "C"
@@ -63,19 +63,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_PLUGIN_API_MAJOR;
-   minorVer = INF_PLUGIN_API_MINOR;
+   majorVer = VRKIT_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }
@@ -83,11 +83,11 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-ModeHarnessPlugin::ModeHarnessPlugin(const inf::plugin::Info& info)
-   : Plugin(info)
+ModeHarnessPlugin::ModeHarnessPlugin(const plugin::Info& info)
+   : viewer::Plugin(info)
 {
    /* Do nothing. */ ;
 }
@@ -108,19 +108,19 @@ ModeHarnessPlugin::~ModeHarnessPlugin()
    mNextComponent.reset();
    mCurComponent.reset();
 
-   std::map<std::string, inf::ModeComponentPtr>::iterator c;
-   for ( c = mComponents.begin(); c != mComponents.end(); ++c )
+   typedef std::map<std::string, mode::ComponentPtr>::iterator iter_type;
+   for ( iter_type c = mComponents.begin(); c != mComponents.end(); ++c )
    {
       (*c).second->exit(mViewer);
    }
 }
 
-inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
+viewer::PluginPtr ModeHarnessPlugin::init(ViewerPtr viewer)
 {
    mViewer = viewer;
 
-   inf::SignalRepositoryPtr signal_data =
-      viewer->getSceneObj()->getSceneData<SignalRepository>();
+   signal::RepositoryPtr signal_data =
+      viewer->getSceneObj()->getSceneData<signal::Repository>();
 
    // Configuration.
    const std::string elt_type_name(getElementType());
@@ -139,7 +139,7 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
       const std::string& name((*i).name);
       const std::string& plugin((*i).plugin);
 
-      inf::ModeComponentPtr component;
+      mode::ComponentPtr component;
 
       if ( mComponents.count(name) == 0 )
       {
@@ -150,9 +150,9 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
          }
          catch (std::runtime_error& ex)
          {
-            IOV_STATUS << "[Mode Harness] ERROR: Failed to load mode "
-                       << "component '" << name << "':\n" << ex.what()
-                       << std::endl;
+            VRKIT_STATUS << "[Mode Harness] ERROR: Failed to load mode "
+                         << "component '" << name << "':\n" << ex.what()
+                         << std::endl;
          }
       }
       // If the named compnent is already known, reuse the existing instance.
@@ -184,15 +184,15 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
       {
          if ( mComponents.count(comp_name) > 0 )
          {
-            inf::ModeComponentPtr component = mComponents[comp_name];
+            mode::ComponentPtr component = mComponents[comp_name];
 
-            IOV_STATUS << "[Mode Harness] Connecting mode component '"
-                       << component->getDescription() << "'\n"
-                       << "               to signal '" << sig_name << "'"
-                       << std::endl;
+            VRKIT_STATUS << "[Mode Harness] Connecting mode component '"
+                         << component->getDescription() << "'\n"
+                         << "               to signal '" << sig_name << "'"
+                         << std::endl;
 
             typedef boost::signal<void ()> signal_type;
-            typedef SignalContainer<signal_type> signal_container_type;
+            typedef signal::Container<signal_type> signal_container_type;
 
             // Ensure that sig_name is a known signal.
             if ( ! signal_data->hasSignal(sig_name) )
@@ -204,7 +204,7 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
             // Connect the newly instantiated component with its signal.
             mConnections.push_back(
                signal_data->getSignal<signal_type>(sig_name)->connect(
-                  boost::bind(&inf::ModeHarnessPlugin::prepComponentSwitch,
+                  boost::bind(&ModeHarnessPlugin::prepComponentSwitch,
                               this, component)
                )
             );
@@ -213,28 +213,28 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
          }
          else
          {
-            IOV_STATUS << "[Mode Harness] ERROR: No component '" << comp_name
-                       << "' to connect to signal '" << sig_name << "'"
-                       << std::endl;
+            VRKIT_STATUS << "[Mode Harness] ERROR: No component '"
+                         << comp_name << "' to connect to signal '"
+                         << sig_name << "'" << std::endl;
          }
       }
       else
       {
-         IOV_STATUS << "[Mode Harness] ERROR: Component already registered "
-                    << "for signal '" << sig_name << "'" << std::endl;
+         VRKIT_STATUS << "[Mode Harness] ERROR: Component already registered "
+                      << "for signal '" << sig_name << "'" << std::endl;
       }
    }
 
-   inf::ModeComponentPtr default_component;
+   mode::ComponentPtr default_component;
 
    // Set the default component.
    if ( ! mDefaultComponentName.empty() )
    {
       if ( mComponents.count(mDefaultComponentName) == 0 )
       {
-         IOV_STATUS << "[Mode Harness] ERROR: Unknown or invalid component '"
-                    << mDefaultComponentName << "' used for default component!"
-                    << std::endl;
+         VRKIT_STATUS << "[Mode Harness] ERROR: Unknown or invalid component '"
+                      << mDefaultComponentName
+                      << "' used for default component!" << std::endl;
       }
       else
       {
@@ -243,8 +243,8 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
    }
    else
    {
-      IOV_STATUS << "[Mode Harness] WARNING: No default mode component "
-                 << "has been identified!" << std::endl;
+      VRKIT_STATUS << "[Mode Harness] WARNING: No default mode component "
+                   << "has been identified!" << std::endl;
    }
 
    // If we have a default component, assign it mNextComponent. The default
@@ -259,14 +259,14 @@ inf::PluginPtr ModeHarnessPlugin::init(inf::ViewerPtr viewer)
    // considered to be a fatal error.
    else
    {
-      IOV_STATUS << "WARNING: There is no default mode component."
-                 << std::endl;
+      VRKIT_STATUS << "WARNING: There is no default mode component."
+                   << std::endl;
    }
 
    return shared_from_this();
 }
 
-void ModeHarnessPlugin::update(inf::ViewerPtr viewer)
+void ModeHarnessPlugin::update(ViewerPtr viewer)
 {
    // Sanity check.
    vprASSERT(mViewer == viewer && "Our viewer changed!");
@@ -285,25 +285,26 @@ void ModeHarnessPlugin::update(inf::ViewerPtr viewer)
          // If there is an active component, deactivate it.
          if ( mCurComponent )
          {
-            IOV_STATUS << "Deactivating '" << mCurComponent->getDescription()
-                       << "'" << std::endl;
+            VRKIT_STATUS << "Deactivating '"
+                         << mCurComponent->getDescription() << "'"
+                         << std::endl;
             mCurComponent->deactivate(viewer);
          }
 
          // Do the switch.
          mCurComponent  = mNextComponent;
-         mNextComponent = inf::ModeComponentPtr();
+         mNextComponent = mode::ComponentPtr();
 
          // If there is a new current component, activate it.
          if ( mCurComponent )
          {
-            IOV_STATUS << "Activating '" << mCurComponent->getDescription()
-                       << "'" << std::endl;
+            VRKIT_STATUS << "Activating '" << mCurComponent->getDescription()
+                         << "'" << std::endl;
 
             // If activation fails, then we will not have an active component.
             if ( ! mCurComponent->activate(viewer) )
             {
-               mCurComponent = inf::ModeComponentPtr();
+               mCurComponent = mode::ComponentPtr();
             }
          }
       }
@@ -328,7 +329,7 @@ void ModeHarnessPlugin::configure(jccl::ConfigElementPtr elt)
       msg << "Configuration of ModeHarnessPlugin failed.  Required config "
           << "element version is " << req_cfg_version << ", but element '"
           << elt->getName() << "' is version " << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    const std::string component_path_prop("component_path");
@@ -340,13 +341,13 @@ void ModeHarnessPlugin::configure(jccl::ConfigElementPtr elt)
 
    // Set up two default search paths:
    //    1. Relative path to './plugins/mode'
-   //    2. IOV_BASE_DIR/lib/IOV/plugins/mode
+   //    2. VRKIT_BASE_DIR/lib/vrkit/plugins/mode
    //
    // In all of the above cases, the 'debug' subdirectory is searched first if
-   // this is a debug build (i.e., when IOV_DEBUG is defined and _DEBUG is
+   // this is a debug build (i.e., when VRKIT_DEBUG is defined and _DEBUG is
    // not).
    std::vector<std::string> component_path =
-      inf::plugin::getDefaultSearchPath("mode");
+      plugin::getDefaultSearchPath("mode");
 
    const unsigned int num_plugin_paths(elt->getNum(component_path_prop));
    for ( unsigned int i = 0; i < num_plugin_paths; ++i )
@@ -380,8 +381,7 @@ void ModeHarnessPlugin::configure(jccl::ConfigElementPtr elt)
       );
    }
 
-   std::vector<vpr::LibraryPtr> modules =
-      inf::plugin::findModules(component_path);
+   std::vector<vpr::LibraryPtr> modules = plugin::findModules(component_path);
    std::for_each(modules.begin(), modules.end(),
                  boost::bind(&ModeHarnessPlugin::registerModule, this, _1));
 }
@@ -389,30 +389,30 @@ void ModeHarnessPlugin::configure(jccl::ConfigElementPtr elt)
 void ModeHarnessPlugin::registerModule(vpr::LibraryPtr module)
 {
    mViewer->getPluginRegistry()->addEntry(
-      inf::TypedRegistryEntry<inf::ModeComponent>::create(
-         module, &inf::ModeComponent::validatePluginLib
+      plugin::TypedRegistryEntry<mode::Component>::create(
+         module, &mode::Component::validatePluginLib
       )
    );
 }
 
-inf::ModeComponentPtr
+mode::ComponentPtr
 ModeHarnessPlugin::makeComponent(const std::string& pluginType,
-                                 inf::ViewerPtr viewer)
+                                 ViewerPtr viewer)
 {
-   IOV_STATUS << "   Instantiating mode component '" << pluginType << "' ..."
-              << std::flush;
+   VRKIT_STATUS << "   Instantiating mode component '" << pluginType
+                << "' ..." << std::flush;
    std::vector<AbstractPluginPtr> deps;
    AbstractPluginPtr m = viewer->getPluginRegistry()->makeInstance(pluginType,
                                                                    deps);
-   inf::ModeComponentPtr component =
-      boost::dynamic_pointer_cast<inf::ModeComponent>(m);
+   mode::ComponentPtr component =
+      boost::dynamic_pointer_cast<mode::Component>(m);
    vprASSERT(component.get() != NULL);
-   IOV_STATUS << " [OK]" << std::endl;
+   VRKIT_STATUS << " [OK]" << std::endl;
 
    return component->init(viewer);
 }
 
-void ModeHarnessPlugin::prepComponentSwitch(inf::ModeComponentPtr newComponent)
+void ModeHarnessPlugin::prepComponentSwitch(mode::ComponentPtr newComponent)
 {
    // Update mNextComponent in a thread-safe manner. The actual component
    // swapping happens in run().

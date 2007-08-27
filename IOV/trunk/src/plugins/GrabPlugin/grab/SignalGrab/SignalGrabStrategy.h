@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_SIGNAL_GRAB_STRATEGY_H_
-#define _INF_SIGNAL_GRAB_STRATEGY_H_
+#ifndef _VRKIT_SIGNAL_GRAB_STRATEGY_H_
+#define _VRKIT_SIGNAL_GRAB_STRATEGY_H_
 
 #include <string>
 #include <vector>
@@ -26,33 +26,34 @@
 
 #include <jccl/Config/ConfigElementPtr.h>
 
-#include <IOV/GrabSignalDataPtr.h>
-#include <IOV/SceneObjectPtr.h>
-#include <IOV/WandInterfacePtr.h>
-#include <IOV/Grab/GrabStrategy.h>
-#include <IOV/Util/DigitalCommand.h>
+#include <vrkit/SceneObjectPtr.h>
+#include <vrkit/WandInterfacePtr.h>
+#include <vrkit/scenedata/GrabSignalDataPtr.h>
+#include <vrkit/grab/Strategy.h>
+#include <vrkit/util/DigitalCommand.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 class SignalGrabStrategy
-   : public inf::GrabStrategy
+   : public grab::Strategy
    , public boost::enable_shared_from_this<SignalGrabStrategy>
 {
 protected:
-   SignalGrabStrategy(const inf::plugin::Info& info);
+   SignalGrabStrategy(const plugin::Info& info);
 
 public:
-   static GrabStrategyPtr create(const inf::plugin::Info& info)
+   static grab::StrategyPtr create(const plugin::Info& info)
    {
-      return GrabStrategyPtr(new SignalGrabStrategy(info));
+      return grab::StrategyPtr(new SignalGrabStrategy(info));
    }
 
    virtual ~SignalGrabStrategy();
 
-   virtual GrabStrategyPtr init(ViewerPtr viewer, grab_callback_t grabCallback,
-                                release_callback_t releaseCallback);
+   virtual grab::StrategyPtr init(ViewerPtr viewer,
+                                  grab_callback_t grabCallback,
+                                  release_callback_t releaseCallback);
 
    virtual void setFocus(ViewerPtr viewer, const bool focused);
 
@@ -72,7 +73,7 @@ private:
 
    void release();
 
-   /** @name inf::GrabSignalData Slots */
+   /** @name vrkit::GrabSignalData Slots */
    //@{
    /**
     * Receives "asynchronous" object release signals in order to maintain
@@ -80,7 +81,7 @@ private:
     *
     * @param objs The scene objects that were released asynchronously.
     *
-    * @see inf::GrabSignalData::asyncRelease
+    * @see vrkit::GrabSignalData::asyncRelease
     */
    void objectsReleased(const std::vector<SceneObjectPtr>& objs);
    //@}
@@ -97,19 +98,19 @@ private:
 
    /** @name Button(s) for choosing objects to grab. */
    //@{
-   inf::DigitalCommand mChooseBtn;
+   util::DigitalCommand mChooseBtn;
    std::string mChooseText;
    //@}
 
    /** @name Button(s) for grabbing objects. */
    //@{
-   inf::DigitalCommand mGrabBtn;
+   util::DigitalCommand mGrabBtn;
    std::string mGrabText;
    //@}
 
    /** @name Button(s) for releasing objects. */
    //@{
-   inf::DigitalCommand mReleaseBtn;
+   util::DigitalCommand mReleaseBtn;
    std::string mReleaseText;
    //@}
 
@@ -131,4 +132,4 @@ private:
 }
 
 
-#endif /* _INF_SIGNAL_GRAB_STRATEGY_H_ */
+#endif /* _VRKIT_SIGNAL_GRAB_STRATEGY_H_ */

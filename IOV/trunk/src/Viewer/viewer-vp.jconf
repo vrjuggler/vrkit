@@ -7,7 +7,7 @@
          <plugin>ViewpointsPlugin</plugin>
          <isect_strategy>PointIntersection</isect_strategy>
       </infiscape_opensg_viewer>
-      <iov_wand_interface name="Wand Interface" version="1">
+      <vrkit_wand_interface name="Wand Interface" version="1">
          <position_name>VJWand</position_name>
          <digital_name>VJButton0</digital_name>
          <digital_name>VJButton1</digital_name>
@@ -19,7 +19,7 @@
          <analog_name>VJAnalog1</analog_name>
          <analog_name>VJAnalog2</analog_name>
          <analog_name>VJAnalog3</analog_name>
-      </iov_wand_interface>
+      </vrkit_wand_interface>
       <mode_switch_plugin name="Mode Switcher" version="2">
          <swap_button_nums>3^</swap_button_nums>
          <plugins>

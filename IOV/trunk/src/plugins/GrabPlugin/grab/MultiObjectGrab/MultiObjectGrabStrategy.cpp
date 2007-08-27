@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <IOV/Config.h>
+#include <vrkit/Config.h>
 
 #include <functional>
 #include <boost/bind.hpp>
@@ -27,32 +27,31 @@
 #include <vpr/Util/Assert.h>
 #include <jccl/Config/ConfigElement.h>
 
-#include <IOV/Plugin/PluginConfig.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/EventData.h>
-#include <IOV/Scene.h>
-#include <IOV/User.h>
-#include <IOV/Viewer.h>
-#include <IOV/InterfaceTrader.h>
-#include <IOV/WandInterface.h>
-#include <IOV/SceneObject.h>
-#include <IOV/StatusPanelData.h>
-#include <IOV/Util/Exceptions.h>
-#include <IOV/Config.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
+#include <vrkit/plugin/Config.h>
+#include <vrkit/scenedata/EventData.h>
+#include <vrkit/Scene.h>
+#include <vrkit/User.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/InterfaceTrader.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/SceneObject.h>
+#include <vrkit/Version.h>
+#include <vrkit/scenedata/StatusPanelData.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "MultiObjectGrabStrategy.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape.grab", "MultiObjectGrabStrategy",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::GrabStrategy> sPluginCreator(
-   boost::bind(&inf::MultiObjectGrabStrategy::create, sInfo)
+static vrkit::plugin::Creator<vrkit::grab::Strategy> sPluginCreator(
+   boost::bind(&vrkit::MultiObjectGrabStrategy::create, sInfo)
 );
 
 extern "C"
@@ -60,19 +59,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_GRAB_STRATEGY_PLUGIN_API_MAJOR;
-   minorVer = INF_GRAB_STRATEGY_PLUGIN_API_MINOR;
+   majorVer = VRKIT_GRAB_STRATEGY_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_GRAB_STRATEGY_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getGrabStrategyCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getGrabStrategyCreator()
 {
    return &sPluginCreator;
 }
@@ -80,11 +79,11 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getGrabStrategyCreator()
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-MultiObjectGrabStrategy::MultiObjectGrabStrategy(const inf::plugin::Info& info)
-   : GrabStrategy(info)
+MultiObjectGrabStrategy::MultiObjectGrabStrategy(const plugin::Info& info)
+   : grab::Strategy(info)
    , mChooseText("Choose object to grab")
    , mGrabText("Grab object(s)")
    , mReleaseText("Release object(s)")
@@ -104,7 +103,7 @@ MultiObjectGrabStrategy::~MultiObjectGrabStrategy()
                  boost::bind(&boost::signals::connection::disconnect, _1));
 }
 
-GrabStrategyPtr MultiObjectGrabStrategy::
+grab::StrategyPtr MultiObjectGrabStrategy::
 init(ViewerPtr viewer, grab_callback_t grabCallback,
      release_callback_t releaseCallback)
 {
@@ -152,7 +151,7 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
    // commands.
    if ( focused )
    {
-      inf::ScenePtr scene = viewer->getSceneObj();
+      ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
@@ -202,7 +201,7 @@ void MultiObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
    }
    else
    {
-      inf::ScenePtr scene = viewer->getSceneObj();
+      ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
@@ -316,7 +315,7 @@ void MultiObjectGrabStrategy::configure(jccl::ConfigElementPtr elt)
           << "config element version is " << req_cfg_version
           << ", but element '" << elt->getName() << "' is version "
           << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    const std::string choose_btn_prop("choose_button_nums");
@@ -331,7 +330,7 @@ void MultiObjectGrabStrategy::configure(jccl::ConfigElementPtr elt)
                          mWandInterface);
 }
 
-inf::Event::ResultType MultiObjectGrabStrategy::
+event::ResultType MultiObjectGrabStrategy::
 objectIntersected(SceneObjectPtr obj, const gmtl::Point3f& pnt)
 {
    if ( ! mGrabbing )
@@ -345,26 +344,26 @@ objectIntersected(SceneObjectPtr obj, const gmtl::Point3f& pnt)
    }
    else
    {
-      return inf::Event::DONE;
+      return event::DONE;
    }
 
-   return inf::Event::CONTINUE;
+   return event::CONTINUE;
 }
 
-inf::Event::ResultType MultiObjectGrabStrategy::
+event::ResultType MultiObjectGrabStrategy::
 objectDeintersected(SceneObjectPtr obj)
 {
    if ( mGrabbing )
    {
-      return inf::Event::DONE;
+      return event::DONE;
    }
 
    mCurIsectObject = SceneObjectPtr();
 
-   return inf::Event::CONTINUE;
+   return event::CONTINUE;
 }
 
-void MultiObjectGrabStrategy::grabbableObjStateChanged(inf::SceneObjectPtr obj)
+void MultiObjectGrabStrategy::grabbableObjStateChanged(SceneObjectPtr obj)
 {
    // If mChosenObjects is not empty, then we have a collection of objects to
    // grab that have not yet been grabbed. obj may be in mChosenObjects, and

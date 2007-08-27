@@ -30,31 +30,31 @@
 #include <vpr/System.h>
 #include <jccl/Config/ConfigElement.h>
 
-#include <IOV/InterfaceTrader.h>
-#include <IOV/User.h>
-#include <IOV/Viewer.h>
-#include <IOV/WandInterface.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/PluginRegistry.h>
-#include <IOV/TypedInitRegistryEntry.h>
-#include <IOV/Util/Exceptions.h>
-#include <IOV/Status.h>
-#include <IOV/StatusPanelData.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
-#include <IOV/Plugin/Helpers.h>
+#include <vrkit/InterfaceTrader.h>
+#include <vrkit/User.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/Status.h>
+#include <vrkit/Version.h>
+#include <vrkit/scenedata/StatusPanelData.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Registry.h>
+#include <vrkit/plugin/TypedInitRegistryEntry.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/plugin/Helpers.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "ModeSwitchPlugin.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape", "ModeSwitchPlugin",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   boost::bind(&inf::ModeSwitchPlugin::create, sInfo)
+static vrkit::plugin::Creator<vrkit::viewer::Plugin> sPluginCreator(
+   boost::bind(&vrkit::ModeSwitchPlugin::create, sInfo)
 );
 
 extern "C"
@@ -62,19 +62,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_PLUGIN_API_MAJOR;
-   minorVer = INF_PLUGIN_API_MINOR;
+   majorVer = VRKIT_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }
@@ -89,7 +89,7 @@ const vpr::GUID mode_switch_status_id("8c0034da-b613-4bd0-9c30-f8c35f48ba1a");
 
 }
 
-namespace inf
+namespace vrkit
 {
 
 std::string ModeSwitchPlugin::getDescription()
@@ -104,7 +104,7 @@ std::string ModeSwitchPlugin::getDescription()
    }
 }
 
-PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
+viewer::PluginPtr ModeSwitchPlugin::init(ViewerPtr viewer)
 {
    const std::string plugin_path_prop("plugin_path");
    const std::string plugins_prop("plugins");
@@ -121,40 +121,42 @@ PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
 
    // -- Configure -- //
    std::string elt_type_name = getElementType();
-   jccl::ConfigElementPtr elt = viewer->getConfiguration().getConfigElement(elt_type_name);
+   jccl::ConfigElementPtr elt =
+      viewer->getConfiguration().getConfigElement(elt_type_name);
 
-   if(!elt)
+   if ( ! elt )
    {
       throw PluginException("ModeSwitchPlugin not find its configuration.",
-                            IOV_LOCATION);
+                            VRKIT_LOCATION);
    }
 
    vprASSERT(elt->getID() == getElementType());
 
-   // Check for correct version of plugin configuration
+   // Check for correct version of plug-in configuration.
    if ( elt->getVersion() < req_cfg_version )
    {
       std::ostringstream msg;
       msg << "ModeSwitchPlugin: Configuration failed. Required cfg version: "
           << req_cfg_version << " found:" << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    // ---- Process configuration --- //
    mMaxMode = 0;
 
-   // -- Setup the plugin search path -- //
+   // -- Setup the plug-in search path -- //
    std::vector<std::string> search_path;
    const unsigned int num_paths(elt->getNum(plugin_path_prop));
 
    for ( unsigned int i = 0; i < num_paths; ++i )
    {
-      std::string new_path = elt->getProperty<std::string>(plugin_path_prop, i);
-      search_path.push_back(new_path);
+      search_path.push_back(
+         elt->getProperty<std::string>(plugin_path_prop, i)
+      );
    }
 
    const std::vector<vpr::LibraryPtr> modules =
-      inf::plugin::findModules(search_path);
+      plugin::findModules(search_path);
    std::for_each(
       modules.begin(), modules.end(),
       boost::bind(&ModeSwitchPlugin::registerModule, this, _1, viewer)
@@ -169,21 +171,20 @@ PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
    mMaxMode = num_mode_names - 1;
    for ( unsigned int i = 0; i < num_mode_names; ++i )
    {
-      std::string mode_name = elt->getProperty<std::string>(mode_names_prop, i);
-      mModeNames.push_back(mode_name);
+      mModeNames.push_back(elt->getProperty<std::string>(mode_names_prop, i));
    }
 
-   // --- Load the managed plugins --- //
+   // --- Load the managed plug-ins --- //
    const unsigned int num_plugins(elt->getNum(plugins_prop));
 
-   IOV_STATUS << "[Mode Switch Plug-in] Found " << num_plugins
-              << " plug-ins to load." << std::endl;
+   VRKIT_STATUS << "[Mode Switch Plug-in] Found " << num_plugins
+                << " plug-ins to load." << std::endl;
 
-   inf::PluginRegistryPtr plugin_registry = viewer->getPluginRegistry();
+   plugin::RegistryPtr plugin_registry = viewer->getPluginRegistry();
 
-   // Attempt to load each plugin
-   // - Get creator and create plugin
-   // - Push onto plugin list
+   // Attempt to load each plug-in
+   // - Get creator and create plug-in
+   // - Push onto plug-in list
    for ( unsigned int i = 0; i < num_plugins; ++i )
    {
       PluginData plugin_data;
@@ -197,7 +198,7 @@ PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
                    << std::flush;
 
          std::vector<AbstractPluginPtr> deps;
-         inf::AbstractPluginPtr p =
+         AbstractPluginPtr p =
             plugin_registry->makeInstance(plugin_data.mName, deps);
 
          std::vector<PluginData> plugins;
@@ -206,7 +207,8 @@ PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
          typedef std::vector<AbstractPluginPtr>::iterator iter_type;
          for ( iter_type d = deps.begin(); d != deps.end(); ++d )
          {
-            PluginPtr cur_dep = boost::dynamic_pointer_cast<inf::Plugin>(*d);
+            viewer::PluginPtr cur_dep =
+               boost::dynamic_pointer_cast<viewer::Plugin>(*d);
 
             if ( cur_dep )
             {
@@ -217,7 +219,7 @@ PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
             }
          }
 
-         plugin_data.mPlugin = boost::dynamic_pointer_cast<inf::Plugin>(p);
+         plugin_data.mPlugin = boost::dynamic_pointer_cast<Plugin>(p);
 
          if ( ! plugin_data.mPlugin )
          {
@@ -225,7 +227,7 @@ PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
             msg_stream << "Invalid plug-in type '"
                        << p->getInfo().getFullName()
                        << "' given as plug-in for the Mode Switch Plug-in!";
-            throw inf::PluginException(msg_stream.str(), IOV_LOCATION);
+            throw PluginException(msg_stream.str(), VRKIT_LOCATION);
          }
 
          plugins.push_back(plugin_data);
@@ -254,15 +256,16 @@ PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
       }
       catch (std::runtime_error& ex)
       {
-         std::cerr << "[FAILED]\n   WARNING: ModeSwitchPlugin failed to load plug-in '"
+         std::cerr << "[FAILED]\n"
+                   << "WARNING: ModeSwitchPlugin failed to load plug-in '"
                    << plugin_data.mName << "': " << ex.what() << std::endl;
       }
    }
 
    // Make sure we have enough mode names to match up with the number of modes.
-   if(mMaxMode >= mModeNames.size())
+   if ( mMaxMode >= mModeNames.size() )
    {
-      mModeNames.resize(mMaxMode+1, std::string("Unknown Mode"));
+      mModeNames.resize(mMaxMode + 1, std::string("Unknown Mode"));
    }
 
    switchToMode(0, viewer);
@@ -270,17 +273,17 @@ PluginPtr ModeSwitchPlugin::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
-void ModeSwitchPlugin::contextInit(inf::ViewerPtr viewer)
+void ModeSwitchPlugin::contextInit(ViewerPtr viewer)
 {
    // Inform all plug-ins of context initialization.
-   std::vector<PluginData>::iterator i;
-   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   typedef std::vector<PluginData>::iterator iter_type;
+   for ( iter_type i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
       (*i).mPlugin->contextInit(viewer);
    }
 }
 
-void ModeSwitchPlugin::update(inf::ViewerPtr viewer)
+void ModeSwitchPlugin::update(ViewerPtr viewer)
 {
    if ( isFocused() )
    {
@@ -295,19 +298,19 @@ void ModeSwitchPlugin::update(inf::ViewerPtr viewer)
       }
    }
 
-   std::vector<PluginData>::iterator i;
-   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   typedef std::vector<PluginData>::iterator iter_type;
+   for ( iter_type i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
       (*i).mPlugin->update(viewer);
    }
 }
 
-void ModeSwitchPlugin::contextPreDraw(inf::ViewerPtr viewer)
+void ModeSwitchPlugin::contextPreDraw(ViewerPtr viewer)
 {
    // Only tell the focused plug-in(s) to perform context-specific pre-draw
    // operations.
-   std::vector<PluginData>::iterator i;
-   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   typedef std::vector<PluginData>::iterator iter_type;
+   for ( iter_type i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
       if ( (*i).mPlugin->isFocused() )
       {
@@ -316,12 +319,12 @@ void ModeSwitchPlugin::contextPreDraw(inf::ViewerPtr viewer)
    }
 }
 
-void ModeSwitchPlugin::draw(inf::ViewerPtr viewer)
+void ModeSwitchPlugin::draw(ViewerPtr viewer)
 {
    // Only tell the focused plug-in(s) to perform context-specific draw
    // operations.
-   std::vector<PluginData>::iterator i;
-   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   typedef std::vector<PluginData>::iterator iter_type;
+   for ( iter_type i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
       if ( (*i).mPlugin->isFocused() )
       {
@@ -330,12 +333,12 @@ void ModeSwitchPlugin::draw(inf::ViewerPtr viewer)
    }
 }
 
-void ModeSwitchPlugin::contextPostDraw(inf::ViewerPtr viewer)
+void ModeSwitchPlugin::contextPostDraw(ViewerPtr viewer)
 {
    // Only tell the focused plug-in(s) to perform context-specific post-draw
    // operations.
-   std::vector<PluginData>::iterator i;
-   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   typedef std::vector<PluginData>::iterator iter_type;
+   for ( iter_type i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
       if ( (*i).mPlugin->isFocused() )
       {
@@ -344,39 +347,39 @@ void ModeSwitchPlugin::contextPostDraw(inf::ViewerPtr viewer)
    }
 }
 
-void ModeSwitchPlugin::contextClose(inf::ViewerPtr viewer)
+void ModeSwitchPlugin::contextClose(ViewerPtr viewer)
 {
    // Inform all plug-ins of context shutdown.
-   std::vector<PluginData>::iterator i;
-   for ( i = mPlugins.begin(); i != mPlugins.end(); ++i )
+   typedef std::vector<PluginData>::iterator iter_type;
+   for ( iter_type i = mPlugins.begin(); i != mPlugins.end(); ++i )
    {
       (*i).mPlugin->contextClose(viewer);
    }
 }
 
 void ModeSwitchPlugin::registerModule(vpr::LibraryPtr module,
-                                      inf::ViewerPtr viewer)
+                                      ViewerPtr viewer)
 {
    viewer->getPluginRegistry()->addEntry(
-      TypedInitRegistryEntry<inf::Plugin>::create(
-         module, &inf::Plugin::validatePluginLib,
-         boost::bind(&inf::Plugin::init, _1, viewer)
+      plugin::TypedInitRegistryEntry<viewer::Plugin>::create(
+         module, &viewer::Plugin::validatePluginLib,
+         boost::bind(&viewer::Plugin::init, _1, viewer)
       )
    );
 }
 
 void ModeSwitchPlugin::switchToMode(const unsigned int modeNum,
-                                    inf::ViewerPtr viewer)
+                                    ViewerPtr viewer)
 {
    //mode_switch_status_id
-   if(modeNum > mMaxMode)
+   if ( modeNum > mMaxMode )
    {
       std::cerr << "ModeSwitchPlugin: Attempted to switch out of range to: "
                 << modeNum << ".  Ignoring." << std::endl;
       return;
    }
 
-   IOV_STATUS << "Switching to mode: " << mModeNames[modeNum] << std::endl;
+   VRKIT_STATUS << "Switching to mode: " << mModeNames[modeNum] << std::endl;
 
    StatusPanelDataPtr status_panel_data =
       viewer->getSceneObj()->getSceneData<StatusPanelData>();

@@ -21,22 +21,22 @@
 #include <boost/bind.hpp>
 #include <boost/assign/list_of.hpp>
 
-#include <IOV/PluginCreator.h>
-#include <IOV/Viewer.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/Version.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
 
 #include "VolumeDrawingPlugin.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape", "VolumeDrawingPlugin",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   boost::bind(&inf::VolumeDrawingPlugin::create, sInfo)
+static vrkit::plugin::Creator<vrkit::viewer::Plugin> sPluginCreator(
+   boost::bind(&vrkit::VolumeDrawingPlugin::create, sInfo)
 );
 
 extern "C"
@@ -44,45 +44,45 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_PLUGIN_API_MAJOR;
-   minorVer = INF_PLUGIN_API_MINOR;
+   majorVer = VRKIT_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }
 //@}
 }
 
-namespace inf
+namespace vrkit
 {
 
-VolumeDrawingPlugin::VolumeDrawingPlugin(const inf::plugin::Info& info)
-   : inf::Plugin(info)
+VolumeDrawingPlugin::VolumeDrawingPlugin(const plugin::Info& info)
+   : viewer::Plugin(info)
 {
    /* Do nothing. */ ;
 }
 
-PluginPtr VolumeDrawingPlugin::init(inf::ViewerPtr)
+viewer::PluginPtr VolumeDrawingPlugin::init(ViewerPtr)
 {
    return shared_from_this();
 }
 
-void VolumeDrawingPlugin::contextInit(inf::ViewerPtr viewer)
+void VolumeDrawingPlugin::contextInit(ViewerPtr viewer)
 {
    viewer->getRenderAction()->setVolumeDrawing(isFocused());
 }
 
-void VolumeDrawingPlugin::update(inf::ViewerPtr)
+void VolumeDrawingPlugin::update(ViewerPtr)
 {
    /* Do nothing. */ ;
 }

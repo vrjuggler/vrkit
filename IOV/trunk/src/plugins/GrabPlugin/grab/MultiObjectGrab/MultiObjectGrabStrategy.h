@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_MULTI_OBJECT_GRAB_STRATEGY_H_
-#define _INF_MULTI_OBJECT_GRAB_STRATEGY_H_
+#ifndef _VRKIT_MULTI_OBJECT_GRAB_STRATEGY_H_
+#define _VRKIT_MULTI_OBJECT_GRAB_STRATEGY_H_
 
 #include <string>
 #include <vector>
@@ -29,21 +29,21 @@
 
 #include <jccl/Config/ConfigElementPtr.h>
 
-#include <IOV/SceneObjectPtr.h>
-#include <IOV/EventDataPtr.h>
-#include <IOV/Grab/GrabStrategy.h>
-#include <IOV/Util/DigitalCommand.h>
+#include <vrkit/SceneObjectPtr.h>
+#include <vrkit/scenedata/EventDataPtr.h>
+#include <vrkit/grab/Strategy.h>
+#include <vrkit/util/DigitalCommand.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 class MultiObjectGrabStrategy
-   : public GrabStrategy
+   : public grab::Strategy
    , public boost::enable_shared_from_this<MultiObjectGrabStrategy>
 {
 protected:
-   MultiObjectGrabStrategy(const inf::plugin::Info& info);
+   MultiObjectGrabStrategy(const plugin::Info& info);
 
 public:
    static std::string getId()
@@ -51,15 +51,16 @@ public:
       return "MultiObjectGrab";
    }
 
-   static GrabStrategyPtr create(const inf::plugin::Info& info)
+   static grab::StrategyPtr create(const plugin::Info& info)
    {
-      return GrabStrategyPtr(new MultiObjectGrabStrategy(info));
+      return grab::StrategyPtr(new MultiObjectGrabStrategy(info));
    }
 
    virtual ~MultiObjectGrabStrategy();
 
-   virtual GrabStrategyPtr init(ViewerPtr viewer, grab_callback_t grabCallback,
-                                release_callback_t releaseCallback);
+   virtual grab::StrategyPtr init(ViewerPtr viewer,
+                                  grab_callback_t grabCallback,
+                                  release_callback_t releaseCallback);
 
    virtual void setFocus(ViewerPtr viewer, const bool focused);
 
@@ -82,15 +83,15 @@ private:
     * @param parentObj The top-most ancestor of \p obj.
     * @param pnt       The intersection point.
     */
-   inf::Event::ResultType objectIntersected(inf::SceneObjectPtr obj,
-                                            const gmtl::Point3f& pnt);
+   event::ResultType objectIntersected(SceneObjectPtr obj,
+                                       const gmtl::Point3f& pnt);
 
    /**
     * Responds to object de-intersection signals.
     *
     * @param obj The object associated with the de-intersection signal.
     */
-   inf::Event::ResultType objectDeintersected(inf::SceneObjectPtr obj);
+   event::ResultType objectDeintersected(SceneObjectPtr obj);
 
    /**
     * Responds to the signal emitted when the grabbable state of a scene
@@ -102,9 +103,9 @@ private:
     *       object's grabbable state change signal no that we are no longer
     *       interested in it.
     *
-    * @param obj The scene object that was removed from inf::GrabData.
+    * @param obj The scene object that was removed from vrkit::GrabData.
     */
-   void grabbableObjStateChanged(inf::SceneObjectPtr obj);
+   void grabbableObjStateChanged(SceneObjectPtr obj);
 
    WandInterfacePtr mWandInterface;
 
@@ -118,19 +119,19 @@ private:
 
    /** @name Button(s) for adding objects to selection. */
    //@{
-   inf::DigitalCommand mChooseBtn;
+   util::DigitalCommand mChooseBtn;
    std::string mChooseText;
    //@}
 
    /** @name Button(s) for grabbing objects. */
    //@{
-   inf::DigitalCommand mGrabBtn;
+   util::DigitalCommand mGrabBtn;
    std::string mGrabText;
    //@}
 
    /** @name Button(s) for releasing objects. */
    //@{
-   inf::DigitalCommand mReleaseBtn;
+   util::DigitalCommand mReleaseBtn;
    std::string mReleaseText;
    //@}
 
@@ -156,4 +157,4 @@ private:
 }
 
 
-#endif /* _INF_MULTI_OBJECT_GRAB_STRATEGY_H_ */
+#endif /* _VRKIT_MULTI_OBJECT_GRAB_STRATEGY_H_ */

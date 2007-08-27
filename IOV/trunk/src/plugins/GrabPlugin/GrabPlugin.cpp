@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <string.h>
+#include <cstring>
 #include <algorithm>
 #include <utility>
 #include <boost/bind.hpp>
@@ -29,27 +29,26 @@
 #include <gmtl/External/OpenSGConvert.h>
 
 #include <vpr/vpr.h>
-#include <vpr/System.h>
 #include <vpr/Util/FileUtils.h>
 
-#include <IOV/EventData.h>
-#include <IOV/Viewer.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/PluginPtr.h>
-#include <IOV/PluginRegistry.h>
-#include <IOV/User.h>
-#include <IOV/InterfaceTrader.h>
-#include <IOV/WandInterface.h>
-#include <IOV/SceneObject.h>
-#include <IOV/Status.h>
-#include <IOV/TypedRegistryEntry.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
-#include <IOV/Plugin/Helpers.h>
-#include <IOV/Grab/GrabStrategy.h>
-#include <IOV/Grab/MoveStrategy.h>
-#include <IOV/Util/Exceptions.h>
-#include <IOV/Util/OpenSGHelpers.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/User.h>
+#include <vrkit/InterfaceTrader.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/SceneObject.h>
+#include <vrkit/Status.h>
+#include <vrkit/Exception.h>
+#include <vrkit/Version.h>
+#include <vrkit/exceptions/PluginException.h>
+#include <vrkit/scenedata/EventData.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Registry.h>
+#include <vrkit/plugin/TypedRegistryEntry.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/plugin/Helpers.h>
+#include <vrkit/grab/Strategy.h>
+#include <vrkit/move/Strategy.h>
+#include <vrkit/util/OpenSGHelpers.h>
 
 #include "GrabPlugin.h"
 
@@ -57,12 +56,12 @@
 using namespace boost::assign;
 namespace fs = boost::filesystem;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape", "GrabPlugin",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   boost::bind(&inf::GrabPlugin::create, sInfo)
+static vrkit::plugin::Creator<vrkit::viewer::Plugin> sPluginCreator(
+   boost::bind(&vrkit::GrabPlugin::create, sInfo)
 );
 
 extern "C"
@@ -70,19 +69,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_PLUGIN_API_MAJOR;
-   minorVer = INF_PLUGIN_API_MINOR;
+   majorVer = VRKIT_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }
@@ -90,19 +89,19 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 
 }
 
-namespace inf
+namespace vrkit
 {
 
 template<typename T>
-void registerModule(vpr::LibraryPtr module, inf::ViewerPtr viewer)
+void registerModule(vpr::LibraryPtr module, ViewerPtr viewer)
 {
    viewer->getPluginRegistry()->addEntry(
-      inf::TypedRegistryEntry<T>::create(module, &T::validatePluginLib)
+      plugin::TypedRegistryEntry<T>::create(module, &T::validatePluginLib)
    );
 }
 
-GrabPlugin::GrabPlugin(const inf::plugin::Info& info)
-   : Plugin(info)
+GrabPlugin::GrabPlugin(const plugin::Info& info)
+   : viewer::Plugin(info)
 {
    /* Do nothing. */ ;
 }
@@ -112,7 +111,7 @@ GrabPlugin::~GrabPlugin()
    /* Do nothing. */ ;
 }
 
-PluginPtr GrabPlugin::init(ViewerPtr viewer)
+viewer::PluginPtr GrabPlugin::init(ViewerPtr viewer)
 {
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
    mEventData->objectsMoved.connect(
@@ -123,7 +122,7 @@ PluginPtr GrabPlugin::init(ViewerPtr viewer)
    mWandInterface = if_trader.getWandInterface();
 
    // Get the plug-in registry for our strategy plug-in types.
-   inf::PluginRegistryPtr plugin_registry = viewer->getPluginRegistry();
+   plugin::RegistryPtr plugin_registry = viewer->getPluginRegistry();
    plugin_registry->pluginInstantiated().connect(
       boost::bind(&GrabPlugin::pluginInstantiated, this, _1, viewer)
    );
@@ -142,36 +141,36 @@ PluginPtr GrabPlugin::init(ViewerPtr viewer)
    // Load the grab strategy.
    try
    {
-      IOV_STATUS << "   Loading grab strategy plug-in '" << mGrabStrategyName
-                 << "' ..." << std::flush;
-      std::vector<inf::AbstractPluginPtr> deps;
+      VRKIT_STATUS << "   Loading grab strategy plug-in '"
+                   << mGrabStrategyName << "' ..." << std::flush;
+      std::vector<AbstractPluginPtr> deps;
       plugin_registry->makeInstance(mGrabStrategyName, deps);
-      IOV_STATUS << "[OK]" << std::endl;
+      VRKIT_STATUS << "[OK]" << std::endl;
    }
    catch (std::runtime_error& ex)
    {
-      IOV_STATUS << "[ERROR]\nWARNING: Failed to load strategy plug-in "
-                 << mGrabStrategyName << ":\n" << ex.what() << std::endl;
+      VRKIT_STATUS << "[ERROR]\nWARNING: Failed to load strategy plug-in "
+                   << mGrabStrategyName << ":\n" << ex.what() << std::endl;
    }
 
    // Build the list of move strategies.
    typedef std::vector<std::string>::iterator iter_type;
    for ( iter_type itr = mMoveStrategyNames.begin();
          itr != mMoveStrategyNames.end();
-         ++itr)
+         ++itr )
    {
       try
       {
-         IOV_STATUS << "   Loading move strategy plug-in '"
-                    << *itr << "' ..." << std::flush;
-         std::vector<inf::AbstractPluginPtr> deps;
+         VRKIT_STATUS << "   Loading move strategy plug-in '" << *itr
+                      << "' ..." << std::flush;
+         std::vector<AbstractPluginPtr> deps;
          plugin_registry->makeInstance(*itr, deps);
-         IOV_STATUS << "[OK]" << std::endl;
+         VRKIT_STATUS << "[OK]" << std::endl;
       }
       catch (std::runtime_error& ex)
       {
-         IOV_STATUS << "[ERROR]\nWARNING: Failed to load strategy plug-in "
-                    << *itr << ":\n" << ex.what() << std::endl;
+         VRKIT_STATUS << "[ERROR]\nWARNING: Failed to load strategy plug-in "
+                      << *itr << ":\n" << ex.what() << std::endl;
       }
    }
 
@@ -207,8 +206,10 @@ void GrabPlugin::update(ViewerPtr viewer)
          {
             gmtl::Matrix44f new_obj_mat = mGrabbed_pobj_M_obj_map[*o];
 
-            std::vector<MoveStrategyPtr>::iterator s;
-            for ( s = mMoveStrategies.begin(); s != mMoveStrategies.end(); ++s )
+            typedef std::vector<move::StrategyPtr>::iterator iter_type;
+            for ( iter_type s = mMoveStrategies.begin();
+                  s != mMoveStrategies.end();
+                  ++s )
             {
                // new_obj_mat is guaranteed to place the object into pobj
                // space.
@@ -225,7 +226,7 @@ void GrabPlugin::update(ViewerPtr viewer)
    }
 }
 
-void GrabPlugin::focusChanged(inf::ViewerPtr viewer)
+void GrabPlugin::focusChanged(ViewerPtr viewer)
 {
    if ( mGrabStrategy )
    {
@@ -233,8 +234,8 @@ void GrabPlugin::focusChanged(inf::ViewerPtr viewer)
    }
 }
 
-inf::Event::ResultType GrabPlugin::
-defaultObjectsMovedSlot(const EventData::moved_obj_list_t& objs)
+event::ResultType
+GrabPlugin::defaultObjectsMovedSlot(const EventData::moved_obj_list_t& objs)
 {
    EventData::moved_obj_list_t::const_iterator o;
    for ( o = objs.begin(); o != objs.end(); ++o )
@@ -244,10 +245,10 @@ defaultObjectsMovedSlot(const EventData::moved_obj_list_t& objs)
       (*o).first->moveTo(obj_mat_osg);
    }
 
-   return Event::CONTINUE;
+   return event::CONTINUE;
 }
 
-bool GrabPlugin::config(jccl::ConfigElementPtr elt, inf::ViewerPtr viewer)
+bool GrabPlugin::config(jccl::ConfigElementPtr elt, ViewerPtr viewer)
 {
    vprASSERT(elt->getID() == getElementType());
 
@@ -260,7 +261,7 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt, inf::ViewerPtr viewer)
       msg << "Configuration of GrabPlugin failed.  Required config "
           << "element version is " << req_cfg_version << ", but element '"
           << elt->getName() << "' is version " << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    const std::string grab_strategy_path_prop("grab_strategy_plugin_path");
@@ -270,20 +271,20 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt, inf::ViewerPtr viewer)
 
    // Set up two default search paths for Grab Strategy plug-ins:
    //    1. Relative path to './plugins/grab'
-   //    2. IOV_BASE_DIR/lib/IOV/plugins/grab
+   //    2. VRKIT_BASE_DIR/lib/vrkit/plugins/grab
    //
    // In all of the above cases, the 'debug' subdirectory is searched first if
-   // this is a debug build (i.e., when IOV_DEBUG is defined and _DEBUG is
+   // this is a debug build (i.e., when VRKIT_DEBUG is defined and _DEBUG is
    // not).
    const std::vector<std::string> grab_search_path =
       makeSearchPath(elt, grab_strategy_path_prop, "grab");
 
    // Set up two default search paths for Move Strategy plug-ins:
    //    1. Relative path to './plugins/move'
-   //    2. IOV_BASE_DIR/lib/IOV/plugins/move
+   //    2. VRKIT_BASE_DIR/lib/vrkit/plugins/move
    //
    // In all of the above cases, the 'debug' subdirectory is searched first if
-   // this is a debug build (i.e., when IOV_DEBUG is defined and _DEBUG is
+   // this is a debug build (i.e., when VRKIT_DEBUG is defined and _DEBUG is
    // not).
    const std::vector<std::string> move_search_path =
       makeSearchPath(elt, move_strategy_path_prop, "move");
@@ -299,13 +300,13 @@ bool GrabPlugin::config(jccl::ConfigElementPtr elt, inf::ViewerPtr viewer)
    }
 
    std::vector<vpr::LibraryPtr> modules =
-      inf::plugin::findModules(grab_search_path);
+      plugin::findModules(grab_search_path);
    std::for_each(modules.begin(), modules.end(),
-                 boost::bind(&registerModule<inf::GrabStrategy>, _1, viewer));
+                 boost::bind(&registerModule<grab::Strategy>, _1, viewer));
 
-   modules = inf::plugin::findModules(move_search_path);
+   modules = plugin::findModules(move_search_path);
    std::for_each(modules.begin(), modules.end(),
-                 boost::bind(&registerModule<inf::MoveStrategy>, _1, viewer));
+                 boost::bind(&registerModule<move::Strategy>, _1, viewer));
 
    return true;
 }
@@ -315,7 +316,7 @@ GrabPlugin::makeSearchPath(jccl::ConfigElementPtr elt,
                            const std::string& prop, const std::string& subdir)
 {
    std::vector<std::string> search_path =
-      inf::plugin::getDefaultSearchPath(subdir);
+      plugin::getDefaultSearchPath(subdir);
 
    const unsigned int num_plugin_paths(elt->getNum(prop));
 
@@ -333,13 +334,13 @@ GrabPlugin::makeSearchPath(jccl::ConfigElementPtr elt,
    return search_path;
 }
 
-void GrabPlugin::pluginInstantiated(inf::AbstractPluginPtr plugin,
-                                    inf::ViewerPtr viewer)
+void GrabPlugin::pluginInstantiated(AbstractPluginPtr plugin,
+                                    ViewerPtr viewer)
 {
    if ( ! mGrabStrategy )
    {
-      inf::GrabStrategyPtr g =
-         boost::dynamic_pointer_cast<inf::GrabStrategy>(plugin);
+      grab::StrategyPtr g =
+         boost::dynamic_pointer_cast<grab::Strategy>(plugin);
 
       if ( g )
       {
@@ -353,8 +354,7 @@ void GrabPlugin::pluginInstantiated(inf::AbstractPluginPtr plugin,
       }
    }
 
-   inf::MoveStrategyPtr m =
-      boost::dynamic_pointer_cast<inf::MoveStrategy>(plugin);
+   move::StrategyPtr m = boost::dynamic_pointer_cast<move::Strategy>(plugin);
 
    if ( m )
    {
@@ -363,7 +363,7 @@ void GrabPlugin::pluginInstantiated(inf::AbstractPluginPtr plugin,
    }
 }
 
-void GrabPlugin::objectsGrabbed(inf::ViewerPtr viewer,
+void GrabPlugin::objectsGrabbed(ViewerPtr viewer,
                                 const std::vector<SceneObjectPtr>& objs,
                                 const gmtl::Point3f& isectPoint)
 {
@@ -379,14 +379,14 @@ void GrabPlugin::objectsGrabbed(inf::ViewerPtr viewer,
    );
 
    std::for_each(mMoveStrategies.begin(), mMoveStrategies.end(),
-                 boost::bind(&MoveStrategy::objectsGrabbed, _1, viewer, objs,
-                             isectPoint, vp_M_wand_xform));
+                 boost::bind(&move::Strategy::objectsGrabbed, _1, viewer,
+                             objs, isectPoint, vp_M_wand_xform));
 
    // Emit the object selection signal.
    mEventData->objectsSelected(objs);
 }
 
-void GrabPlugin::objectsReleased(inf::ViewerPtr viewer,
+void GrabPlugin::objectsReleased(ViewerPtr viewer,
                                  const std::vector<SceneObjectPtr>& objs)
 {
    std::vector<SceneObjectPtr>::const_iterator o;
@@ -396,7 +396,7 @@ void GrabPlugin::objectsReleased(inf::ViewerPtr viewer,
    }
 
    std::for_each(mMoveStrategies.begin(), mMoveStrategies.end(),
-                 boost::bind(&MoveStrategy::objectsReleased, _1, viewer,
+                 boost::bind(&move::Strategy::objectsReleased, _1, viewer,
                              objs));
 
    // Emit the de-select event for all the objects that were released.

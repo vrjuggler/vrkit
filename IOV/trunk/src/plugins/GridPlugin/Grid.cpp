@@ -28,12 +28,12 @@
 #include <vpr/Util/Assert.h>
 #include <jccl/Config/ConfigElement.h>
 
-#include <IOV/Util/Exceptions.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "Grid.h"
 
 
-namespace inf
+namespace vrkit
 {
 
 GridPtr Grid::init(jccl::ConfigElementPtr cfgElt)
@@ -49,7 +49,7 @@ GridPtr Grid::init(jccl::ConfigElementPtr cfgElt)
       msg << "Failed to configure grid '" << cfgElt->getName()
           << "'. Required config element version is " << req_cfg_version
           << ", but this element is version " << cfgElt->getVersion();
-      throw inf::PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    mName = cfgElt->getName();
@@ -68,7 +68,7 @@ GridPtr Grid::init(jccl::ConfigElementPtr cfgElt)
    {
       std::ostringstream msg_stream;
       msg_stream << "Invalid grid dimensions " << width << "x" << height;
-      throw inf::PluginException(msg_stream.str(), IOV_LOCATION);
+      throw PluginException(msg_stream.str(), VRKIT_LOCATION);
    }
 
    const float granularity = cfgElt->getProperty<float>(granularity_prop);
@@ -77,7 +77,7 @@ GridPtr Grid::init(jccl::ConfigElementPtr cfgElt)
    {
       std::ostringstream msg_stream;
       msg_stream << "Invalid grid cell granularity " << granularity;
-      throw inf::PluginException(msg_stream.str(), IOV_LOCATION);
+      throw PluginException(msg_stream.str(), VRKIT_LOCATION);
    }
 
    OSG::Real32 red   = cfgElt->getProperty<OSG::Real32>(color_prop, 0);
@@ -120,7 +120,7 @@ GridPtr Grid::init(jccl::ConfigElementPtr cfgElt)
       std::ostringstream msg_stream;
       msg_stream << "Invalid corner value " << corner_val
                  << "; must be one of 0, 1, 2, or 3";
-      throw inf::PluginException(msg_stream.str(), IOV_LOCATION);
+      throw PluginException(msg_stream.str(), VRKIT_LOCATION);
    }
 
    const OSG::Vec3f corner_pos(
@@ -129,9 +129,11 @@ GridPtr Grid::init(jccl::ConfigElementPtr cfgElt)
       cfgElt->getProperty<float>(corner_pos_prop, 2)
    );
    OSG::Quaternion rot;
-   rot.setValue(gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 0)),
-                gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 1)),
-                gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 2)));
+   rot.setValue(
+      gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 0)),
+      gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 1)),
+      gmtl::Math::deg2Rad(cfgElt->getProperty<float>(orient_prop, 2))
+   );
 
    initGeometry(width, height, granularity, corner, corner_pos, rot,
                 OSG::Color3f(red, green, blue));
@@ -207,7 +209,8 @@ void Grid::initGeometry(const OSG::Real32 width, const OSG::Real32 height,
       plane_mat->setTransparency(0.90f);
    OSG::endEditCP(plane_mat, mat_mask);
 
-   OSG::SimpleMaterialPtr line_mat = OSG::SimpleMaterialPtr::dcast(OSG::deepClone(plane_mat));
+   OSG::SimpleMaterialPtr line_mat =
+      OSG::SimpleMaterialPtr::dcast(OSG::deepClone(plane_mat));
 
    OSG::beginEditCP(line_mat, OSG::SimpleMaterial::TransparencyFieldMask);
       line_mat->setTransparency(0.0f);
@@ -253,7 +256,8 @@ void Grid::initGeometry(const OSG::Real32 width, const OSG::Real32 height,
    mRoot = OSG::Transform::create();
 
    OSG::Matrix xform;
-   xform.setTransform(center_pt, rot, OSG::Vec3f(1.0f, 1.0f, 1.0f), OSG::Quaternion(), cornerPos - center_pt);
+   xform.setTransform(center_pt, rot, OSG::Vec3f(1.0f, 1.0f, 1.0f),
+                      OSG::Quaternion(), cornerPos - center_pt);
 
    move(xform);
 

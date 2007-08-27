@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <IOV/Config.h>
+#include <vrkit/Config.h>
 
 #include <boost/bind.hpp>
 #include <boost/assign/list_of.hpp>
@@ -24,28 +24,28 @@
 #include <gmtl/MatrixOps.h>
 #include <gmtl/External/OpenSGConvert.h>
 
-#include <IOV/Plugin/PluginConfig.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/SceneObject.h>
-#include <IOV/Status.h>
-#include <IOV/User.h>
-#include <IOV/Viewer.h>
-#include <IOV/WandInterface.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
-#include <IOV/Util/Exceptions.h>
+#include <vrkit/plugin/Config.h>
+#include <vrkit/SceneObject.h>
+#include <vrkit/Status.h>
+#include <vrkit/User.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/Version.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/Plugin/Info.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "SimpleSlideMoveStrategy.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape.move", "SimpleSlideMoveStrategy",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::MoveStrategy> sPluginCreator(
-   boost::bind(&inf::SimpleSlideMoveStrategy::create, sInfo)
+static vrkit::plugin::Creator<vrkit::move::Strategy> sPluginCreator(
+   boost::bind(&vrkit::SimpleSlideMoveStrategy::create, sInfo)
 );
 
 extern "C"
@@ -53,19 +53,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_MOVE_STRATEGY_PLUGIN_API_MAJOR;
-   minorVer = INF_MOVE_STRATEGY_PLUGIN_API_MINOR;
+   majorVer = VRKIT_MOVE_STRATEGY_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_MOVE_STRATEGY_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getMoveStrategyCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getMoveStrategyCreator()
 {
    return &sPluginCreator;
 }
@@ -73,12 +73,11 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getMoveStrategyCreator()
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-SimpleSlideMoveStrategy::
-SimpleSlideMoveStrategy(const inf::plugin::Info& info)
-   : inf::MoveStrategy(info)
+SimpleSlideMoveStrategy::SimpleSlideMoveStrategy(const plugin::Info& info)
+   : move::Strategy(info)
    , mTransValue(0.0f)
    , mAnalogNum(0)
    , mForwardValue(1.0f)
@@ -88,7 +87,7 @@ SimpleSlideMoveStrategy(const inf::plugin::Info& info)
    /* Do nothing. */ ;
 }
 
-inf::MoveStrategyPtr SimpleSlideMoveStrategy::init(inf::ViewerPtr viewer)
+move::StrategyPtr SimpleSlideMoveStrategy::init(ViewerPtr viewer)
 {
    jccl::ConfigElementPtr cfg_elt =
       viewer->getConfiguration().getConfigElement(getElementType());
@@ -99,34 +98,36 @@ inf::MoveStrategyPtr SimpleSlideMoveStrategy::init(inf::ViewerPtr viewer)
       {
          configure(cfg_elt);
       }
-      catch (inf::Exception& ex)
+      catch (Exception& ex)
       {
          std::cerr << ex.what() << std::endl;
       }
    }
 
-   vprASSERT(mForwardValue == 0.0f || mForwardValue == 1.0f &&
+   vprASSERT((mForwardValue == 0.0f || mForwardValue == 1.0f) &&
              "Invalid setting for mForwardValue");
 
    return shared_from_this();
 }
 
-void SimpleSlideMoveStrategy::
-objectsGrabbed(inf::ViewerPtr, const std::vector<SceneObjectPtr>&,
-               const gmtl::Point3f&, const gmtl::Matrix44f&)
+void
+SimpleSlideMoveStrategy::objectsGrabbed(ViewerPtr,
+                                        const std::vector<SceneObjectPtr>&,
+                                        const gmtl::Point3f&,
+                                        const gmtl::Matrix44f&)
 {
    /* Do nothing. */ ;
 }
 
-void SimpleSlideMoveStrategy::
-objectsReleased(inf::ViewerPtr, const std::vector<SceneObjectPtr>&)
+void
+SimpleSlideMoveStrategy::objectsReleased(ViewerPtr,
+                                         const std::vector<SceneObjectPtr>&)
 {
    mTransValue = 0.0f;
 }
 
 gmtl::Matrix44f
-SimpleSlideMoveStrategy::computeMove(inf::ViewerPtr viewer,
-                                     SceneObjectPtr obj,
+SimpleSlideMoveStrategy::computeMove(ViewerPtr viewer, SceneObjectPtr obj,
                                      const gmtl::Matrix44f& vp_M_wand,
                                      const gmtl::Matrix44f& curObjPos)
 {
@@ -204,7 +205,7 @@ void SimpleSlideMoveStrategy::configure(jccl::ConfigElementPtr cfgElt)
           << "config element version is " << req_cfg_version
           << ", but element '" << cfgElt->getName() << "' is version "
           << cfgElt->getVersion();
-      throw inf::PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    const std::string analog_input_prop("analog_input");
@@ -222,9 +223,10 @@ void SimpleSlideMoveStrategy::configure(jccl::ConfigElementPtr cfgElt)
    }
    else
    {
-      IOV_STATUS << "ERROR: Analog input index (" << analog_num << ") given!\n"
-                 << "This must be -1 (to disable) or in the range [0, 4)."
-                 << std::endl;
+      VRKIT_STATUS << "ERROR: Analog input index (" << analog_num
+                   << ") given!\n"
+                   << "This must be -1 (to disable) or in the range [0, 4)."
+                   << std::endl;
    }
 
    const float fwd_val = cfgElt->getProperty<float>(forward_value_prop);
@@ -235,9 +237,9 @@ void SimpleSlideMoveStrategy::configure(jccl::ConfigElementPtr cfgElt)
    }
    else
    {
-      IOV_STATUS << "ERROR: Invalid forward sliding value (" << fwd_val
-                 << ") given!\n"
-                 << "This must be either 0.0 or 1.0" << std::endl;
+      VRKIT_STATUS << "ERROR: Invalid forward sliding value (" << fwd_val
+                   << ") given!\n"
+                   << "This must be either 0.0 or 1.0" << std::endl;
    }
 
    const float eps = cfgElt->getProperty<float>(slide_epsilon_prop);
@@ -248,8 +250,8 @@ void SimpleSlideMoveStrategy::configure(jccl::ConfigElementPtr cfgElt)
    }
    else
    {
-      IOV_STATUS << "ERROR: Slide threshold must be non-negative!"
-                 << std::endl;
+      VRKIT_STATUS << "ERROR: Slide threshold must be non-negative!"
+                   << std::endl;
    }
 
    const float slide_mult = cfgElt->getProperty<float>(slide_multiplier_prop);
@@ -260,8 +262,8 @@ void SimpleSlideMoveStrategy::configure(jccl::ConfigElementPtr cfgElt)
    }
    else
    {
-      IOV_STATUS << "ERROR: Slide acceleration multiplier must be greater "
-                 << "than 0!" << std::endl;
+      VRKIT_STATUS << "ERROR: Slide acceleration multiplier must be greater "
+                   << "than 0!" << std::endl;
    }
 }
 

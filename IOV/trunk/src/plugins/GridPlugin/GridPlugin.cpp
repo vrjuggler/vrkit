@@ -26,14 +26,15 @@
 #include <vpr/vpr.h>
 #include <jccl/Config/ConfigElement.h>
 
-#include <IOV/PluginCreator.h>
-#include <IOV/StatusPanelData.h>
-#include <IOV/Status.h>
-#include <IOV/User.h>
-#include <IOV/Viewer.h>
-#include <IOV/WandInterface.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
+#include <vrkit/Status.h>
+#include <vrkit/User.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/Version.h>
+#include <vrkit/scenedata/StatusPanelData.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "Grid.h"
 #include "GridPlugin.h"
@@ -41,12 +42,12 @@
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape", "GridPlugin",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   boost::bind(&inf::GridPlugin::create, sInfo)
+static vrkit::plugin::Creator<vrkit::viewer::Plugin> sPluginCreator(
+   boost::bind(&vrkit::GridPlugin::create, sInfo)
 );
 
 extern "C"
@@ -54,30 +55,30 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_PLUGIN_API_MAJOR;
-   minorVer = INF_PLUGIN_API_MINOR;
+   majorVer = VRKIT_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }
 //@}
 }
 
-namespace inf
+namespace vrkit
 {
 
-GridPlugin::GridPlugin(const inf::plugin::Info& info)
-   : Plugin(info)
+GridPlugin::GridPlugin(const plugin::Info& info)
+   : viewer::Plugin(info)
    , mSelectedGridIndex(-1)
    , mGridsVisible(false)
    , mAnalogNum(-1)
@@ -90,7 +91,7 @@ GridPlugin::GridPlugin(const inf::plugin::Info& info)
    /* Do nothing. */ ;
 }
 
-PluginPtr GridPlugin::init(inf::ViewerPtr viewer)
+viewer::PluginPtr GridPlugin::init(ViewerPtr viewer)
 {
    mWandInterface = viewer->getUser()->getInterfaceTrader().getWandInterface();
 
@@ -102,8 +103,8 @@ PluginPtr GridPlugin::init(inf::ViewerPtr viewer)
       configure(cfg_elt);
    }
 
-   std::vector<inf::GridPtr>::iterator g;
-   for ( g = mGrids.begin(); g != mGrids.end(); ++g )
+   typedef std::vector<GridPtr>::iterator iter_type;
+   for ( iter_type g = mGrids.begin(); g != mGrids.end(); ++g )
    {
       OSG::GroupNodePtr decorator_root =
          viewer->getSceneObj()->getDecoratorRoot();
@@ -116,7 +117,7 @@ PluginPtr GridPlugin::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
-void GridPlugin::update(inf::ViewerPtr viewer)
+void GridPlugin::update(ViewerPtr viewer)
 {
    if ( isFocused() )
    {
@@ -125,8 +126,8 @@ void GridPlugin::update(inf::ViewerPtr viewer)
       if ( mActivateBtn() )
       {
          mGridsVisible = ! mGridsVisible;
-         std::vector<inf::GridPtr>::iterator g;
-         for ( g = mGrids.begin(); g != mGrids.end(); ++g )
+         typedef std::vector<GridPtr>::iterator iter_type;
+         for ( iter_type g = mGrids.begin(); g != mGrids.end(); ++g )
          {
             (*g)->setVisible(mGridsVisible);
          }
@@ -148,9 +149,9 @@ void GridPlugin::update(inf::ViewerPtr viewer)
             mSelectedGridIndex = (mSelectedGridIndex + 1) % mGrids.size();
             mGrids[mSelectedGridIndex]->setSelected(true);
 
-            IOV_STATUS << "Grid #" << mSelectedGridIndex
-                       << " (" << mGrids[mSelectedGridIndex]->getName()
-                       << ") selected" << std::endl;
+            VRKIT_STATUS << "Grid #" << mSelectedGridIndex
+                         << " (" << mGrids[mSelectedGridIndex]->getName()
+                         << ") selected" << std::endl;
 
             // XXX: Should the visible state change when the grid is selected?
             // If it doesn't, then there is no visual cue to the user that the
@@ -213,7 +214,7 @@ void GridPlugin::update(inf::ViewerPtr viewer)
                gmtl::makeTrans<gmtl::Matrix44f>(gmtl::Vec3f(0.0f, 0.0f,
                                                             trans_val));
 
-            inf::GridPtr grid = mGrids[mSelectedGridIndex];
+            GridPtr grid = mGrids[mSelectedGridIndex];
             gmtl::Matrix44f grid_xform;
             gmtl::set(grid_xform, grid->getCurrentXform());
             grid->move(grid_xform * delta_trans_mat);
@@ -238,8 +239,8 @@ void GridPlugin::update(inf::ViewerPtr viewer)
             // it should be set to false so that all the grids can be toggled
             // on at once.
             bool grid_visible(false);
-            std::vector<inf::GridPtr>::iterator g;
-            for ( g = mGrids.begin(); g != mGrids.end(); ++g )
+            typedef std::vector<GridPtr>::iterator iter_type;
+            for ( iter_type g = mGrids.begin(); g != mGrids.end(); ++g )
             {
                if ( (*g)->isVisible() )
                {
@@ -254,9 +255,9 @@ void GridPlugin::update(inf::ViewerPtr viewer)
    }
 }
 
-void GridPlugin::focusChanged(inf::ViewerPtr viewer)
+void GridPlugin::focusChanged(ViewerPtr viewer)
 {
-   inf::ScenePtr scene = viewer->getSceneObj();
+   ScenePtr scene = viewer->getSceneObj();
    StatusPanelDataPtr status_panel_data =
       scene->getSceneData<StatusPanelData>();
 
@@ -363,7 +364,7 @@ void GridPlugin::configure(jccl::ConfigElementPtr elt)
       msg << "Configuration of GridPlugin failed.  Required config "
           << "element version is " << req_cfg_version << ", but element '"
           << elt->getName() << "' is version " << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    const std::string activate_btn_prop("activate_button_nums");
@@ -388,12 +389,12 @@ void GridPlugin::configure(jccl::ConfigElementPtr elt)
       try
       {
          mGrids.push_back(
-            inf::Grid::create()->init(
+            Grid::create()->init(
                elt->getProperty<jccl::ConfigElementPtr>(grids_prop, i)
             )
          );
       }
-      catch (inf::Exception& ex)
+      catch (Exception& ex)
       {
          std::cerr << "Failed to configure grid #" << i << ":\n" << ex.what()
                    << std::endl;

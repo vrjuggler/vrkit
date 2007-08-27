@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_RAY_INTERSECTION_STRATEGY_H_
-#define _INF_RAY_INTERSECTION_STRATEGY_H_
+#ifndef _VRKIT_RAY_INTERSECTION_STRATEGY_H_
+#define _VRKIT_RAY_INTERSECTION_STRATEGY_H_
 
 #include <string>
 
@@ -35,21 +35,20 @@
 
 #include <jccl/Config/ConfigElementPtr.h>
 
-#include <IOV/ViewerPtr.h>
-#include <IOV/Util/Exceptions.h>
-#include <IOV/Grab/IntersectionStrategy.h>
-#include <IOV/Util/SceneObjectTraverser.h>
+#include <vrkit/ViewerPtr.h>
+#include <vrkit/isect/Strategy.h>
+#include <vrkit/util/SceneObjectTraverser.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 class RayIntersectionStrategy
-   : public IntersectionStrategy
+   : public isect::Strategy
    , public boost::enable_shared_from_this<RayIntersectionStrategy>
 {
 protected:
-   RayIntersectionStrategy(const inf::plugin::Info& info);
+   RayIntersectionStrategy(const plugin::Info& info);
 
 public:
    virtual ~RayIntersectionStrategy();
@@ -59,19 +58,19 @@ public:
       return "RayIntersection";
    }
 
-   static IntersectionStrategyPtr create(const inf::plugin::Info& info)
+   static isect::StrategyPtr create(const plugin::Info& info)
    {
-      return IntersectionStrategyPtr(new RayIntersectionStrategy(info));
+      return isect::StrategyPtr(new RayIntersectionStrategy(info));
    }
 
-   virtual inf::IntersectionStrategyPtr init(ViewerPtr viewer);
+   virtual isect::StrategyPtr init(ViewerPtr viewer);
 
    virtual void update(ViewerPtr viewer);
 
-   virtual SceneObjectPtr
-      findIntersection(ViewerPtr viewer,
-                       const std::vector<SceneObjectPtr>& objs,
-                       gmtl::Point3f& intersectPoint);
+   virtual SceneObjectPtr findIntersection(
+      ViewerPtr viewer, const std::vector<SceneObjectPtr>& objs,
+      gmtl::Point3f& intersectPoint
+   );
 
    void setVisible(const bool visible);
 
@@ -85,7 +84,7 @@ private:
 
    /** @name Intersection Traversal Methods */
    //@{
-   SceneObjectTraverser::Result enterFunc(SceneObjectPtr obj);
+   util::SceneObjectTraverser::Result enterFunc(SceneObjectPtr obj);
    void setHit(float enterVal, SceneObjectPtr obj, const OSG::Pnt3f&  point);
    //@}
 
@@ -97,8 +96,8 @@ private:
     *
     * @param cfgElt The config element to use for configuring this object.
     *
-    * @throw inf::PluginException is thrown if the version of the given
-    *        config element is too old.
+    * @throw vrkit::PluginException
+    *           Thrown if the version of the given config element is too old.
     */
    void configure(jccl::ConfigElementPtr cfgElt);
 
@@ -135,4 +134,4 @@ private:
 }
 
 
-#endif /*_INF_RAY_INTERSECTION_STRATEGY_H_*/
+#endif /* _VRKIT_RAY_INTERSECTION_STRATEGY_H_ */

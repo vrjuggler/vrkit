@@ -16,31 +16,35 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_VOLUME_DRAWING_PLUGIN_H_
-#define _INF_VOLUME_DRAWING_PLUGIN_H_
+#ifndef _VRKIT_VOLUME_DRAWING_PLUGIN_H_
+#define _VRKIT_VOLUME_DRAWING_PLUGIN_H_
 
-#include <IOV/Plugin/PluginConfig.h>
+#include <vrkit/plugin/Config.h>
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <IOV/Plugin.h>
-#include <IOV/ViewerPtr.h>
+#include <vrkit/ViewerPtr.h>
+#include <vrkit/viewer/Plugin.h>
 
 
-namespace inf
+namespace vrkit
 {
 
+/**
+ * This plug-in enables OpenSG rendering of node (box) volumes. This is not to
+ * be confused with volume rendering.
+ */
 class VolumeDrawingPlugin
-   : public inf::Plugin
+   : public viewer::Plugin
    , public boost::enable_shared_from_this<VolumeDrawingPlugin>
 {
 protected:
-   VolumeDrawingPlugin(const inf::plugin::Info& info);
+   VolumeDrawingPlugin(const plugin::Info& info);
 
 public:
-   static inf::PluginPtr create(const inf::plugin::Info& info)
+   static viewer::PluginPtr create(const plugin::Info& info)
    {
-      return inf::PluginPtr(new VolumeDrawingPlugin(info));
+      return viewer::PluginPtr(new VolumeDrawingPlugin(info));
    }
 
    virtual ~VolumeDrawingPlugin()
@@ -60,7 +64,7 @@ public:
     *
     * @return A pointer to this plug-in is returned.
     */
-   virtual PluginPtr init(inf::ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
    /**
     * Activates OpenSG volume drawing for the newly opened context.
@@ -70,17 +74,17 @@ public:
     *
     * @param viewer The VR Juggler application object.
     */
-   virtual void contextInit(inf::ViewerPtr viewer);
+   virtual void contextInit(ViewerPtr viewer);
 
    /**
     * Does nothing as this plug-in does not have any state.
     *
     * @param viewer The VR Juggler application object.
     */
-   virtual void update(inf::ViewerPtr viewer);
+   virtual void update(ViewerPtr viewer);
 };
 
 }
 
 
-#endif /* _INF_VOLUME_DRAWING_PLUGIN_H_ */
+#endif /* _VRKIT_VOLUME_DRAWING_PLUGIN_H_ */

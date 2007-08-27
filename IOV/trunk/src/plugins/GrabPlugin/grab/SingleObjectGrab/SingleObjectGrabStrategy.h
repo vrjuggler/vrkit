@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_SINGLE_OBJECT_GRAB_STRATEGY_H_
-#define _INF_SINGLE_OBJECT_GRAB_STRATEGY_H_
+#ifndef _VRKIT_SINGLE_OBJECT_GRAB_STRATEGY_H_
+#define _VRKIT_SINGLE_OBJECT_GRAB_STRATEGY_H_
 
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
@@ -28,20 +28,20 @@
 
 #include <jccl/Config/ConfigElementPtr.h>
 
-#include <IOV/SceneObjectPtr.h>
-#include <IOV/Grab/GrabStrategy.h>
-#include <IOV/Util/DigitalCommand.h>
+#include <vrkit/SceneObjectPtr.h>
+#include <vrkit/grab/Strategy.h>
+#include <vrkit/util/DigitalCommand.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 class SingleObjectGrabStrategy
-   : public GrabStrategy
+   : public grab::Strategy
    , public boost::enable_shared_from_this<SingleObjectGrabStrategy>
 {
 protected:
-   SingleObjectGrabStrategy(const inf::plugin::Info& info);
+   SingleObjectGrabStrategy(const plugin::Info& info);
 
 public:
    static std::string getId()
@@ -49,15 +49,16 @@ public:
       return "SingleObjectGrab";
    }
 
-   static GrabStrategyPtr create(const inf::plugin::Info& info)
+   static grab::StrategyPtr create(const plugin::Info& info)
    {
-      return GrabStrategyPtr(new SingleObjectGrabStrategy(info));
+      return grab::StrategyPtr(new SingleObjectGrabStrategy(info));
    }
 
    virtual ~SingleObjectGrabStrategy();
 
-   virtual GrabStrategyPtr init(ViewerPtr viewer, grab_callback_t grabCallback,
-                                release_callback_t releaseCallback);
+   virtual grab::StrategyPtr init(ViewerPtr viewer,
+                                  grab_callback_t grabCallback,
+                                  release_callback_t releaseCallback);
 
    virtual void setFocus(ViewerPtr viewer, const bool focused);
 
@@ -80,15 +81,15 @@ private:
     * @param parentObj The top-most ancestor of \p obj.
     * @param pnt       The intersection point.
     */
-   inf::Event::ResultType objectIntersected(inf::SceneObjectPtr obj,
-                                            const gmtl::Point3f& pnt);
+   event::ResultType objectIntersected(SceneObjectPtr obj,
+                                       const gmtl::Point3f& pnt);
 
    /**
     * Responds to object de-intersection signals.
     *
     * @param obj The object associated with the de-intersection signal.
     */
-   inf::Event::ResultType objectDeintersected(inf::SceneObjectPtr obj);
+   event::ResultType objectDeintersected(SceneObjectPtr obj);
 
    /**
     * @post \c mGrabbing is false, and \c mGrabbedObj holds a NULL pointer.
@@ -104,7 +105,7 @@ private:
     *
     * @see releaseGrabbedObject()
     */
-   void grabbableObjStateChanged(inf::SceneObjectPtr obj);
+   void grabbableObjStateChanged(SceneObjectPtr obj);
 
    WandInterfacePtr mWandInterface;
 
@@ -116,13 +117,13 @@ private:
 
    /** @name Button(s) for grabbing objects. */
    //@{
-   inf::DigitalCommand mGrabBtn;
+   util::DigitalCommand mGrabBtn;
    std::string mGrabText;
    //@}
 
    /** @name Button(s) for releasing objects. */
    //@{
-   inf::DigitalCommand mReleaseBtn;
+   util::DigitalCommand mReleaseBtn;
    std::string mReleaseText;
    //@}
 
@@ -146,4 +147,4 @@ private:
 }
 
 
-#endif /* _INF_SINGLE_OBJECT_GRAB_STRATEGY_H_ */
+#endif /* _VRKIT_SINGLE_OBJECT_GRAB_STRATEGY_H_ */

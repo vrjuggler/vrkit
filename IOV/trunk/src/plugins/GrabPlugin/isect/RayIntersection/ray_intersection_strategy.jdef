@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?org-vrjuggler-jccl-settings definition.version="3.1"?>
 <definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="ray_intersection_strategy" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
-   <definition_version version="1" label="Ray Intersection Strategy (Infiscape)">
+   <definition_version version="1" label="Ray Intersection Strategy">
       <abstract>false</abstract>
       <help />
-      <category>/Infiscape/</category>
+      <category>/vrkit/</category>
       <property valuetype="float" variable="false" name="ray_length">
          <help>The length of the rendered ray in feet. The ray itself is infinite; this property simply defines how much of the ray is rendered in the scene.</help>
          <value label="Ray Length (Feet)" defaultvalue="5.0"/>
@@ -27,10 +27,10 @@
       </property>
       <upgrade_transform />
    </definition_version>
-   <definition_version version="2" label="Ray Intersection Strategy (Infiscape)">
+   <definition_version version="2" label="Ray Intersection Strategy">
       <abstract>false</abstract>
       <help />
-      <category>/Infiscape/</category>
+      <category>/vrkit/</category>
       <property valuetype="float" variable="false" name="ray_length">
          <help>The length of the rendered ray in feet. The ray itself is infinite; this property simply defines how much of the ray is rendered in the scene.</help>
          <value label="Ray Length (Feet)" defaultvalue="5.0"/>

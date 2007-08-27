@@ -16,51 +16,51 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_VIEWPOINTS_PLUGIN_H_
-#define _INF_VIEWPOINTS_PLUGIN_H_
+#ifndef _VRKIT_VIEWPOINTS_PLUGIN_H_
+#define _VRKIT_VIEWPOINTS_PLUGIN_H_
 
-#include <IOV/Plugin/PluginConfig.h>
+#include <vrkit/plugin/Config.h>
 
 #include <string>
+#include <vector>
 #include <boost/enable_shared_from_this.hpp>
 #include <gmtl/Matrix.h>
-#include <vector>
 
-#include <IOV/Plugin.h>
-#include <IOV/WandInterfacePtr.h>
-#include <IOV/Util/DigitalCommand.h>
+#include <vrkit/WandInterfacePtr.h>
+#include <vrkit/viewer/Plugin.h>
+#include <vrkit/util/DigitalCommand.h>
 
 
-namespace inf
+namespace vrkit
 {
 
-/** Plugin for moving between preset viewpoints.
- *
+/**
+ * Plug-in for moving between configured viewpoints.
  */
 class ViewpointsPlugin
-   : public inf::Plugin
+   : public viewer::Plugin
    , public boost::enable_shared_from_this<ViewpointsPlugin>
 {
 protected:
-   ViewpointsPlugin(const inf::plugin::Info& info)
-      : Plugin(info)
+   ViewpointsPlugin(const plugin::Info& info)
+      : viewer::Plugin(info)
       , mNextViewpoint(0)
    {;}
 
 public:
-   static PluginPtr create(const inf::plugin::Info& info);
+   static viewer::PluginPtr create(const plugin::Info& info);
 
    virtual ~ViewpointsPlugin()
    {;}
 
    virtual std::string getDescription()
    {
-      return std::string("Viewpoints Plugin");
+      return std::string("Viewpoints Plug-in");
    }
 
-   virtual PluginPtr init(inf::ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
-   virtual void update(inf::ViewerPtr viewer);
+   virtual void update(ViewerPtr viewer);
 
 protected:
    struct Viewpoint
@@ -71,12 +71,12 @@ protected:
 
 private:
    WandInterfacePtr        mWandInterface;      /**< Ptr to the wand interface to use. */
-   inf::DigitalCommand     mControlCmd;         /**< The control digital command. */
-   unsigned                mNextViewpoint;      /**< The next viewpoint to switch to. */
+   util::DigitalCommand    mControlCmd;         /**< The control digital command. */
+   unsigned int            mNextViewpoint;      /**< The next viewpoint to switch to. */
    std::vector<Viewpoint>  mViewpoints;         /**< The predefined viewpoints. */
 };
 
-} // namespace inf
+} // namespace vrkit
 
 
-#endif
+#endif /* _VRKIT_VIEWPOINTS_PLUGIN_H_ */

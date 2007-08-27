@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?org-vrjuggler-jccl-settings definition.version="3.1"?>
 <definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="model_swap_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
-   <definition_version version="1" label="Model Swap Plugin">
+   <definition_version version="1" label="Model Swap Plug-in">
       <abstract>false</abstract>
       <help />
-      <category>/Infiscape/</category>
+      <category>/vrkit/</category>
       <property valuetype="string" variable="false" name="control_button_num">
          <help>Select the number(s) of the button that should activate model swapping. The button number must be in the range [0,5]. -1 means to disable the use of this feature. Multiple buttons using a comma-separated list of button numbers.</help>
          <value label="Control Button" defaultvalue="0" />

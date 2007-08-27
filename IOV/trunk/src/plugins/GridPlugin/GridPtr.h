@@ -16,17 +16,19 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_GRID_PTR_H_
-#define _INF_GRID_PTR_H_
+#ifndef _VRKIT_GRID_PTR_H_
+#define _VRKIT_GRID_PTR_H_
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
-namespace inf
+
+namespace vrkit
 {
    class Grid;
    typedef boost::shared_ptr<Grid> GridPtr;
    typedef boost::weak_ptr<Grid> GridWeakPtr;
 }
 
-#endif
+
+#endif /* _VRKIT_GRID_PTR_H_ */

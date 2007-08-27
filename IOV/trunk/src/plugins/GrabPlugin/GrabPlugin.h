@@ -16,10 +16,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_GRAB_PLUGIN_H_
-#define _INF_GRAB_PLUGIN_H_
+#ifndef _VRKIT_GRAB_PLUGIN_H_
+#define _VRKIT_GRAB_PLUGIN_H_
 
-#include <IOV/Plugin/PluginConfig.h>
+#include <vrkit/plugin/Config.h>
 
 #include <string>
 #include <map>
@@ -30,29 +30,29 @@
 #include <gmtl/Matrix.h>
 #include <gmtl/Point.h>
 
-#include <IOV/EventData.h>
-#include <IOV/Plugin.h>
-#include <IOV/AbstractPluginPtr.h>
-#include <IOV/WandInterfacePtr.h>
-#include <IOV/Grab/GrabStrategyPtr.h>
-#include <IOV/Grab/MoveStrategyPtr.h>
-#include <IOV/SceneObjectPtr.h>
+#include <vrkit/AbstractPluginPtr.h>
+#include <vrkit/WandInterfacePtr.h>
+#include <vrkit/SceneObjectPtr.h>
+#include <vrkit/scenedata/EventData.h>
+#include <vrkit/grab/StrategyPtr.h>
+#include <vrkit/move/StrategyPtr.h>
+#include <vrkit/viewer/Plugin.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 class GrabPlugin
-   : public inf::Plugin
+   : public viewer::Plugin
    , public boost::enable_shared_from_this<GrabPlugin>
 {
 protected:
-   GrabPlugin(const inf::plugin::Info& info);
+   GrabPlugin(const plugin::Info& info);
 
 public:
-   static inf::PluginPtr create(const inf::plugin::Info& info)
+   static viewer::PluginPtr create(const plugin::Info& info)
    {
-      return inf::PluginPtr(new GrabPlugin(info));
+      return viewer::PluginPtr(new GrabPlugin(info));
    }
 
    virtual ~GrabPlugin();
@@ -62,63 +62,61 @@ public:
       return std::string("Grabbing");
    }
 
-   virtual PluginPtr init(inf::ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
-   virtual void update(inf::ViewerPtr viewer);
+   virtual void update(ViewerPtr viewer);
 
 protected:
-   void focusChanged(inf::ViewerPtr viewer);
+   void focusChanged(ViewerPtr viewer);
 
-   inf::Event::ResultType
+   event::ResultType
       defaultObjectsMovedSlot(const EventData::moved_obj_list_t& objs);
 
 private:
    static std::string getElementType()
    {
-      return std::string("iov_grab_plugin");
+      return std::string("vrkit_grab_plugin");
    }
 
-   bool config(jccl::ConfigElementPtr elt, inf::ViewerPtr viewer);
+   bool config(jccl::ConfigElementPtr elt, ViewerPtr viewer);
 
    std::vector<std::string> makeSearchPath(jccl::ConfigElementPtr elt,
                                            const std::string& prop,
                                            const std::string& subdir);
 
-   void pluginInstantiated(inf::AbstractPluginPtr plugin,
-                           inf::ViewerPtr viewer);
+   void pluginInstantiated(AbstractPluginPtr plugin, ViewerPtr viewer);
 
-   void objectsGrabbed(inf::ViewerPtr viewer,
+   void objectsGrabbed(ViewerPtr viewer,
                        const std::vector<SceneObjectPtr>& objs,
                        const gmtl::Point3f& isectPoint);
 
-   void objectsReleased(inf::ViewerPtr viewer,
+   void objectsReleased(ViewerPtr viewer,
                         const std::vector<SceneObjectPtr>& objs);
 
    /**
     * Responds to the signal emitted when the grabbable state of a scene
     * object changes. If \p obj is currently grabbed, then it is released.
     *
-    * @param obj    The scene object that was removed from inf::GrabData.
+    * @param obj    The scene object that was removed from vrkit::GrabData.
     * @param viewer The VR Juggler application object within which this
     *               plug-in is active.
     *
     * @see objectsReleased()
     */
-   void grabbableObjStateChanged(inf::SceneObjectPtr obj,
-                                 inf::ViewerPtr viewer);
+   void grabbableObjStateChanged(SceneObjectPtr obj, ViewerPtr viewer);
 
    WandInterfacePtr mWandInterface;
 
    /** @name Grab Strategy */
    //@{
-   std::string     mGrabStrategyName;
-   GrabStrategyPtr mGrabStrategy;
+   std::string       mGrabStrategyName;
+   grab::StrategyPtr mGrabStrategy;
    //@}
 
    /** @name Move Strategies */
    //@{
    std::map<SceneObjectPtr, gmtl::Matrix44f> mGrabbed_pobj_M_obj_map;
-   std::vector<MoveStrategyPtr> mMoveStrategies;
+   std::vector<move::StrategyPtr> mMoveStrategies;
    std::vector<std::string> mMoveStrategyNames;
    //@}
 
@@ -128,4 +126,4 @@ private:
 }
 
 
-#endif
+#endif /* _VRKIT_GRAB_PLUGIN_H_ */

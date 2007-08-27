@@ -41,7 +41,7 @@ if platform == 'darwin':
                               '-framework', 'OpenGL'])
 
 if platform != 'win32':
-   ui_env.Prepend(LIBS = ['iov' + shared_lib_suffix])
+   ui_env.Prepend(LIBS = ['vrkit' + shared_lib_suffix])
 
 plugin_dir = os.path.join('..', '..', 'plugins', 'StatusPanelPlugin')
 srcs = ['ui_test.cpp', os.path.join(plugin_dir, 'StatusPanel.cpp'),

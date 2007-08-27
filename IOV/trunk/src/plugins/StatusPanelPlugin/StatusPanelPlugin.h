@@ -16,11 +16,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_STATUS_PANEL_PLUGIN_H_
-#define _INF_STATUS_PANEL_PLUGIN_H_
+#ifndef _VRKIT_STATUS_PANEL_PLUGIN_H_
+#define _VRKIT_STATUS_PANEL_PLUGIN_H_
 
-#include <IOV/Plugin.h>
-#include <IOV/Plugin/PluginConfig.h>
+#include <vrkit/plugin/Config.h>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
@@ -32,22 +31,24 @@
 #include <vpr/vpr.h>
 #include <vpr/Util/GUID.h>
 
+#include <vrkit/viewer/Plugin.h>
+
 #include "StatusPanel.h"
 #include "StatusPanelViewOriginal.h"
 
 
-namespace inf
+namespace vrkit
 {
 
 class StatusPanelPlugin
-   : public inf::Plugin
+   : public viewer::Plugin
    , public boost::enable_shared_from_this<StatusPanelPlugin>
 {
 protected:
-   StatusPanelPlugin(const inf::plugin::Info& info);
+   StatusPanelPlugin(const plugin::Info& info);
 
 public:
-   static inf::PluginPtr create(const inf::plugin::Info& info);
+   static viewer::PluginPtr create(const plugin::Info& info);
 
    virtual ~StatusPanelPlugin();
 
@@ -58,9 +59,9 @@ public:
     *
     * @return This object is returned as a shared pointer.
     */
-   virtual inf::PluginPtr init(inf::ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
-   virtual void update(inf::ViewerPtr viewer);
+   virtual void update(ViewerPtr viewer);
 
    /** Get status panel for direct usage. */
    StatusPanel& getPanel();
@@ -69,7 +70,7 @@ public:
     * Sets the visibility of the StatusPanel scenegraph.
     *
     * @post The StatusPanel scenegraph reflects the desired visibility
-    * 	    state.
+    *       state.
     *
     * @param visible The new desired visibility state.
     */
@@ -88,4 +89,4 @@ protected:
 }
 
 
-#endif
+#endif /* _VRKIT_STATUS_PANEL_PLUGIN_H_ */

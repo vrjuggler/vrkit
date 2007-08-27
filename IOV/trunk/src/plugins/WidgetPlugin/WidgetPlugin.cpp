@@ -26,28 +26,29 @@
 #include <vpr/vpr.h>
 #include <jccl/Config/ConfigElement.h>
 
-#include <IOV/EventData.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/StatusPanelData.h>
-#include <IOV/Status.h>
-#include <IOV/User.h>
-#include <IOV/Viewer.h>
-#include <IOV/Widget/Widget.h>
-#include <IOV/Widget/WidgetData.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
+#include <vrkit/Status.h>
+#include <vrkit/User.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/Widget.h>
+#include <vrkit/Version.h>
+#include <vrkit/scenedata/EventData.h>
+#include <vrkit/scenedata/StatusPanelData.h>
+#include <vrkit/scenedata/WidgetData.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "WidgetPlugin.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape", "WidgetPlugin",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   boost::bind(&inf::WidgetPlugin::create, sInfo)
+static vrkit::plugin::Creator<vrkit::viewer::Plugin> sPluginCreator(
+   boost::bind(&vrkit::WidgetPlugin::create, sInfo)
 );
 
 extern "C"
@@ -55,30 +56,30 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_PLUGIN_API_MAJOR;
-   minorVer = INF_PLUGIN_API_MINOR;
+   majorVer = VRKIT_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }
 //@}
 }
 
-namespace inf
+namespace vrkit
 {
 
-WidgetPlugin::WidgetPlugin(const inf::plugin::Info& info)
-   : Plugin(info)
+WidgetPlugin::WidgetPlugin(const plugin::Info& info)
+   : viewer::Plugin(info)
    , mSelectText("Activate/Deactivate Widgets")
 //   , SelectedWidget(-1)
    , mWidgetPressed(false)
@@ -87,15 +88,15 @@ WidgetPlugin::WidgetPlugin(const inf::plugin::Info& info)
    /* Do nothing. */ ;
 }
 
-PluginPtr WidgetPlugin::init(inf::ViewerPtr viewer)
+viewer::PluginPtr WidgetPlugin::init(ViewerPtr viewer)
 {
    mWandInterface = viewer->getUser()->getInterfaceTrader().getWandInterface();
 
    // XXX: Temporary hack.
    // Set up connection to block move event of grabbed object. This allows us
    // to select objects in the scene, but does not allow us to move them.
-   inf::ScenePtr scene = viewer->getSceneObj();
-   EventDataPtr event_data = scene->getSceneData<inf::EventData>();
+   ScenePtr scene = viewer->getSceneObj();
+   EventDataPtr event_data = scene->getSceneData<EventData>();
    mMovedConnection =
       event_data->objectsMoved.connect(
          0, boost::bind(&WidgetPlugin::objectsMovedSlot, this, _1)
@@ -139,19 +140,18 @@ PluginPtr WidgetPlugin::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
-inf::Event::ResultType
-WidgetPlugin::objectIntersected(inf::SceneObjectPtr obj,
-                                const gmtl::Point3f& pnt)
+event::ResultType WidgetPlugin::objectIntersected(SceneObjectPtr obj,
+                                                  const gmtl::Point3f& pnt)
 {
    const std::vector<SceneObjectPtr>& objs = mWidgetData->getWidgets();
 
-   if (!isFocused())
+   if ( ! isFocused() )
    {
-      return inf::Event::CONTINUE;
+      return event::CONTINUE;
    }
 
    // Ensure that we intersected a widget and not a model etc.
-   inf::SceneObjectPtr parent = obj->getParent();
+   SceneObjectPtr parent = obj->getParent();
    while ( NULL != parent.get() )
    {
       if ( std::find(objs.begin(), objs.end(), parent) != objs.end() )
@@ -164,16 +164,15 @@ WidgetPlugin::objectIntersected(inf::SceneObjectPtr obj,
 
          // Don't allow anyone else to process this event since it is only
          // for widgets. (ex. BasicHighlighter)
-         return inf::Event::DONE;
+         return event::DONE;
       }
       parent = parent->getParent();
    }
 
-   return inf::Event::CONTINUE;
+   return event::CONTINUE;
 }
 
-inf::Event::ResultType
-WidgetPlugin::objectDeintersected(inf::SceneObjectPtr obj)
+event::ResultType WidgetPlugin::objectDeintersected(SceneObjectPtr obj)
 {
    if ( mIntersectedObj != NULL &&
         mIntersectedObj == obj &&
@@ -188,13 +187,13 @@ WidgetPlugin::objectDeintersected(inf::SceneObjectPtr obj)
 
       // Don't allow anyone else to process this event since it is only
       // for widgets. (ex. BasicHighlighter)
-      return inf::Event::DONE;
+      return event::DONE;
    }
 
-   return inf::Event::CONTINUE;
+   return event::CONTINUE;
 }
 
-void WidgetPlugin::update(inf::ViewerPtr viewer)
+void WidgetPlugin::update(ViewerPtr viewer)
 {
    if ( isFocused() )
    {
@@ -260,8 +259,9 @@ void WidgetPlugin::update(inf::ViewerPtr viewer)
    }
 }
 
-inf::Event::ResultType WidgetPlugin::
-objectsSelected(const std::vector<inf::SceneObjectPtr>& objs, bool selected)
+event::ResultType
+WidgetPlugin::objectsSelected(const std::vector<SceneObjectPtr>& objs,
+                              bool selected)
 {
    if (selected)
    {
@@ -270,20 +270,20 @@ objectsSelected(const std::vector<inf::SceneObjectPtr>& objs, bool selected)
    }
    else
    {
-      mSelectedObject = inf::SceneObjectPtr();
+      mSelectedObject = SceneObjectPtr();
    }
-   return inf::Event::CONTINUE;
+   return event::CONTINUE;
 }
 
-inf::Event::ResultType WidgetPlugin::
-objectsMovedSlot(const EventData::moved_obj_list_t&)
+event::ResultType
+WidgetPlugin::objectsMovedSlot(const EventData::moved_obj_list_t&)
 {
-   return inf::Event::DONE;
+   return event::DONE;
 }
 
-void WidgetPlugin::focusChanged(inf::ViewerPtr viewer)
+void WidgetPlugin::focusChanged(ViewerPtr viewer)
 {
-   inf::ScenePtr scene = viewer->getSceneObj();
+   ScenePtr scene = viewer->getSceneObj();
    StatusPanelDataPtr status_panel_data =
       scene->getSceneData<StatusPanelData>();
 
@@ -318,7 +318,7 @@ void WidgetPlugin::focusChanged(inf::ViewerPtr viewer)
 
       if ( status_panel_data->mStatusPanelPlugin )
       {
-         inf::StatusPanel& panel =
+         StatusPanel& panel =
             status_panel_data->mStatusPanelPlugin->getPanel();
 
          if ( mActivateBtn.isConfigured() )
@@ -360,7 +360,7 @@ void WidgetPlugin::focusChanged(inf::ViewerPtr viewer)
    {
       if ( status_panel_data->mStatusPanelPlugin )
       {
-         inf::StatusPanel& panel =
+         StatusPanel& panel =
             status_panel_data->mStatusPanelPlugin->getPanel();
 
          if ( mActivateBtn.isConfigured() )
@@ -430,7 +430,7 @@ void WidgetPlugin::configure(jccl::ConfigElementPtr elt)
       msg << "Configuration of WidgetPlugin failed.  Required config "
           << "element version is " << req_cfg_version << ", but element '"
           << elt->getName() << "' is version " << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    const std::string activate_btn_prop("activate_button_nums");

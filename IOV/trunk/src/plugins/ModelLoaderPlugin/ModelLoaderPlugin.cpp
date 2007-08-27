@@ -27,34 +27,29 @@
 #include <gmtl/Generate.h>
 #include <gmtl/External/OpenSGConvert.h>
 
-#include <OpenSG/OSGRefPtr.h>
-#include <OpenSG/OSGSwitch.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGSceneFileHandler.h>
 
-#include <IOV/Viewer.h>
-#include <IOV/WandInterface.h>
-#include <IOV/Util/DigitalCommand.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/InterfaceTrader.h>
-#include <IOV/User.h>
-#include <IOV/Status.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
-#include <IOV/Util/Exceptions.h>
+#include <jccl/Config/ConfigElement.h>
+
+#include <vrkit/Viewer.h>
+#include <vrkit/Version.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "ModelLoaderPlugin.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape", "ModelLoaderPlugin",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   boost::bind(&inf::ModelLoaderPlugin::create, sInfo)
+static vrkit::plugin::Creator<vrkit::viewer::Plugin> sPluginCreator(
+   boost::bind(&vrkit::ModelLoaderPlugin::create, sInfo)
 );
 
 extern "C"
@@ -62,19 +57,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_PLUGIN_API_MAJOR;
-   minorVer = INF_PLUGIN_API_MINOR;
+   majorVer = VRKIT_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }
@@ -82,20 +77,20 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-PluginPtr ModelLoaderPlugin::create(const inf::plugin::Info& info)
+viewer::PluginPtr ModelLoaderPlugin::create(const plugin::Info& info)
 {
-   return PluginPtr(new ModelLoaderPlugin(info));
+   return viewer::PluginPtr(new ModelLoaderPlugin(info));
 }
 
 std::string ModelLoaderPlugin::getDescription()
 {
-   return std::string("Model Loader Plugin");
+   return std::string("Model Loader Plug-in");
 }
 
-PluginPtr ModelLoaderPlugin::init(inf::ViewerPtr viewer)
+viewer::PluginPtr ModelLoaderPlugin::init(ViewerPtr viewer)
 {
    const std::string plugin_tkn("model_loader_plugin");
    const std::string units_to_meters_tkn("units_to_meters");
@@ -112,9 +107,9 @@ PluginPtr ModelLoaderPlugin::init(inf::ViewerPtr viewer)
    if ( !elt )
    {
       std::stringstream ex_msg;
-      ex_msg << "Model loader plugin could not find its configuration.  "
+      ex_msg << "Model loader plug-in could not find its configuration.  "
              << "Looking for type: " << plugin_tkn;
-      throw PluginException(ex_msg.str(), IOV_LOCATION);
+      throw PluginException(ex_msg.str(), VRKIT_LOCATION);
    }
 
    // -- Read configuration -- //
@@ -126,14 +121,14 @@ PluginPtr ModelLoaderPlugin::init(inf::ViewerPtr viewer)
       std::stringstream msg;
       msg << "ModelLoaderPlugin: Configuration failed. Required cfg version: "
           << req_cfg_version << " found:" << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    // Get the scaling factor
    float to_meters_scalar = elt->getProperty<float>(units_to_meters_tkn);
 
    // Get the paths to all the models, load them, and add them to the scene
-   inf::ScenePtr scene = viewer->getSceneObj();
+   ScenePtr scene = viewer->getSceneObj();
    OSG::TransformNodePtr scene_xform_root = scene->getTransformRoot();
 
    OSG::beginEditCP(scene_xform_root);
@@ -193,9 +188,9 @@ PluginPtr ModelLoaderPlugin::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
-void ModelLoaderPlugin::update(inf::ViewerPtr)
+void ModelLoaderPlugin::update(ViewerPtr)
 {
    /* Do nothing. */ ;
 }
 
-}  // namespace inf
+}  // namespace vrkit

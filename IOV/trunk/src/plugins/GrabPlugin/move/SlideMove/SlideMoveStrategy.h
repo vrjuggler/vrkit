@@ -16,26 +16,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_SLIDE_MOVE_STRATEGY_H_
-#define _INF_SLIDE_MOVE_STRATEGY_H_
+#ifndef _VRKIT_SLIDE_MOVE_STRATEGY_H_
+#define _VRKIT_SLIDE_MOVE_STRATEGY_H_
 
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 
 #include <jccl/Config/ConfigElementPtr.h>
 
-#include <IOV/Grab/MoveStrategy.h>
+#include <vrkit/move/Strategy.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 class SlideMoveStrategy
-   : public inf::MoveStrategy
+   : public move::Strategy
    , public boost::enable_shared_from_this<SlideMoveStrategy>
 {
 protected:
-   SlideMoveStrategy(const inf::plugin::Info& info);
+   SlideMoveStrategy(const plugin::Info& info);
 
 public:
    static std::string getId()
@@ -43,9 +43,9 @@ public:
       return "SlideMove";
    }
 
-   static inf::MoveStrategyPtr create(const inf::plugin::Info& info)
+   static move::StrategyPtr create(const plugin::Info& info)
    {
-      return inf::MoveStrategyPtr(new SlideMoveStrategy(info));
+      return move::StrategyPtr(new SlideMoveStrategy(info));
    }
 
    virtual ~SlideMoveStrategy()
@@ -53,19 +53,18 @@ public:
       /* Do nothing. */ ;
    }
 
-   virtual inf::MoveStrategyPtr init(inf::ViewerPtr viewer);
+   virtual move::StrategyPtr init(ViewerPtr viewer);
 
-   virtual void objectsGrabbed(inf::ViewerPtr viewer,
+   virtual void objectsGrabbed(ViewerPtr viewer,
                                const std::vector<SceneObjectPtr>& obj,
                                const gmtl::Point3f& intersectPoint,
                                const gmtl::Matrix44f& vp_M_wand);
 
-   virtual void objectsReleased(inf::ViewerPtr viewer,
+   virtual void objectsReleased(ViewerPtr viewer,
                                 const std::vector<SceneObjectPtr>& obj);
 
    // Note: Use the curObjPos instead of obj->getMatrix()
-   virtual gmtl::Matrix44f computeMove(inf::ViewerPtr viewer,
-                                       SceneObjectPtr obj,
+   virtual gmtl::Matrix44f computeMove(ViewerPtr viewer, SceneObjectPtr obj,
                                        const gmtl::Matrix44f& vp_M_wand,
                                        const gmtl::Matrix44f& curObjPos);
 
@@ -83,8 +82,8 @@ private:
     *
     * @param cfgElt The config element to use for configuring this object.
     *
-    * @throw inf::PluginException is thrown if the version of the given
-    *        config element is too old.
+    * @throw vrkit::PluginException
+    *           Thrown if the version of the given config element is too old.
     */
    void configure(jccl::ConfigElementPtr cfgElt);
 
@@ -109,4 +108,4 @@ private:
 }
 
 
-#endif /* _INF_BASIC_MOVE_STRATEGY_H_ */
+#endif /* _VRKIT_BASIC_MOVE_STRATEGY_H_ */

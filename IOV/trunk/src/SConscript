@@ -95,4 +95,4 @@ def makeBundle(target, env):
 
 Export('makeBundle')
 
-SConscript(dirs = ['IOV', 'plugins', 'SlaveViewer', 'Viewer'])
+SConscript(dirs = ['vrkit', 'plugins', 'SlaveViewer', 'Viewer'])

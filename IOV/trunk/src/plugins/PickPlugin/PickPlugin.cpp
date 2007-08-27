@@ -16,48 +16,32 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <string.h>
-#include <algorithm>
 #include <boost/bind.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/assign/list_of.hpp>
 
-#include <gmtl/Matrix.h>
-#include <gmtl/MatrixOps.h>
-#include <gmtl/External/OpenSGConvert.h>
-
-#include <vpr/vpr.h>
-#include <vpr/System.h>
-#include <vpr/Util/FileUtils.h>
-
-#include <IOV/EventData.h>
-#include <IOV/Viewer.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/PluginPtr.h>
-#include <IOV/User.h>
-#include <IOV/InterfaceTrader.h>
-#include <IOV/WandInterface.h>
-#include <IOV/ViewPlatform.h>
-#include <IOV/SceneObject.h>
-#include <IOV/Status.h>
-#include <IOV/StatusPanelData.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
-#include <IOV/Util/Exceptions.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/User.h>
+#include <vrkit/InterfaceTrader.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/SceneObject.h>
+#include <vrkit/Version.h>
+#include <vrkit/scenedata/EventData.h>
+#include <vrkit/scenedata/StatusPanelData.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "PickPlugin.h"
 
 
 using namespace boost::assign;
-namespace fs = boost::filesystem;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape", "PickPlugin",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   boost::bind(&inf::PickPlugin::create, sInfo)
+static vrkit::plugin::Creator<vrkit::viewer::Plugin> sPluginCreator(
+   boost::bind(&vrkit::PickPlugin::create, sInfo)
 );
 
 extern "C"
@@ -65,19 +49,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_PLUGIN_API_MAJOR;
-   minorVer = INF_PLUGIN_API_MINOR;
+   majorVer = VRKIT_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }
@@ -85,11 +69,11 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-PickPlugin::PickPlugin(const inf::plugin::Info& info)
-   : Plugin(info)
+PickPlugin::PickPlugin(const plugin::Info& info)
+   : viewer::Plugin(info)
    , mPickText("Select/Deselect Toggle")
    , mIntersecting(false)
    , mPicking(false)
@@ -97,7 +81,7 @@ PickPlugin::PickPlugin(const inf::plugin::Info& info)
    ;
 }
 
-PluginPtr PickPlugin::init(ViewerPtr viewer)
+viewer::PluginPtr PickPlugin::init(ViewerPtr viewer)
 {
    mEventData = viewer->getSceneObj()->getSceneData<EventData>();
 
@@ -133,9 +117,8 @@ PluginPtr PickPlugin::init(ViewerPtr viewer)
    return shared_from_this();
 }
 
-inf::Event::ResultType
-PickPlugin::objectIntersected(inf::SceneObjectPtr obj,
-                              gmtl::Point3f pnt)
+event::ResultType PickPlugin::objectIntersected(SceneObjectPtr obj,
+                                                gmtl::Point3f pnt)
 {
    // If we intersected a grabbable object.
    if ( obj->isGrabbable() )
@@ -146,16 +129,15 @@ PickPlugin::objectIntersected(inf::SceneObjectPtr obj,
       mIntersecting = true;
    }
 
-   return inf::Event::CONTINUE;
+   return event::CONTINUE;
 }
 
-inf::Event::ResultType
-PickPlugin::objectDeintersected(inf::SceneObjectPtr obj)
+event::ResultType PickPlugin::objectDeintersected(SceneObjectPtr obj)
 {
    mIntersecting = false;
    mIntersectedObj = SceneObjectPtr();
 
-   return inf::Event::CONTINUE;
+   return event::CONTINUE;
 }
 
 void PickPlugin::update(ViewerPtr)
@@ -214,7 +196,7 @@ bool PickPlugin::config(jccl::ConfigElementPtr elt)
       msg << "Configuration of PickPlugin failed.  Required config "
           << "element version is " << req_cfg_version << ", but element '"
           << elt->getName() << "' is version " << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    const std::string pick_btn_prop("pick_button_nums");
@@ -227,13 +209,13 @@ bool PickPlugin::config(jccl::ConfigElementPtr elt)
    return true;
 }
 
-void PickPlugin::focusChanged(inf::ViewerPtr viewer)
+void PickPlugin::focusChanged(ViewerPtr viewer)
 {
    // If we have focus and our grab/release button is configured, we
    // will update the status panel to include our command.
    if ( isFocused() && mPickBtn.isConfigured() )
    {
-      inf::ScenePtr scene = viewer->getSceneObj();
+      ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
@@ -247,7 +229,7 @@ void PickPlugin::focusChanged(inf::ViewerPtr viewer)
    }
    else if ( ! isFocused() )
    {
-      inf::ScenePtr scene = viewer->getSceneObj();
+      ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
       status_panel_data->removeControlText(mPickBtn.toString(), mPickText);

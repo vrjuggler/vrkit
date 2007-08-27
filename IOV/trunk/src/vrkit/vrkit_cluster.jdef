@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="vrkit_cluster" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="vrkit Cluster Settings">
+      <abstract>false</abstract>
+      <help>Cluster configuration for a vrkit viewer application.</help>
+      <category>/vrkit/</category>
+      <property valuetype="string" variable="false" name="listen_addr">
+         <help>The address on which we will listen for incoming connections from slave viewers (servers in OpenSG terminology). If the value of this property is empty, the local host name will be used to get the address for binding the server socket. For a single-homed host, it is suitable to use an empty value for this property.</help>
+         <value label="Listen Address" defaultvalue=""/>
+      </property>
+      <property valuetype="integer" variable="false" name="listen_port">
+         <help>The port on which we will listen for incoming connections from slave viewers (servers in OpenSG terminology). If the value of this property is 0, then no accepting socket will be opened for incoming connections from slave viewers.</help>
+         <value label="Listen Port" defaultvalue="34000"/>
+      </property>
+      <property valuetype="integer" variable="false" name="slave_count">
+         <help>The number of slaves that must connect to the master application before it can begin executing its frame loop. The value of this property must be greater than or equal to 0.</help>
+         <value label="Slave Count" defaultvalue="0"/>
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>

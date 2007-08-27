@@ -25,26 +25,26 @@
 
 #include <jccl/Config/ConfigElement.h>
 
-#include <IOV/SignalRepository.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/Status.h>
-#include <IOV/Scene.h>
-#include <IOV/Viewer.h>
-#include <IOV/StatusPanelData.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
+#include <vrkit/Status.h>
+#include <vrkit/Scene.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/Version.h>
+#include <vrkit/scenedata/StatusPanelData.h>
+#include <vrkit/signal/Repository.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
 
 #include "StatusPanelPlugin.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape", "StatusPanelPlugin",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   boost::bind(&inf::StatusPanelPlugin::create, sInfo)
+static vrkit::plugin::Creator<vrkit::viewer::Plugin> sPluginCreator(
+   boost::bind(&vrkit::StatusPanelPlugin::create, sInfo)
 );
 
 extern "C"
@@ -52,29 +52,23 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_PLUGIN_API_MAJOR;
-   minorVer = INF_PLUGIN_API_MINOR;
+   majorVer = VRKIT_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }
 //@}
-}
-
-namespace inf
-{
-   typedef boost::shared_ptr<StatusPanelPlugin> StatusPanelPluginPtr;
-   typedef boost::weak_ptr<StatusPanelPlugin> StatusPanelPluginWeakPtr;
 }
 
 namespace
@@ -83,7 +77,9 @@ namespace
 class StatusOutputter
 {
 public:
-   StatusOutputter(inf::StatusPanelPluginPtr p)
+   typedef boost::shared_ptr<vrkit::StatusPanelPlugin> plugin_ptr_t;
+
+   StatusOutputter(plugin_ptr_t p)
       : mStatusPlugin(p)
    {
       /* Do nothing. */ ;
@@ -91,20 +87,20 @@ public:
 
    void operator() (const std::string& msg)
    {
-      inf::StatusPanelPluginPtr status_panel_plugin(mStatusPlugin);
+      plugin_ptr_t status_panel_plugin(mStatusPlugin);
       status_panel_plugin->getPanel().addStatusMessage(msg);
    }
 
-   inf::StatusPanelPluginWeakPtr mStatusPlugin;
+   boost::weak_ptr<vrkit::StatusPanelPlugin> mStatusPlugin;
 };
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-StatusPanelPlugin::StatusPanelPlugin(const inf::plugin::Info& info)
-   : Plugin(info)
+StatusPanelPlugin::StatusPanelPlugin(const plugin::Info& info)
+   : viewer::Plugin(info)
 {
    /* Do nothing. */;
 }
@@ -115,9 +111,9 @@ StatusPanelPlugin::~StatusPanelPlugin()
    mOutputConn.disconnect();
 }
 
-inf::PluginPtr StatusPanelPlugin::create(const inf::plugin::Info& info)
+viewer::PluginPtr StatusPanelPlugin::create(const plugin::Info& info)
 {
-   return inf::PluginPtr(new StatusPanelPlugin(info));
+   return viewer::PluginPtr(new StatusPanelPlugin(info));
 }
 
 std::string StatusPanelPlugin::getDescription()
@@ -130,9 +126,10 @@ StatusPanel& StatusPanelPlugin::getPanel()
    return mStatusPanel;
 }
 
-inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
+viewer::PluginPtr StatusPanelPlugin::init(ViewerPtr viewer)
 {
-   IOV_STATUS << "StatusPanelPlugin::init: Initializing plugin." << std::endl;
+   VRKIT_STATUS << "StatusPanelPlugin::init: Initializing plugin."
+                << std::endl;
 
    // Initialize panel
    mStatusPanelView.initialize(viewer->getDrawScaleFactor(), &mStatusPanel);
@@ -205,26 +202,27 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
       dec_root.node()->addChild(mPanelXformNode.node());
    OSG::endEditCP(dec_root);
 
-   // Register visibility signal with SignalRepository
-   inf::SignalRepositoryPtr sig_repos =
-      viewer->getSceneObj()->getSceneData<SignalRepository>();
+   // Register visibility signal with vrkit::signal::Repository.
+   signal::RepositoryPtr sig_repos =
+      viewer->getSceneObj()->getSceneData<signal::Repository>();
 
    typedef boost::signal<void (bool)> sig_type;
    const std::string sig_name("Toggle Status Panel Visibility");
 
    if ( ! sig_repos->hasSignal(sig_name) )
    {
-      sig_repos->addSignal(sig_name, SignalContainer<sig_type>::create());
+      sig_repos->addSignal(sig_name, signal::Container<sig_type>::create());
    }
 
    // Connect new signal to slot after SwitchNode creation
-   mVisConn = sig_repos->getSignal<sig_type>(sig_name)->connect(
-      boost::bind(&inf::StatusPanelPlugin::setVisibility, this, _1)
-   );
+   mVisConn =
+      sig_repos->getSignal<sig_type>(sig_name)->connect(
+         boost::bind(&StatusPanelPlugin::setVisibility, this, _1)
+      );
 
    // Register with status
    StatusOutputter status_outputter(shared_from_this());
-   mOutputConn = inf::Status::instance()->addOutputter(status_outputter);
+   mOutputConn = Status::instance()->addOutputter(status_outputter);
 
    // Connect StatusPanel methods to StatusPanelData signals
    StatusPanelDataPtr status_panel_data =
@@ -278,7 +276,7 @@ inf::PluginPtr StatusPanelPlugin::init(inf::ViewerPtr viewer)
    return shared_from_this();
 }
 
-void StatusPanelPlugin::update(inf::ViewerPtr)
+void StatusPanelPlugin::update(ViewerPtr)
 {
    mStatusPanelView.update();        // Do any updates that we need from this frame
 }
@@ -286,15 +284,9 @@ void StatusPanelPlugin::update(inf::ViewerPtr)
 void StatusPanelPlugin::setVisibility(bool visible)
 {
    OSG::beginEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
-      if( visible )
-      {
-	 mPanelVisSwitchNode->setChoice(OSG::Switch::ALL);
-      }
-      else
-      {
-	 mPanelVisSwitchNode->setChoice(OSG::Switch::NONE);
-      }
+      mPanelVisSwitchNode->setChoice(visible ? OSG::Switch::ALL
+                                             : OSG::Switch::NONE);
    OSG::endEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
 }
 
-} // namespace inf
+} // namespace vrkit

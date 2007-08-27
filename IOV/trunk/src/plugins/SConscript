@@ -63,7 +63,7 @@ def makePlugin(srcDir, pluginName, instDir):
       if platform == 'win32':
          plugin_env.Depends(plugin_lib,
                             os.path.join(inst_paths['lib'],
-                                         'iov%s.lib' % shared_lib_suffix))
+                                         'vrkit%s.lib' % shared_lib_suffix))
          plugin_lib = [p for p in plugin_lib if str(p).endswith('.dll')]
 
       plugin_env.Install(inst_dir, plugin_lib)
@@ -86,18 +86,18 @@ def makePlugin(srcDir, pluginName, instDir):
 src_dir = sca_util.getFullSrcPath(env)
 plugin_dirs = [d for d in os.listdir(src_dir) if (os.path.isdir(pj(src_dir,d)) and not d.startswith('.'))]
 
-# Create plugin environment with paths
-# to the IOV library we built and installed
+# Create plugin environment with paths to the vrkit library we built and
+# installed.
 plugin_env = build_env.Copy()
 plugin_env.Append(CPPPATH = inst_paths['include'],
                   LIBPATH = inst_paths['lib'])
 
 # On Windows, we use automatic linking.
 if platform != 'win32':
-   plugin_env.Prepend(LIBS = ['iov' + shared_lib_suffix])
+   plugin_env.Prepend(LIBS = ['vrkit' + shared_lib_suffix])
 
 # Add define since we are building.
-plugin_env.AppendUnique(CPPDEFINES = ['_IOV_PLUGIN_BUILD_',])
+plugin_env.AppendUnique(CPPDEFINES = ['_VRKIT_PLUGIN_BUILD_',])
 
 if platform == 'darwin':
    plugin_env['SHLINKFLAGS'] = SCons.Util.CLVar('$LINKFLAGS -bundle')

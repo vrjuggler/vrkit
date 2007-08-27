@@ -16,38 +16,37 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <IOV/Config.h>
+#include <vrkit/Config.h>
 
 #include <algorithm>
 #include <boost/bind.hpp>
 #include <boost/assign/list_of.hpp>
 
-#include <IOV/Plugin/PluginConfig.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/GrabSignalData.h>
-#include <IOV/InterfaceTrader.h>
-#include <IOV/WandInterface.h>
-#include <IOV/User.h>
-#include <IOV/Scene.h>
-#include <IOV/SceneObject.h>
-#include <IOV/Viewer.h>
-#include <IOV/StatusPanelData.h>
-#include <IOV/Util/Exceptions.h>
-#include <IOV/Config.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
+#include <vrkit/plugin/Config.h>
+#include <vrkit/InterfaceTrader.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/User.h>
+#include <vrkit/Scene.h>
+#include <vrkit/SceneObject.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/Version.h>
+#include <vrkit/scenedata/GrabSignalData.h>
+#include <vrkit/scenedata/StatusPanelData.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "SignalGrabStrategy.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape.grab", "SignalGrabStrategy",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::GrabStrategy> sPluginCreator(
-   boost::bind(&inf::SignalGrabStrategy::create, sInfo)
+static vrkit::plugin::Creator<vrkit::grab::Strategy> sPluginCreator(
+   boost::bind(&vrkit::SignalGrabStrategy::create, sInfo)
 );
 
 extern "C"
@@ -55,19 +54,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_GRAB_STRATEGY_PLUGIN_API_MAJOR;
-   minorVer = INF_GRAB_STRATEGY_PLUGIN_API_MINOR;
+   majorVer = VRKIT_GRAB_STRATEGY_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_GRAB_STRATEGY_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getGrabStrategyCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getGrabStrategyCreator()
 {
    return &sPluginCreator;
 }
@@ -75,11 +74,11 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getGrabStrategyCreator()
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-SignalGrabStrategy::SignalGrabStrategy(const inf::plugin::Info& info)
-   : GrabStrategy(info)
+SignalGrabStrategy::SignalGrabStrategy(const plugin::Info& info)
+   : grab::Strategy(info)
    , mChooseText("Choose object(s) to grab")
    , mGrabText("Grab object(s)")
    , mReleaseText("Release object(s)")
@@ -95,9 +94,9 @@ SignalGrabStrategy::~SignalGrabStrategy()
                  boost::bind(&boost::signals::connection::disconnect, _1));
 }
 
-GrabStrategyPtr SignalGrabStrategy::init(ViewerPtr viewer,
-                                         grab_callback_t grabCallback,
-                                         release_callback_t releaseCallback)
+grab::StrategyPtr SignalGrabStrategy::init(ViewerPtr viewer,
+                                           grab_callback_t grabCallback,
+                                           release_callback_t releaseCallback)
 {
    mGrabCallback    = grabCallback;
    mReleaseCallback = releaseCallback;
@@ -132,7 +131,7 @@ void SignalGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
    // commands.
    if ( focused )
    {
-      inf::ScenePtr scene = viewer->getSceneObj();
+      ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
@@ -182,7 +181,7 @@ void SignalGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
    }
    else
    {
-      inf::ScenePtr scene = viewer->getSceneObj();
+      ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
@@ -259,7 +258,7 @@ void SignalGrabStrategy::configure(jccl::ConfigElementPtr elt)
       msg << "Configuration of SignalGrabStrategy failed.  Required config "
           << "element version is " << req_cfg_version << ", but element '"
           << elt->getName() << "' is version " << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    const std::string choose_btn_prop("choose_button_nums");

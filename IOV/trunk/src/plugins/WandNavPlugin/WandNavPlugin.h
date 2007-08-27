@@ -16,34 +16,34 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef WAND_NAV_PLUGIN_H
-#define WAND_NAV_PLUGIN_H
+#ifndef _VRKIT_WAND_NAV_PLUGIN_H_
+#define _VRKIT_WAND_NAV_PLUGIN_H_
 
-#include <IOV/Plugin/PluginConfig.h>
+#include <vrkit/plugin/Config.h>
 
 #include <boost/enable_shared_from_this.hpp>
 
 #include <vpr/Util/Interval.h>
 
-#include <IOV/WandInterfacePtr.h>
-#include <IOV/Util/DigitalCommand.h>
-#include <IOV/Plugin/NavPlugin.h>
+#include <vrkit/WandInterfacePtr.h>
+#include <vrkit/util/DigitalCommand.h>
+#include <vrkit/nav/Strategy.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 class WandNavPlugin
-   : public NavPlugin
+   : public nav::Strategy
    , public boost::enable_shared_from_this<WandNavPlugin>
 {
 protected:
-   WandNavPlugin(const inf::plugin::Info& info);
+   WandNavPlugin(const plugin::Info& info);
 
 public:
-   static inf::PluginPtr create(const inf::plugin::Info& info)
+   static viewer::PluginPtr create(const plugin::Info& info)
    {
-      return inf::PluginPtr(new WandNavPlugin(info));
+      return viewer::PluginPtr(new WandNavPlugin(info));
    }
 
    virtual ~WandNavPlugin()
@@ -56,7 +56,7 @@ public:
       return std::string("Navigation");
    }
 
-   virtual PluginPtr init(ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
    /**
     * @pre \c canHandleElement() returned true.
@@ -86,7 +86,7 @@ protected:
       FLY  = 1      /**< Fly mode */
    };
 
-   virtual void focusChanged(inf::ViewerPtr viewer);
+   virtual void focusChanged(ViewerPtr viewer);
 
    virtual void updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
@@ -109,11 +109,11 @@ protected:
    float mRotationSensitivity;      /**< Scalar on rotation delta.  Used to adjust sensitivity. */
    NavMode mNavMode;
 
-   inf::DigitalCommand mForwardBtn;     /**< Button for forward motion. */
-   inf::DigitalCommand mReverseBtn;     /**< Button for reverse. */
-   inf::DigitalCommand mRotateBtn;      /**< Button for rotate. */
-   inf::DigitalCommand mModeBtn;        /**< Button for swapping mode. */
-   inf::DigitalCommand mResetBtn;       /**< Button for resetting location. */
+   util::DigitalCommand mForwardBtn;     /**< Button for forward motion. */
+   util::DigitalCommand mReverseBtn;     /**< Button for reverse. */
+   util::DigitalCommand mRotateBtn;      /**< Button for rotate. */
+   util::DigitalCommand mModeBtn;        /**< Button for swapping mode. */
+   util::DigitalCommand mResetBtn;       /**< Button for resetting location. */
 
    std::string mForwardText;
    std::string mReverseText;
@@ -125,4 +125,4 @@ protected:
 }
 
 
-#endif
+#endif /* _VRKIT_WAND_NAV_PLUGIN_H_ */

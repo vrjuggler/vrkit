@@ -35,28 +35,28 @@
 
 #include <vpr/Util/Assert.h>
 
-#include <IOV/InterfaceTrader.h>
-#include <IOV/Viewer.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/WandInterface.h>
-#include <IOV/User.h>
-#include <IOV/Util/Exceptions.h>
-#include <IOV/Status.h>
-#include <IOV/StatusPanelData.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
+#include <vrkit/InterfaceTrader.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/User.h>
+#include <vrkit/Status.h>
+#include <vrkit/Version.h>
+#include <vrkit/scenedata/StatusPanelData.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "SimpleNavPlugin.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape", "SimpleNavPlugin",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::Plugin> sPluginCreator(
-   boost::bind(&inf::SimpleNavPlugin::create, sInfo)
+static vrkit::plugin::Creator<vrkit::viewer::Plugin> sPluginCreator(
+   boost::bind(&vrkit::SimpleNavPlugin::create, sInfo)
 );
 
 extern "C"
@@ -64,19 +64,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_PLUGIN_API_MAJOR;
-   minorVer = INF_PLUGIN_API_MINOR;
+   majorVer = VRKIT_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 {
    return &sPluginCreator;
 }
@@ -84,11 +84,11 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getCreator()
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-SimpleNavPlugin::SimpleNavPlugin(const inf::plugin::Info& info)
-   : NavPlugin(info)
+SimpleNavPlugin::SimpleNavPlugin(const plugin::Info& info)
+   : nav::Strategy(info)
    , mCanNavigate(false)
    , mVelocity(0.0f)
    , mNavMode(WALK)
@@ -100,7 +100,7 @@ SimpleNavPlugin::SimpleNavPlugin(const inf::plugin::Info& info)
    mCanNavigate = isFocused();
 }
 
-PluginPtr SimpleNavPlugin::init(ViewerPtr viewer)
+viewer::PluginPtr SimpleNavPlugin::init(ViewerPtr viewer)
 {
    const std::string plugin_path_prop("plugin_path");
    const std::string plugin_prop("plugin");
@@ -115,22 +115,25 @@ PluginPtr SimpleNavPlugin::init(ViewerPtr viewer)
 
    // -- Configure -- //
    std::string elt_type_name = getElementType();
-   jccl::ConfigElementPtr elt = viewer->getConfiguration().getConfigElement(elt_type_name);
+   jccl::ConfigElementPtr elt =
+      viewer->getConfiguration().getConfigElement(elt_type_name);
 
-   if(!elt)
+   if ( ! elt )
    {
-      throw PluginException("SimpleNavPlugin could not find its configuration.", IOV_LOCATION);
+      throw PluginException(
+         "SimpleNavPlugin could not find its configuration.", VRKIT_LOCATION
+      );
    }
    vprASSERT(elt->getID() == getElementType());
 
    // Check for correct version of plugin configuration
-   if(elt->getVersion() < req_cfg_version)
+   if ( elt->getVersion() < req_cfg_version )
    {
       std::stringstream msg;
       msg << "Configuration of SimpleNavPlugin failed.  Required config "
           << "element version is " << req_cfg_version << ", but element '"
           << elt->getName() << "' is version " << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    // Get the button for navigation
@@ -146,9 +149,9 @@ PluginPtr SimpleNavPlugin::init(ViewerPtr viewer)
    return shared_from_this();
 }
 
-void SimpleNavPlugin::focusChanged(inf::ViewerPtr viewer)
+void SimpleNavPlugin::focusChanged(ViewerPtr viewer)
 {
-   inf::ScenePtr scene = viewer->getSceneObj();
+   ScenePtr scene = viewer->getSceneObj();
    StatusPanelDataPtr status_panel_data =
       scene->getSceneData<StatusPanelData>();
 
@@ -276,8 +279,8 @@ void SimpleNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
       if ( mModeBtn() )
       {
          mNavMode = (mNavMode == WALK ? FLY : WALK);
-         IOV_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
-                   << std::endl;
+         VRKIT_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
+                      << std::endl;
       }
 
       // If the accelerate button and the rotate button are pressed together,

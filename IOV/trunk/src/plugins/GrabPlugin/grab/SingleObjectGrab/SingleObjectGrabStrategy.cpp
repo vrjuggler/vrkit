@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <IOV/Config.h>
+#include <vrkit/Config.h>
 
 #include <boost/bind.hpp>
 #include <boost/assign/list_of.hpp>
@@ -26,31 +26,31 @@
 #include <vpr/Util/Assert.h>
 #include <jccl/Config/ConfigElement.h>
 
-#include <IOV/Plugin/PluginConfig.h>
-#include <IOV/PluginCreator.h>
-#include <IOV/EventData.h>
-#include <IOV/Scene.h>
-#include <IOV/User.h>
-#include <IOV/Viewer.h>
-#include <IOV/InterfaceTrader.h>
-#include <IOV/WandInterface.h>
-#include <IOV/SceneObject.h>
-#include <IOV/StatusPanelData.h>
-#include <IOV/Version.h>
-#include <IOV/Plugin/Info.h>
-#include <IOV/Util/Exceptions.h>
+#include <vrkit/plugin/Config.h>
+#include <vrkit/Scene.h>
+#include <vrkit/User.h>
+#include <vrkit/Viewer.h>
+#include <vrkit/InterfaceTrader.h>
+#include <vrkit/WandInterface.h>
+#include <vrkit/SceneObject.h>
+#include <vrkit/Version.h>
+#include <vrkit/scenedata/EventData.h>
+#include <vrkit/scenedata/StatusPanelData.h>
+#include <vrkit/plugin/Creator.h>
+#include <vrkit/plugin/Info.h>
+#include <vrkit/exceptions/PluginException.h>
 
 #include "SingleObjectGrabStrategy.h"
 
 
 using namespace boost::assign;
 
-static const inf::plugin::Info sInfo(
+static const vrkit::plugin::Info sInfo(
    "com.infiscape.grab", "SingleObjectGrabStrategy",
-   list_of(IOV_VERSION_MAJOR)(IOV_VERSION_MINOR)(IOV_VERSION_PATCH)
+   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
 );
-static inf::PluginCreator<inf::GrabStrategy> sPluginCreator(
-   boost::bind(&inf::SingleObjectGrabStrategy::create, sInfo)
+static vrkit::plugin::Creator<vrkit::grab::Strategy> sPluginCreator(
+   boost::bind(&vrkit::SingleObjectGrabStrategy::create, sInfo)
 );
 
 extern "C"
@@ -58,19 +58,19 @@ extern "C"
 
 /** @name Plug-in Entry Points */
 //@{
-IOV_PLUGIN_API(const inf::plugin::Info*) getPluginInfo()
+VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
 {
    return &sInfo;
 }
 
-IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                               vpr::Uint32& minorVer)
+VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                                 vpr::Uint32& minorVer)
 {
-   majorVer = INF_GRAB_STRATEGY_PLUGIN_API_MAJOR;
-   minorVer = INF_GRAB_STRATEGY_PLUGIN_API_MINOR;
+   majorVer = VRKIT_GRAB_STRATEGY_PLUGIN_API_MAJOR;
+   minorVer = VRKIT_GRAB_STRATEGY_PLUGIN_API_MINOR;
 }
 
-IOV_PLUGIN_API(inf::PluginCreatorBase*) getGrabStrategyCreator()
+VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getGrabStrategyCreator()
 {
    return &sPluginCreator;
 }
@@ -78,12 +78,11 @@ IOV_PLUGIN_API(inf::PluginCreatorBase*) getGrabStrategyCreator()
 
 }
 
-namespace inf
+namespace vrkit
 {
 
-SingleObjectGrabStrategy::
-SingleObjectGrabStrategy(const inf::plugin::Info& info)
-   : GrabStrategy(info)
+SingleObjectGrabStrategy::SingleObjectGrabStrategy(const plugin::Info& info)
+   : grab::Strategy(info)
    , mGrabText("Grab")
    , mReleaseText("Release")
    , mIntersecting(false)
@@ -99,7 +98,7 @@ SingleObjectGrabStrategy::~SingleObjectGrabStrategy()
    mGrabbedObjConnection.disconnect();
 }
 
-GrabStrategyPtr SingleObjectGrabStrategy::
+grab::StrategyPtr SingleObjectGrabStrategy::
 init(ViewerPtr viewer, grab_callback_t grabCallback,
      release_callback_t releaseCallback)
 {
@@ -145,7 +144,7 @@ void SingleObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
    // commands.
    if ( focused )
    {
-      inf::ScenePtr scene = viewer->getSceneObj();
+      ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
@@ -180,7 +179,7 @@ void SingleObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
    }
    else
    {
-      inf::ScenePtr scene = viewer->getSceneObj();
+      ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
 
@@ -245,7 +244,7 @@ void SingleObjectGrabStrategy::configure(jccl::ConfigElementPtr elt)
           << "config element version is " << req_cfg_version
           << ", but element '" << elt->getName() << "' is version "
           << elt->getVersion();
-      throw PluginException(msg.str(), IOV_LOCATION);
+      throw PluginException(msg.str(), VRKIT_LOCATION);
    }
 
    const std::string grab_btn_prop("grab_button_nums");
@@ -257,8 +256,9 @@ void SingleObjectGrabStrategy::configure(jccl::ConfigElementPtr elt)
                          mWandInterface);
 }
 
-inf::Event::ResultType SingleObjectGrabStrategy::
-objectIntersected(SceneObjectPtr obj, const gmtl::Point3f& pnt)
+event::ResultType
+SingleObjectGrabStrategy::objectIntersected(SceneObjectPtr obj,
+                                            const gmtl::Point3f& pnt)
 {
    if ( ! mGrabbing )
    {
@@ -272,24 +272,24 @@ objectIntersected(SceneObjectPtr obj, const gmtl::Point3f& pnt)
    }
    else
    {
-      return inf::Event::DONE;
+      return event::DONE;
    }
 
-   return inf::Event::CONTINUE;
+   return event::CONTINUE;
 }
 
-inf::Event::ResultType SingleObjectGrabStrategy::
-objectDeintersected(SceneObjectPtr obj)
+event::ResultType
+SingleObjectGrabStrategy::objectDeintersected(SceneObjectPtr obj)
 {
    if ( mGrabbing )
    {
-      return inf::Event::DONE;
+      return event::DONE;
    }
 
    mIntersecting = false;
    mIntersectedObj = SceneObjectPtr();
 
-   return inf::Event::CONTINUE;
+   return event::CONTINUE;
 }
 
 void SingleObjectGrabStrategy::releaseGrabbedObject()
@@ -311,8 +311,7 @@ void SingleObjectGrabStrategy::releaseGrabbedObject()
    mReleaseCallback(objs);
 }
 
-void SingleObjectGrabStrategy::
-grabbableObjStateChanged(inf::SceneObjectPtr obj)
+void SingleObjectGrabStrategy::grabbableObjStateChanged(SceneObjectPtr obj)
 {
    // If we are currently grabbing obj and its grabbable state has changed so
    // that it is no longer grabbable, we must release it.

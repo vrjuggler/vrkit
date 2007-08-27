@@ -135,7 +135,7 @@ for opt in build_options.itervalues():
 #Export('required_libs_options', 'build_options')
 Export('build_options')
 
-help_text = """---- IOV Build System ---- 
+help_text = """---- vrkit Build System ---- 
 
 %s
 
@@ -183,9 +183,9 @@ if not sca_util.hasHelpFlag():
    inst_paths['base'] = opt_env['prefix']
    inst_paths['bin'] = pj(inst_paths['base'], 'bin')
    inst_paths['lib'] = pj(inst_paths['base'],'lib')
-   inst_paths['lib_plugin'] = pj(inst_paths['lib'],'IOV','plugins')
+   inst_paths['lib_plugin'] = pj(inst_paths['lib'], 'vrkit', 'plugins')
    inst_paths['include'] = pj(inst_paths['base'],'include')
-   inst_paths['share'] = pj(inst_paths['base'],'share','IOV')
+   inst_paths['share'] = pj(inst_paths['base'], 'share', 'vrkit')
    inst_paths['definitions'] = pj(inst_paths['share'],'definitions')
    inst_paths['app_base'] = pj(inst_paths['share'],'apps')
    inst_paths['test_base'] = pj(inst_paths['share'],'test')
@@ -212,7 +212,7 @@ if not sca_util.hasHelpFlag():
    if boost_options.isAvailable():
       boost_options.apply(opt_env)
    else:
-      print "WARNING: Cannot build IOV without Boost.Signals"
+      print "WARNING: Cannot build vrkit without Boost.Signals"
 
    if "win32" == platform:
       opt_env.Append(CPPFLAGS = ["/wd4103", "/wd4251", "/wd4275"])
@@ -224,10 +224,10 @@ if not sca_util.hasHelpFlag():
       # If we are debug or debug runtime, then we define preprocessor symbols
       # to indicate as much.
       if combo['type'].startswith('debug'):
-         build_env.AppendUnique(CPPDEFINES = ['IOV_DEBUG', 'JUGGLER_DEBUG'])
+         build_env.AppendUnique(CPPDEFINES = ['VRKIT_DEBUG', 'JUGGLER_DEBUG'])
       # If we are optimized we want no debugging at all.
       elif combo['type'] == 'optimized':
-         build_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'IOV_OPT',
+         build_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'VRKIT_OPT',
                                               'JUGGLER_OPT'])
 
       # Enable boost auto-linking.

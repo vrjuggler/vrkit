@@ -16,10 +16,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_STATUS_PANEL_H_
-#define _INF_STATUS_PANEL_H_
+#ifndef _VRKIT_STATUS_PANEL_H_
+#define _VRKIT_STATUS_PANEL_H_
 
-#include <IOV/Config.h>
+#include <vrkit/Config.h>
 
 #include <vector>
 #include <string>
@@ -27,10 +27,10 @@
 #include <map>
 #include <boost/signal.hpp>
 
-#include <IOV/Util/SignalProxy.h>
+#include <vrkit/signal/SignalProxy.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 class StatusPanel
@@ -143,9 +143,9 @@ public:
 
    typedef boost::signal<void ()> signal_t;
 
-   inf::SignalProxy<signal_t> statusPanelChanged()
+   signal::SignalProxy<signal_t> statusPanelChanged()
    {
-      return inf::SignalProxy<signal_t>(mChangeSignal);
+      return signal::SignalProxy<signal_t>(mChangeSignal);
    }
 
 public:  // Configuration params //
@@ -175,4 +175,4 @@ protected:
 }
 
 
-#endif
+#endif /* _VRKIT_STATUS_PANEL_H_ */

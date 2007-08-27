@@ -16,35 +16,36 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_LOGO_PLUGIN_H_
-#define _INF_LOGO_PLUGIN_H_
+#ifndef _VRKIT_LOGO_PLUGIN_H_
+#define _VRKIT_LOGO_PLUGIN_H_
 
-#include <IOV/Plugin/PluginConfig.h>
+#include <vrkit/plugin/Config.h>
 
 #include <string>
-#include <boost/enable_shared_from_this.hpp>
-#include <gmtl/Matrix.h>
 #include <vector>
+#include <boost/enable_shared_from_this.hpp>
 
-#include <IOV/Plugin.h>
-#include <IOV/WandInterfacePtr.h>
+#include <vrkit/WandInterfacePtr.h>
+#include <vrkit/viewer/Plugin.h>
 
-namespace inf
+
+namespace vrkit
 {
 
 /** Plugin for loading logos into the scene.
  *
  */
 class LogoPlugin
-   : public inf::Plugin, public boost::enable_shared_from_this<LogoPlugin>
+   : public viewer::Plugin
+   , public boost::enable_shared_from_this<LogoPlugin>
 {
 protected:
-   LogoPlugin(const inf::plugin::Info& info)
-      : Plugin(info)
+   LogoPlugin(const plugin::Info& info)
+      : viewer::Plugin(info)
    {;}
 
 public:
-   static PluginPtr create(const inf::plugin::Info& info);
+   static viewer::PluginPtr create(const plugin::Info& info);
 
    virtual ~LogoPlugin()
    {;}
@@ -54,9 +55,9 @@ public:
       return std::string("Logo Plugin");
    }
 
-   virtual PluginPtr init(inf::ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
-   virtual void update(inf::ViewerPtr viewer);
+   virtual void update(ViewerPtr viewer);
 
 protected:
    struct Logo
@@ -67,11 +68,9 @@ protected:
 
 private:
    std::vector<Logo>    mLogos;  /**< List of loaded logos. */
-
-
 };
 
-} // namespace inf
+} // namespace vrkit
 
 
-#endif
+#endif /* _VRKIT_LOGO_PLUGIN_H_ */

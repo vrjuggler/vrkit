@@ -16,28 +16,28 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_OBJECT_SPACE_MOVE_STRATEGY_H_
-#define _INF_OBJECT_SPACE_MOVE_STRATEGY_H_
+#ifndef _VRKIT_OBJECT_SPACE_MOVE_STRATEGY_H_
+#define _VRKIT_OBJECT_SPACE_MOVE_STRATEGY_H_
 
 #include <map>
 #include <boost/enable_shared_from_this.hpp>
 
-#include <IOV/Grab/MoveStrategy.h>
-
 #include <gmtl/Quat.h>
 #include <gmtl/QuatOps.h>
 
+#include <vrkit/move/Strategy.h>
 
-namespace inf
+
+namespace vrkit
 {
 
 class ObjectSpaceMoveStrategy
-   : public inf::MoveStrategy
+   : public move::Strategy
    , public boost::enable_shared_from_this<ObjectSpaceMoveStrategy>
 {
 protected:
-   ObjectSpaceMoveStrategy(const inf::plugin::Info& info)
-      : inf::MoveStrategy(info)
+   ObjectSpaceMoveStrategy(const plugin::Info& info)
+      : move::Strategy(info)
    {
       /* Do nothing. */ ;
    }
@@ -48,9 +48,9 @@ public:
       return "ObjectSpaceMove";
    }
 
-   static inf::MoveStrategyPtr create(const inf::plugin::Info& info)
+   static move::StrategyPtr create(const plugin::Info& info)
    {
-      return inf::MoveStrategyPtr(new ObjectSpaceMoveStrategy(info));
+      return move::StrategyPtr(new ObjectSpaceMoveStrategy(info));
    }
 
    virtual ~ObjectSpaceMoveStrategy()
@@ -58,17 +58,17 @@ public:
       /* Do nothing. */ ;
    }
 
-   virtual inf::MoveStrategyPtr init(inf::ViewerPtr viewer);
+   virtual move::StrategyPtr init(ViewerPtr viewer);
 
-   virtual void objectsGrabbed(inf::ViewerPtr viewer,
+   virtual void objectsGrabbed(ViewerPtr viewer,
                                const std::vector<SceneObjectPtr>& objs,
                                const gmtl::Point3f& intersectPoint,
                                const gmtl::Matrix44f& vp_M_wand);
 
-   virtual void objectsReleased(inf::ViewerPtr viewer,
+   virtual void objectsReleased(ViewerPtr viewer,
                                 const std::vector<SceneObjectPtr>& objs);
 
-   virtual gmtl::Matrix44f computeMove(inf::ViewerPtr viewer,
+   virtual gmtl::Matrix44f computeMove(ViewerPtr viewer,
                                        SceneObjectPtr obj,
                                        const gmtl::Matrix44f& vp_M_wand,
                                        const gmtl::Matrix44f& curObjPos);
@@ -92,4 +92,4 @@ private:
 }
 
 
-#endif /* _INF_BASIC_MOVE_STRATEGY_H_ */
+#endif /* _VRKIT_BASIC_MOVE_STRATEGY_H_ */

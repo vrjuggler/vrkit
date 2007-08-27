@@ -4,7 +4,7 @@
    <definition_version version="1" label="Model">
       <abstract>false</abstract>
       <help />
-      <category>/Infiscape/</category>
+      <category>/vrkit/</category>
       <property valuetype="string" variable="false" name="path">
          <help>Model path</help>
          <value label="Path" defaultvalue=""/>

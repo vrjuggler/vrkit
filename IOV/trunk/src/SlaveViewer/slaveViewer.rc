@@ -95,12 +95,12 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://www.infiscape.com/"
             VALUE "CompanyName", "Infiscape Corporation"
-            VALUE "FileDescription", "IOV slaveViewer"
+            VALUE "FileDescription", "vrkit slaveViewer"
             VALUE "FileVersion", VERSION_STR
-            VALUE "InternalName", "IOV slaveViewer"
+            VALUE "InternalName", "vrkit slaveViewer"
             VALUE "LegalCopyright", COPYRIGHT_STR
             VALUE "OriginalFilename", "slaveViewer.exe"
-            VALUE "ProductName", "IOV slaveViewer"
+            VALUE "ProductName", "vrkit slaveViewer"
             VALUE "ProductVersion", VERSION_STR
         END
     END

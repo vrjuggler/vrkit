@@ -52,7 +52,7 @@
 
 #include <OpenSG/OSGVerifyGeoGraphOp.h>
 
-#include <IOV/UiBuilder.h>
+#include <vrkit/UiBuilder.h>
 
 // XXX: These include paths stink.
 #include "../../plugins/StatusPanelPlugin/StatusPanel.h"
@@ -508,7 +508,7 @@ int main(int argc, char* argv[])
 
     //
 #if 0
-    inf::UiBuilder builder;
+    vrkit::UiBuilder builder;
 
     OSG::Color3f white(0.4,0.4,0.4);
     OSG::GeometryPtr pan_geom = builder.createGeomGeo();
@@ -530,7 +530,7 @@ int main(int argc, char* argv[])
 
     OSG::Color3f text_color(0,1,0);
     OSG::GeometryPtr text_geom = builder.createTextGeom();
-    inf::UiBuilder::Font font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
+    vrkit::UiBuilder::Font font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
 
     builder.buildText(text_geom, font, "At 0,0\nText", OSG::Vec2f(0,0), text_color, 1.0f, 1.0f);
     builder.addText(text_geom, font, "At 0,10\nText", OSG::Vec2f(0,10), OSG::Color3f(0,1,1), 1.0f, 1.0f);
@@ -558,8 +558,8 @@ int main(int argc, char* argv[])
     // Status panel
    ///*
     // Use feet as the unit.
-    inf::StatusPanel status_panel;
-    inf::StatusPanelViewOriginal status_panel_view;
+    vrkit::StatusPanel status_panel;
+    vrkit::StatusPanelViewOriginal status_panel_view;
     status_panel_view.initialize(3.28f, &status_panel);
 
 
@@ -716,10 +716,10 @@ int setupGLUT(int *argc, char *argv[])
     glutInit(argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH | GLUT_DOUBLE);
 
+    int winid = glutCreateWindow("vrkit UI Test");
 
-    int winid = glutCreateWindow("IOV UI Test");
-
-    std::cout << "Depth size: " << glutGet(GLUT_WINDOW_DEPTH_SIZE) << std::endl;
+    std::cout << "Depth size: " << glutGet(GLUT_WINDOW_DEPTH_SIZE)
+              << std::endl;
 
     initgl();
     glutReshapeFunc(reshape);

@@ -16,10 +16,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_MODE_HARNESS_PLUGIN_H_
-#define _INF_MODE_HARNESS_PLUGIN_H_
+#ifndef _VRKIT_MODE_HARNESS_PLUGIN_H_
+#define _VRKIT_MODE_HARNESS_PLUGIN_H_
 
-#include <IOV/Plugin/PluginConfig.h>
+#include <vrkit/plugin/Config.h>
 
 #include <string>
 #include <vector>
@@ -31,18 +31,18 @@
 
 #include <jccl/Config/ConfigElementPtr.h>
 
-#include <IOV/Plugin.h>
-#include <IOV/ModeComponentPtr.h>
+#include <vrkit/viewer/Plugin.h>
+#include <vrkit/mode/ComponentPtr.h>
 
 
-namespace inf
+namespace vrkit
 {
 
 /**
  * The Mode Harness Plug-in provides a way to switch between mutually
  * exclusive "mode components" programatically. Switching is done by emitting
- * a signal via inf::SignalRepository. The component activated in response to
- * a signal is associated with the signal through the configuration of this
+ * a signal via vrkit::SignalRepository. The component activated in response
+ * to a signal is associated with the signal through the configuration of this
  * plug-in.
  *
  * The main difference between this plug-in and the Mode Switch Plug-in is
@@ -63,16 +63,16 @@ namespace inf
  * @since 0.23
  */
 class ModeHarnessPlugin
-   : public inf::Plugin
+   : public viewer::Plugin
    , public boost::enable_shared_from_this<ModeHarnessPlugin>
 {
 protected:
-   ModeHarnessPlugin(const inf::plugin::Info& info);
+   ModeHarnessPlugin(const plugin::Info& info);
 
 public:
-   static inf::PluginPtr create(const inf::plugin::Info& info)
+   static viewer::PluginPtr create(const plugin::Info& info)
    {
-      return inf::PluginPtr(new ModeHarnessPlugin(info));
+      return viewer::PluginPtr(new ModeHarnessPlugin(info));
    }
 
    virtual ~ModeHarnessPlugin();
@@ -98,15 +98,15 @@ public:
     * @return A pointer to this plug-in is returned.
     *
     * @see configure()
-    * @see inf::SignalRepository
+    * @see vrkit::SignalRepository
     */
-   virtual inf::PluginPtr init(inf::ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
    /**
     * If a component switch is scheduled to occur, the currently active
     * component (if there is one) is deactivated. Then, the component switch
     * occurs. If there is a new component to replace the old, the new
-    * component is activated. Finally, inf::ModeComponent::update() is
+    * component is activated. Finally, vrkit::mode::Component::update() is
     * invoked on the currently active component.
     *
     * @post \c mNextComponent is a NULL pointer. \c mCurComponent is the
@@ -115,12 +115,12 @@ public:
     *
     * @param viewer The viewer application object.
     */
-   virtual void update(inf::ViewerPtr viewer);
+   virtual void update(ViewerPtr viewer);
 
 private:
    static std::string getElementType()
    {
-      return std::string("iov_mode_harness_plugin");
+      return std::string("vrkit_mode_harness_plugin");
    }
 
    /**
@@ -135,30 +135,31 @@ private:
 
    void registerModule(vpr::LibraryPtr module);
 
-   void pluginInstantiated(inf::AbstractPluginPtr plugin);
+   void pluginInstantiated(AbstractPluginPtr plugin);
 
    /**
     * Instantiates and initializes the named component. The ready-to-use mode
     * component is returned to the caller.
     *
     * @post A new instance of the named component is created and initialized
-    *       using the given instance of inf::Viewer.
+    *       using the given instance of vrkit::Viewer.
     *
     * @param pluginType The type ID for the plug-in object to instantiate.
     * @param viewer     The VR Juggler application object.
     *
     * @return A fully initialized component that implements the interface
-    *         inf::ModeComponent is returned.
+    *         vrkit::mode::Component is returned.
     *
-    * @throw std::runtime_error is thrown if the named component cannot be
-    *        loaded for some reason.
+    * @throw std::runtime_error
+    *           Thrown if the named component cannot be loaded for some
+    *           reason.
     */
-   inf::ModeComponentPtr makeComponent(const std::string& pluginType,
-                                       inf::ViewerPtr viewer);
+   mode::ComponentPtr makeComponent(const std::string& pluginType,
+                                    ViewerPtr viewer);
 
    /**
     * Prepares to switch the current mode component to \p newComponent.
-    * This method is a slot for signals emitted by inf::ModeSignalData. The
+    * This method is a slot for signals emitted by vrkit::ModeSignalData. The
     * mode switching is performed in a thread-safe manner since this method
     * may be invoked from a thread other than the main application loop.
     *
@@ -166,7 +167,7 @@ private:
     *
     * @param newComponent The next component that will be used.
     */
-   void prepComponentSwitch(inf::ModeComponentPtr newComponent);
+   void prepComponentSwitch(mode::ComponentPtr newComponent);
 
    struct ComponentInfo
    {
@@ -183,9 +184,9 @@ private:
 
    struct SignalDef
    {
-      SignalDef(const std::string& name_, const std::string& componentName_)
-         : name(name_)
-         , componentName(componentName_)
+      SignalDef(const std::string& name, const std::string& componentName)
+         : name(name)
+         , componentName(componentName)
       {
          /* Do nothing. */ ;
       }
@@ -194,7 +195,7 @@ private:
       std::string componentName;
    };
 
-   inf::ViewerPtr mViewer;
+   ViewerPtr mViewer;
 
    /** @name Component Management */
    //@{
@@ -211,14 +212,14 @@ private:
    std::vector<SignalDef> mSignalDefs;
 
    /** All the components that were instantiated based on the configuration. */
-   std::map<std::string, inf::ModeComponentPtr> mComponents;
+   std::map<std::string, mode::ComponentPtr> mComponents;
 
    /** The currently active component. This may be a NULL pointer. */
-   inf::ModeComponentPtr mCurComponent;
+   mode::ComponentPtr mCurComponent;
 
    /** The next component to be activated. */
-   inf::ModeComponentPtr mNextComponent;
-   vpr::Mutex            mNextComponentMutex;   /**< Lock for mNextComponent */
+   mode::ComponentPtr mNextComponent;
+   vpr::Mutex         mNextComponentMutex;   /**< Lock for mNextComponent */
    //@}
 
    /** Slot connection to the Signal Repository. */
@@ -228,4 +229,4 @@ private:
 }
 
 
-#endif /* _INF_MODE_HARNESS_PLUGIN_H_ */
+#endif /* _VRKIT_MODE_HARNESS_PLUGIN_H_ */

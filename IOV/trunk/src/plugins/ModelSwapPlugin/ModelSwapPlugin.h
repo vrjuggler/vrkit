@@ -16,36 +16,37 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_MODEL_SWAP_PLUGIN_H_
-#define _INF_MODEL_SWAP_PLUGIN_H_
+#ifndef _VRKIT_MODEL_SWAP_PLUGIN_H_
+#define _VRKIT_MODEL_SWAP_PLUGIN_H_
+
+#include <vrkit/plugin/Config.h>
 
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 
-#include <OpenSG/OSGRefPtr.h>
 #include <OpenSG/OSGSwitch.h>
 
-#include <IOV/Plugin/PluginConfig.h>
-#include <IOV/Plugin.h>
-#include <IOV/WandInterfacePtr.h>
-#include <IOV/Util/DigitalCommand.h>
+#include <vrkit/WandInterfacePtr.h>
+#include <vrkit/viewer/Plugin.h>
+#include <vrkit/util/DigitalCommand.h>
 
-namespace inf
+
+namespace vrkit
 {
 
 class ModelSwapPlugin
-   : public inf::Plugin
+   : public viewer::Plugin
    , public boost::enable_shared_from_this<ModelSwapPlugin>
 {
 protected:
-   ModelSwapPlugin(const inf::plugin::Info& info)
-      : Plugin(info)
+   ModelSwapPlugin(const plugin::Info& info)
+      : viewer::Plugin(info)
    {
       /* Do nothing. */ ;
    }
 
 public:
-   static inf::PluginPtr create(const inf::plugin::Info& info);
+   static viewer::PluginPtr create(const plugin::Info& info);
 
    virtual ~ModelSwapPlugin()
    {
@@ -54,21 +55,21 @@ public:
 
    virtual std::string getDescription();
 
-   /** Initialize and configure the plugin.
-    *
+   /**
+    * Initializes and configures the plug-in.
     */
-   virtual PluginPtr init(inf::ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
-   virtual void update(inf::ViewerPtr viewer);
+   virtual void update(ViewerPtr viewer);
 
 protected:
-   WandInterfacePtr        mWandInterface;      /**< Ptr to the wand interface to use. */
-   inf::DigitalCommand     mSwapButton;       /**< Ptr to the digital button. */
-   OSG::NodeRefPtr            mSwitchNode;
-   OSG::SwitchRefPtr          mSwitchCore;
-
+   WandInterfacePtr     mWandInterface; /**< Ptr to the wand interface to use. */
+   util::DigitalCommand mSwapButton;    /**< Ptr to the digital button. */
+   OSG::NodeRefPtr      mSwitchNode;
+   OSG::SwitchRefPtr    mSwitchCore;
 }; // ModelSwapPlugin
 
-}  // namespace inf
+}  // namespace vrkit
 
-#endif
+
+#endif /* _VRKIT_MODEL_SWAP_PLUGIN_H_ */

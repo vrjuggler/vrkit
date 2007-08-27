@@ -16,10 +16,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _INF_GRID_PLUGIN_H_
-#define _INF_GRID_PLUGIN_H_
+#ifndef _VRKIT_GRID_PLUGIN_H_
+#define _VRKIT_GRID_PLUGIN_H_
 
-#include <IOV/Plugin/PluginConfig.h>
+#include <vrkit/plugin/Config.h>
 
 #include <string>
 #include <vector>
@@ -27,29 +27,28 @@
 
 #include <jccl/Config/ConfigElementPtr.h>
 
-#include <IOV/Plugin.h>
-#include <IOV/WandInterfacePtr.h>
-#include <IOV/ViewerPtr.h>
-#include <IOV/Util/DigitalCommand.h>
-#include <IOV/Util/Exceptions.h>
+#include <vrkit/WandInterfacePtr.h>
+#include <vrkit/ViewerPtr.h>
+#include <vrkit/viewer/Plugin.h>
+#include <vrkit/util/DigitalCommand.h>
 
 #include "GridPtr.h"
 
 
-namespace inf
+namespace vrkit
 {
 
 class GridPlugin
-   : public inf::Plugin
+   : public viewer::Plugin
    , public boost::enable_shared_from_this<GridPlugin>
 {
 protected:
-   GridPlugin(const inf::plugin::Info& info);
+   GridPlugin(const plugin::Info& info);
 
 public:
-   static inf::PluginPtr create(const inf::plugin::Info& info)
+   static viewer::PluginPtr create(const plugin::Info& info)
    {
-      return inf::PluginPtr(new GridPlugin(info));
+      return viewer::PluginPtr(new GridPlugin(info));
    }
 
    virtual ~GridPlugin()
@@ -62,7 +61,7 @@ public:
       return std::string("Grid");
    }
 
-   virtual PluginPtr init(inf::ViewerPtr viewer);
+   virtual viewer::PluginPtr init(ViewerPtr viewer);
 
    /**
     * Updates the state of the grids based on input from the wand interface.
@@ -72,7 +71,7 @@ public:
     *
     * @param viewer The VR Juggler application object.
     */
-   virtual void update(inf::ViewerPtr viewer);
+   virtual void update(ViewerPtr viewer);
 
 protected:
    /**
@@ -86,12 +85,12 @@ protected:
     *
     * @param viewer The VR Juggler application object.
     */
-   void focusChanged(inf::ViewerPtr viewer);
+   void focusChanged(ViewerPtr viewer);
 
 private:
    static std::string getElementType()
    {
-      return std::string("iov_grid_plugin");
+      return std::string("vrkit_grid_plugin");
    }
 
    /**
@@ -101,16 +100,17 @@ private:
     *
     * @param elt The config element for this plug-in.
     *
-    * @throw inf::Exception is thrown if the given config element contains
-    *        bad data, is out of date, or is otherwise unusable.
+    * @throw vrkit::Exception
+    *           Thrown if the given config element contains bad data, is out
+    *           of date, or is otherwise unusable.
     */
    void configure(jccl::ConfigElementPtr elt);
 
-   inf::WandInterfacePtr mWandInterface;
+   WandInterfacePtr mWandInterface;
 
    /** @name Grid State */
    //@{
-   std::vector<inf::GridPtr> mGrids;
+   std::vector<GridPtr> mGrids;
    int mSelectedGridIndex;
    bool mGridsVisible;
    //@}
@@ -123,10 +123,10 @@ private:
 
    /** @name Digital Buttons */
    //@{
-   inf::DigitalCommand mActivateBtn;    /**< Activate/deactivate all button */
-   inf::DigitalCommand mCycleBtn;       /**< Cycle grid selection button */
-   inf::DigitalCommand mHideBtn;        /**< Show/hide grid button */
-   inf::DigitalCommand mResetBtn;       /**< Reset grid position button */
+   util::DigitalCommand mActivateBtn;    /**< Activate/deactivate all button */
+   util::DigitalCommand mCycleBtn;       /**< Cycle grid selection button */
+   util::DigitalCommand mHideBtn;        /**< Show/hide grid button */
+   util::DigitalCommand mResetBtn;       /**< Reset grid position button */
    //@}
 
    /** @name Digital Button Command Descriptions */

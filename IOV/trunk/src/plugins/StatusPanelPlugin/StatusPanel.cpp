@@ -18,12 +18,11 @@
 
 #include <vector>
 #include <algorithm>
-#include <boost/concept_check.hpp>
 
 #include "StatusPanel.h"
 
 
-namespace inf
+namespace vrkit
 {
 
 StatusPanel::StatusPanel()
@@ -83,7 +82,6 @@ void StatusPanel::addControlText(const std::string& cmdText,
 void StatusPanel::removeControlText(const std::string& cmdText,
                                     const std::string& desc)
 {
-   std::vector<std::string>::iterator i;
    std::vector<std::string>& vec = mCenterText[cmdText];
    vec.erase(std::remove(vec.begin(), vec.end(), desc), vec.end());
 }
@@ -93,10 +91,11 @@ void StatusPanel::addStatusMessage(const std::string& msg)
    mStatusLines.push_front(msg);
 
    // Shrink status lines to fit.
-   while(mStatusLines.size() > mStatusHistorySize)
+   while ( mStatusLines.size() > mStatusHistorySize )
    {
       mStatusLines.pop_back();
    }
+
    mChangeSignal();
 }
 
@@ -113,4 +112,4 @@ void StatusPanel::setStatusHistorySize(const unsigned int size)
    mChangeSignal();
 }
 
-} // namespace inf
+} // namespace vrkit
