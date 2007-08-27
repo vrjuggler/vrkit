@@ -23,11 +23,12 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 #include <vpr/Util/GUID.h>
 
 #include <vrkit/SceneData.h>
-#include <vrkit/scenedata/SignalEmitter.h>
+#include <vrkit/signal/Emitter.h>
 
 
 namespace vrkit
@@ -36,7 +37,7 @@ namespace vrkit
 /**
  * A signal emitter that exists as vrkit scene data.
  *
- * @see vrkit::SignalEmitter
+ * @see vrkit::signal::Emitter
  *
  * @since 0.23.2
  */
@@ -45,7 +46,7 @@ template<typename SlotSignature
        , typename SignalListContainer::signals SignalBegin = SignalListContainer::BEGIN
        , typename SignalListContainer::signals SignalEnd = SignalListContainer::END>
 class SignalData
-   : public SignalEmitter<SlotSignature
+   : public signal::Emitter<SlotSignature
                         , SignalListContainer
                         , SignalBegin
                         , SignalEnd>
@@ -53,11 +54,11 @@ class SignalData
 {
 protected:
    SignalData()
-       : SignalEmitter<SlotSignature
-                     , SignalListContainer
-                     , SignalBegin
-                     , SignalEnd>()
-       , SceneData()
+      : signal::Emitter<SlotSignature
+                      , SignalListContainer
+                      , SignalBegin
+                      , SignalEnd>()
+      , SceneData()
    {
       /* Do nothing. */ ;
    }
