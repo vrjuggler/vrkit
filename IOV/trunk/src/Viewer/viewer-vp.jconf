@@ -2,11 +2,11 @@
 <?org-vrjuggler-jccl-settings configuration.version="3.0"?>
 <configuration xmlns="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" name="/home/patrick/src/pro/Assembly/src/external/common/OpenSG/VRJ/Viewer/viewer.jconf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.0/configuration http://www.vrjuggler.org/jccl/xsd/3.0/configuration.xsd">
    <elements>
-      <infiscape_opensg_viewer name="Viewer" version="4">
+      <vrkit_viewer name="Viewer" version="4">
          <root_name>RootNode</root_name>
          <plugin>ViewpointsPlugin</plugin>
          <isect_strategy>PointIntersection</isect_strategy>
-      </infiscape_opensg_viewer>
+      </vrkit_viewer>
       <vrkit_wand_interface name="Wand Interface" version="1">
          <position_name>VJWand</position_name>
          <digital_name>VJButton0</digital_name>
