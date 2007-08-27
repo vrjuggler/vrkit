@@ -35,7 +35,7 @@
 #include <gadget/Type/Position/PositionUnitConversion.h>
 
 #include <vrkit/ExitCodes.h>
-#include <vrkit/Slave/SlaveViewer.h>
+#include <vrkit/slave/SlaveViewer.h>
 
 //OSG_USING_NAMESPACE
 
