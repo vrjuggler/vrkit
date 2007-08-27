@@ -41,21 +41,24 @@ namespace signal
  *
  * http://www.scottcollins.net/articles/a-deeper-look-at-signals-and-slots.html
  *
+ * @note This class was renamed from vrkit::SignalProxy and moved into the
+ *       vrkit::signal namespace in version 0.47.
+ *
  * @since 0.24.1
  */
-template<typename Signal>
-class SignalProxy
+template<typename SignalT>
+class Proxy
 {
 public:
-   typedef Signal signal_t;
+   typedef SignalT signal_t;
 
-   SignalProxy(signal_t& signal)
+   Proxy(signal_t& signal)
       : mSignal(signal)
    {
       /* Do nothing. */ ;
    }
 
-   SignalProxy(const SignalProxy& rhs)
+   Proxy(const Proxy& rhs)
       : mSignal(rhs.mSignal)
    {
       /* Do nothing. */ ;

@@ -31,7 +31,7 @@
 #include <vpr/DynLoad/Library.h>
 
 #include <vrkit/AbstractPluginPtr.h>
-#include <vrkit/signal/SignalProxy.h>
+#include <vrkit/signal/Proxy.h>
 #include <vrkit/plugin/RegistryEntryPtr.h>
 #include <vrkit/plugin/RegistryPtr.h>
 
@@ -79,19 +79,19 @@ public:
       register_signal_t;
    typedef boost::signal<void (vpr::LibraryPtr)> removal_signal_t;
 
-   signal::SignalProxy<instance_signal_t> pluginInstantiated()
+   signal::Proxy<instance_signal_t> pluginInstantiated()
    {
-      return signal::SignalProxy<instance_signal_t>(mPluginInstantiated);
+      return signal::Proxy<instance_signal_t>(mPluginInstantiated);
    }
 
-   signal::SignalProxy<register_signal_t> moduleRegistered()
+   signal::Proxy<register_signal_t> moduleRegistered()
    {
-      return signal::SignalProxy<register_signal_t>(mModuleRegistered);
+      return signal::Proxy<register_signal_t>(mModuleRegistered);
    }
 
-   signal::SignalProxy<removal_signal_t> moduleRemoved()
+   signal::Proxy<removal_signal_t> moduleRemoved()
    {
-      return signal::SignalProxy<removal_signal_t>(mModuleRemoved);
+      return signal::Proxy<removal_signal_t>(mModuleRemoved);
    }
    //@}
 

@@ -29,7 +29,7 @@
 
 #include <vrkit/Config.h>
 #include <vrkit/SceneObjectPtr.h>
-#include <vrkit/signal/SignalProxy.h>
+#include <vrkit/signal/Proxy.h>
 
 
 namespace vrkit
@@ -258,9 +258,9 @@ public:
     *
     * @since 0.24.1
     */
-   signal::SignalProxy<self_signal_t> intersectStateChanged()
+   signal::Proxy<self_signal_t> intersectStateChanged()
    {
-      return signal::SignalProxy<self_signal_t>(mIntersectStateChanged);
+      return signal::Proxy<self_signal_t>(mIntersectStateChanged);
    }
 
    /**
@@ -268,9 +268,9 @@ public:
     *
     * @since 0.24.1
     */
-   signal::SignalProxy<self_signal_t> grabbableStateChanged()
+   signal::Proxy<self_signal_t> grabbableStateChanged()
    {
-      return signal::SignalProxy<self_signal_t>(mGrabbableStateChanged);
+      return signal::Proxy<self_signal_t>(mGrabbableStateChanged);
    }
 
    /**
@@ -278,9 +278,9 @@ public:
     *
     * @since 0.24.1
     */
-   signal::SignalProxy<self_obj_signal_t> childAdded()
+   signal::Proxy<self_obj_signal_t> childAdded()
    {
-      return signal::SignalProxy<self_obj_signal_t>(mChildAdded);
+      return signal::Proxy<self_obj_signal_t>(mChildAdded);
    }
 
    /**
@@ -288,9 +288,9 @@ public:
     *
     * @since 0.24.1
     */
-   signal::SignalProxy<self_obj_signal_t> childRemoved()
+   signal::Proxy<self_obj_signal_t> childRemoved()
    {
-      return signal::SignalProxy<self_obj_signal_t>(mChildRemoved);
+      return signal::Proxy<self_obj_signal_t>(mChildRemoved);
    }
    //@}
 

@@ -32,7 +32,7 @@
 #include <vrkit/AbstractPlugin.h>
 #include <vrkit/SceneObjectPtr.h>
 #include <vrkit/ViewerPtr.h>
-#include <vrkit/signal/SignalProxy.h>
+#include <vrkit/signal/Proxy.h>
 
 #include <vrkit/grab/StrategyPtr.h>
 

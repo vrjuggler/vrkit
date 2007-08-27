@@ -30,7 +30,7 @@
 #include <OpenSG/OSGWindow.h>
 #include <OpenSG/OSGRenderAction.h>
 
-#include <vrkit/signal/SignalProxy.h>
+#include <vrkit/signal/Proxy.h>
 #include <vrkit/video/CameraPtr.h>
 #include <vrkit/video/EncoderManager.h>
 #include <vrkit/video/RecorderPtr.h>
@@ -195,9 +195,9 @@ public:
     *
     * @since 0.45.2
     */
-   signal::SignalProxy<basic_signal_t> recordingStarted()
+   signal::Proxy<basic_signal_t> recordingStarted()
    {
-      return signal::SignalProxy<basic_signal_t>(mRecordingStarted);
+      return signal::Proxy<basic_signal_t>(mRecordingStarted);
    }
 
    /**
@@ -207,9 +207,9 @@ public:
     *
     * @since 0.45.2
     */
-   signal::SignalProxy<basic_signal_t> recordingPaused()
+   signal::Proxy<basic_signal_t> recordingPaused()
    {
-      return signal::SignalProxy<basic_signal_t>(mRecordingPaused);
+      return signal::Proxy<basic_signal_t>(mRecordingPaused);
    }
 
    /**
@@ -219,9 +219,9 @@ public:
     *
     * @since 0.45.2
     */
-   signal::SignalProxy<basic_signal_t> recordingResumed()
+   signal::Proxy<basic_signal_t> recordingResumed()
    {
-      return signal::SignalProxy<basic_signal_t>(mRecordingResumed);
+      return signal::Proxy<basic_signal_t>(mRecordingResumed);
    }
 
    /**
@@ -231,9 +231,9 @@ public:
     *
     * @since 0.45.2
     */
-   signal::SignalProxy<basic_signal_t> recordingStopped()
+   signal::Proxy<basic_signal_t> recordingStopped()
    {
-      return signal::SignalProxy<basic_signal_t>(mRecordingStopped);
+      return signal::Proxy<basic_signal_t>(mRecordingStopped);
    }
    //@}
 

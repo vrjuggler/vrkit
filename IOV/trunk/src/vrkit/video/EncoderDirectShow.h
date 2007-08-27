@@ -95,7 +95,7 @@ public:
 
    virtual OSG::Image::PixelFormat getPixelFormat()
    {
-      return OSG::Image::OSG_BGR_PF;
+      return OSG::Image::OSG_RGB_PF;
    }
    //@}
 

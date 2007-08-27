@@ -27,7 +27,7 @@
 
 #include <OpenSG/OSGImage.h>
 
-#include <vrkit/signal/SignalProxy.h>
+#include <vrkit/signal/Proxy.h>
 #include <vrkit/video/Encoder.h>
 #include <vrkit/video/EncoderManagerPtr.h>
 
@@ -137,9 +137,9 @@ public:
     *
     * @since 0.45.2
     */
-   signal::SignalProxy<basic_signal_t> encodingStarted()
+   signal::Proxy<basic_signal_t> encodingStarted()
    {
-      return signal::SignalProxy<basic_signal_t>(mEncodingStarted);
+      return signal::Proxy<basic_signal_t>(mEncodingStarted);
    }
 
    /**
@@ -147,9 +147,9 @@ public:
     *
     * @since 0.45.2
     */
-   signal::SignalProxy<basic_signal_t> encodingPaused()
+   signal::Proxy<basic_signal_t> encodingPaused()
    {
-      return signal::SignalProxy<basic_signal_t>(mEncodingPaused);
+      return signal::Proxy<basic_signal_t>(mEncodingPaused);
    }
 
    /**
@@ -157,9 +157,9 @@ public:
     *
     * @since 0.45.2
     */
-   signal::SignalProxy<basic_signal_t> encodingResumed()
+   signal::Proxy<basic_signal_t> encodingResumed()
    {
-      return signal::SignalProxy<basic_signal_t>(mEncodingResumed);
+      return signal::Proxy<basic_signal_t>(mEncodingResumed);
    }
 
    /**
@@ -167,9 +167,9 @@ public:
     *
     * @since 0.45.2
     */
-   signal::SignalProxy<basic_signal_t> encodingStopped()
+   signal::Proxy<basic_signal_t> encodingStopped()
    {
-      return signal::SignalProxy<basic_signal_t>(mEncodingStopped);
+      return signal::Proxy<basic_signal_t>(mEncodingStopped);
    }
    //@}
 

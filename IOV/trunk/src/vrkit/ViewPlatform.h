@@ -25,7 +25,7 @@
 #include <gmtl/MatrixOps.h>
 
 #include <vrkit/ViewerPtr.h>
-#include <vrkit/signal/SignalProxy.h>
+#include <vrkit/signal/Proxy.h>
 
 
 namespace vrkit
@@ -93,9 +93,9 @@ public:
     *
     * @since 0.26.7
     */
-   signal::SignalProxy<signal_t> platformMoved()
+   signal::Proxy<signal_t> platformMoved()
    {
-      return signal::SignalProxy<signal_t>(mPlatformMoved);
+      return signal::Proxy<signal_t>(mPlatformMoved);
    }
    //@}
 

@@ -161,7 +161,12 @@ EncoderPtr EncoderDirectShow::create()
 
 EncoderDirectShow::~EncoderDirectShow()
 {
-   // XXX: Finished with COM
+   // Be sure that we are no longer encoding before calling CoUninitialize().
+   // The value of mRunning helps ensure that this call will not cause bad
+   // things to happen.
+   stopEncoding();
+
+   // We are finished with COM.
    CoUninitialize();
 }
 
@@ -305,10 +310,17 @@ void EncoderDirectShow::stopEncoding()
    mMediaController = NULL;
 
    // Clean up our filter and source pin.
-   mByteSource->Release();
-   mByteSource = NULL;
-   mByteStream->Release();
-   mByteStream = NULL;
+   if ( NULL != mByteSource )
+   {
+      mByteSource->Release();
+      mByteSource = NULL;
+   }
+
+   if ( NULL != mByteStream )
+   {
+      mByteStream->Release();
+      mByteStream = NULL;
+   }
 }
 
 void EncoderDirectShow::writeFrame(vpr::Uint8* data)

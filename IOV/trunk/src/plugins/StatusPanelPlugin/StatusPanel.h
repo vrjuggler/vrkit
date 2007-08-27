@@ -27,7 +27,7 @@
 #include <map>
 #include <boost/signal.hpp>
 
-#include <vrkit/signal/SignalProxy.h>
+#include <vrkit/signal/Proxy.h>
 
 
 namespace vrkit
@@ -143,9 +143,9 @@ public:
 
    typedef boost::signal<void ()> signal_t;
 
-   signal::SignalProxy<signal_t> statusPanelChanged()
+   signal::Proxy<signal_t> statusPanelChanged()
    {
-      return signal::SignalProxy<signal_t>(mChangeSignal);
+      return signal::Proxy<signal_t>(mChangeSignal);
    }
 
 public:  // Configuration params //
