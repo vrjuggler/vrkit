@@ -86,6 +86,16 @@ protected:
    Viewer();
 
 public:
+   /**
+    * An alias for the base class of vrkit::Viewer. Due to the change
+    * from vrj::OpenSGApp to vrj::opensg::App in VR Juggler 2.3.11, it is
+    * convenient to have access to this type name without having to spread
+    * #ifdef's around.
+    *
+    * @since 0.47.1
+    */
+   typedef vrkit::OpenSGApp base_type;
+
    static ViewerPtr create()
    {
       ViewerPtr new_viewer(new Viewer);
@@ -155,12 +165,14 @@ public:
    }
 
    /**
-    * Returns the context-specific render action for this viewer. This method
-    * may only be called when an OpenGL context is active.
+    * Returns the context-specific data for this viewer. This method may only
+    * be called when an OpenGL context is active.
     *
-    * @since 0.28.0
+    * @note This method replaced vrkit::Viewer::getRenderAction().
+    *
+    * @since 0.47.1
     */
-   OSG::RenderAction* getRenderAction();
+   const base_type::context_data& getContextData();
 
    /**
     * @note Derived classes must call base class implementation.

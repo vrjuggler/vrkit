@@ -328,9 +328,9 @@ void Viewer::contextPostDraw()
                              shared_from_this()));
 }
 
-OSG::RenderAction* Viewer::getRenderAction()
+const Viewer::base_type::context_data& Viewer::getContextData()
 {
-   return mContextData->mRenderAction;
+   return *mContextData;
 }
 
 void Viewer::contextClose()

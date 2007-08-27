@@ -79,7 +79,7 @@ viewer::PluginPtr VolumeDrawingPlugin::init(ViewerPtr)
 
 void VolumeDrawingPlugin::contextInit(ViewerPtr viewer)
 {
-   viewer->getRenderAction()->setVolumeDrawing(isFocused());
+   viewer->getContextData().mRenderAction->setVolumeDrawing(isFocused());
 }
 
 void VolumeDrawingPlugin::update(ViewerPtr)
