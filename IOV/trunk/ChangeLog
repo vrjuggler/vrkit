@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-27 patrick  Set VRKIT_BASE_DIR automatically on Windows.
+2007-08-26 patrick  Introduced new vrkit directory structore.
+                    -- VERSION -- 0.47.0
 2007-08-24 patrick  Added inf::CoreTypeSeqPredicate that allows compile-time
                     construction of a sequence of OSG::NodeCore subclasses for
                     use with inf::DynamicSceneObject.
