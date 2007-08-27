@@ -32,6 +32,9 @@
 namespace vrkit
 {
 
+namespace signal
+{
+
 /**
  * A generic signal emitter. The signals are identified by a unique constant
  * as defined in the enumerated type \p SignalListContainer::signals. The range
@@ -69,13 +72,15 @@ namespace vrkit
  * @note The value of \c SignalListContainer::END indicates the number of
  *       signals that may be emitted by this signal emitter instantiation.
  *
+ * @note This class was renamed from vrkit::SignalEmitter in version 0.47.
+ *
  * @since 0.23.2
  */
 template<typename SlotSignature
        , typename SignalListContainer
        , typename SignalListContainer::signals SignalBegin = SignalListContainer::BEGIN
        , typename SignalListContainer::signals SignalEnd = SignalListContainer::END>
-class SignalEmitter
+class Emitter
 {
 public:
    typedef typename SignalListContainer::signals signal_list_t;
@@ -85,8 +90,8 @@ public:
    /**
     * Initializes the collection of signals that may be emitted herein.
     */
-   SignalEmitter()
-       : mSignals(SignalEnd)
+   Emitter()
+      : mSignals(SignalEnd)
    {
       // Construct an MPL range of constants. \c SignalListContainer::signals
       // must be an enum, and its values must be in a sequential range
@@ -105,15 +110,8 @@ public:
       > signals;
 
       // Iterate over the signals defined in S::signals and register each one.
-      boost::mpl::for_each<signals>(
-         boost::bind(
-            &SignalEmitter<SlotSignature
-                         , SignalListContainer
-                         , SignalBegin
-                         , SignalEnd>::addSignal,
-            this, _1
-         )
-      );
+      boost::mpl::for_each<signals>(boost::bind(&Emitter::addSignal, this,
+                                    _1));
    }
 
    /**
@@ -121,7 +119,7 @@ public:
     *
     * @post The \c boost::signal instances stored in \c mSignals are deleted.
     */
-   ~SignalEmitter()
+   ~Emitter()
    {
       /* Do nothing. */ ;
    }
@@ -194,6 +192,8 @@ private:
 
    std::vector< boost::shared_ptr<signal_t> > mSignals;
 };
+
+}
 
 }
 
