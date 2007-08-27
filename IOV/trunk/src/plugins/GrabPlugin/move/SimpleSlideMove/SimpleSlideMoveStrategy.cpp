@@ -32,7 +32,7 @@
 #include <vrkit/WandInterface.h>
 #include <vrkit/Version.h>
 #include <vrkit/plugin/Creator.h>
-#include <vrkit/Plugin/Info.h>
+#include <vrkit/plugin/Info.h>
 #include <vrkit/exceptions/PluginException.h>
 
 #include "SimpleSlideMoveStrategy.h"
