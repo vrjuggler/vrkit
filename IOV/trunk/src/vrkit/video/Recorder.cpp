@@ -233,7 +233,7 @@ void Recorder::setAspect(const OSG::Real32 aspect)
 
 void Recorder::setFov(const OSG::Real32 fov)
 {
-   mCamera->setFov(fov);
+   mCamera->setFov(OSG::osgdegree2rad(fov));
 }
 
 void Recorder::setNearFar(const OSG::Real32 nearVal, const OSG::Real32 farVal)

@@ -88,7 +88,7 @@ public:
    void setFilename(const std::string& filename);
 
    /**
-    * Set the field of view for the video camera.
+    * Set the field of view for the video camera in degrees.
     */
    void setFov(const OSG::Real32 fov);
 
