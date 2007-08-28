@@ -69,9 +69,8 @@ elif mingw_ffmpeg.isAvailable():
          env.AppendUnique(LINKFLAGS = [l])
 elif ffdshow_ffmpeg.isAvailable():
    have_ffmpeg = True
-   ffdshow_ffmpeg.verbose = True
    ffdshow_ffmpeg.apply(env)
-   env.AppendUnique(CPPDEFINES = ['VRKIT_WITH_FFMPEG_FFDSHOW'],
+   env.AppendUnique(CPPDEFINES = ['VRKIT_WITH_FFMPEG'],
                     LIBS = ['libavcodec'])
 
 if "win32" == platform:
