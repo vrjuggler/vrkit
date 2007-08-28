@@ -94,17 +94,6 @@ FFmpeg on Windows
 
 The video capture code that uses FFmpeg (see vrkit::video::EncoderFFmpeg)
 can be used on Windows, though it takes quite a bit of preparatory work.
-There are two ways that vrkit can be built against FFmpeg:
-
-   1. Using FFmpeg as compiled using MinGW (the normal, but very labor-
-      intensive way of using FFmpeg).
-   2. Using FFmpeg from ffdshow. Currently, this is the only (or at least
-      the easiest) way to get a 64-bit build of FFmpeg for Windows.
-
-These are explained in more detail below.
-
-* FFmpeg and MinGW
-
 The standard FFmpeg code base, which usually must be acquired from the
 FFmpeg Subversion repository, requires a C99-compliant compiler. Visual C++
 is not such a compiler, and thus GCC must be used. Fortunately, there are
@@ -150,36 +139,6 @@ must be given to the scons command are the following:
     mingw_ffmpeg: The path to the FFmpeg installation. If using MSYS, a
                   likely value is C:\MSYS\1.0\local (/usr/local in the eyes
                   of MSYS).
-
-* FFmpeg from ffdshow
-
-Compiling FFmpeg from the ffdshow source is much, much simpler than building
-FFmpeg and its dependencies using MinGW and Cygwin. Get the ffdshow source
-from SourceForge and open the appropriate Visual Studio solution for
-libavcodec in the src\ffmpeg directory. Build the Win32 and/or x64 Release
-targets. Once it is built, there will be a libavcodec.lib static library
-in the ReleaseWin32 and/or Releasex64 directory.
-
-The issue at this point is that this version of FFmpeg does not appear to
-have a proper installation mechanism. To install it, copy all the header
-files in src\ffmpeg\libavcodec, src\ffmpeg\libavformat, and
-src\ffmpeg\libavutil to a location such as X:\ffmpeg\include\ffmpeg. Copy
-the appropriate libavocdec.lib to X:\ffmpeg\lib. Then, edit any header files
-in X:\ffmpeg\include\ffmpeg that include other FFmpeg headers relative to the
-libavcodec, libavformat, and/or libavutil directory to remove the directory
-prefix. For example, if a file contains the following:
-
-   #include "libavodec/avcodec.h"
-
-change it thusly:
-
-   #include "avcodec.h"
-
-Once this FFmpeg build is installed, then the option that must be given to
-the scons command to build vrkit is the following:
-
-   ffdshow_ffmpeg: The path to the FFmpeg installation as built from ffdshow.
-                   From the example path above, this would be X:\ffmpeg.
 
 Building on Mac OS X
 ====================
