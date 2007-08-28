@@ -55,9 +55,6 @@ public:
       void (const std::string&, const std::string&, const unsigned int)
    > set_cmd_string_uint_t;
    typedef boost::signal<
-      bool (const std::string&, const std::string&)
-   > has_cmd_string_t;
-   typedef boost::signal<
       void (const float, const float, const float)
    > set_float3_t;
    typedef boost::signal<void (const unsigned int)> set_uint_t;
@@ -73,8 +70,6 @@ public:
    set_cmd_string_uint_t addControlText;
 
    set_cmd_string_t removeControlText;
-
-   has_cmd_string_t hasControlText;
 
    set_string_t addStatusMessage;
 

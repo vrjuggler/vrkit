@@ -152,29 +152,15 @@ void SingleObjectGrabStrategy::setFocus(ViewerPtr viewer, const bool focused)
       // panel to include that information.
       if ( mGrabBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mGrabBtn.toString(), mGrabText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mGrabBtn.toString(), mGrabText,
-                                              1);
-         }
+         status_panel_data->addControlText(mGrabBtn.toString(), mGrabText, 1);
       }
 
       // If release button(s) is/are configured, we will update the status
       // panel to include that information.
       if ( mReleaseBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mReleaseBtn.toString(),
-                                              mReleaseText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mReleaseBtn.toString(),
-                                              mReleaseText, 1);
-         }
+         status_panel_data->addControlText(mReleaseBtn.toString(),
+                                           mReleaseText, 1);
       }
    }
    else

@@ -80,28 +80,6 @@ public:
    void removeControlText(const std::string& cmdText,
                           const std::string& desc);
 
-   /**
-    * Determines if the named line contains the given text.
-    *
-    * @since 0.10.0
-    */
-   bool hasControlText(const std::string& cmdText, const std::string& desc)
-      const
-   {
-      bool flag(false);
-
-      if ( mCenterText.count(cmdText) != 0 )
-      {
-         const std::vector<std::string>& vec =
-            (*mCenterText.find(cmdText)).second;
-         flag = std::find(vec.begin(), vec.end(), desc) != vec.end();
-      }
-
-      mChangeSignal();
-
-      return flag;
-   }
-
    /** Add another message to the status panel. */
    void addStatusMessage(const std::string& msg);
 
@@ -158,7 +136,15 @@ public:  // Configuration params //
     */
    void setStatusHistorySize(const unsigned int size);
 
-protected:
+private:
+   /**
+    * Determines if the named line contains the given text.
+    *
+    * @since 0.10.0
+    */
+   bool hasControlText(const std::string& cmdText, const std::string& desc)
+      const;
+
    std::string    mHeaderTitle;     /**< Header title */
    std::string    mCenterTitle;     /**< Center title */
    std::string    mBottomTitle;     /**< Bottom title */

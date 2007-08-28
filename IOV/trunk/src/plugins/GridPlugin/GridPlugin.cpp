@@ -300,53 +300,25 @@ void GridPlugin::focusChanged(ViewerPtr viewer)
    {
       if ( mActivateBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mActivateBtn.toString(),
-                                              mActivateText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mActivateBtn.toString(),
-                                              mActivateText, 1);
-         }
+         status_panel_data->addControlText(mActivateBtn.toString(),
+                                           mActivateText, 1);
       }
 
       if ( mCycleBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mCycleBtn.toString(),
-                                              mCycleText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mCycleBtn.toString(),
-                                              mCycleText, 1);
-         }
+         status_panel_data->addControlText(mCycleBtn.toString(), mCycleText,
+                                           1);
       }
 
       if ( mHideBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mHideBtn.toString(), mHideText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mHideBtn.toString(), mHideText,
-                                              1);
-         }
+         status_panel_data->addControlText(mHideBtn.toString(), mHideText, 1);
       }
 
       if ( mResetBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mResetBtn.toString(),
-                                              mResetText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mResetBtn.toString(),
-                                              mResetText, 1);
-         }
+         status_panel_data->addControlText(mResetBtn.toString(), mResetText,
+                                           1);
       }
    }
 }

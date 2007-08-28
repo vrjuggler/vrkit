@@ -256,10 +256,6 @@ viewer::PluginPtr StatusPanelPlugin::init(ViewerPtr viewer)
       boost::bind(&StatusPanel::removeControlText, &mStatusPanel, _1, _2)
    );
 
-   status_panel_data->hasControlText.connect(
-      boost::bind(&StatusPanel::hasControlText, &mStatusPanel, _1, _2)
-   );
-
    status_panel_data->addStatusMessage.connect(
       boost::bind(&StatusPanel::addStatusMessage, &mStatusPanel, _1)
    );

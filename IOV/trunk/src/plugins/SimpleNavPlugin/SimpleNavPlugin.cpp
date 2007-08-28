@@ -189,53 +189,25 @@ void SimpleNavPlugin::focusChanged(ViewerPtr viewer)
    {
       if ( mForBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mForBtn.toString(),
-                                              mForwardText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mForBtn.toString(),
-                                              mForwardText, 1);
-         }
+         status_panel_data->addControlText(mForBtn.toString(), mForwardText,
+                                           1);
       }
 
       if ( mRevBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mRevBtn.toString(),
-                                              mReverseText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mRevBtn.toString(),
-                                              mReverseText, 1);
-         }
+         status_panel_data->addControlText(mRevBtn.toString(), mReverseText,
+                                           1);
       }
 
       if ( mRotateBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mRotateBtn.toString(),
-                                              mRotateText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mRotateBtn.toString(),
-                                              mRotateText, 1);
-         }
+         status_panel_data->addControlText(mRotateBtn.toString(), mRotateText,
+                                           1);
       }
 
       if ( mModeBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mModeBtn.toString(), mModeText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mModeBtn.toString(), mModeText,
-                                              1);
-         }
+         status_panel_data->addControlText(mModeBtn.toString(), mModeText, 1);
       }
    }
 }

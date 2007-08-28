@@ -218,14 +218,7 @@ void PickPlugin::focusChanged(ViewerPtr viewer)
       ScenePtr scene = viewer->getSceneObj();
       StatusPanelDataPtr status_panel_data =
          scene->getSceneData<StatusPanelData>();
-
-      const bool has =
-         status_panel_data->hasControlText(mPickBtn.toString(), mPickText);
-
-      if ( ! has )
-      {
-         status_panel_data->addControlText(mPickBtn.toString(), mPickText, 1);
-      }
+      status_panel_data->addControlText(mPickBtn.toString(), mPickText, 1);
    }
    else if ( ! isFocused() )
    {

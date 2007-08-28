@@ -73,10 +73,13 @@ void StatusPanel::addControlText(const std::string& cmdText,
                                  const std::string& desc,
                                  const unsigned int)
 {
-   // XXX: I don't know how to make a robust priority queue that allows
-   // iteration.
-   mCenterText[cmdText].push_back(desc);
-   mChangeSignal();
+   if ( ! hasControlText(cmdText, desc) )
+   {
+      // XXX: I don't know how to make a robust priority queue that allows
+      // iteration.
+      mCenterText[cmdText].push_back(desc);
+      mChangeSignal();
+   }
 }
 
 void StatusPanel::removeControlText(const std::string& cmdText,
@@ -110,6 +113,22 @@ void StatusPanel::setStatusHistorySize(const unsigned int size)
    }
 
    mChangeSignal();
+}
+
+bool StatusPanel::hasControlText(const std::string& cmdText,
+                                 const std::string& desc)
+   const
+{
+   bool flag(false);
+
+   if ( mCenterText.count(cmdText) != 0 )
+   {
+      const std::vector<std::string>& vec =
+         (*mCenterText.find(cmdText)).second;
+      flag = std::find(vec.begin(), vec.end(), desc) != vec.end();
+   }
+
+   return flag;
 }
 
 } // namespace vrkit

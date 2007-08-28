@@ -267,66 +267,31 @@ void WandNavPlugin::focusChanged(ViewerPtr viewer)
    {
       if ( mForwardBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mForwardBtn.toString(),
-                                              mForwardText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mForwardBtn.toString(),
-                                              mForwardText, 1);
-         }
+         status_panel_data->addControlText(mForwardBtn.toString(),
+                                           mForwardText, 1);
       }
 
       if ( mReverseBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mReverseBtn.toString(),
-                                              mReverseText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mReverseBtn.toString(),
-                                              mReverseText, 1);
-         }
+         status_panel_data->addControlText(mReverseBtn.toString(),
+                                           mReverseText, 1);
       }
 
       if ( mRotateBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mRotateBtn.toString(),
-                                              mRotateText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mRotateBtn.toString(),
-                                              mRotateText, 1);
-         }
+         status_panel_data->addControlText(mRotateBtn.toString(), mRotateText,
+                                           1);
       }
 
       if ( mModeBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mModeBtn.toString(), mModeText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mModeBtn.toString(), mModeText,
-                                              1);
-         }
+         status_panel_data->addControlText(mModeBtn.toString(), mModeText, 1);
       }
 
       if ( mResetBtn.isConfigured() )
       {
-         const bool has =
-            status_panel_data->hasControlText(mResetBtn.toString(),
-                                              mResetText);
-
-         if ( ! has )
-         {
-            status_panel_data->addControlText(mResetBtn.toString(),
-                                              mResetText, 1);
-         }
+         status_panel_data->addControlText(mResetBtn.toString(), mResetText,
+                                           1);
       }
    }
 }
