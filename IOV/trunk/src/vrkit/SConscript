@@ -71,11 +71,8 @@ elif ffdshow_ffmpeg.isAvailable():
    have_ffmpeg = True
    ffdshow_ffmpeg.verbose = True
    ffdshow_ffmpeg.apply(env)
-   env.AppendUnique(CPPDEFINES = ['VRKIT_WITH_FFMPEG_FFDSHOW'])
-   # These are added using LINKFLAGS rather than LIBS so that SCons does not
-   # append ".lib" to each library name.
-   # XXX: Is there a better way to do this?
-   env.AppendUnique(LINKFLAGS = ['libavcodec.lib'])
+   env.AppendUnique(CPPDEFINES = ['VRKIT_WITH_FFMPEG_FFDSHOW'],
+                    LIBS = ['libavcodec'])
 
 if "win32" == platform:
    # To compile against the FFmpeg libraries with Visual C++, we have to be
