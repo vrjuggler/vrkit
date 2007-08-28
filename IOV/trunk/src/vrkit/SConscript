@@ -75,7 +75,7 @@ elif ffdshow_ffmpeg.isAvailable():
    # These are added using LINKFLAGS rather than LIBS so that SCons does not
    # append ".lib" to each library name.
    # XXX: Is there a better way to do this?
-   env.AppendUnique(LINKFLAGS = ['libavformat.lib'])
+   env.AppendUnique(LINKFLAGS = ['libavcodec.lib'])
 
 if "win32" == platform:
    # To compile against the FFmpeg libraries with Visual C++, we have to be
