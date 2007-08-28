@@ -109,6 +109,15 @@ ffmpeg_options = \
                                                                False, True)
 
 if "win32" == platform:
+   opts.AddOption(
+      sca_opts.BoolOption("enable_vfw", "Enable the use of Video for Windows",
+                          True)
+   )
+   opts.AddOption(
+      sca_opts.BoolOption("enable_dshow", "Enable the use of DirectShow",
+                          True)
+   )
+
    opts.Add("platform_sdk", "Microsoft Platform SDK location",
             default = r"C:\Program Files\Microsoft Platform SDK")
 
