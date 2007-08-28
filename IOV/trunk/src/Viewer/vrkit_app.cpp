@@ -71,10 +71,6 @@
 
 #include <vrkit/Status.h>
 
-// Video includes.
-#include <vrkit/video/Recorder.h>
-#include <vrkit/video/Encoder.h>
-
 
 #if __VJ_version < 2003002
 namespace vrj
@@ -141,18 +137,6 @@ public:
       mFileName = filename;
    }
 
-   void setVideoFilename(const std::string& filename)
-   {
-      mVideoFileName = filename;
-      // If the user passed in a filename they want to record!
-      mUseVidRec = true;
-   }
-
-   void setVideoCodec(const std::string& codec)
-   {
-      mVideoCodec = codec;
-   }
-
 protected:
    void initGl();
 
@@ -162,8 +146,6 @@ protected:
       , mSceneObjTypeName("StaticSceneObject")
       , mMatChooserWidth(1.0f)  // 1 foot wide
       , mMatChooserHeight(1.5f) // 1.5 feet tall
-      , mUseVidRec(false)
-      , mVideoCodec("mpeg4")
    {
       /* Do nothing. */ ;
    }
@@ -194,23 +176,11 @@ protected:
    vrkit::widget::MaterialChooserPtr mMaterialChooser; /**< The chooser we are using. */
    OSG::MaterialPoolPtr              mMaterialPool;
    //@}
-
-   bool                         mUseVidRec;
-   vrkit::video::RecorderPtr    mVideoRecorder;
-   std::string                  mVideoFileName;
-   std::string                  mVideoCodec;
 };
 
 void OpenSgViewer::contextInit()
 {
    vrkit::Viewer::contextInit();
-
-   if(mUseVidRec)
-   {
-      // Context specific data. Should be one copy per context
-      context_data* c_data = &(*mContextData);
-      mVideoRecorder->contextInit(c_data->mWin);
-   }
 
    initGl();
 }
@@ -241,21 +211,6 @@ void OpenSgViewer::draw()
 void OpenSgViewer::contextPreDraw()
 {
    vrkit::Viewer::contextPreDraw();
-
-   if(mUseVidRec)
-   {
-      context_data* c_data = &(*mContextData);
-
-      vrkit::UserPtr vrkit_user = getUser();
-
-      OSG::Matrix4f head_trans;
-      gmtl::set(head_trans,
-                vrkit_user->getHeadProxy()->getData(getDrawScaleFactor()));
-
-      c_data->mRenderAction->setWindow(c_data->mWin.getCPtr());
-
-      mVideoRecorder->render(c_data->mRenderAction, head_trans);
-   }
 }
 
 void OpenSgViewer::deallocate()
@@ -266,11 +221,6 @@ void OpenSgViewer::deallocate()
    mMaterialPool    = OSG::NullFC;
    mHighlighter     = vrkit::util::BasicHighlighterPtr();
    mSoundPlayer     = vrkit::util::EventSoundPlayerPtr();
-   if(mUseVidRec)
-   {
-      mVideoRecorder->endRecording();
-      mVideoRecorder = vrkit::video::RecorderPtr();
-   }
 }
 
 vrkit::event::ResultType OpenSgViewer::
@@ -343,8 +293,13 @@ void OpenSgViewer::init()
    else
    {
       std::cout << "Loading scene: " << mFileName << std::endl;
-      model_root =
-         OSG::SceneFileHandler::the().read((OSG::Char8*) (mFileName.c_str()));
+      model_root = OSG::SceneFileHandler::the().read(mFileName.c_str());
+
+      if ( OSG::NullFC == model_root )
+      {
+         std::cerr << "FATAL ERROR: Failed to load " << mFileName << "!\n";
+         std::exit(-2);
+      }
    }
 
    mMaterialPool = OSG::MaterialPool::create();
@@ -438,85 +393,6 @@ void OpenSgViewer::init()
 
       // Register object for intersection.
       addObject(model_obj);
-   }
-
-   mVideoRecorder = vrkit::video::RecorderPtr(); // Init when not using vidcam
-
-   if(mUseVidRec)
-   {
-      mVideoRecorder = vrkit::video::Recorder::create()->init();
-      mVideoRecorder->setFilename(mVideoFileName);
-      //mVideoRecorder->setFrameSize(1024, 768);
-      //mVideoRecorder->setStereo(true);
-      vrkit::video::Encoder::container_format_list_t formats =
-         mVideoRecorder->getAvailableFormats();
-
-#if 1
-      // Debug code for printing out all choices. Should get relocated to Encoder?
-      std::cout << "Encoding Format Choices" << std::endl;
-      std::cout << formats.size() << " choices.." << std::endl;
-      std::cout << "-------------------------------------" << std::endl;
-      typedef vrkit::video::Encoder::container_format_list_t::const_iterator
-         iter_type;
-      for ( iter_type i = formats.begin(); i != formats.end(); ++i )
-      {
-	 std::cout << (*i).mFormatLongName << std::endl;
-	 std::cout << "  id         : " << (*i).mFormatName << std::endl;
-	 std::cout << "  encoder    : " << (*i).mEncoderName << std::endl;
-	 std::cout << "  codecs     :" << std::endl;
-	 if( 0 == (*i).mCodecList.size() )
-	 {
-	    std::cout << "               default" << std::endl;
-	 }
-	 else
-	 {
-            typedef vrkit::video::Encoder::codec_list_t::const_iterator
-               codec_iter_type;
-            for ( codec_iter_type j = (*i).mCodecList.begin();
-                  j != (*i).mCodecList.end();
-                  ++j )
-	    {
-	       std::cout << "               " << (*j) << std::endl;
-	    }
-	 }
-	 std::cout << "  extensions :" << std::endl;
-         typedef std::vector<std::string>::const_iterator ext_iter_type;
-         for ( ext_iter_type j = (*i).mFileExtensions.begin();
-               j != (*i).mFileExtensions.end();
-               ++j )
-	 {
-	    std::cout << "               " << (*j) << std::endl;
-	 }
-      std::cout << "-------------------------------------" << std::endl;
-      }
-#endif
-
-      vrkit::video::EncoderManager::video_encoder_format_t config;
-      //config.mEncoderName = "FFmpegEncoder";
-      //config.mContainerFormat = "avi";
-      //config.mCodec = "mpeg4";
-      // XXX: How to pick defaults?
-      config.mEncoderName = formats[0].mEncoderName;
-      config.mContainerFormat = formats[0].mFormatName;
-      config.mCodec = "";
-      mVideoRecorder->setFormat(config);
-
-      mVideoRecorder->startRecording();
-
-      OSG::NodePtr frame_root = mVideoRecorder->getFrame();
-
-      // Create the test plane to put the texture on.
-      OSG::NodePtr plane_root = mVideoRecorder->getDebugPlane();
-
-      OSG::GroupNodePtr decorator_root = scene->getDecoratorRoot();
-      OSG::beginEditCP(decorator_root);
-	 decorator_root.node()->addChild(plane_root);
-	 decorator_root.node()->addChild(frame_root);
-      OSG::endEditCP(decorator_root);
-
-      // Ensure that this is called after anythin that effects getScene().
-      // VR Juggler normally calls this each frame before rendering.
-      mVideoRecorder->setSceneRoot(getScene());
    }
 }
 
@@ -651,12 +527,6 @@ int main(int argc, char* argv[])
          ("file,f",
           po::value<std::string>()->default_value("data/scenes/test_scene.osb"),
           "File to load in scene")
-         ("video-file,v",
-          po::value<std::string>()->composing(),
-          "File to save video to.")
-         ("video-codec,c",
-          po::value<std::string>()->composing(),
-          "Codec to encode video with.")
       ;
 
       po::options_description cmdline_options;
@@ -767,20 +637,6 @@ int main(int argc, char* argv[])
       {
          std::string filename = vm["file"].as<std::string>();
          app->setFilename(filename);
-      }
-
-      if (vm.count("video-file") != 0)
-      {
-	 std::cout << "Setting video file name!" << std::endl;
-	 std::string video_file = vm["video-file"].as<std::string>();
-	 app->setVideoFilename(video_file);
-      }
-
-      if (vm.count("video-codec") != 0)
-      {
-	 std::cout << "Setting video codec!" << std::endl;
-	 std::string video_codec = vm["video-codec"].as<std::string>();
-	 app->setVideoCodec(video_codec);
       }
 
       VRKIT_STATUS << "Starting the kernel." << std::endl;

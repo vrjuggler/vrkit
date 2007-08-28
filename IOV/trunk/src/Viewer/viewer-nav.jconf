@@ -141,18 +141,26 @@
       <mode_switch_plugin name="Mode Switch Plug-in" version="2">
          <swap_button_nums>3^</swap_button_nums>
          <plugins>
-            <mode_plugin_def name="Nav Plugin" version="1">
+            <mode_plugin_def name="Nav Plug-in" version="1">
                <plugin>WandNavPlugin</plugin>
                <active_modes>0</active_modes>
             </mode_plugin_def>
          </plugins>
          <plugins>
-            <mode_plugin_def name="Grab Plugin" version="1">
+            <mode_plugin_def name="Grab Plug-in" version="1">
                <plugin>GrabPlugin</plugin>
                <active_modes>0</active_modes>
             </mode_plugin_def>
          </plugins>
+         <plugins>
+            <mode_plugin_def name="Video Capture Plug-in" version="1">
+               <plugin>VideoCapturePlugin</plugin>
+               <active_modes>0</active_modes>
+               <active_modes>1</active_modes>
+            </mode_plugin_def>
+         </plugins>
          <mode_names>Navigation/Grab Mode</mode_names>
+         <mode_names>Video Capture Mode</mode_names>
       </mode_switch_plugin>
       <status_panel_plugin name="StatusPanel" version="2">
          <grab_command_exp />
@@ -232,6 +240,31 @@
          <grab_button_nums>0^</grab_button_nums>
          <release_button_nums>0^</release_button_nums>
       </single_object_grab_strategy>
+      <vrkit_video_capture_plugin name="Video Capture Plug-in" version="1">
+         <output_file>vrkit_movie.avi</output_file>
+         <encoder>FFmpeg</encoder>
+         <codec></codec>
+         <resolution>1024</resolution>
+         <resolution>768</resolution>
+         <fov>60.0</fov>
+         <fps>60</fps>
+         <stereo_recording>false</stereo_recording>
+         <show_view_frame>true</show_view_frame>
+         <view_frame_distance>5.0</view_frame_distance>
+         <view_frame_border_size>0.25</view_frame_border_size>
+         <show_debug_frame>false</show_debug_frame>
+         <debug_frame_translation>0.0</debug_frame_translation>
+         <debug_frame_translation>0.0</debug_frame_translation>
+         <debug_frame_translation>0.0</debug_frame_translation>
+         <debug_frame_rotation>0.0</debug_frame_rotation>
+         <debug_frame_rotation>0.0</debug_frame_rotation>
+         <debug_frame_rotation>0.0</debug_frame_rotation>
+         <camera_proxy>VJWand</camera_proxy>
+         <start_command_exp>4^</start_command_exp>
+         <pause_command_exp />
+         <resume_command_exp />
+         <stop_command_exp>5^</stop_command_exp>
+      </vrkit_video_capture_plugin>
    </elements>
 </configuration>
 
