@@ -231,7 +231,7 @@ static void show_formats(void)
             long_name ? long_name:" ");
 	   for(unsigned int i = 0; i < code_tags.size(); i++)
 	   {
-	       std::cout << "       " << code_tags[i] << std::endl;
+	       VRKIT_STATUS << "       " << code_tags[i] << std::endl;
 	   }
 	 }
     }
@@ -363,7 +363,7 @@ EncoderPtr EncoderFFmpeg::init()
 void EncoderFFmpeg::startEncoding()
 {
 #if defined(VRKIT_DEBUG)
-   std::cout << "Creating a encoder. file: " << getFilename()
+   VRKIT_STATUS << "Creating a encoder. file: " << getFilename()
              << " w: " << getWidth() << " h: " << getHeight() << std::endl;
 #endif
 
@@ -385,8 +385,8 @@ void EncoderFFmpeg::startEncoding()
 
       if ( NULL == mFormatOut )
       {
-         std::cout << "Container format invalid or not specified. Falling back to..." << std::endl;
-         std::cout << "Trying to guess container format from filename: " << getFilename() << std::endl;
+         VRKIT_STATUS << "Container format invalid or not specified. Falling back to..." << std::endl;
+         VRKIT_STATUS << "Trying to guess container format from filename: " << getFilename() << std::endl;
          mFormatOut = guess_format(NULL, getFilename().c_str(), NULL);
       }
 
@@ -433,7 +433,7 @@ void EncoderFFmpeg::startEncoding()
       if ( NULL == codec )
       {
 #if defined(VRKIT_DEBUG)
-         std::cout << "Invalid codec specified for this container. "
+         VRKIT_STATUS << "Invalid codec specified for this container. "
                    << "Falling back to default." << std::endl;
 #endif
          codec = avcodec_find_encoder(mFormatOut->video_codec);
@@ -859,7 +859,7 @@ void EncoderFFmpeg::writeFrame(vpr::Uint8* data)
       throw RecordingException("Error while writing frame.", VRKIT_LOCATION);
    }
 
-   //std::cout << "frame: " << mFrameCount << std::endl;
+   //VRKIT_STATUS << "frame: " << mFrameCount << std::endl;
    ++mFrameCount;
 }
 
