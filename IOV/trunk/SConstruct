@@ -118,6 +118,29 @@ if "win32" == platform:
                           True)
    )
 
+   # Options related to using FFmpeg compiled for use with MinGW.
+   opts.Add(
+      "mingw",
+      "MinGW installation directory (only needed if using FFmpeg from MinGW)."
+   )
+   opts.Add(
+      "mingw_gcc_lib",
+      "Directory containing MinGW libgcc.a (only needed if using FFmpeg from MinGW)."
+   )
+
+   mingw_ffmpeg = \
+      sca_opts.StandardPackageOption("mingw_ffmpeg", 
+                                     "Use FFmpeg build for MinGW use.")
+   opts.AddOption(mingw_ffmpeg)
+   Export('mingw_ffmpeg')
+
+   # Options related to using FFmpeg compiled for use with ffdshow.
+   ffdshow_ffmpeg = \
+      sca_opts.StandardPackageOption("ffdshow_ffmpeg", 
+                                     "Use FFmpeg from ffdshow.")
+   opts.AddOption(ffdshow_ffmpeg)
+   Export('ffdshow_ffmpeg')
+
    opts.Add("platform_sdk", "Microsoft Platform SDK location",
             default = r"C:\Program Files\Microsoft Platform SDK")
 

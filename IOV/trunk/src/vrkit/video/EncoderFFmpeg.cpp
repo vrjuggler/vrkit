@@ -24,8 +24,6 @@
 #  define uint64_t_C(c)    (c ## ULL)
 #endif
 
-#include <stdint.h>
-
 #ifndef INT64_C
 #  define INT64_C(c)      (c ## LL)
 #  define UINT64_C(c)     (c ## ULL)
@@ -415,8 +413,8 @@ void EncoderFFmpeg::startEncoding()
       }
       mFormatContext->oformat = mFormatOut;
       mFormatContext->max_delay = (int)(0.7 * AV_TIME_BASE);
-      snprintf(mFormatContext->filename, sizeof(mFormatContext->filename),
-               "%s", getFilename().c_str());
+      std::strncpy(mFormatContext->filename, getFilename().c_str(),
+                   sizeof(mFormatContext->filename));
 
       // Add the audio and video streams using the default format codecs
       // and initialize the codecs.

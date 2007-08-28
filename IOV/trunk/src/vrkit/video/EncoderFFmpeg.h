@@ -23,7 +23,9 @@
 
 #include <vrkit/Config.h>
 
+#include <stdint.h>
 #include <string>
+
 #include <vpr/vprTypes.h>
 
 #include <vrkit/video/Encoder.h>

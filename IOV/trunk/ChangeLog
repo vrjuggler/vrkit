@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-28 patrick  vrkit::video::EncoderFFmpeg now works on Windows.
+                    -- VERSION -- 0.47.2
 2007-08-27 patrick  Replaced vrkit::Viewer::getRenderAction() with
                     vrkit::Viewer::getContextData().
                     -- VERSION -- 0.47.1
