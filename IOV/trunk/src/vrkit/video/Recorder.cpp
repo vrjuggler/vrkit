@@ -392,9 +392,6 @@ void Recorder::generateDebugFrame()
    OSG::Real32 frame_height = 2.0 * (OSG::osgtan(mCamera->getFov()/2.0) * mFrameDist);
    OSG::Real32 frame_width = frame_height * mCamera->getAspect();
 
-   std::cout << "height: " << frame_height << "  width: " << frame_width << std::endl;
-   std::cout << "scale: " << mDrawScale << std::endl;
-
    // =============
    // |           |
    // |           |
