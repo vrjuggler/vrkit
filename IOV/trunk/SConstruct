@@ -98,14 +98,19 @@ boost_options = SConsAddons.Options.Boost.Boost("boost", "1.33.0",
                                                 autoLink = True)
 
 vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("VR Juggler", "2.0.1")
-opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.6.0",
-                                                   required = True, useCppPath=True)
+opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.8.0",
+                                                   required = True,
+                                                   useCppPath = True)
 
-ffmpeg_options = SConsAddons.Options.FlagPollBasedOption.FlagPollBasedOption("AvFormat", "libavformat", "51.0.0", False, True)
+ffmpeg_options = \
+   SConsAddons.Options.FlagPollBasedOption.FlagPollBasedOption("AvFormat",
+                                                               "libavformat",
+                                                               "51.0.0",
+                                                               False, True)
 
 if "win32" == platform:
    opts.Add("platform_sdk", "Microsoft Platform SDK location",
-      default=r"C:\Program Files\Microsoft Platform SDK")
+            default = r"C:\Program Files\Microsoft Platform SDK")
 
 Export('boost_options','opensg_options', 'ffmpeg_options', 'vrj_options')
 
