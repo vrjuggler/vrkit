@@ -40,5 +40,72 @@
       </property>
       <upgrade_transform />
    </definition_version>
+   <definition_version version="2" label="vrkit Viewer Application">
+      <abstract>false</abstract>
+      <help />
+      <category>/vrkit/</category>
+      <property valuetype="boolean" variable="false" name="enable_grabbing">
+         <help>Enable/disable grabbing scene objects.</help>
+         <value label="Enable Grabbing?" defaultvalue="true"/>
+      </property>
+      <property valuetype="string" variable="true" name="core_type">
+         <help>Identifies a node core type that identifies an object suitable for user interaction. Node core types are things such as "Transform" or "MaterialGroup". Invalid types will be filtered out automatically.</help>
+         <value label="Node Core Type" defaultvalue="Transform"/>
+      </property>
+      <property valuetype="boolean" variable="false" name="use_material_chooser">
+         <help>Enable/disable the use of the material chooser frame.</help>
+         <value label="Use Material Chooser?" defaultvalue="false"/>
+      </property>
+      <property valuetype="float" variable="false" name="chooser_initial_size">
+         <help>Initial size of the material chooser panel in feet.</help>
+         <value label="Width (Feet)" defaultvalue="2.0"/>
+         <value label="Height (Feet)" defaultvalue="3.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="chooser_initial_position">
+         <help>Initial position of the lower left corner of the material chooser panel.</help>
+         <value label="X (Feet)" defaultvalue="0.0"/>
+         <value label="Y (Feet)" defaultvalue="0.0"/>
+         <value label="Z (Feet)" defaultvalue="0.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="chooser_initial_rotation">
+         <help>Initial rotation of the material chooser panel.</help>
+         <value label="X Rotation" defaultvalue="0.0"/>
+         <value label="Y Rotation" defaultvalue="0.0"/>
+         <value label="Z Rotation" defaultvalue="0.0"/>
+      </property>
+      <upgrade_transform>
+         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jconf="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" version="1.0">
+            <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
+            <xsl:variable name="jconf">http://www.vrjuggler.org/jccl/xsd/3.0/configuration</xsl:variable>
+
+            <xsl:template match="/">
+                <xsl:apply-templates/>
+            </xsl:template>
+
+            <xsl:template match="jconf:vrkit_app">
+               <xsl:element namespace="{$jconf}" name="vrkit_app">
+                  <xsl:attribute name="name">
+                     <xsl:value-of select="@name"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="version">2</xsl:attribute>
+                  <xsl:copy-of select="./jconf:enable_grabbing" />
+                  <xsl:element namespace="{$jconf}" name="core_type">
+                     <xsl:text>Transform</xsl:text>
+                  </xsl:element>
+                  <xsl:copy-of select="./jconf:use_material_chooser" />
+                  <xsl:for-each select="./jconf:chooser_initial_size">
+                     <xsl:copy-of select="." />
+                  </xsl:for-each>
+                  <xsl:for-each select="./jconf:chooser_initial_position">
+                     <xsl:copy-of select="." />
+                  </xsl:for-each>
+                  <xsl:for-each select="./jconf:chooser_initial_rotation">
+                     <xsl:copy-of select="." />
+                  </xsl:for-each>
+               </xsl:element>
+            </xsl:template>
+         </xsl:stylesheet>
+      </upgrade_transform>
+   </definition_version>
 </definition>
 

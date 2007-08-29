@@ -16,9 +16,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <stdlib.h>
+#include <cstdlib>
+#include <vector>
 #include <boost/program_options.hpp>
-
 #include <boost/bind.hpp>
 
 #include <OpenSG/OSGNode.h>
@@ -59,12 +59,13 @@
 #include <vrkit/scenedata/EventData.h>
 #include <vrkit/User.h>
 #include <vrkit/Scene.h>
+#include <vrkit/DynamicSceneObject.h>
 #include <vrkit/DynamicSceneObjectTransform.h>
-#include <vrkit/StaticSceneObject.h>
 #include <vrkit/WandInterface.h>
 #include <vrkit/Exception.h>
 #include <vrkit/util/BasicHighlighter.h>
 #include <vrkit/util/EventSoundPlayer.h>
+#include <vrkit/util/CoreTypePredicate.h>
 
 #include <vrkit/widget/MaterialChooser.h>
 #include <vrkit/scenedata/WidgetData.h>
@@ -143,7 +144,6 @@ protected:
    OpenSgViewer()
       : vrkit::Viewer()
       , mEnableGrab(true)
-      , mSceneObjTypeName("StaticSceneObject")
       , mMatChooserWidth(1.0f)  // 1 foot wide
       , mMatChooserHeight(1.5f) // 1.5 feet tall
    {
@@ -164,8 +164,8 @@ protected:
 
    /** @name Scene Object Handling */
    //@{
-   bool        mEnableGrab;
-   std::string mSceneObjTypeName;
+   bool mEnableGrab;
+   std::vector<OSG::FieldContainerType*> mCoreTypes;
    //@}
 
    /** @name Material Chooser Properties */
@@ -306,19 +306,6 @@ void OpenSgViewer::init()
    mMaterialPool->add(model_root);
    mMaterialChooser->setMaterialPool(mMaterialPool);
 
-   OSG::TransformPtr model_xform_core = OSG::Transform::create();
-   OSG::beginEditCP(model_xform_core, OSG::Transform::MatrixFieldMask);
-      OSG::Matrix model_pos;
-      model_xform_core->setMatrix(model_pos);
-   OSG::endEditCP(model_xform_core, OSG::Transform::MatrixFieldMask);
-
-   OSG::TransformNodePtr model_xform = OSG::TransformNodePtr(model_xform_core);
-   OSG::setName(model_xform.node(), "Model Xform");
-
-   OSG::beginEditCP(model_xform);
-      model_xform.node()->addChild(model_root);
-   OSG::endEditCP(model_xform);
-
    // --- Light setup --- //
    // - Add directional light for scene
    // - Create a beacon for it and connect to that beacon
@@ -359,7 +346,7 @@ void OpenSgViewer::init()
    // --- Setup Scene -- //
    // add the loaded scene to the light node, so that it is lit by the light
    OSG::beginEditCP(light_node);
-      light_node->addChild(model_xform);
+      light_node->addChild(model_root);
    OSG::endEditCP(light_node);
 
    // create the root part of the scene
@@ -372,27 +359,11 @@ void OpenSgViewer::init()
 
    if ( mEnableGrab )
    {
-      vrkit::SceneObjectPtr model_obj;
-
-      if ( mSceneObjTypeName == "StaticSceneObject" )
-      {
-         model_obj = makeSceneObject<vrkit::StaticSceneObject>(model_xform);
-      }
-      else if ( mSceneObjTypeName == "DynamicSceneObject" )
-      {
-         model_obj =
-            makeSceneObject<vrkit::DynamicSceneObjectTransform>(model_xform);
-      }
-      else
-      {
-         VRKIT_STATUS << "ERROR: Invalid scene object type name '"
-                      << mSceneObjTypeName << "'" << std::endl
-                      << "Falling back on StaticSceneObject" << std::endl;
-         model_obj = makeSceneObject<vrkit::StaticSceneObject>(model_xform);
-      }
-
-      // Register object for intersection.
-      addObject(model_obj);
+      // Register object for intersection and grabbing.
+      vrkit::util::CoreTypePredicate pred(mCoreTypes);
+      addObject(
+         vrkit::DynamicSceneObject::create()->init(model_root, pred, true)
+      );
    }
 }
 
@@ -435,7 +406,7 @@ void OpenSgViewer::initGl()
 
 void OpenSgViewer::configure(jccl::ConfigElementPtr cfgElt)
 {
-   const unsigned int req_cfg_ver(1);
+   const unsigned int req_cfg_ver(2);
 
    if ( cfgElt->getVersion() < req_cfg_ver )
    {
@@ -449,14 +420,32 @@ void OpenSgViewer::configure(jccl::ConfigElementPtr cfgElt)
    }
 
    const std::string enable_grab_prop("enable_grabbing");
-   const std::string scene_obj_type_prop("scene_object_type");
+   const std::string core_type_prop("core_type");
    const std::string use_mchooser_prop("use_material_chooser");
    const std::string initial_size_prop("chooser_initial_size");
    const std::string initial_pos_prop("chooser_initial_position");
    const std::string initial_rot_prop("chooser_initial_rotation");
 
-   mEnableGrab       = cfgElt->getProperty<bool>(enable_grab_prop);
-   mSceneObjTypeName = cfgElt->getProperty<std::string>(scene_obj_type_prop);
+   mEnableGrab = cfgElt->getProperty<bool>(enable_grab_prop);
+
+   const unsigned int num_types = cfgElt->getNum(core_type_prop);
+   for ( unsigned int i = 0; i < num_types; ++i )
+   {
+      const std::string type_name = 
+         cfgElt->getProperty<std::string>(core_type_prop, i);
+      OSG::FieldContainerType* fct =
+         OSG::FieldContainerFactory::the()->findType(type_name.c_str());
+
+      if ( NULL != fct )
+      {
+         mCoreTypes.push_back(fct);
+      }
+      else
+      {
+         VRKIT_STATUS << "Skipping unknown type '" << type_name << "'"
+                      << std::endl;
+      }
+   }
 
    const float width  = cfgElt->getProperty<float>(initial_size_prop, 0);
    const float height = cfgElt->getProperty<float>(initial_size_prop, 1);

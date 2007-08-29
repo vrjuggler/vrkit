@@ -219,9 +219,9 @@
          <grab_shader_scale>1.0</grab_shader_scale>
          <grab_shader_exponent>1.0</grab_shader_exponent>
       </basic_highlighter>
-      <vrkit_app name="Basic Viewer Application" version="1">
+      <vrkit_app name="vrkit Application" version="2">
          <enable_grabbing>true</enable_grabbing>
-         <scene_object_type>StaticSceneObject</scene_object_type>
+         <core_type>Transform</core_type>
          <use_material_chooser>false</use_material_chooser>
          <chooser_initial_size>2.0</chooser_initial_size>
          <chooser_initial_size>3.0</chooser_initial_size>
@@ -243,7 +243,7 @@
       <vrkit_video_capture_plugin name="Video Capture Plug-in" version="1">
          <output_file>vrkit_movie.avi</output_file>
          <encoder>FFmpeg</encoder>
-         <codec></codec>
+         <codec />
          <resolution>1024</resolution>
          <resolution>768</resolution>
          <fov>60.0</fov>
