@@ -29,6 +29,7 @@
 
 #include <OpenSG/OSGBaseTypes.h>
 
+#include <vrj/vrjParam.h>
 #include <vrj/Kernel/Kernel.h>
 
 #include <vrkit/ExitCodes.h>
@@ -64,7 +65,15 @@ int main(int argc, char* argv[])
    std::string root_name;
    std::string mask_str;
 
+   vrj::Kernel* kernel  = vrj::Kernel::instance();
+
    po::options_description generic("Generic options");
+#if __VJ_version >= 2003000
+   po::options_description& general_desc = kernel->getGeneralOptions();
+   po::options_description& cluster_desc = kernel->getClusterOptions();
+   generic.add(general_desc).add(cluster_desc);
+#endif
+
    generic.add_options()
       ("version,v", "print version string")
       ("help", "produce help message")
@@ -126,7 +135,10 @@ int main(int argc, char* argv[])
          return vrkit::EXIT_ERR_MISSING_ADDR;
       }
 
-      vrj::Kernel* kernel  = vrj::Kernel::instance();
+#if __VJ_version >= 2003000
+      // Intialize the kernel before loading config files.
+      kernel->init(vm);
+#endif
 
       if ( vm.count("jconf") == 0 )
       {
