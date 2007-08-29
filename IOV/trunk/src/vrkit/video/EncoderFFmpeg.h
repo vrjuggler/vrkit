@@ -128,10 +128,10 @@ private:
    AVFrame*          mYuvFrame;
    AVFrame*          mRgbFrame;
 
-   unsigned char*     mAudioOutBuffer;
-   unsigned int       mAudioOutBufferSize;
-   int                audio_input_frame_size;
-   int16_t*           mAudioSamples;
+   unsigned char*    mAudioOutBuffer;
+   unsigned int      mAudioOutBufferSize;
+   int               audio_input_frame_size;
+   int16_t*          mAudioSamples;
    unsigned char*    mVideoOutBuffer;
    unsigned int      mVideoOutBufferSize;
    unsigned int      mFrameCount;

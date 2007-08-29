@@ -113,13 +113,13 @@ void CameraFBO::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
    if( OSG::NullFC != mFboVP)
    {
       Camera::setSize(width, height);
-      
+
       // Make sure this isn't the camera calling setsize from init
       // Resize the viewport.
       OSG::beginEditCP(mFboVP);
-	 mFboVP->setSize(0, 0, width - 1, height - 1);
-	 mFboVP->setStorageWidth(width);
-	 mFboVP->setStorageHeight(height);
+         mFboVP->setSize(0, 0, width - 1, height - 1);
+         mFboVP->setStorageWidth(width);
+         mFboVP->setStorageHeight(height);
       OSG::endEditCP(mFboVP);
    }
 }
@@ -134,7 +134,7 @@ void CameraFBO::render(OSG::RenderAction* ra)
    glClear(GL_DEPTH_BUFFER_BIT);
    glPushAttrib(GL_ALL_ATTRIB_BITS);
       glPushMatrix();
-	 mFboVP->render(ra);
+         mFboVP->render(ra);
       glPopMatrix();
    glPopAttrib();
 

@@ -158,143 +158,162 @@ void EncoderFFmpeg::stopEncoding()
 
 static void show_formats(void)
 {
-    AVInputFormat *ifmt;
-    AVOutputFormat *ofmt;
-    AVCodec *p, *p2;
-    const char *last_name;
+   AVInputFormat *ifmt;
+   AVOutputFormat *ofmt;
+   AVCodec *p, *p2;
+   const char *last_name;
 
-    printf("File formats:\n");
-    last_name= "000";
-    for(;;){
-        int decode=0;
-        int encode=0;
-        const char *name=NULL;
-        const char *long_name=NULL;
-   const char *exts=NULL;
-   std::vector<std::string> code_tags;
-
-        for(ofmt = ::first_oformat; ofmt != NULL; ofmt = ofmt->next) {
-            if((name == NULL || strcmp(ofmt->name, name)<0) &&
-                strcmp(ofmt->name, last_name)>0){
-                name= ofmt->name;
-                long_name= ofmt->long_name;
-      exts=ofmt->extensions;
-      if(ofmt->codec_tag != NULL)
-           {
-         //char tmp_codec_tag[4];
-         for(const AVCodecTag* tag = ofmt->codec_tag[0]; tag->id != CODEC_ID_NONE; tag++)
-         {
-           /*
-           tmp_codec_tag[0] = tag->tag & 0xff;
-           tmp_codec_tag[1] = (tag->tag >> 8) & 0xff;
-           tmp_codec_tag[2] = (tag->tag >> 16) & 0xff;
-           tmp_codec_tag[3] = (tag->tag >> 24) & 0xff;
-           */
-           AVCodec* current_codec = avcodec_find_encoder((CodecID)tag->id);
-           if(current_codec != NULL)
-           {
-         if(current_codec->type == CODEC_TYPE_VIDEO)
-         {
-            code_tags.push_back(current_codec->name);
-         }
-           }
-         }
-      }
-
-           if (ofmt->video_codec != CODEC_ID_NONE)
-      {
-           encode=1;
-           }
-            }
-        }
-        for(ifmt = first_iformat; ifmt != NULL; ifmt = ifmt->next) {
-            if((name == NULL || strcmp(ifmt->name, name)<0) &&
-                strcmp(ifmt->name, last_name)>0){
-                name= ifmt->name;
-                long_name= ifmt->long_name;
-                encode=0;
-            }
-            if(name && strcmp(ifmt->name, name)==0)
-                decode=1;
-        }
-        if(name==NULL)
-            break;
-        last_name= name;
-        if(encode)
+   printf("File formats:\n");
+   last_name= "000";
+   for(;;)
    {
-        printf(
-            "%-20s  %-15s %s\n",
-            exts,
-       name,
-            long_name ? long_name:" ");
-      for(unsigned int i = 0; i < code_tags.size(); i++)
+      int decode=0;
+      int encode=0;
+      const char *name=NULL;
+      const char *long_name=NULL;
+      const char *exts=NULL;
+      std::vector<std::string> code_tags;
+
+      for(ofmt = ::first_oformat; ofmt != NULL; ofmt = ofmt->next)
       {
-          VRKIT_STATUS << "       " << code_tags[i] << std::endl;
+         if((name == NULL || strcmp(ofmt->name, name)<0) &&
+               strcmp(ofmt->name, last_name)>0)
+         {
+            name= ofmt->name;
+            long_name= ofmt->long_name;
+            exts=ofmt->extensions;
+            if(ofmt->codec_tag != NULL)
+            {
+               for(const AVCodecTag* tag = ofmt->codec_tag[0]; tag->id != CODEC_ID_NONE; tag++)
+               {
+                  AVCodec* current_codec = avcodec_find_encoder((CodecID)tag->id);
+                  if(current_codec != NULL)
+                  {
+                     if(current_codec->type == CODEC_TYPE_VIDEO)
+                     {
+                        code_tags.push_back(current_codec->name);
+                     }
+                  }
+               }
+            }
+
+            if (ofmt->video_codec != CODEC_ID_NONE)
+            {
+               encode=1;
+            }
+         }
       }
-    }
-    }
-    printf("\n");
 
-    printf("Codecs:\n");
-    last_name= "000";
-    for(;;){
-        int decode=0;
-        int encode=0;
-        int cap=0;
-        const char *type_str;
+      for(ifmt = first_iformat; ifmt != NULL; ifmt = ifmt->next)
+      {
+         if((name == NULL || strcmp(ifmt->name, name)<0) &&
+               strcmp(ifmt->name, last_name)>0)
+         {
+            name= ifmt->name;
+            long_name= ifmt->long_name;
+            encode=0;
+         }
 
-        p2=NULL;
-        for(p = first_avcodec; p != NULL; p = p->next)
-        {
-            if((p2==NULL || strcmp(p->name, p2->name)<0) && strcmp(p->name, last_name)>0)
+         if(name && strcmp(ifmt->name, name)==0)
+         {
+            decode=1;
+         }
+      }
+
+      if(name==NULL)
+      {
+         break;
+      }
+
+      last_name= name;
+
+      if(encode)
+      {
+         printf("%-20s  %-15s %s\n",
+                  exts,
+                  name,
+                  long_name ? long_name:" ");
+
+         for(unsigned int i = 0; i < code_tags.size(); i++)
+         {
+            VRKIT_STATUS << "       " << code_tags[i] << std::endl;
+         }
+      }
+   }
+   printf("\n");
+
+   printf("Codecs:\n");
+   last_name= "000";
+   for(;;)
+   {
+      int decode=0;
+      int encode=0;
+      int cap=0;
+      const char *type_str;
+
+      p2=NULL;
+      for(p = first_avcodec; p != NULL; p = p->next)
+      {
+         if((p2==NULL || strcmp(p->name, p2->name)<0) &&
+               strcmp(p->name, last_name)>0)
+         {
+            p2= p;
+            decode= encode= cap=0;
+         }
+
+         if(p2 && strcmp(p->name, p2->name)==0)
+         {
+            if(p->decode)
             {
-                p2= p;
-                decode= encode= cap=0;
+               decode=1;
             }
-            if(p2 && strcmp(p->name, p2->name)==0)
-            {
-                if(p->decode)
-                   decode=1;
-                if(p->encode)
-                   encode=1;
-                cap |= p->capabilities;
-            }
-        }
-        if(p2==NULL)
-            break;
-        last_name= p2->name;
 
-        switch(p2->type) {
-        case CODEC_TYPE_VIDEO:
+            if(p->encode)
+            {
+               encode=1;
+            }
+            cap |= p->capabilities;
+         }
+      }
+
+      if(p2==NULL)
+      {
+         break;
+      }
+      last_name= p2->name;
+
+      switch(p2->type)
+      {
+         case CODEC_TYPE_VIDEO:
             type_str = "V";
             break;
-        case CODEC_TYPE_AUDIO:
+         case CODEC_TYPE_AUDIO:
             type_str = "A";
             break;
-        case CODEC_TYPE_SUBTITLE:
+         case CODEC_TYPE_SUBTITLE:
             type_str = "S";
             break;
-        default:
+         default:
             type_str = "?";
             break;
-        }
-   if(encode && p2->type == CODEC_TYPE_VIDEO)
-   {
-        printf(
-            " %s%s%s%s%s%s %s",
-            decode ? "D": (/*p2->decoder ? "d":*/" "),
-            encode ? "E":" ",
-            type_str,
-            cap & CODEC_CAP_DRAW_HORIZ_BAND ? "S":" ",
-            cap & CODEC_CAP_DR1 ? "D":" ",
-            cap & CODEC_CAP_TRUNCATED ? "T":" ",
-            p2->name);
-       /* if(p2->decoder && decode==0)
-            printf(" use %s for decoding", p2->decoder->name);*/
-        printf("\n");
+      }
+
+      if(encode && p2->type == CODEC_TYPE_VIDEO)
+      {
+         printf(" %s%s%s%s%s%s %s",
+                  decode ? "D": (/*p2->decoder ? "d":*/" "),
+                  encode ? "E":" ",
+                  type_str,
+                  cap & CODEC_CAP_DRAW_HORIZ_BAND ? "S":" ",
+                  cap & CODEC_CAP_DR1 ? "D":" ",
+                  cap & CODEC_CAP_TRUNCATED ? "T":" ",
+                  p2->name);
+         /* if(p2->decoder && decode==0)
+         printf(" use %s for decoding", p2->decoder->name);*/
+         printf("\n");
+      }
    }
-    }
-    printf("\n");
+   printf("\n");
 }
 
 EncoderPtr EncoderFFmpeg::init()
@@ -309,49 +328,48 @@ EncoderPtr EncoderFFmpeg::init()
    {
       if(out_fmt->name != NULL)
       {
-    if( out_fmt->video_codec != CODEC_ID_NONE )
-    {
-       allowable_codecs.clear();
-       if( out_fmt->codec_tag != NULL )
-       {
-          for(const AVCodecTag* tag = out_fmt->codec_tag[0]; tag->id != CODEC_ID_NONE; tag++)
-          {
-        AVCodec* current_codec = avcodec_find_encoder((CodecID)tag->id);
-        if(current_codec != NULL)
-        {
-           if(current_codec->type == CODEC_TYPE_VIDEO)
-           {
-         allowable_codecs.push_back(std::string(current_codec->name));
-           }
-        }
-          }
-       }
+         if( out_fmt->video_codec != CODEC_ID_NONE )
+         {
+            allowable_codecs.clear();
+            if( out_fmt->codec_tag != NULL )
+            {
+               for(const AVCodecTag* tag = out_fmt->codec_tag[0]; tag->id != CODEC_ID_NONE; tag++)
+               {
+                  AVCodec* current_codec = avcodec_find_encoder((CodecID)tag->id);
+                  if(current_codec != NULL)
+                  {
+                     if(current_codec->type == CODEC_TYPE_VIDEO)
+                     {
+                        allowable_codecs.push_back(std::string(current_codec->name));
+                     }
+                  }
+               }
+            }
 
-       Encoder::container_format_info_t new_format;
-       new_format.mFormatName = std::string(out_fmt->name);
-       if( out_fmt->long_name != NULL )
-       {
-          new_format.mFormatLongName = std::string(out_fmt->long_name);
-       }
-       if( out_fmt->extensions != NULL )
-       {
-          std::string extensions(out_fmt->extensions);
-          std::vector<std::string> extensions_vector;
-          boost::algorithm::split(extensions_vector, extensions,
+            Encoder::container_format_info_t new_format;
+            new_format.mFormatName = std::string(out_fmt->name);
+            if( out_fmt->long_name != NULL )
+            {
+               new_format.mFormatLongName = std::string(out_fmt->long_name);
+            }
+            if( out_fmt->extensions != NULL )
+            {
+               std::string extensions(out_fmt->extensions);
+               std::vector<std::string> extensions_vector;
+               boost::algorithm::split(extensions_vector, extensions,
                                        boost::algorithm::is_any_of(","));
-          new_format.mFileExtensions = extensions_vector;
-       }
+               new_format.mFileExtensions = extensions_vector;
+            }
 
-       // Keep only unique codec names
-       Encoder::codec_list_t::iterator new_end = 
-               std::unique(allowable_codecs.begin(), allowable_codecs.end());
-       allowable_codecs.erase(new_end, allowable_codecs.end());
-       new_format.mCodecList = allowable_codecs;
+            // Keep only unique codec names
+            Encoder::codec_list_t::iterator new_end =
+                  std::unique(allowable_codecs.begin(), allowable_codecs.end());
+            allowable_codecs.erase(new_end, allowable_codecs.end());
 
-       new_format.mEncoderName = getName();
-
-       mContainerFormatInfoList.push_back(new_format);
-    }
+            new_format.mCodecList = allowable_codecs;
+            new_format.mEncoderName = getName();
+            mContainerFormatInfoList.push_back(new_format);
+         }
       }
    }
 

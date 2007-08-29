@@ -120,17 +120,17 @@ protected:
 
    virtual void render(OSG::RenderAction* ra) = 0;
 
-   OSG::TransformRefPtr                 mTransform;     /**< The location and orientation of the camera. */
-   OSG::TextureChunkPtr                 mLeftTexture;   /**< Texture that the FBO renders into. */
-   OSG::TextureChunkPtr                 mRightTexture;  /**< Texture that the FBO renders into. */
-   OSG::TextureChunkPtr                 mCurrentTexture;  /**< Texture that the FBO renders into. */
-   OSG::ImagePtr                        mLeftImage;
-   OSG::ImagePtr                        mRightImage;
-   OSG::ImagePtr                        mCurrentImage;
-   OSG::PerspectiveCameraPtr            mCamera;       /**< Perspective camera for the FBO. */
-   OSG::UInt32                          mWidth;        /**< Width of the FBO. */
-   OSG::UInt32                          mHeight;       /**< Height of the FBO. */
-   OSG::WindowPtr                       mWindow;
+   OSG::TransformRefPtr       mTransform;     /**< The location and orientation of the camera. */
+   OSG::TextureChunkPtr       mLeftTexture;   /**< Texture that the FBO renders into. */
+   OSG::TextureChunkPtr       mRightTexture;  /**< Texture that the FBO renders into. */
+   OSG::TextureChunkPtr       mCurrentTexture;  /**< Texture that the FBO renders into. */
+   OSG::ImagePtr              mLeftImage;
+   OSG::ImagePtr              mRightImage;
+   OSG::ImagePtr              mCurrentImage;
+   OSG::PerspectiveCameraPtr  mCamera;       /**< Perspective camera for the FBO. */
+   OSG::UInt32                mWidth;        /**< Width of the FBO. */
+   OSG::UInt32                mHeight;       /**< Height of the FBO. */
+   OSG::WindowPtr             mWindow;
 };
 
 }
