@@ -60,7 +60,6 @@
 #include <vrkit/User.h>
 #include <vrkit/Scene.h>
 #include <vrkit/DynamicSceneObject.h>
-#include <vrkit/DynamicSceneObjectTransform.h>
 #include <vrkit/WandInterface.h>
 #include <vrkit/Exception.h>
 #include <vrkit/util/BasicHighlighter.h>
