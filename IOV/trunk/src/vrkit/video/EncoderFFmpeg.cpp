@@ -369,10 +369,6 @@ void EncoderFFmpeg::startEncoding()
    {
       const vpr::Uint32 bitrate = 1400;
 
-      // init avcodec && avformat
-      avcodec_register_all();
-      av_register_all();
-
       // XXX: Debug code to output all valid formats & codecs.
       //show_formats();
 
