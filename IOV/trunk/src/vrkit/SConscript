@@ -33,13 +33,31 @@ env.Append(CPPPATH = [inst_paths['include']] )    # Need to find the vrkit direc
 env.AppendUnique(CPPDEFINES = ['_VRKIT_BUILD_'])
 
 if ffmpeg_options.isAvailable():
-   have_ffmpeg = True
    env.AppendUnique(CPPDEFINES = ['VRKIT_WITH_FFMPEG'])
    ffmpeg_options.apply(env)
 elif mingw_ffmpeg.isAvailable():
-   have_ffmpeg = True
+   # To compile against the FFmpeg libraries with Visual C++, we have to be
+   # able to find the C99 inttypes headers. These are bundled with vrkit in
+   # the src/vrkit/video/inttypes directory. The build, however, uses the
+   # include path relative to the build directory, so we do not include the
+   # 'src' component in the path below.
+   # NOTE: This has to be done before applying the settings in mingw_ffmpeg
+   # to env so that this include path extension comes before the extension
+   # that would allow discovery of the MinGW headers. We want our inttypes
+   # headers to be found because they are suitable for use with Visual C++.
+   # The ones in MinGW are not.
+   env.Append(CPPPATH = [pj(inst_paths['include'], 'vrkit', 'video',
+                            'inttypes')])
+
    mingw_ffmpeg.apply(env)
    env.AppendUnique(CPPDEFINES = ['VRKIT_WITH_FFMPEG'])
+
+   # This is a hack to ensure that the compiler finds the Microsoft headers
+   # before MinGW headers with the same name. Mixing Visual C++ and MinGW is
+   # a tricky balancing act.
+   vcdir = env['MSVS']['VCINSTALLDIR']
+   env.PrependUnique(CPPPATH = [pj(vcdir, 'include'),
+                                pj(vcdir, 'PlatformSDK', 'include')])
 
    # When building against MinGW stuff, we need to link against libgcc.a and
    # libmingwex.a. Thus, we have to be able to find them.
@@ -53,7 +71,7 @@ elif mingw_ffmpeg.isAvailable():
    # XXX: Is there a better way to do this?
    env.AppendUnique(LINKFLAGS = ['libavformat.a', 'libavcodec.a',
                                  'libavutil.a', 'libgcc.a', 'libmingwex.a'],
-                    LIBS = ['ws2_32.lib'])
+                    LIBS = ['ws2_32'])
 
    # NOTE: FAAD and x264 are not included here on purpose. The use of those
    # libraries with FFmpeg requires that FFmpeg be licensed under the GPL,
@@ -69,24 +87,16 @@ elif mingw_ffmpeg.isAvailable():
          env.AppendUnique(LINKFLAGS = [l])
 
 if "win32" == platform:
-   # To compile against the FFmpeg libraries with Visual C++, we have to be
-   # able to find the C99 inttypes headers. These are bundled with vrkit in
-   # the src/vrkit/video/inttypes directory. The build, however, uses the
-   # include path relative to the build directory, so we do not include the
-   # 'src' component in the path below.
-   if have_ffmpeg:
-      env.Append(CPPPATH = [pj(inst_paths['include'], 'vrkit', 'video',
-                               'inttypes')])
-
    if env['enable_vfw']:
       env.Append(CPPDEFINES = ['VRKIT_WITH_VFW'])
 
-   if env['enable_dshow']:
-      # Add ATL paths to build.
-      vc_inst_dir = env['MSVS']['VCINSTALLDIR']
-      env.Append(CPPPATH = [pj(vc_inst_dir, 'atlmfc', 'include'),],
-                 LIBPATH = [pj(vc_inst_dir, 'atlmfc', 'lib'),])
+   # Add ATL paths to build.
+   vc_inst_dir = env['MSVS']['VCINSTALLDIR']
 
+   env.Prepend(CPPPATH = [pj(vc_inst_dir, 'atlmfc', 'include')],
+               LIBPATH = [pj(vc_inst_dir, 'atlmfc', 'lib')])
+
+   if env['enable_dshow']:
       # Add the platform sdk for DirectShow.
       psdk = env["platform_sdk"]
       bc_path = pj(psdk, 'Samples', 'Multimedia', 'DirectShow', 'BaseClasses')
