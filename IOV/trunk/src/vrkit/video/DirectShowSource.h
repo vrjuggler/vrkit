@@ -35,6 +35,8 @@
 #include <typeinfo>
 
 #include <vpr/vprTypes.h>
+#include <vpr/vprParam.h>
+#include <vpr/Util/Error.h>
 
 #include <vrkit/Exception.h>
 
@@ -176,8 +178,37 @@ CComPtr<IType> query(CComPtr<CType> obj, REFIID iid)
 #define query(obj, ifType) \
    (query<ifType>(obj, IID_ ## ifType))
 
+#if __VPR_version >= 1001006
 /**
- * Translates the use of FAILED() into an vrkit::Exception.
+ * Translates the use of FAILED() into a vrkit::Exception.
+ *
+ * @note vpr::Error::getCurrentErrorMsg() was added in VPR 1.1.6.
+ */
+#define CHECK_RESULT(op, msg)                                           \
+   if ( FAILED(op) )                                                    \
+   {                                                                    \
+      std::ostringstream msg_stream;                                    \
+      msg_stream << msg;                                                \
+      const std::string err_msg = vpr::Error::getCurrentErrorMsg();     \
+      if ( ! err_msg.empty() )                                          \
+      {                                                                 \
+         msg_stream << std::endl << err_msg;                            \
+      }                                                                 \
+      throw vrkit::Exception(msg_stream.str(), VRKIT_LOCATION);         \
+   }
+#else
+/**
+ * Translates the use of FAILED() into a vrkit::Exception.
+ */
+#define CHECK_RESULT(op, msg)                                           \
+   if ( FAILED(op) )                                                    \
+   {                                                                    \
+      throw vrkit::Exception(msg, VRKIT_LOCATION);                      \
+   }
+#endif
+
+/**
+ * Translates the use of FAILED() into a vrkit::Exception.
  */
 #define CHECK_RESULT(op, msg)                           \
    if ( FAILED(op) )                                    \
