@@ -207,15 +207,6 @@ CComPtr<IType> query(CComPtr<CType> obj, REFIID iid)
    }
 #endif
 
-/**
- * Translates the use of FAILED() into a vrkit::Exception.
- */
-#define CHECK_RESULT(op, msg)                           \
-   if ( FAILED(op) )                                    \
-   {                                                    \
-      throw vrkit::Exception(msg, VRKIT_LOCATION);      \
-   }
-
 #define RETURN_FAILED(op)       \
    if ( FAILED(hr = op) )       \
    {                            \
