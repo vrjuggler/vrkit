@@ -39,7 +39,7 @@ DynamicSceneObjectTransform::DynamicSceneObjectTransform()
 }
 
 DynamicSceneObjectTransformPtr
-DynamicSceneObjectTransform::init(OSG::TransformNodePtr node)
+DynamicSceneObjectTransform::init(OSG::NodePtr node)
 {
    typedef boost::mpl::vector<OSG::Transform> core_types;
 

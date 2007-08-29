@@ -21,7 +21,7 @@
 
 #include <vrkit/Config.h>
 
-#include <OpenSG/OSGTransform.h>
+#include <OpenSG/OSGNode.h>
 
 #include <vrkit/DynamicSceneObject.h>
 #include <vrkit/DynamicSceneObjectTransformPtr.h>
@@ -53,13 +53,12 @@ public:
    /**
     * Initializes this dynamic scene object.
     *
-    * @param node The OpenSG node with a transform core that is the root of
-    *             the scene graph sub-tree represented by this dynamic scene
-    *             object.
+    * @param node The OpenSG node that is the root of the scene graph sub-tree
+    *             represented by this dynamic scene object.
     *
     * @return This object is returned as a shared pointer.
     */
-   DynamicSceneObjectTransformPtr init(OSG::TransformNodePtr node);
+   DynamicSceneObjectTransformPtr init(OSG::NodePtr node);
 };
 
 }
