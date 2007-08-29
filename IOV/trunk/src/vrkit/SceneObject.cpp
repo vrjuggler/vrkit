@@ -156,4 +156,11 @@ std::vector<SceneObjectPtr> SceneObject::getChildren()
    return std::vector<SceneObjectPtr>();
 }
 
+void SceneObject::setNodeTravMask(OSG::NodePtr node)
+{
+   OSG::beginEditCP(node, OSG::Node::TravMaskFieldMask);
+      node->setTravMask(node->getTravMask() & ~128);
+   OSG::endEditCP(node, OSG::Node::TravMaskFieldMask);
+}
+
 }

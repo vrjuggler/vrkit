@@ -41,9 +41,7 @@ init(OSG::NodePtr node, boost::function<bool (OSG::NodePtr)> predicate,
    isSceneObject = predicate;
    mMakeMoveable = makeMoveable;
 
-   OSG::beginEditCP(mRootNode, OSG::Node::TravMaskFieldMask);
-      mRootNode->setTravMask(mRootNode->getTravMask() & ~128);
-   OSG::endEditCP(mRootNode, OSG::Node::TravMaskFieldMask);
+   setNodeTravMask(mRootNode);
 
    if ( makeMoveable )
    {

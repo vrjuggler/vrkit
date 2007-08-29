@@ -295,6 +295,16 @@ public:
    //@}
 
 protected:
+   /**
+    * Sets the traversal mask on the given node so that it is suitable for
+    * vrkit intersection testing.
+    *
+    * @post The traversal mask field for \p node is changed.
+    *
+    * @since 0.48.1
+    */
+   virtual void setNodeTravMask(OSG::NodePtr node);
+
    /** @name Intersection and Grab State */
    //@{
    bool mCanIntersect;  /**< Indicates whether intersection is allowed. */

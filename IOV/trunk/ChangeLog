@@ -1,5 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-29 patrick  Added vrkit::SceneObject::setNodeTravMask() to eliminate
+                    code duplication in vrkit::StaticSceneObjct,
+                    vrkit::DynamicSceneObject, and subclasses thereof.
+                    -- VERSION -- 0.48.1
 2007-08-28 patrick  Removed vrkit::StatusPanelData::hasControlText()
                     -- VERSION -- 0.48.0
 2007-08-28 patrick  Added the Video Capture Plug-in.
