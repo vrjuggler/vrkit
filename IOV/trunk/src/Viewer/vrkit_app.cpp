@@ -509,7 +509,15 @@ int main(int argc, char* argv[])
 
    try
    {
+      vrj::Kernel* kernel = vrj::Kernel::instance();  // Get the kernel
+
       po::options_description generic("General options");
+#if __VJ_version >= 2003000
+      po::options_description& general_desc = kernel->getGeneralOptions();
+      po::options_description& cluster_desc = kernel->getClusterOptions();
+      generic.add(general_desc).add(cluster_desc);
+#endif
+
       generic.add_options()
          ("help", "produce help message")
          ;
@@ -549,8 +557,12 @@ int main(int argc, char* argv[])
          return EXIT_SUCCESS;
       }
 
-      vrj::Kernel* kernel = vrj::Kernel::instance();  // Get the kernel
       OpenSgViewerPtr app = OpenSgViewer::create();   // Create the app object
+
+#if __VJ_version >= 2003000
+      // Intialize the kernel before loading config files.
+      kernel->init(vm);
+#endif
 
       if ( vm.count("defs") == 0 )
       {
