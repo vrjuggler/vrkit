@@ -51,11 +51,11 @@ init(OSG::NodePtr node, boost::function<bool (OSG::NodePtr)> predicate,
       OSG::TransformPtr xform_core =
          OSG::TransformPtr::dcast(root_node_core.get());
 
-      // If geomRoot does not currently have a transform core, then we need to
-      // create a new node to hold the core of geomRoot and give geomRoot a
-      // transform core. The children of geomRoot are moved to be children of
-      // the newly created node, and this new node is added as the only child
-      // of node. The process is done this way so that it is safe to do during
+      // If root does not currently have a transform core, then we need to
+      // create a new node to hold the core of root and give root a transform
+      // core. The children of root are moved to be children of the newly
+      // created node, and this new node is added as the only child of node.
+      // The process is done this way so that it is safe to do during
       // traversal of the OpenSG scene graph.
       if ( OSG::NullFC == xform_core )
       {
@@ -87,6 +87,10 @@ init(OSG::NodePtr node, boost::function<bool (OSG::NodePtr)> predicate,
          OSG::beginEditCP(node, OSG::Node::ChildrenFieldMask);
             node->addChild(new_child);
          OSG::endEditCP(node, OSG::Node::ChildrenFieldMask);
+      }
+      else
+      {
+         mTransformCore = xform_core;
       }
 
       // At this point, node has a transform core.
