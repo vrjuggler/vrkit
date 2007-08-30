@@ -1,4 +1,0 @@
-#!python
-#
-SConscript(dirs = ['UITest',])
-

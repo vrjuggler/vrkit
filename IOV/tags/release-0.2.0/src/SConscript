@@ -1,8 +1,0 @@
-#!python
-#
-Import('*')
-env = baseEnv.Copy()
-Export('env')
-
-SConscript(dirs = ['IOV', 'plugins', 'SlaveViewer', 'Viewer'])
-
