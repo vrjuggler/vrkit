@@ -27,7 +27,6 @@
 #include <OpenSG/OSGMatrix.h>
 #include <OpenSG/OSGMaterialPool.h>
 #include <OpenSG/OSGSimpleGeometry.h>
-#include <OpenSG/OSGSimpleAttachments.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGDirectionalLight.h>
 #include <OpenSG/OSGSceneFileHandler.h>
@@ -94,12 +93,6 @@ namespace
 
       return errCode == GL_NO_ERROR;
    }
-}
-
-template<typename T>
-boost::shared_ptr<T> makeSceneObject(OSG::TransformNodePtr modelXform)
-{
-   return T::create()->init(modelXform);
 }
 
 class OpenSgViewer;
