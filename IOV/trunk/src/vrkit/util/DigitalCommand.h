@@ -135,13 +135,14 @@ public:
    /**
     * Determines whether this digital command is in the given state.
     *
-    * @pre This digital command was configured successfully.
+    * @pre This digital command was configured successfully. If it was not,
+    *      then false is always returned.
     *
     * @since 0.41.0
     */
    bool test() const
    {
-      return mTestFunc();
+      return mTestFunc.empty() ? false : mTestFunc();
    }
 
    /**
