@@ -42,12 +42,6 @@ SetOption('max_drift',30)           # 30 second drift on MD5 Files
 SetOption('implicit_cache',1)
 SConsignFile()                      # Store all .sconsign stuff in single file
 
-####  Local Helper methods ###
-def symlinkInstallFunc(dest, source, env):
-    """Install a source file into a destination by sym linking it."""
-    os.symlink(pj(os.getcwd(), source), dest)
-    return 0
-
 # --- Main Build --- #
 if GetPlatform() == 'win32':
    # XXX: Temp hack to get msvs version setting
