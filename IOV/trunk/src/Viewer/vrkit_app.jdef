@@ -52,6 +52,10 @@
          <help>Identifies a node core type that identifies an object suitable for user interaction. Node core types are things such as "Transform" or "MaterialGroup". Invalid types will be filtered out automatically.</help>
          <value label="Node Core Type" defaultvalue="Transform"/>
       </property>
+      <property valuetype="string" variable="false" name="save_scene_command_exp">
+         <help>Describe the button state that causes the scene to be saved to the file &lt;tt&gt;scene.osb&lt;/tt&gt;. The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <value label="Save Command" defaultvalue="5^" />
+      </property>
       <upgrade_transform>
          <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jconf="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" version="1.0">
             <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
@@ -70,6 +74,9 @@
                   <xsl:copy-of select="./jconf:enable_grabbing" />
                   <xsl:element namespace="{$jconf}" name="core_type">
                      <xsl:text>Transform</xsl:text>
+                  </xsl:element>
+                  <xsl:element namespace="{$jconf}" name="save_scene_command_exp">
+                     <xsl:text>5^</xsl:text>
                   </xsl:element>
                </xsl:element>
             </xsl:template>

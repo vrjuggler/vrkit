@@ -46,6 +46,7 @@
 #include <vrkit/scenedata/MaterialPoolData.h>
 #include <vrkit/util/BasicHighlighter.h>
 #include <vrkit/util/EventSoundPlayer.h>
+#include <vrkit/util/DigitalCommand.h>
 #include <vrkit/util/CoreTypePredicate.h>
 
 
@@ -129,6 +130,7 @@ private:
    std::string                      mFileName;
    vrkit::util::BasicHighlighterPtr mHighlighter;
    vrkit::util::EventSoundPlayerPtr mSoundPlayer;
+   vrkit::util::DigitalCommand      mSaveCmd;
 
    /** @name Scene Object Handling */
    //@{
@@ -149,11 +151,7 @@ void VrkitApp::preFrame()
    // Call up to get navigation and plugin updates.
    vrkit::Viewer::preFrame();
 
-   vrkit::WandInterfacePtr wand_if =
-      getUser()->getInterfaceTrader().getWandInterface();
-   gadget::DigitalInterface& save_btn(wand_if->getButton(5));
-
-   if ( save_btn->getData() == gadget::Digital::TOGGLE_ON )
+   if ( mSaveCmd() )
    {
       OSG::GroupNodePtr root = getSceneObj()->getSceneRoot();
       OSG::SceneFileHandler::the().write(root, "scene.osb");
@@ -337,6 +335,7 @@ void VrkitApp::configure(jccl::ConfigElementPtr cfgElt)
 
    const std::string enable_grab_prop("enable_grabbing");
    const std::string core_type_prop("core_type");
+   const std::string save_scene_exp_prop("save_scene_command_exp");
 
    mEnableGrab = cfgElt->getProperty<bool>(enable_grab_prop);
 
@@ -358,6 +357,11 @@ void VrkitApp::configure(jccl::ConfigElementPtr cfgElt)
                       << std::endl;
       }
    }
+
+   vrkit::WandInterfacePtr wand_if =
+      getUser()->getInterfaceTrader().getWandInterface();
+   mSaveCmd.configure(cfgElt->getProperty<std::string>(save_scene_exp_prop),
+                      wand_if);
 }
 
 // This is a demonstration of how a slot for the objectsMoved signal might be

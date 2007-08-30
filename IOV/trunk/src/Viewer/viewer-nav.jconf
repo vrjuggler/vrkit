@@ -222,6 +222,7 @@
       <vrkit_app name="vrkit Application" version="2">
          <enable_grabbing>true</enable_grabbing>
          <core_type>Transform</core_type>
+         <save_scene_command_exp>5^</save_scene_command_exp>
       </vrkit_app>
       <event_sound_player name="Event Sound Player" version="1">
          <intersect_sound_name>intersect</intersect_sound_name>
