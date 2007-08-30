@@ -222,15 +222,6 @@
       <vrkit_app name="vrkit Application" version="2">
          <enable_grabbing>true</enable_grabbing>
          <core_type>Transform</core_type>
-         <use_material_chooser>false</use_material_chooser>
-         <chooser_initial_size>2.0</chooser_initial_size>
-         <chooser_initial_size>3.0</chooser_initial_size>
-         <chooser_initial_position>-5.0</chooser_initial_position>
-         <chooser_initial_position>5.0</chooser_initial_position>
-         <chooser_initial_position>-5.0</chooser_initial_position>
-         <chooser_initial_rotation>0.0</chooser_initial_rotation>
-         <chooser_initial_rotation>0.0</chooser_initial_rotation>
-         <chooser_initial_rotation>0.0</chooser_initial_rotation>
       </vrkit_app>
       <event_sound_player name="Event Sound Player" version="1">
          <intersect_sound_name>intersect</intersect_sound_name>

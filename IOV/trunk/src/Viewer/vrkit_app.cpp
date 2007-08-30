@@ -23,21 +23,10 @@
 
 #include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGTransform.h>
-
 #include <OpenSG/OSGMatrix.h>
-#include <OpenSG/OSGMaterialPool.h>
 #include <OpenSG/OSGSimpleGeometry.h>
-#include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGDirectionalLight.h>
 #include <OpenSG/OSGSceneFileHandler.h>
-
-#include <gmtl/Xforms.h>
-#include <gmtl/Vec.h>
-#include <gmtl/Generate.h>
-#include <gmtl/Coord.h>
-#include <gmtl/Matrix.h>
-#include <gmtl/MatrixOps.h>
-#include <gmtl/External/OpenSGConvert.h>
 
 #include <vpr/vpr.h>
 #include <vpr/System.h>
@@ -55,20 +44,17 @@
 #include <vrj/Kernel/User.h>
 
 #include <vrkit/Viewer.h>
-#include <vrkit/scenedata/EventData.h>
 #include <vrkit/User.h>
 #include <vrkit/Scene.h>
+#include <vrkit/Status.h>
 #include <vrkit/DynamicSceneObject.h>
 #include <vrkit/WandInterface.h>
 #include <vrkit/Exception.h>
+#include <vrkit/scenedata/EventData.h>
+#include <vrkit/scenedata/MaterialPoolData.h>
 #include <vrkit/util/BasicHighlighter.h>
 #include <vrkit/util/EventSoundPlayer.h>
 #include <vrkit/util/CoreTypePredicate.h>
-
-#include <vrkit/widget/MaterialChooser.h>
-#include <vrkit/scenedata/WidgetData.h>
-
-#include <vrkit/Status.h>
 
 
 #if __VJ_version < 2003002
@@ -136,8 +122,6 @@ protected:
    OpenSgViewer()
       : vrkit::Viewer()
       , mEnableGrab(true)
-      , mMatChooserWidth(1.0f)  // 1 foot wide
-      , mMatChooserHeight(1.5f) // 1.5 feet tall
    {
       /* Do nothing. */ ;
    }
@@ -159,15 +143,6 @@ protected:
    bool mEnableGrab;
    std::vector<OSG::FieldContainerType*> mCoreTypes;
    //@}
-
-   /** @name Material Chooser Properties */
-   //@{
-   float                             mMatChooserWidth;
-   float                             mMatChooserHeight;
-   gmtl::Coord3fXYZ                  mMatChooserCoord;
-   vrkit::widget::MaterialChooserPtr mMaterialChooser; /**< The chooser we are using. */
-   OSG::MaterialPoolPtr              mMaterialPool;
-   //@}
 };
 
 void OpenSgViewer::contextInit()
@@ -181,8 +156,6 @@ void OpenSgViewer::preFrame()
 {
    // Call up to get navigation and plugin updates.
    vrkit::Viewer::preFrame();
-
-   mMaterialChooser->update();
 
    vrkit::WandInterfacePtr wand_if =
       getUser()->getInterfaceTrader().getWandInterface();
@@ -209,10 +182,8 @@ void OpenSgViewer::deallocate()
 {
    vrkit::Viewer::deallocate();
 
-   mMaterialChooser = vrkit::widget::MaterialChooserPtr();
-   mMaterialPool    = OSG::NullFC;
-   mHighlighter     = vrkit::util::BasicHighlighterPtr();
-   mSoundPlayer     = vrkit::util::EventSoundPlayerPtr();
+   mHighlighter = vrkit::util::BasicHighlighterPtr();
+   mSoundPlayer = vrkit::util::EventSoundPlayerPtr();
 }
 
 vrkit::event::ResultType OpenSgViewer::
@@ -256,24 +227,6 @@ void OpenSgViewer::init()
 
    vrkit::ScenePtr scene = getSceneObj();
 
-   mMaterialChooser = vrkit::widget::MaterialChooser::create();
-
-   // Initialize panel
-   const float feet_to_app_units(0.3048f * getDrawScaleFactor());
-   mMaterialChooser->init(getDrawScaleFactor());
-   mMaterialChooser->setWidthHeight(mMatChooserWidth * feet_to_app_units,
-                                    mMatChooserWidth * feet_to_app_units);
-
-   // Set at T*R
-   OSG::Matrix xform_osg;
-   gmtl::set(xform_osg, gmtl::make<gmtl::Matrix44f>(mMatChooserCoord));
-   mMaterialChooser->moveTo(xform_osg);
-
-   // Add widget to scene.
-   vrkit::WidgetDataPtr widget_data = scene->getSceneData<vrkit::WidgetData>();
-   widget_data->addWidget(mMaterialChooser);
-   addObject(mMaterialChooser);
-
    OSG::RefPtr<OSG::NodePtr> model_root;
 
    // Load the model to use
@@ -294,9 +247,12 @@ void OpenSgViewer::init()
       }
    }
 
-   mMaterialPool = OSG::MaterialPool::create();
-   mMaterialPool->add(model_root);
-   mMaterialChooser->setMaterialPool(mMaterialPool);
+   // Make the materials of the loaded model available in the material pool.
+   // XXX: This is a little clunky, and it might be better if this were done
+   // by vrkit::Viewer::addObject().
+   vrkit::MaterialPoolDataPtr mat_pool =
+      scene->getSceneData<vrkit::MaterialPoolData>();
+   mat_pool->getMaterialPool()->add(model_root);
 
    // --- Light setup --- //
    // - Add directional light for scene
@@ -413,10 +369,6 @@ void OpenSgViewer::configure(jccl::ConfigElementPtr cfgElt)
 
    const std::string enable_grab_prop("enable_grabbing");
    const std::string core_type_prop("core_type");
-   const std::string use_mchooser_prop("use_material_chooser");
-   const std::string initial_size_prop("chooser_initial_size");
-   const std::string initial_pos_prop("chooser_initial_position");
-   const std::string initial_rot_prop("chooser_initial_rotation");
 
    mEnableGrab = cfgElt->getProperty<bool>(enable_grab_prop);
 
@@ -438,46 +390,6 @@ void OpenSgViewer::configure(jccl::ConfigElementPtr cfgElt)
                       << std::endl;
       }
    }
-
-   const float width  = cfgElt->getProperty<float>(initial_size_prop, 0);
-   const float height = cfgElt->getProperty<float>(initial_size_prop, 1);
-
-   if ( width > 0.0f )
-   {
-      mMatChooserWidth = width;
-   }
-   else
-   {
-      VRKIT_STATUS << "ERROR: Invalid width for material chooser " << width
-                   << std::endl;
-   }
-
-   if ( height > 0.0f )
-   {
-      mMatChooserHeight = height;
-   }
-   else
-   {
-      VRKIT_STATUS << "ERROR: Invalid height for material chooser " << height
-                   << std::endl;
-   }
-
-   const float feet_to_app_units(0.3048f * getDrawScaleFactor());
-
-   const float xt = cfgElt->getProperty<float>(initial_pos_prop, 0);
-   const float yt = cfgElt->getProperty<float>(initial_pos_prop, 1);
-   const float zt = cfgElt->getProperty<float>(initial_pos_prop, 2);
-
-   const float xr = cfgElt->getProperty<float>(initial_rot_prop, 0);
-   const float yr = cfgElt->getProperty<float>(initial_rot_prop, 1);
-   const float zr = cfgElt->getProperty<float>(initial_rot_prop, 2);
-
-   mMatChooserCoord.pos().set(xt * feet_to_app_units,
-                              yt * feet_to_app_units,
-                              zt * feet_to_app_units);
-   mMatChooserCoord.rot().set(gmtl::Math::deg2Rad(xr),
-                              gmtl::Math::deg2Rad(yr),
-                              gmtl::Math::deg2Rad(zr));
 }
 
 namespace po = boost::program_options;

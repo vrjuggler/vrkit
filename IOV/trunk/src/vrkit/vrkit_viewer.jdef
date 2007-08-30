@@ -182,6 +182,7 @@
             <enum label="GrabPlugin" value="com.infiscape.GrabPlugin"/>
             <enum label="GridPlugin" value="com.infiscape.GridPlugin"/>
             <enum label="LogoPlugin" value="com.infiscape.LogoPlugin"/>
+            <enum label="MaterialChooserPlugin" value="com.infiscape.MaterialChooserPlugin"/>
             <enum label="ModeHarnessPlugin" value="com.infiscape.ModeHarnessPlugin"/>
             <enum label="ModelLoaderPlugin" value="com.infiscape.ModelLoaderPlugin"/>
             <enum label="ModelSwapPlugin" value="com.infiscape.ModelSwapPlugin"/>

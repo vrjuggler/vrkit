@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-08-30 patrick  Added the Material Chooser Plug-in.
+                    -- VERSION -- 0.48.2
 2007-08-29 patrick  Added vrkit::SceneObject::setNodeTravMask() to eliminate
                     code duplication in vrkit::StaticSceneObjct,
                     vrkit::DynamicSceneObject, and subclasses thereof.
