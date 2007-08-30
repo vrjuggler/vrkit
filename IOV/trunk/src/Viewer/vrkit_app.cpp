@@ -31,16 +31,8 @@
 #include <vpr/vpr.h>
 #include <vpr/System.h>
 #include <jccl/Config/ConfigElement.h>
-
 #include <vrj/vrjParam.h>
 #include <vrj/Kernel/Kernel.h>
-
-#if __VJ_version < 2003011
-#  include <vrj/Draw/OGL/GlWindow.h>
-#else
-#  include <vrj/Draw/OpenGL/Window.h>
-#endif
-
 #include <vrj/Kernel/User.h>
 
 #include <vrkit/Viewer.h>
@@ -68,63 +60,62 @@ typedef class User* UserPtr;
 
 namespace
 {
-   bool checkGLError(const char* where)
-   {
-      GLenum errCode = 0;
-      if ((errCode = glGetError()) != GL_NO_ERROR)
-      {
-         const GLubyte *errString = gluErrorString(errCode);
-         FWARNING(("%s OpenGL Error: %s!\n", where, errString));
-      }
 
-      return errCode == GL_NO_ERROR;
+bool checkGLError(const char* where)
+{
+   const GLenum err_code(glGetError());
+   if ( err_code != GL_NO_ERROR )
+   {
+      FWARNING(("%s OpenGL Error: %s!\n", where,
+                gluErrorString(err_code)));
    }
+
+   return err_code == GL_NO_ERROR;
 }
 
-class OpenSgViewer;
-typedef boost::shared_ptr<OpenSgViewer> OpenSgViewerPtr;
+}
 
-class OpenSgViewer : public vrkit::Viewer
+class VrkitApp;
+typedef boost::shared_ptr<VrkitApp> VrkitAppPtr;
+
+class VrkitApp : public vrkit::Viewer
 {
-public:
-   static OpenSgViewerPtr create()
+private:
+   VrkitApp()
+      : vrkit::Viewer()
+      , mEnableGrab(true)
    {
-      OpenSgViewerPtr new_viewer(new OpenSgViewer);
-      return new_viewer;
+      /* Do nothing. */ ;
    }
 
-   virtual ~OpenSgViewer()
-   {;}
+public:
+   static VrkitAppPtr create()
+   {
+      return VrkitAppPtr(new VrkitApp());
+   }
+
+   virtual ~VrkitApp()
+   {
+      /* Do nothing. */ ;
+   }
 
    // Callback methods
 
-   vrkit::event::ResultType
-      objectsMovedSlot(const vrkit::EventData::moved_obj_list_t& objs);
-
    virtual void init();
    virtual void contextInit();
-   virtual void contextPreDraw();
-   virtual void draw();
    virtual void preFrame();
 
    virtual void deallocate();
 
    // Configuration settings
 
-   void setFilename(std::string filename)
+   void setFilename(const std::string& filename)
    {
       mFileName = filename;
    }
 
-protected:
+private:
    void initGl();
-
-   OpenSgViewer()
-      : vrkit::Viewer()
-      , mEnableGrab(true)
-   {
-      /* Do nothing. */ ;
-   }
 
    static std::string getElementType()
    {
@@ -133,7 +124,8 @@ protected:
 
    void configure(jccl::ConfigElementPtr cfgElt);
 
-protected:
+   vrkit::event::ResultType objectsMovedSlot();
+
    std::string                      mFileName;
    vrkit::util::BasicHighlighterPtr mHighlighter;
    vrkit::util::EventSoundPlayerPtr mSoundPlayer;
@@ -145,14 +137,14 @@ protected:
    //@}
 };
 
-void OpenSgViewer::contextInit()
+void VrkitApp::contextInit()
 {
    vrkit::Viewer::contextInit();
 
    initGl();
 }
 
-void OpenSgViewer::preFrame()
+void VrkitApp::preFrame()
 {
    // Call up to get navigation and plugin updates.
    vrkit::Viewer::preFrame();
@@ -168,17 +160,7 @@ void OpenSgViewer::preFrame()
    }
 }
 
-void OpenSgViewer::draw()
-{
-   vrkit::Viewer::draw();
-}
-
-void OpenSgViewer::contextPreDraw()
-{
-   vrkit::Viewer::contextPreDraw();
-}
-
-void OpenSgViewer::deallocate()
+void VrkitApp::deallocate()
 {
    vrkit::Viewer::deallocate();
 
@@ -186,15 +168,7 @@ void OpenSgViewer::deallocate()
    mSoundPlayer = vrkit::util::EventSoundPlayerPtr();
 }
 
-vrkit::event::ResultType OpenSgViewer::
-objectsMovedSlot(const vrkit::EventData::moved_obj_list_t&)
-{
-   //std::cout << "MOVED" << std::endl;
-   //return vrkit::event::DONE;
-   return vrkit::event::CONTINUE;
-}
-
-void OpenSgViewer::init()
+void VrkitApp::init()
 {
    vrkit::Viewer::init();
 
@@ -217,23 +191,25 @@ void OpenSgViewer::init()
    mHighlighter = vrkit::util::BasicHighlighter::create()->init(myself);
    mSoundPlayer = vrkit::util::EventSoundPlayer::create()->init(myself);
 
-   vrkit::EventDataPtr event_data =
-      getSceneObj()->getSceneData<vrkit::EventData>();
-   event_data->objectsMoved.connect(
-      0, boost::bind(&OpenSgViewer::objectsMovedSlot, this, _1)
-   );
-
-   vprASSERT(getSceneObj().get() != NULL);      // We should have valid scene
-
    vrkit::ScenePtr scene = getSceneObj();
 
-   OSG::RefPtr<OSG::NodePtr> model_root;
+   vrkit::EventDataPtr event_data = scene->getSceneData<vrkit::EventData>();
+
+   // The vrkit::EventData::objectsMoved signal provides a vector of
+   // vrkit::SceneObjectPtr objects that are the objects being moved. We
+   // ignore that vector by not passing _1 to boost::bind() here, but
+   // normally, a slot would want to know about those objects.
+   event_data->objectsMoved.connect(
+      0, boost::bind(&VrkitApp::objectsMovedSlot, this)
+   );
+
+   OSG::NodeRefPtr model_root;
 
    // Load the model to use
-   if (mFileName.empty())
+   if ( mFileName.empty() )
    {
       std::cout << "Loading fake geometry." << std::endl;
-      model_root = OSG::makeTorus(0.75, 2.1, 21, 21);
+      model_root = OSG::makeTorus(0.75f, 2.1f, 21, 21);
    }
    else
    {
@@ -248,6 +224,8 @@ void OpenSgViewer::init()
    }
 
    // Make the materials of the loaded model available in the material pool.
+   // This is only here so that the Material Chooser Plug-in can have
+   // something to work with if it is configured to be used.
    // XXX: This is a little clunky, and it might be better if this were done
    // by vrkit::Viewer::addObject().
    vrkit::MaterialPoolDataPtr mat_pool =
@@ -257,53 +235,43 @@ void OpenSgViewer::init()
    // --- Light setup --- //
    // - Add directional light for scene
    // - Create a beacon for it and connect to that beacon
-   OSG::NodePtr  light_node;
-   OSG::NodePtr  light_beacon;
-   light_node   = OSG::Node::create();
-   light_beacon = OSG::Node::create();
-   OSG::DirectionalLightPtr light_core = OSG::DirectionalLight::create();
-   OSG::TransformPtr light_beacon_core = OSG::Transform::create();
+   OSG::DirectionalLightNodePtr light_node(OSG::DirectionalLight::create());
+   OSG::TransformNodePtr light_beacon(OSG::Transform::create());
 
-   // Setup light beacon
+   // Set up light beacon.
    OSG::Matrix light_pos;
    light_pos.setTransform(OSG::Vec3f(2.0f, 5.0f, 4.0f));
 
-   OSG::beginEditCP(light_beacon_core, OSG::Transform::MatrixFieldMask);
-      light_beacon_core->setMatrix(light_pos);
-   OSG::endEditCP(light_beacon_core, OSG::Transform::MatrixFieldMask);
+   OSG::beginEditCP(light_beacon, OSG::Transform::MatrixFieldMask);
+      light_beacon->setMatrix(light_pos);
+   OSG::endEditCP(light_beacon, OSG::Transform::MatrixFieldMask);
 
-   OSG::beginEditCP(light_beacon);
-      light_beacon->setCore(light_beacon_core);
-   OSG::endEditCP(light_beacon);
+   // Set up light node.
+   OSG::beginEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
+      light_node.node()->addChild(light_beacon);
+   OSG::endEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
 
-   // Setup light node
-   OSG::addRefCP(light_node);
    OSG::beginEditCP(light_node);
-      light_node->setCore(light_core);
-      light_node->addChild(light_beacon);
+      light_node->setAmbient(0.9f, 0.8f, 0.8f, 1.0f);
+      light_node->setDiffuse(0.6f, 0.6f, 0.6f, 1.0f);
+      light_node->setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+      light_node->setDirection(0.0f, 0.0f, 1.0f);
+      light_node->setBeacon(light_beacon);
    OSG::endEditCP(light_node);
 
-   OSG::beginEditCP(light_core);
-      light_core->setAmbient   (0.9, 0.8, 0.8, 1);
-      light_core->setDiffuse   (0.6, 0.6, 0.6, 1);
-      light_core->setSpecular  (1, 1, 1, 1);
-      light_core->setDirection (0, 0, 1);
-      light_core->setBeacon    (light_beacon);
-   OSG::endEditCP(light_core);
-
-   // --- Setup Scene -- //
+   // --- Set up Scene -- //
    // add the loaded scene to the light node, so that it is lit by the light
-   OSG::beginEditCP(light_node);
-      light_node->addChild(model_root);
-   OSG::endEditCP(light_node);
+   OSG::beginEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
+      light_node.node()->addChild(model_root);
+   OSG::endEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
 
    // create the root part of the scene
    OSG::TransformNodePtr scene_transform_root = scene->getTransformRoot();
 
    // Set up the root node
-   OSG::beginEditCP(scene_transform_root.node());
+   OSG::beginEditCP(scene_transform_root.node(), OSG::Node::ChildrenFieldMask);
       scene_transform_root.node()->addChild(light_node);
-   OSG::endEditCP(scene_transform_root.node());
+   OSG::endEditCP(scene_transform_root.node(), OSG::Node::ChildrenFieldMask);
 
    if ( mEnableGrab )
    {
@@ -315,7 +283,7 @@ void OpenSgViewer::init()
    }
 }
 
-void OpenSgViewer::initGl()
+void VrkitApp::initGl()
 {
    //glEnable(GL_NORMALIZE);
 
@@ -352,7 +320,7 @@ void OpenSgViewer::initGl()
 #endif
 }
 
-void OpenSgViewer::configure(jccl::ConfigElementPtr cfgElt)
+void VrkitApp::configure(jccl::ConfigElementPtr cfgElt)
 {
    const unsigned int req_cfg_ver(2);
 
@@ -392,10 +360,19 @@ void OpenSgViewer::configure(jccl::ConfigElementPtr cfgElt)
    }
 }
 
-namespace po = boost::program_options;
+// This is a demonstration of how a slot for the objectsMoved signal might be
+// written.
+vrkit::event::ResultType VrkitApp::objectsMovedSlot()
+{
+   //std::cout << "MOVED" << std::endl;
+   //return vrkit::event::DONE;
+   return vrkit::event::CONTINUE;
+}
 
 int main(int argc, char* argv[])
 {
+   namespace po = boost::program_options;
+
    const int EXIT_ERR_MISSING_JCONF(1);
    const int EXIT_ERR_MISSING_APP_CONF(2);
    const int EXIT_ERR_EXCEPTION(-1);
@@ -450,7 +427,7 @@ int main(int argc, char* argv[])
          return EXIT_SUCCESS;
       }
 
-      OpenSgViewerPtr app = OpenSgViewer::create();   // Create the app object
+      VrkitAppPtr app = VrkitApp::create();   // Create the app object
 
 #if __VJ_version >= 2003000
       // Intialize the kernel before loading config files.
@@ -479,9 +456,8 @@ int main(int argc, char* argv[])
 
       VRKIT_STATUS << "Using jdef path: ";
 
-      for ( std::vector<std::string>::iterator i = jdef_dirs.begin();
-            i != jdef_dirs.end();
-            ++i )
+      typedef std::vector<std::string>::iterator iter_type;
+      for ( iter_type i = jdef_dirs.begin(); i != jdef_dirs.end(); ++i )
       {
          VRKIT_STATUS << *i << " ";
       }
@@ -494,9 +470,7 @@ int main(int argc, char* argv[])
 
          if ( ! jdef_dirs.empty() )
          {
-            for ( std::vector<std::string>::iterator i = jdef_dirs.begin();
-                  i != jdef_dirs.end();
-                  ++i )
+            for ( iter_type i = jdef_dirs.begin(); i != jdef_dirs.end(); ++i )
             {
                kernel->scanForConfigDefinitions(*i);
             }
