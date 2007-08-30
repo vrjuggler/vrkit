@@ -23,4 +23,61 @@
       </property>
       <upgrade_transform />
    </definition_version>
+   <definition_version version="2" label="Model">
+      <abstract>false</abstract>
+      <help />
+      <category>/vrkit/</category>
+      <property valuetype="string" variable="false" name="path">
+         <help>Model path</help>
+         <value label="Path" defaultvalue=""/>
+      </property>
+      <property valuetype="float" variable="false" name="position">
+         <help>Model position</help>
+         <value label="X" defaultvalue="0.0"/>
+         <value label="Y" defaultvalue="0.0"/>
+         <value label="Z" defaultvalue="0.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="rotation">
+         <help>Model rotation</help>
+         <value label="X Rot" defaultvalue="0.0"/>
+         <value label="Y Rot" defaultvalue="0.0"/>
+         <value label="Z Rot" defaultvalue="0.0"/>
+      </property>
+      <property valuetype="boolean" variable="false" name="enable_grabbing">
+         <help>Enable/disable grabbing for this model. The model will be loaded with dynamic interaction discovery, so all children of the root that are identified as being grabbable will be made so.</help>
+         <value label="Enable Grabbing?" defaultvalue="true"/>
+      </property>
+      <property valuetype="string" variable="true" name="core_type">
+         <help>Identifies a node core type that identifies an object suitable for user interaction. Node core types are things such as "Transform" or "MaterialGroup". Invalid types will be filtered out automatically.</help>
+         <value label="Node Core Type" defaultvalue="Transform"/>
+      </property>
+      <upgrade_transform>
+         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jconf="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" version="1.0">
+            <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
+            <xsl:variable name="jconf">http://www.vrjuggler.org/jccl/xsd/3.0/configuration</xsl:variable>
+
+            <xsl:template match="/">
+                <xsl:apply-templates/>
+            </xsl:template>
+
+            <xsl:template match="jconf:model">
+               <xsl:element namespace="{$jconf}" name="model">
+                  <xsl:attribute name="name">
+                     <xsl:value-of select="@name"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="version">2</xsl:attribute>
+                  <xsl:copy-of select="./jconf:path" />
+                  <xsl:copy-of select="./jconf:position" />
+                  <xsl:copy-of select="./jconf:rotation" />
+                  <xsl:element namespace="{$jconf}" name="enable_grabbing">
+                     <xsl:text>true</xsl:text>
+                  </xsl:element>
+                  <xsl:element namespace="{$jconf}" name="core_type">
+                     <xsl:text>Transform</xsl:text>
+                  </xsl:element>
+               </xsl:element>
+            </xsl:template>
+         </xsl:stylesheet>
+      </upgrade_transform>
+   </definition_version>
 </definition>
