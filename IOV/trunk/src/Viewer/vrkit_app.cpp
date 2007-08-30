@@ -40,6 +40,7 @@
 #include <vrkit/Scene.h>
 #include <vrkit/Status.h>
 #include <vrkit/DynamicSceneObject.h>
+#include <vrkit/DynamicSceneObjectTransform.h>
 #include <vrkit/WandInterface.h>
 #include <vrkit/Exception.h>
 #include <vrkit/scenedata/EventData.h>
@@ -273,11 +274,20 @@ void VrkitApp::init()
 
    if ( mEnableGrab )
    {
-      // Register object for intersection and grabbing.
-      vrkit::util::CoreTypePredicate pred(mCoreTypes);
-      addObject(
-         vrkit::DynamicSceneObject::create()->init(model_root, pred, true)
-      );
+      if ( mCoreTypes.empty() )
+      {
+         addObject(
+            vrkit::DynamicSceneObjectTransform::create()->init(model_root)
+         );
+      }
+      else
+      {
+         // Register object for intersection and grabbing.
+         vrkit::util::CoreTypePredicate pred(mCoreTypes);
+         addObject(
+            vrkit::DynamicSceneObject::create()->init(model_root, pred, true)
+         );
+      }
    }
 }
 
