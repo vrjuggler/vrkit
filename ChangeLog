@@ -1,0 +1,363 @@
+DATE       AUTHOR   CHANGE
+---------- -------- -----------------------------------------------------------
+2007-08-30 patrick  Added support for object grabbing to the Model Loader
+                    Plug-in via the use of vrkit::DynamicSceneObject.
+                    -- VERSION -- 0.48.3
+2007-08-30 patrick  Added the Material Chooser Plug-in.
+                    -- VERSION -- 0.48.2
+2007-08-29 patrick  Added vrkit::SceneObject::setNodeTravMask() to eliminate
+                    code duplication in vrkit::StaticSceneObjct,
+                    vrkit::DynamicSceneObject, and subclasses thereof.
+                    -- VERSION -- 0.48.1
+2007-08-28 patrick  Removed vrkit::StatusPanelData::hasControlText()
+                    -- VERSION -- 0.48.0
+2007-08-28 patrick  Added the Video Capture Plug-in.
+                    -- VERSION -- 0.47.3
+2007-08-28 patrick  vrkit::video::EncoderFFmpeg now works on Windows.
+                    -- VERSION -- 0.47.2
+2007-08-27 patrick  Replaced vrkit::Viewer::getRenderAction() with
+                    vrkit::Viewer::getContextData().
+                    -- VERSION -- 0.47.1
+2007-08-27 patrick  Set VRKIT_BASE_DIR automatically on Windows.
+2007-08-26 patrick  Introduced new vrkit directory structure.
+                    -- VERSION -- 0.47.0
+2007-08-24 patrick  Added inf::CoreTypeSeqPredicate that allows compile-time
+                    construction of a sequence of OSG::NodeCore subclasses for
+                    use with inf::DynamicSceneObject.
+                    -- VERSION -- 0.46.1
+2007-08-23 patrick  Made inf::DynamicSceneObject's dynamic discovery of scene
+                    object parent/child relationships much more flexible. The
+                    old behavior that was limited to OSG::Transform node cores
+                    is now in inf::DynamicSceneObjectTransform.
+                    -- VERSION -- 0.46.0
+2007-08-23 patrick  inf::VideoCamera now emits signals when the recording
+                    state changes.
+                    -- VERSION -- 0.45.2
+2007-08-22 patrick  Added new exception types for improved error reporting in
+                    the use of inf::VideoCamera and friends.
+                    -- VERSION -- 0.45.1
+2007-08-21 patrick  Renamed signal objects in inf::EventData to be more like
+                    method names. Renamed signal objects in
+                    inf::StatusPanelData to be more like method names.
+                    -- VERSION -- 0.45.0
+2007-08-18 dshipton Further refactoring of the video capture interfaces.
+                    -- VERSION -- 0.44.0
+2007-08-17 aronb    Added support for OpenGL video caputre using DirectShow.
+2007-08-14 dshipton Refactored video classes into distinct pieces. VideoCamera
+                    is the main class that users manipulate.
+                    -- VERSION -- 0.43.0
+2007-08-09 dshipton Added inf::FboVideoCamera::setNearFar().
+                    -- VERSION -- 0.42.2
+2007-08-06 patrick  Removed pure virtual destroy() method from the plug-in base
+                    classes.
+                    -- VERSION -- 0.42.0
+2007-08-04 patrick  Removed the implicit conversion to bool for
+                    inf::DigitalCommand (introduced in 0.41.0).
+                    -- VERSION -- 0.41.2
+2007-08-04 patrick  Updated the Viewpoints Plug-in to use inf::DigitalCommand.
+                    -- VERSION -- 0.41.1
+2007-08-03 patrick  Revamped inf::DigitalCommand to be fully configurable using
+                    button state expressions. All plug-ins currently using
+                    inf::DigitalCommand have been updated for this new
+                    capability.
+                    -- VERSION -- 0.41.0
+2007-08-02 dshipton Added inf::User::getInterocularDistance() for obtaining
+                    the users eye separation with an optional scaling factor.
+                    -- VERSION -- 0.40.2
+2007-08-01 patrick  Added inf::User::getHeadProxy() for getting access to the
+                    user head position.
+                    -- VERSION -- 0.40.1
+2007-07-31 patrick  inf::plugin::buildSearchPath() now looks in the "debug"
+                    subdirectory for optimized and debug-enabled builds. For a
+                    debug-enabled build, it looks in the "debug" subdirectory
+                    first; for an optimized build, second.
+                    inf::PluginRegistry::addEntry() now ignores duplicate entry
+                    additions.
+                    -- VERSION -- 0.40.0
+2007-07-27 patrick  Made inf::WandInterface configurable.
+                    -- VERSION -- 0.39.0
+2007-07-26 dshipton Added dynamic visibility toggling to the Status Panel
+                    Plug-in.
+                    -- VERSION -- 0.38.0
+2007-07-26 aronb    Added support for stereo movie creation.
+                    -- VERSION -- 0.37.2
+2007-07-24 aronb    Added support for creating movies using Video for Windows.
+                    -- VERSION -- 0.37.1
+2007-07-20 aronb    Added video capture support.
+                    -- VERSION -- 0.37.0
+2007-07-17 patrick  Changed the Mode Harness Plug-in slot signature from
+                    void (const std::string&) to void ().
+2007-07-16 patrick  Reimplemented plug-in handling to support dependency
+                    management and versioning. Replaced inf::PluginFactory
+                    with inf::PluginRegistry. Introduced inf::plugin::Info.
+                    -- VERSION -- 0.36.0
+2007-07-13 patrick  Separated the Intersect Strategy plug-ins from the Grab
+                    and Move Strategy plug-ins in the IOV installation tree.
+2007-07-12 patrick  For debug builds, do not put "_d" in the plug-in name. The
+                    debug-enabled plug-ins (not linked against the debug
+                    runtime on Windows) are installed in the 'debug'
+                    subdirectory of the directory containing the optimized
+                    plug-ins. This is in line with changes in naming convention
+                    in VR Juggler 2.2, though this change does not make VR
+                    Juggler 2.2 the minimum required version.
+                    -- VERSION -- 0.35.0
+2007-07-11 patrick  Refactored inf::SignalRepository to be much more generic
+                    and flexible.
+                    -- VERSION -- 0.34.0
+2006-12-01 patrick  Fixed forward/reverse inversion bug in the slide move
+                    strategies.
+2006-10-30 patrick  Introduced the Simple Slide Move Strategy as an alternative
+                    to the (currently broken) Slide Move Strategy.
+2006-10-25 patrick  Introduced inf::HighlightCoreFinder to give external code
+                    access to the mechanism used by
+                    inf::GeometryHighlightTraverser to find node cores that
+                    can handle materials.
+2006-09-30 patrick  IOV 0.32 branch created.
+                    -- VERSION -- 0.33.0
+2006-09-11 patrick  Extended inf::SlaveViewer and the slaveViewer exectuable
+                    to allow the render action traversal mask to be set.
+                    -- VERSION -- 0.32.4
+2006-09-05 patrick  Made the Ray Intersection Strategy more reliable.
+                    -- VERSION -- 0.32.3
+2006-08-15 patrick  Signals are not added to the signal repository by the Mode
+                    Harness Plug-in until a component is available to be
+                    activated by emitting the signal.
+                    -- VERSION -- 0.32.2
+2006-08-09 patrick  To build IOV with GCC 4.1 or newer, Boost 1.34 or newer is
+                    now required.
+                    -- VERSION -- 0.32.1
+2006-07-19 aronb    Refactored the use of intersection strategies.
+                    -- VERSION -- 0.32.0
+2006-07-10 patrick  Refactored inf::GrabPlugin and inf::GrabStrategy so that
+                    inf::GrabPlugin now relies upon its grab strategy to keep
+                    track of which objects are currently grabbed. Added an
+                    "asynchronous" release signal to inf::GrabSignalData.
+                    -- VERSION -- 0.31.0
+                    -- inf::GrabStrategy API VERSION -- 1.1
+2006-06-27 patrick  Extended inf::BasicHighlighter to handle changes to the
+                    list of objects selected for later grabbing by
+                    multi-object grabber strategies.
+                    -- VERSION -- 0.30.5
+2006-06-27 patrick  Added signals to inf::EventData that are emitted when a
+                    multi-object grab strategy adds and removes scene objects
+                    from its collection of objects to be grabbed.
+                    -- VERSION -- 0.30.4
+2006-06-23 patrick  Added a signal-based grab strategy that leaves the
+                    decisions about choosing objects and grabbing & releasing
+                    them up to external code. External code hooks up to this
+                    strategy plug-in through inf::GrabSignalData.
+                    -- VERSION -- 0.30.3
+2006-06-22 patrick  Added DLL memory clean-up bits to inf::MoveStrategy and
+                    inf::IntersectionStrategy.
+                    -- VERSION -- 0.30.2
+                    -- inf::MoveStrategy API VERSION -- 1.2
+                    -- inf::IntersectionStrategy API VERSION -- 1.1
+2006-06-22 patrick  Added a multi-object grab strategy for the Grab Plug-in.
+                    -- VERSION -- 0.30.1
+2006-06-22 patrick  Refactored the Grab Plug-in to use strategies for
+                    determining which object(s) to grab.
+                    -- VERSION -- 0.30.0
+2006-06-22 patrick  Refactored select/move/de-select to operate in terms of
+                    multiple objects all the time.
+                    -- inf::MoveStrategy API VERSION -- 1.1
+                    -- VERSION -- 0.29.0
+2006-06-17 patrick  Added the Volume Drawing Plug-in for rendering OpenSG
+                    volumes.
+2006-06-17 patrick  Extended the inf::Plugin interface to include methods for
+                    context-specific actions (including rendering).
+                    -- inf::Plugin API VERSION -- 1.3
+                    -- VERSION -- 0.28.0
+2006-06-17 patrick  Merged inf::Plugin::updateState() and inf::Plugin::run()
+                    back into inf::Plugin::update(). This reverts most of
+                    Revision 62, which predates this file.
+                    -- inf::Plugin API VERSION -- 1.2
+                    -- VERSION -- 0.27.0
+2006-06-17 patrick  inf::User now updates its view platform every time the
+                    view platform moves.
+2006-06-17 patrick  inf::ViewPlatform now emits a signal when it is moved.
+                    -- VERSION -- 0.26.7
+2006-06-14 patrick  Fixed a bug in the Grab Plug-in object release code that
+                    could result in the object de-selected signal being
+                    emitted twice.
+                    -- VERSION -- 0.26.6
+2006-06-08 patrick  GMTL 0.4.11 or newer is now required to build IOV.
+2006-06-05 patrick  Made the inf::Viewer methods addObject() and removeObject()
+                    public.
+                    -- VERSION -- 0.26.5
+2006-06-06 patrick  Added vpr::DebugCategory objects infDBG_VIEWER and
+                    infDBG_PLUGIN.
+                    -- VERSION -- 0.26.4
+2006-06-06 patrick  Allow the Grab Plug-in to use different buttons for the
+                    grab and release operations.
+                    -- VERSION -- 0.26.3
+2006-06-05 patrick  Made inf::Viewer::getObjects() public.
+                    -- VERSION -- 0.26.2
+2006-06-05 patrick  Added an overload of inf::SignalProxy<T>::connect for group
+                    connection handling.
+                    -- VERSION -- 0.26.1
+2006-06-05 patrick  Added inf::EventSoundPlayer and removed sound triggering
+                    from the Grab Plug-in.
+                    -- VERSION -- 0.26.0
+2006-06-02 patrick  Added inf::SceneObjectTraverser.
+                    -- VERSION -- 0.25.1
+2006-06-01 patrick  Removed inf::GrabData in favor of using
+                    inf::SceneObject::isGrabbable().
+                    -- VERSION -- 0.25.0
+2006-06-01 patrick  Added state change notification to inf::SceneObject and
+                    inf::StaticSceneObject.
+                    -- VERSION -- 0.24.1
+2006-06-01 jalane   Extended Wand Nav Plug-in to allow for negative
+                    acceleration for stopping.
+                    -- VERSION -- 0.24.0
+2006-05-31 jalane   Added Model Switch Plug-in.
+2006-05-30 patrick  Extended inf::SceneObject with state information for
+                    (dis)allowing intersection and grabbing.
+                    -- VERSION -- 0.23.3
+2006-05-30 patrick  Added inf::SignalEmitter and inf::SignalData.
+                    -- VERSION -- 0.23.2
+2006-05-25 patrick  inf::GrabData now emits signals when objects are added and
+                    removed.
+                    -- VERSION -- 0.23.1
+2006-05-24 patrick  Added the Mode Harness Plug-in and associated types
+                    inf::ModeComponent and inf::SignalRepository.
+                    -- VERSION -- 0.23.0
+2006-05-12 patrick  Removed exception specifications from methods.
+                    -- VERSION -- 0.22.0
+2006-04-08 patrick  Those types that are stored using boost::shared_ptr<T> and
+                    have an init() method now return their shared pointer from
+                    the init() method.
+                    -- VERSION -- 0.21.0
+2006-04-07 patrick  Extended the Slide Move Strategy plug-in so that its slide
+                    threshold is configurable.
+                    -- VERSION -- 0.20.3
+2006-04-07 patrick  Changed the type of inf::Event::ResultType from int to
+                    enum.
+                    -- VERSION -- 0.20.2
+2006-04-06 patrick  Removed inf::Widget::move() since it duplicates the
+                    inherited inf::SceneObject::moveTo().
+                    -- VERSION -- 0.20.1
+2006-04-05 aronb    Centralized the intersection test code in inf::Viewer.
+                    -- VERSION -- 0.20.0
+2006-04-03 patrick  Added an overload of inf::Widget::move() that takes an
+                    OSG::Matrix reference so that widgets can be positioned
+                    using a full transformation matrix.
+                    -- VERSION -- 0.19.2
+2006-04-03 patrick  Extended the Ray Intersection Strategy plug-in to use
+                    (configurable) triangle-level intersection testing.
+                    -- VERSION -- 0.19.1
+2006-04-03 patrick  Moved the use of inf::GeometryHighlightTraverser out of the
+                    Grab Plug-in and into the new class inf::BasicHighlighter.
+                    User code must now choose to use (or not to use)
+                    inf::BasicHighlighter or some other object highlight
+                    mechanism.
+                    -- VERSION -- 0.19.0
+2006-03-22 aronb    Refactored the Grab Plug-in to operate in terms of the new
+                    type inf::SceneObject instead of dealing with the scene
+                    graph directly.
+                    -- VERSION -- 0.18.0
+2006-03-21 patrick  Added the Grid Plug-in.
+                    -- VERSION -- 0.17.1
+2006-03-21 aronb    Use Boost.Signals to handle event generation by the Grab
+                    Plug-in.
+                    -- VERSION -- 0.17.0
+2006-03-17 patrick  The functionality of the Point Grab Plug-in has been
+                    superceded by the Grab Plug-in and its Basic Move Strategy
+                    plug-in.
+                    -- VERSION -- 0.16.2
+2006-03-17 patrick  Replaced the Center Point Grab Plug-in with a move strategy
+                    used by the Grab Plug-in.
+                    -- VERSION -- 0.16.1
+2006-03-16 arnob    Added a new grab plug-in whose intersection and object
+                    movement behaviors are defined by strategies that are
+                    plugged in at run time.
+2006-03-16 patrick  Made inf::PluginCreator and inf::PluginFactory templated
+           aronb    types to allow them to be used for plug-in types beyond
+                    those deriving from inf::Plugin.
+2006-03-15 patrick  IOV 0.15 branch created.
+                    -- VERSION -- 0.16.0
+2006-02-07 patrick  Extended ModeSwitchPlugin to allow multiple buttons to be
+                    used for activating mode swapping.
+                    -- VERSION -- 0.15.1
+2006-02-07 patrick  Added inf::DigitalCommand, which was factored from code
+                    formerly in PointGrabPlugin and WandNavPlugin.
+                    -- VERSION -- 0.15.0
+2005-12-23 patrick  Added an overload of inf::Scene::getSceneData<T>() that
+                    takes no argument and instead requires the availability of
+                    T::type_guid.
+                    -- VERSION -- 0.14.1
+2005-12-03 allenb   Extended WandInterface to support analog values.
+                    -- VERSION -- 0.14.0
+2005-12-01 patrick  Split the IOV cluster configuration into a separate
+                    "mix-in" config element type (iov_cluster).
+                    -- VERSION -- 0.13.0
+2005-11-09 patrick  Changed the interpretation of the listen_addr property in
+                    the configuration so that an empty value is treated as a
+                    request to bind to the local machine's standard network
+                    interface.
+                    -- VERSION -- 0.12.1
+2005-11-05 patrick  Fixed a bug in the cluster master connection setup on
+                    multi-homed hosts.
+                    -- VERSION -- 0.12.0
+2005-07-28 patrick  Extended inf::StatusPanel to handle multi-button commands.
+                    -- VERSION -- 0.10.0
+2005-07-28 patrick  Made the intersection and grab shaders for PointGrabPlugin
+                    more configurable through an extension to the config
+                    element for that plug-in.
+                    -- VERSION -- 0.9.1
+2005-07-28 patrick  Handle shader uniform parameters in
+                    inf::GeometryHighlightTraverser::createSHLMaterial().
+                    -- VERSION -- 0.9.0
+2005-07-28 patrick  Fixed another clustering bug in
+                    inf::GeometryHighlightTraverser.
+                    -- VERSION -- 0.8.1
+2005-07-25 patrick  Send the near/far projection settings to the slaves every
+                    frame when running in a cluster configuration.
+                    -- VERSION -- 0.8.0
+2005-07-24 patrick  Fixed serious cluster bugs tied to the class
+                    inf::GeometryHighlightTraverser.
+                    -- VERSION -- 0.7.3
+2005-07-24 patrick  Added inf::StatusPanel::setStatusHistorySize().
+                    -- VERSION -- 0.7.2
+2005-07-23 patrick  Added uniform parameters (color, exponent, and scale) to
+           terry    to the GLSL shader files data/shaders/highlight.vs and
+                    data/shaders/highlight.vs.
+2005-07-23 patrick  Extended the flexibility of the method
+                    inf::GeometryHighlightTraverser::createSHLMaterial().  The
+                    chunk material by this method no longer has a hard-coded
+                    blend chunk.
+                    -- VERSION -- 0.7.1
+2005-07-22 patrick  Refactored inf::GeometryHighlightTraverser yet again so
+                    that the node's subtree is traversed automatically before
+                    every material modification.
+                    -- VERSION -- 0.7.0
+2005-07-21 patrick  Extended inf::StatusPanel with functionality needed for
+                    interactive plug-ins to be able to display their controls.
+                    Changed the signature of inf::Plugin::focusChanged() to
+                    take a parameter of type inf::ViewerPtr.
+                    -- VERSION -- 0.6.0
+2005-07-21 patrick  Switch to using OpenSG typdef's for instantiations of
+                    OSG::CoredNodePtr<T>.
+                    -- VERSION -- 0.5.2
+2005-07-21 patrick  Added the helper method for creating scribe materials
+                    inf::GeometryHighlightTraverser::createScribeMaterial().
+                    -- VERSION -- 0.5.1
+2005-07-20 patrick  Added material management to the class
+                    inf::GeometryHighlightTraverser.
+                    -- VERSION -- 0.5.0
+2005-07-20 patrick  Extended inf::StatusPanel to account for application units.
+                    -- VERSION -- 0.4.2
+2005-07-18 patrick  Added inf::UiBuilder::resetGeomGeo().
+                    -- VERSION -- 0.4.1
+2005-07-15 patrick  Refactored inf::GeometryHighlightTraverser so that uesrs of
+                    the class can add and remove multiple materials.
+                    -- VERSION -- 0.4.0
+2005-07-15 patrick  Changed the interface of inf::GeometryHighlightTraverser
+                    so that it performs the sub-tree traversal itself.
+                    -- VERSION -- 0.3.1
+2005-06-15 allenb   MERGE: rev:247
+                    Fix to make viewpoints start at first one.
+2005-06-14 allenb   New version for development.
+                    -- VERSION -- 0.3.0
+2005-06-14 allenb   Created file.
+                    Tagged version for release.
+                    -- VERSION -- 0.2.0
