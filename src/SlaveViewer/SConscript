@@ -25,54 +25,26 @@ GetPlatform = SConsAddons.Util.GetPlatform;
 
 Import('*')
 
-viewerEnv = build_env.Copy()
+viewerEnv = baseEnv.Copy()
 
-boost_options.apply(viewerEnv)
+boost_options.updateEnv(viewerEnv)
 
 if boost_options.isAvailable():
    viewerEnv.Prepend(CPPPATH = inst_paths['include'],
-                     LIBPATH = inst_paths['lib'])
+                     LIBPATH = inst_paths['lib'],
+                     LIBS = 'iov')
    viewerEnv.Append(CPPPATH = ['.'])
 
    # XXX: There has to be a better way to do this Mac-specific stuff.
-   if platform == 'darwin':
+   if GetPlatform() == 'mac':
       viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
-   # We use automatic linking against the Boost libraries and vrkit on
-   # Windows.
-   if platform != 'win32':
-      po_lib = boost_options.getFullLibName('program_options', viewerEnv)
-      viewerEnv.Prepend(LIBS = ['vrkit' + shared_lib_suffix, po_lib])
+   #po_lib = boost_options.buildFullLibName('program_options')
+   viewerEnv.Prepend(LIBS = ['boost_program_options', 'OSGCluster', 'OSGState', 'OSGGroup', 'OSGDrawable', 'OSGWindow', 'OSGText', 'OSGRenderTraversal'])
 
-   appname = 'slaveViewer'
-   slave_viewer_name = appname + runtime_suffix
-   slave_viewer_srcs = ['slave_app.cpp']
-   if platform == 'win32':
-      slave_viewer_srcs.append(viewerEnv.RES('slaveViewer.rc'))
-
-   slave_viewer_prog = viewerEnv.Program(slave_viewer_name, slave_viewer_srcs)
-   viewerEnv.Install(inst_paths['bin'], slave_viewer_prog)
-
-   # On Windows, we need to ensure that we depend on the vrkit lib.
-   if platform == 'win32':
-      viewerEnv.Depends(slave_viewer_prog,
-                         os.path.join(inst_paths['lib'],
-                                      'vrkit%s.lib' % shared_lib_suffix))
-
-   # This only needs to be done when building against VR Juggler 2.1.21 or
-   # newer.
-   if platform == 'darwin':
-      if hasattr(vrj_options, 'flagpoll_parser') and \
-         vrj_options.flagpoll_parser is not None:
-         parser = vrj_options.flagpoll_parser
-         use_cocoa = parser.callFlagPoll('--get-all-use-cocoa')
-         if use_cocoa == 'yes':
-            viewerEnv['BUNDLE_APP_NAME']   = 'SlaveViewer'
-            viewerEnv['BUNDLE_INFO_PLIST'] = 'src/SlaveViewer/Info.plist'
-            viewerEnv['BUNDLE_PKG_INFO']   = 'src/SlaveViewer/PkgInfo'
-            release_target = viewerEnv.Alias('bundle',
-                                             makeBundle(appname, viewerEnv))
-            viewerEnv.Depends(release_target, appname)
+   slave_viewer_prog = viewerEnv.Program('slaveViewer', 
+                              ['slave_app.cpp'])
+   viewerEnv.Install(pj(inst_paths['app_base'],'slaveViewer'), slave_viewer_prog)
 else:
    print "WARNING: Cannot build slaveViewer without Boost.program_options"
 

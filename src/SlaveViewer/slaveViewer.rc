@@ -18,14 +18,14 @@
 
 // Microsoft Visual C++ generated resource script.
 //
-#include "../version.rc"
+#include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "winresrc.h"
+#include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -45,18 +45,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
-    "#include ""winresrc.h""\r\n"
+    "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -77,8 +77,8 @@ aaaaa ICON "../../data/infiscape_vrjuggler.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION VERSION_NUM
- PRODUCTVERSION VERSION_NUM
+ FILEVERSION 0,15,1,0
+ PRODUCTVERSION 0,15,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -95,13 +95,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://www.infiscape.com/"
             VALUE "CompanyName", "Infiscape Corporation"
-            VALUE "FileDescription", "vrkit slaveViewer"
-            VALUE "FileVersion", VERSION_STR
-            VALUE "InternalName", "vrkit slaveViewer"
-            VALUE "LegalCopyright", COPYRIGHT_STR
+            VALUE "FileDescription", "IOV slaveViewer"
+            VALUE "FileVersion", "0.15.1"
+            VALUE "InternalName", "IOV slaveViewer"
+            VALUE "LegalCopyright", "Copyright © 2005–2006"
             VALUE "OriginalFilename", "slaveViewer.exe"
-            VALUE "ProductName", "vrkit slaveViewer"
-            VALUE "ProductVersion", VERSION_STR
+            VALUE "ProductName", "IOV slaveViewer"
+            VALUE "ProductVersion", "0.15.1"
         END
     END
     BLOCK "VarFileInfo"

@@ -18,62 +18,30 @@
 
 #include <iostream>
 #include <fstream>
-#include <sstream>
-#include <cstdlib>
+#include <stdlib.h>
 #include <exception>
-#include <typeinfo>
 #include <string>
 #include <vector>
 #include <boost/program_options.hpp>
-#include <boost/algorithm/string.hpp>
 
-#include <OpenSG/OSGBaseTypes.h>
-
-#include <vrj/vrjParam.h>
 #include <vrj/Kernel/Kernel.h>
 
-#include <vrkit/ExitCodes.h>
-#include <vrkit/slave/SlaveViewer.h>
+#include <IOV/ExitCodes.h>
+#include <IOV/Slave/SlaveViewer.h>
 
-#define SLAVE_VIEWER_VERSION_MAJOR 1
-#define SLAVE_VIEWER_VERSION_MINOR 0
-#define SLAVE_VIEWER_VERSION_PATCH 0
+#define IOSV_VERSION_MAJOR 0
+#define IOSV_VERSION_MINOR 1
+#define IOSV_VERSION_PATCH 0
 
 
 namespace po = boost::program_options;
-
-template<typename T>
-T fromString(const std::string& str, std::ios_base& (*f)(std::ios_base&))
-{
-   std::istringstream stream(str);
-   T result;
-
-   if ( (stream >> f >> result).fail() )
-   {
-      std::ostringstream msg_stream;
-      msg_stream << "Failed to convert '" << str << "' to type "
-                 << typeid(T).name() << std::endl;
-      throw std::runtime_error(msg_stream.str());
-   }
-
-   return result;
-}
 
 int main(int argc, char* argv[])
 {
    std::string master_addr;
    std::string root_name;
-   std::string mask_str;
-
-   vrj::Kernel* kernel  = vrj::Kernel::instance();
 
    po::options_description generic("Generic options");
-#if __VJ_version >= 2003000
-   po::options_description& general_desc = kernel->getGeneralOptions();
-   po::options_description& cluster_desc = kernel->getClusterOptions();
-   generic.add(general_desc).add(cluster_desc);
-#endif
-
    generic.add_options()
       ("version,v", "print version string")
       ("help", "produce help message")
@@ -88,9 +56,6 @@ int main(int argc, char* argv[])
       ("root,r",
        po::value<std::string>(&root_name)->default_value("RootNode"),
        "Name of the root node being shared by the master")
-      ("mask,m",
-       po::value<std::string>(&mask_str)->default_value("0xffffffff"),
-       "Render action traversal mask in base-8, base-10, or base-16 form")
       ;
 
    po::options_description cmdline_options;
@@ -119,12 +84,10 @@ int main(int argc, char* argv[])
 
       if ( vm.count("version") > 0 )
       {
-         std::cout << "vrkit Slave Viewer Application v"
-                   << SLAVE_VIEWER_VERSION_MAJOR << "."
-                   << SLAVE_VIEWER_VERSION_MINOR << "."
-                   << SLAVE_VIEWER_VERSION_PATCH << std::endl
-                   << "\tCopyright (c) 2005-2007 Allen Bierbaum, "
-                   << "Aron Bierbaum, Patrick Hartling, and Daniel Shipton"
+         std::cout << "Infiscape Slave Viewer Application v"
+                   << IOSV_VERSION_MAJOR << "." << IOSV_VERSION_MINOR << "."
+                   << IOSV_VERSION_PATCH << std::endl
+                   << "\tCopyright (c) 2005 Infiscape Corporation"
                    << std::endl;
          return EXIT_SUCCESS;
       }
@@ -132,18 +95,15 @@ int main(int argc, char* argv[])
       if ( vm.count("addr") == 0 )
       {
          std::cout << "No address for master node given!" << std::endl;
-         return vrkit::EXIT_ERR_MISSING_ADDR;
+         return inf::EXIT_ERR_MISSING_ADDR;
       }
 
-#if __VJ_version >= 2003000
-      // Intialize the kernel before loading config files.
-      kernel->init(vm);
-#endif
+      vrj::Kernel* kernel  = vrj::Kernel::instance();
 
       if ( vm.count("jconf") == 0 )
       {
          std::cout << "No VR Juggler configuration files given!" << std::endl;
-         return vrkit::EXIT_ERR_MISSING_JCONF;
+         return inf::EXIT_ERR_MISSING_JCONF;
       }
       else
       {
@@ -157,42 +117,7 @@ int main(int argc, char* argv[])
          }
       }
 
-      OSG::UInt32 trav_mask(0xffffffff);
-
-      if ( ! mask_str.empty() )
-      {
-         try
-         {
-            std::ios_base& (*formatter)(std::ios_base&);
-
-            // The mask was given as a hexadecimal value.
-            if ( boost::istarts_with(mask_str, "0x") )
-            {
-               formatter = std::hex;
-            }
-            // The mask was given as an octal value.
-            else if ( mask_str != std::string("0") &&
-                      boost::starts_with(mask_str, "0") )
-            {
-               formatter = std::oct;
-            }
-            // The mask was given as a decimal value.
-            else
-            {
-               formatter = std::dec;
-            }
-
-            trav_mask = fromString<OSG::UInt32>(mask_str, formatter);
-         }
-         catch (std::exception& ex)
-         {
-            std::cerr << "Could not set traversal mask from user input:\n"
-                      << ex.what() << std::endl;
-         }
-      }
-
-      vrkit::SlaveViewer* app = new vrkit::SlaveViewer(master_addr, root_name,
-                                                       trav_mask);
+      inf::SlaveViewer* app = new inf::SlaveViewer(master_addr, root_name);
 
       kernel->start();
       kernel->setApplication(app);
@@ -204,7 +129,7 @@ int main(int argc, char* argv[])
    {
       std::cout << ex.what() << std::endl;
       std::cout << visible << std::endl;
-      return vrkit::EXIT_ERR_EXCEPTION;
+      return inf::EXIT_ERR_EXCEPTION;
    }
 
    return EXIT_SUCCESS;

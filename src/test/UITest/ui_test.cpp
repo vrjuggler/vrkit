@@ -22,11 +22,6 @@
 // to display locally.
 //
 
-#include <sstream>
-#include <algorithm>
-#include <vpr/vprConfig.h>
-#include <vpr/Util/Assert.h>
-
 #include <OpenSG/OSGGLUT.h>
 #include <OpenSG/OSGConfig.h>
 #include <OpenSG/OSGSimpleGeometry.h>
@@ -52,12 +47,13 @@
 
 #include <OpenSG/OSGVerifyGeoGraphOp.h>
 
-#include <vrkit/UiBuilder.h>
+#include <IOV/UiBuilder.h>
+#include <IOV/StatusPanel.h>
 
-// XXX: These include paths stink.
-#include "../../plugins/StatusPanelPlugin/StatusPanel.h"
-#include "../../plugins/StatusPanelPlugin/StatusPanelViewOriginal.h"
-
+#include <vpr/vprConfig.h>
+#include <vpr/Util/Assert.h>
+#include <sstream>
+#include <algorithm>
 
 OSG::SimpleSceneManager* mgr;
 
@@ -508,7 +504,7 @@ int main(int argc, char* argv[])
 
     //
 #if 0
-    vrkit::UiBuilder builder;
+    inf::UiBuilder builder;
 
     OSG::Color3f white(0.4,0.4,0.4);
     OSG::GeometryPtr pan_geom = builder.createGeomGeo();
@@ -530,7 +526,7 @@ int main(int argc, char* argv[])
 
     OSG::Color3f text_color(0,1,0);
     OSG::GeometryPtr text_geom = builder.createTextGeom();
-    vrkit::UiBuilder::Font font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
+    inf::UiBuilder::Font font("SANS", OSG::TextFace::STYLE_PLAIN, 64);
 
     builder.buildText(text_geom, font, "At 0,0\nText", OSG::Vec2f(0,0), text_color, 1.0f, 1.0f);
     builder.addText(text_geom, font, "At 0,10\nText", OSG::Vec2f(0,10), OSG::Color3f(0,1,1), 1.0f, 1.0f);
@@ -558,9 +554,8 @@ int main(int argc, char* argv[])
     // Status panel
    ///*
     // Use feet as the unit.
-    vrkit::StatusPanel status_panel;
-    vrkit::StatusPanelViewOriginal status_panel_view;
-    status_panel_view.initialize(3.28f, &status_panel);
+    inf::StatusPanel status_panel(3.28f);
+    status_panel.initialize();
 
 
     std::stringstream status_stream;
@@ -588,9 +583,9 @@ int main(int argc, char* argv[])
     status_panel.addStatusMessage(status_stream.str());
     status_stream.str("");
 
-    status_panel_view.update();
+    status_panel.update();
 
-    scene->addChild(status_panel_view.getPanelRoot());
+    scene->addChild(status_panel.getPanelRoot());
     //*/
 
 
@@ -615,7 +610,7 @@ int main(int argc, char* argv[])
    // Start it up
     mgr->showAll();
 
-    std::cout << "Near: " << mgr->getCamera()->getNear() << " Far: " << mgr->getCamera()->getFar() << std::endl;
+    std::cout << "Near: " << mgr->getCamera()->getNear() << " Far: " << mgr->getCamera()->getFar() << std::endl;    
     mgr->getCamera()->setNear(1.0);
     mgr->getCamera()->setFar(40.0f);
     std::cout << "Near: " << mgr->getCamera()->getNear() << " Far: " << mgr->getCamera()->getFar() << std::endl;
@@ -716,10 +711,10 @@ int setupGLUT(int *argc, char *argv[])
     glutInit(argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH | GLUT_DOUBLE);
 
-    int winid = glutCreateWindow("vrkit UI Test");
 
-    std::cout << "Depth size: " << glutGet(GLUT_WINDOW_DEPTH_SIZE)
-              << std::endl;
+    int winid = glutCreateWindow("IOV UI Test");
+
+    std::cout << "Depth size: " << glutGet(GLUT_WINDOW_DEPTH_SIZE) << std::endl;
 
     initgl();
     glutReshapeFunc(reshape);

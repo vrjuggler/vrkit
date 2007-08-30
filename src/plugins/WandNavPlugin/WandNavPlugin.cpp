@@ -23,8 +23,7 @@
 #include <string.h>
 #include <sstream>
 #include <algorithm>
-#include <boost/bind.hpp>
-#include <boost/assign/list_of.hpp>
+#include <vector>
 
 #include <gmtl/Matrix.h>
 #include <gmtl/MatrixOps.h>
@@ -37,48 +36,35 @@
 
 #include <vpr/Util/Assert.h>
 
-#include <vrkit/InterfaceTrader.h>
-#include <vrkit/Viewer.h>
-#include <vrkit/WandInterface.h>
-#include <vrkit/User.h>
-#include <vrkit/Status.h>
-#include <vrkit/Version.h>
-#include <vrkit/scenedata/StatusPanelData.h>
-#include <vrkit/plugin/Creator.h>
-#include <vrkit/plugin/Info.h>
-#include <vrkit/exceptions/PluginException.h>
+#include <IOV/InterfaceTrader.h>
+#include <IOV/Viewer.h>
+#include <IOV/PluginCreator.h>
+#include <IOV/WandInterface.h>
+#include <IOV/User.h>
+#include <IOV/Util/Exceptions.h>
+#include <IOV/Status.h>
+#include <IOV/StatusPanel.h>
+#include <IOV/StatusPanelPlugin.h>
 
 #include "WandNavPlugin.h"
 
 
-using namespace boost::assign;
-
-static const vrkit::plugin::Info sInfo(
-   "com.infiscape", "WandNavPlugin",
-   list_of(VRKIT_VERSION_MAJOR)(VRKIT_VERSION_MINOR)(VRKIT_VERSION_PATCH)
-);
-static vrkit::plugin::Creator<vrkit::viewer::Plugin> sPluginCreator(
-   boost::bind(&vrkit::WandNavPlugin::create, sInfo)
-);
+static inf::PluginCreator sPluginCreator(&inf::WandNavPlugin::create,
+                                         "Wand Navigator Plug-in");
 
 extern "C"
 {
 
 /** @name Plug-in Entry Points */
 //@{
-VRKIT_PLUGIN_API(const vrkit::plugin::Info*) getPluginInfo()
+IOV_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
+                                               vpr::Uint32& minorVer)
 {
-   return &sInfo;
+   majorVer = INF_PLUGIN_API_MAJOR;
+   minorVer = INF_PLUGIN_API_MINOR;
 }
 
-VRKIT_PLUGIN_API(void) getPluginInterfaceVersion(vpr::Uint32& majorVer,
-                                                 vpr::Uint32& minorVer)
-{
-   majorVer = VRKIT_PLUGIN_API_MAJOR;
-   minorVer = VRKIT_PLUGIN_API_MINOR;
-}
-
-VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
+IOV_PLUGIN_API(inf::PluginCreator*) getCreator()
 {
    return &sPluginCreator;
 }
@@ -86,13 +72,13 @@ VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getCreator()
 
 }
 
-namespace vrkit
+namespace inf
 {
 
-WandNavPlugin::WandNavPlugin(const plugin::Info& info)
-   : nav::Strategy(info)
-   , mLastFrameTime(0, vpr::Interval::Sec)
+WandNavPlugin::WandNavPlugin()
+   : mLastFrameTime(0, vpr::Interval::Sec)
    , mCanNavigate(false)
+   , mNavState(RESET)
    , mVelocity(0.0f)
    , mMaxVelocity(0.5f)
    , mAcceleration(0.005f)
@@ -107,7 +93,7 @@ WandNavPlugin::WandNavPlugin(const plugin::Info& info)
    mCanNavigate = isFocused();
 }
 
-viewer::PluginPtr WandNavPlugin::init(ViewerPtr viewer)
+void WandNavPlugin::init(ViewerPtr viewer)
 {
    InterfaceTrader& if_trader = viewer->getUser()->getInterfaceTrader();
    mWandInterface = if_trader.getWandInterface();
@@ -120,13 +106,11 @@ viewer::PluginPtr WandNavPlugin::init(ViewerPtr viewer)
    if ( ! cfg_elt )
    {
       throw PluginException("WandNavPlugin not find its configuration.",
-                            VRKIT_LOCATION);
+                            IOV_LOCATION);
    }
 
    // Configure it
    config(cfg_elt);
-
-   return shared_from_this();
 }
 
 bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
@@ -138,7 +122,7 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    const std::string reset_btn_prop("reset_button_nums");
    const std::string initial_mode_prop("initial_mode");
    const std::string rotation_sensitivity("rotation_sensitivity");
-   const unsigned int req_cfg_version(3);
+   const unsigned int req_cfg_version(2);
 
    vprASSERT(elt->getID() == getElementType() &&
              "Got unexpected config element type");
@@ -146,31 +130,15 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    // Check for correct version of plugin configuration
    if ( elt->getVersion() < req_cfg_version )
    {
-      // Version 3 is backwards compatible with version 2.
-      if ( elt->getVersion() == 2 )
-      {
-         VRKIT_STATUS << "WARNING: Config element '" << elt->getName()
-                      << "', version " << elt->getVersion()
-                      << ", for the Wand Nav Plug-in is out of date!\n"
-                      << "         The current config element version is "
-                      << req_cfg_version << ". Use VRJConfig to update."
-                      << std::endl;
-      }
-      // Version 1 is incompatible.
-      else
-      {
-         std::stringstream msg;
-         msg << "Configuration of WandNavPlugin failed.  Required config "
-             << "element version is " << req_cfg_version << ", but element '"
-             << elt->getName() << "' is version " << elt->getVersion();
-         throw PluginException(msg.str(), VRKIT_LOCATION);
-      }
+      std::stringstream msg;
+      msg << "Configuration of WandNavPlugin failed.  Required config "
+          << "element version is " << req_cfg_version << ", but element '"
+          << elt->getName() << "' is version " << elt->getVersion();
+      throw PluginException(msg.str(), IOV_LOCATION);
    }
 
    float max_velocity = elt->getProperty<float>("max_velocity");
    float accel        = elt->getProperty<float>("acceleration");
-   float decel        = elt->getProperty<float>("deceleration");
-   mIsDecelerationEnabled = elt->getProperty<bool>("enable_deceleration");
    mRotationSensitivity = elt->getProperty<float>(rotation_sensitivity);
 
    if ( max_velocity > 0.0f )
@@ -183,22 +151,12 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
       setAcceleration(accel);
    }
 
-   if ( decel > 0.0f )
-   {
-      setDeceleration(decel);
-   }
-
    // Get the buttons for navigation.
-   mForwardBtn.configure(elt->getProperty<std::string>(for_btn_prop),
-                         mWandInterface);
-   mReverseBtn.configure(elt->getProperty<std::string>(rev_btn_prop),
-                         mWandInterface);
-   mRotateBtn.configure(elt->getProperty<std::string>(rot_btn_prop),
-                        mWandInterface);
-   mModeBtn.configure(elt->getProperty<std::string>(mode_btn_prop),
-                      mWandInterface);
-   mResetBtn.configure(elt->getProperty<std::string>(reset_btn_prop),
-                       mWandInterface);
+   mForwardBtn.configButtons(elt->getProperty<std::string>(for_btn_prop));
+   mReverseBtn.configButtons(elt->getProperty<std::string>(rev_btn_prop));
+   mRotateBtn.configButtons(elt->getProperty<std::string>(rot_btn_prop));
+   mModeBtn.configButtons(elt->getProperty<std::string>(mode_btn_prop));
+   mResetBtn.configButtons(elt->getProperty<std::string>(reset_btn_prop));
 
    // Get initial mode
    unsigned int mode_id = elt->getProperty<unsigned int>(initial_mode_prop);
@@ -218,159 +176,174 @@ bool WandNavPlugin::config(jccl::ConfigElementPtr elt)
    return true;
 }
 
-void WandNavPlugin::focusChanged(ViewerPtr viewer)
+void WandNavPlugin::focusChanged(inf::ViewerPtr viewer)
 {
-   ScenePtr scene = viewer->getSceneObj();
-   StatusPanelDataPtr status_panel_data =
-      scene->getSceneData<StatusPanelData>();
+   inf::ScenePtr scene = viewer->getSceneObj();
+   StatusPanelPluginDataPtr status_panel_data =
+      scene->getSceneData<StatusPanelPluginData>();
 
    // We can only navigate when we have focus.
    mCanNavigate = isFocused();
-
-   status_panel_data->setHeaderTitle("test");
 
    if ( ! mCanNavigate )
    {
       mVelocity = 0.0f;
 
-      if ( mForwardBtn.isConfigured() )
+      if ( status_panel_data->mStatusPanelPlugin )
       {
-         status_panel_data->removeControlText(mForwardBtn.toString(),
-                                              mForwardText);
-      }
+         inf::StatusPanel& panel =
+            status_panel_data->mStatusPanelPlugin->getPanel();
 
-      if ( mReverseBtn.isConfigured() )
-      {
-         status_panel_data->removeControlText(mReverseBtn.toString(),
-                                              mReverseText);
-      }
+         if ( mForwardBtn.isConfigured() )
+         {
+            // The button numbers in mForwardBtn are zero-based, but we would
+            // like them to be one-based in the status panel display.
+            std::vector<int> btns(transformButtonVec(mForwardBtn.getButtons()));
+            panel.removeControlText(btns, mForwardText);
+         }
 
-      if ( mRotateBtn.isConfigured() )
-      {
-         status_panel_data->removeControlText(mRotateBtn.toString(),
-                                              mRotateText);
-      }
+         if ( mReverseBtn.isConfigured() )
+         {
+            // The button numbers in mReverseBtn are zero-based, but we would
+            // like them to be one-based in the status panel display.
+            std::vector<int> btns(transformButtonVec(mReverseBtn.getButtons()));
+            panel.removeControlText(btns, mReverseText);
+         }
 
-      if ( mModeBtn.isConfigured() )
-      {
-         status_panel_data->removeControlText(mModeBtn.toString(),
-                                              mModeText);
-      }
+         if ( mRotateBtn.isConfigured() )
+         {
+            // The button numbers in mRotateBtn are zero-based, but we would
+            // like them to be one-based in the status panel display.
+            std::vector<int> btns(transformButtonVec(mRotateBtn.getButtons()));
+            panel.removeControlText(btns, mRotateText);
+         }
 
-      if ( mResetBtn.isConfigured() )
-      {
-         status_panel_data->removeControlText(mResetBtn.toString(),
-                                              mResetText);
+         if ( mModeBtn.isConfigured() )
+         {
+            // The button numbers in mModeBtn are zero-based, but we would like
+            // them to be one-based in the status panel display.
+            std::vector<int> btns(transformButtonVec(mModeBtn.getButtons()));
+            panel.removeControlText(btns, mModeText);
+         }
+
+         if ( mResetBtn.isConfigured() )
+         {
+            // The button numbers in mResetBtn are zero-based, but we would
+            // like them to be one-based in the status panel display.
+            std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
+            panel.removeControlText(btns, mResetText);
+         }
       }
    }
    else
    {
-      if ( mForwardBtn.isConfigured() )
+      if ( status_panel_data->mStatusPanelPlugin )
       {
-         status_panel_data->addControlText(mForwardBtn.toString(),
-                                           mForwardText, 1);
-      }
+         inf::StatusPanel& panel =
+            status_panel_data->mStatusPanelPlugin->getPanel();
 
-      if ( mReverseBtn.isConfigured() )
-      {
-         status_panel_data->addControlText(mReverseBtn.toString(),
-                                           mReverseText, 1);
-      }
+         if ( mForwardBtn.isConfigured() )
+         {
+            std::vector<int> btns(transformButtonVec(mForwardBtn.getButtons()));
+            if ( ! panel.hasControlText(btns, mForwardText) )
+            {
+               panel.addControlText(btns, mForwardText);
+            }
+         }
 
-      if ( mRotateBtn.isConfigured() )
-      {
-         status_panel_data->addControlText(mRotateBtn.toString(), mRotateText,
-                                           1);
-      }
+         if ( mReverseBtn.isConfigured() )
+         {
+            std::vector<int> btns(transformButtonVec(mReverseBtn.getButtons()));
+            if ( ! panel.hasControlText(btns, mReverseText) )
+            {
+               panel.addControlText(btns, mReverseText);
+            }
+         }
 
-      if ( mModeBtn.isConfigured() )
-      {
-         status_panel_data->addControlText(mModeBtn.toString(), mModeText, 1);
-      }
+         if ( mRotateBtn.isConfigured() )
+         {
+            std::vector<int> btns(transformButtonVec(mRotateBtn.getButtons()));
+            if ( ! panel.hasControlText(btns, mRotateText) )
+            {
+               panel.addControlText(btns, mRotateText);
+            }
+         }
 
-      if ( mResetBtn.isConfigured() )
-      {
-         status_panel_data->addControlText(mResetBtn.toString(), mResetText,
-                                           1);
+         if ( mModeBtn.isConfigured() )
+         {
+            std::vector<int> btns(transformButtonVec(mModeBtn.getButtons()));
+            if ( ! panel.hasControlText(btns, mModeText) )
+            {
+               panel.addControlText(btns, mModeText);
+            }
+         }
+
+         if ( mResetBtn.isConfigured() )
+         {
+            std::vector<int> btns(transformButtonVec(mResetBtn.getButtons()));
+            if ( ! panel.hasControlText(btns, mResetText) )
+            {
+               panel.addControlText(btns, mResetText);
+            }
+         }
       }
    }
 }
 
-void WandNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
+void WandNavPlugin::updateNavState(ViewerPtr viewer,
+                                   ViewPlatform& viewPlatform)
 {
-   NavState nav_state(NONE);
+   vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
 
-   if ( isFocused() )
+   // Update velocity
+   if ( mForwardBtn.test(mWandInterface, gadget::Digital::ON) )
    {
-      vprASSERT(mWandInterface.get() != NULL && "No valid wand interface");
-
-      // Update velocity
-      if ( mForwardBtn() )
-      {
-         mVelocity += mAcceleration;
-      }
-      else if ( mReverseBtn() )
-      {
-         mVelocity -= mAcceleration;
-      }
-      else if ( mVelocity != 0.0f )
-      {
-         if ( mIsDecelerationEnabled )
-         {
-            if( fabs(mVelocity) <= mDeceleration )
-            {
-               mVelocity = 0.0f;
-            }
-            else if ( mVelocity > 0.0f )
-            {
-               mVelocity -= mDeceleration;
-            }
-            else
-            {
-               mVelocity += mDeceleration;
-            }
-         }
-         else
-         {
-            mVelocity = 0.0f;
-         }
-      }
-
-      // Restrict velocity range to [0.0,max_vel].
-      if ( mVelocity < -mMaxVelocity )
-      {
-         mVelocity = -mMaxVelocity;
-      }
-      if ( mVelocity > mMaxVelocity )
-      {
-         mVelocity = mMaxVelocity;
-      }
-
-      // Swap the navigation mode if the mode switching button was toggled on.
-      if ( mModeBtn() )
-      {
-         nav_state = NONE;
-         mNavMode = (mNavMode == WALK ? FLY : WALK);
-         VRKIT_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
-                      << std::endl;
-      }
-      // If the accelerate button and the rotate button are pressed together,
-      // then reset to the starting point translation and rotation.
-      else if ( mResetBtn() )
-      {
-         nav_state = RESET;
-      }
-      else if ( mRotateBtn() )
-      {
-         nav_state = ROTATE;
-      }
-      else
-      {
-         nav_state = TRANSLATE;
-      }
+      mVelocity += mAcceleration;
+   }
+   else if ( mReverseBtn.test(mWandInterface, gadget::Digital::ON) )
+   {
+      mVelocity -= mAcceleration;
+   }
+   else if ( mVelocity != 0.0f )
+   {
+      mVelocity = 0.0f;
    }
 
-   // Perform the work of navigating.
+   // Restrict velocity range to [0.0,max_vel].
+   if ( mVelocity < -mMaxVelocity )
+   {
+      mVelocity = -mMaxVelocity;
+   }
+   if ( mVelocity > mMaxVelocity )
+   {
+      mVelocity = mMaxVelocity;
+   }
+
+   // Swap the navigation mode if the mode switching button was toggled on.
+   if ( mModeBtn.test(mWandInterface, gadget::Digital::TOGGLE_ON) )
+   {
+      mNavMode = (mNavMode == WALK ? FLY : WALK);
+      IOV_STATUS << "Mode: " << (mNavMode == WALK ? "Walk" : "Fly")
+                << std::endl;
+   }
+   // If the accelerate button and the rotate button are pressed together,
+   // then reset to the starting point translation and rotation.
+   else if ( mResetBtn.test(mWandInterface, gadget::Digital::ON) )
+   {
+      mNavState = RESET;
+   }
+   else if ( mRotateBtn.test(mWandInterface, gadget::Digital::ON) )
+   {
+      mNavState = ROTATE;
+   }
+   else
+   {
+      mNavState = TRANSLATE;
+   }
+}
+
+void WandNavPlugin::runNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
+{
    const vpr::Interval cur_time(mWandInterface->getWandPos()->getTimeStamp());
    const vpr::Interval delta(cur_time - mLastFrameTime);
    float delta_sec(0.0f);
@@ -393,12 +366,8 @@ void WandNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
       gmtl::Matrix44f cur_pos = viewPlatform.getCurPos();
       const float scale_factor(viewer->getDrawScaleFactor());
 
-      switch ( nav_state )
+      switch ( mNavState )
       {
-         // Do nothing if so directed.
-         case NONE:
-            break;
-         // Handle reset.
          case RESET:
             mVelocity = 0.0f;
             gmtl::identity(cur_pos);
@@ -463,7 +432,7 @@ void WandNavPlugin::updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform)
             }
             break;
          default:
-            vprASSERT(false && "Bad value for nav_state");
+            vprASSERT(false && "Bad value for mNavState");
             break;
       }
 
@@ -481,9 +450,20 @@ void WandNavPlugin::setAcceleration(const float acceleration)
    mAcceleration = acceleration;
 }
 
-void WandNavPlugin::setDeceleration(const float deceleration)
+struct IncValue
 {
-   mDeceleration = deceleration;
+   int operator()(int v)
+   {
+      return v + 1;
+   }
+};
+
+std::vector<int> WandNavPlugin::transformButtonVec(const std::vector<int>& btns)
+{
+   std::vector<int> result(btns.size());
+   IncValue inc;
+   std::transform(btns.begin(), btns.end(), result.begin(), inc);
+   return result;
 }
 
 }

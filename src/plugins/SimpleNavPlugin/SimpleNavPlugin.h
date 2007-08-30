@@ -16,32 +16,30 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _VRKIT_SIMPLE_NAV_PLUGIN_H_
-#define _VRKIT_SIMPLE_NAV_PLUGIN_H_
+#ifndef SIMPLE_NAV_PLUGIN_H
+#define SIMPLE_NAV_PLUGIN_H
 
-#include <vrkit/plugin/Config.h>
+#include <IOV/Plugin/PluginConfig.h>
 
 #include <boost/enable_shared_from_this.hpp>
 
-#include <vrkit/WandInterfacePtr.h>
-#include <vrkit/nav/Strategy.h>
-#include <vrkit/util/DigitalCommand.h>
+#include <IOV/WandInterfacePtr.h>
+#include <IOV/Plugin.h>
+#include <IOV/Plugin/NavPlugin.h>
 
 
-namespace vrkit
+namespace inf
 {
 
 class SimpleNavPlugin
-   : public nav::Strategy
+   : public NavPlugin
    , public boost::enable_shared_from_this<SimpleNavPlugin>
 {
-protected:
-   SimpleNavPlugin(const plugin::Info& info);
-
 public:
-   static viewer::PluginPtr create(const plugin::Info& info)
+   static inf::PluginPtr create()
    {
-      return viewer::PluginPtr(new SimpleNavPlugin(info));
+      inf::PluginPtr new_strategy = inf::PluginPtr(new SimpleNavPlugin());
+      return new_strategy;
    }
 
    virtual ~SimpleNavPlugin()
@@ -54,9 +52,27 @@ public:
       return std::string("Navigation");
    }
 
-   virtual viewer::PluginPtr init(ViewerPtr viewer);
+   virtual void init(ViewerPtr viewer);
+
+   /**
+    * Invokes the global scope delete operator.  This is required for proper
+    * releasing of memory in DLLs on Win32.
+    */
+   void operator delete(void* p)
+   {
+      ::operator delete(p);
+   }
 
 protected:
+   /**
+    * Deletes this object.  This is an implementation of the pure virtual
+    * inf::Plugin::destroy() method.
+    */
+   virtual void destroy()
+   {
+      delete this;
+   }
+
    enum NavState
    {
       RESET,
@@ -71,9 +87,13 @@ protected:
       FLY       /**< Fly mode */
    };
 
-   virtual void focusChanged(ViewerPtr viewer);
+   SimpleNavPlugin();
 
-   virtual void updateNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
+   virtual void focusChanged(inf::ViewerPtr viewer);
+
+   virtual void updateNavState(ViewerPtr viewer, ViewPlatform& viewPlatform);
+
+   virtual void runNav(ViewerPtr viewer, ViewPlatform& viewPlatform);
 
    static std::string getElementType()
    {
@@ -83,14 +103,15 @@ protected:
    WandInterfacePtr mWandInterface;
 
    bool mCanNavigate;
+   NavState mNavState;
 
    float mVelocity;
    NavMode mNavMode;
 
-   util::DigitalCommand mForBtn;         /**< Button for forward motion. */
-   util::DigitalCommand mRevBtn;         /**< Button for reverse. */
-   util::DigitalCommand mRotateBtn;      /**< Button for rotate. */
-   util::DigitalCommand mModeBtn;        /**< Button for swapping mode. */
+   int mForBtn;      /**< Button for forward motion. */
+   int mRevBtn;      /**< Button for reverse. */
+   int mRotateBtn;   /**< Button for rotate. */
+   int mModeBtn;     /**< Button for swapping mode. */
 
    std::string mForwardText;
    std::string mReverseText;
@@ -101,4 +122,4 @@ protected:
 }
 
 
-#endif /* _VRKIT_SIMPLE_NAV_PLUGIN_H_ */
+#endif

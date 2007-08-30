@@ -18,70 +18,34 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import SConsAddons.Util as sca_util      # Get the utils
+import SConsAddons.Util       # Get the utils
 import sys, os, re, string, glob
-import os.path
 pj = os.path.join
+GetPlatform = SConsAddons.Util.GetPlatform;
 
 Import('*')
 
-viewerEnv = build_env.Copy()
+viewerEnv = baseEnv.Copy()
 
-boost_options.apply(viewerEnv)
+boost_options.updateEnv(viewerEnv)
 
 if boost_options.isAvailable():
    viewerEnv.Prepend(CPPPATH = inst_paths['include'],
-                     LIBPATH = inst_paths['lib'])
+                     LIBPATH = inst_paths['lib'],
+                     LIBS = 'iov')
 
    # XXX: There has to be a better way to do this Mac-specific stuff.
-   if platform == 'darwin':
+   if GetPlatform() == 'mac':
       viewerEnv.Append(LINKFLAGS = ['-Wl,-bind_at_load'])
 
-   # We use automatic linking against the Boost libraries and vrkit on
-   # Windows.
-   if platform != 'win32':
-      po_lib = boost_options.getFullLibName('program_options', viewerEnv)
-      viewerEnv.Prepend(LIBS = ['vrkit' + shared_lib_suffix, po_lib])
+   viewerEnv.Prepend(LIBS = ['boost_program_options', 'OSGCluster', 'OSGState', 'OSGGroup', 'OSGDrawable', 'OSGWindow', 'OSGText', 'OSGRenderTraversal'])
+   #po_lib = boost_options.buildFullLibName('program_options')
+   #viewerEnv.Prepend(LIBS = [po_lib])
 
-   appname = 'vrkit_app'
-   vrkit_app_name = appname + runtime_suffix
-   vrkit_app_srcs = ['vrkit_app.cpp']
-   if platform == 'win32':
-      vrkit_app_srcs.append(viewerEnv.RES('vrkit_app.rc'))
-
-   vrkit_app_prog = viewerEnv.Program(vrkit_app_name, vrkit_app_srcs)
-   viewerEnv.Install(inst_paths['bin'], vrkit_app_prog)
-
-   # On Windows, we need to ensure that we depend on the vrkit lib.
-   if platform == 'win32':
-      viewerEnv.Depends(vrkit_app_prog,
-                         os.path.join(inst_paths['lib'],
-                                      'vrkit%s.lib' % shared_lib_suffix))
-
-   # Only install *.jdef and *.jconf files on first pass.
-   if 0 == variant_pass:
-      jdef_files  = []
-      jconf_files = []
-      for path, dirs, files in sca_util.WalkBuildFromSource('.', viewerEnv):
-         jconf_files += [pj(path,f) for f in files if f.endswith('.jconf')]
-         jdef_files  += [pj(path,f) for f in files if f.endswith('.jdef')]
-
-      viewerEnv.Install(pj(inst_paths['app_base'], 'Viewer'), jconf_files)
-      viewerEnv.Install(inst_paths['definitions'], jdef_files)
-
-   # This only needs to be done when building against VR Juggler 2.1.21 or
-   # newer.
-   if platform == 'darwin':
-      if hasattr(vrj_options, 'flagpoll_parser') and \
-         vrj_options.flagpoll_parser is not None:
-         parser = vrj_options.flagpoll_parser
-         use_cocoa = parser.callFlagPoll('--get-all-use-cocoa')
-         if use_cocoa == 'yes':
-            viewerEnv['BUNDLE_APP_NAME']   = 'Viewer'
-            viewerEnv['BUNDLE_INFO_PLIST'] = 'src/Viewer/Info.plist'
-            viewerEnv['BUNDLE_PKG_INFO']   = 'src/Viewer/PkgInfo'
-            release_target = viewerEnv.Alias('bundle',
-                                             makeBundle(appname, viewerEnv))
-            viewerEnv.Depends(release_target, appname)
+   jconf_files = ['viewer-nav.jconf', 'viewer-vp.jconf']
+   infi_app_prog = viewerEnv.Program('infi_app', ['infi_app.cpp',])
+   viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), infi_app_prog)
+   viewerEnv.Install(pj(inst_paths['app_base'],'Viewer'), jconf_files)
 else:
-   print "WARNING: Cannot build vrkit_app without Boost.program_options"
+   print "WARNING: Cannot build infi_app without Boost.program_options"
+
