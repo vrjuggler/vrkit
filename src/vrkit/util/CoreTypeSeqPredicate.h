@@ -40,11 +40,11 @@ namespace util
  * are provided in a Boost MPL type sequence as the template parameter of this
  * class. This means that this class only suitable for cases when the types or
  * interest are known at compile time. In the case when the types of interest
- * are not known statically at compile time, use vrkit::CoreTypePredicate
+ * are not known statically at compile time, use vrkit::util::CoreTypePredicate
  * instead.
  *
  * @see vrkit::DynamicSceneObject
- * @see vrkit::CoreTypePredicate
+ * @see vrkit::util::CoreTypePredicate
  *
  * @note This class was moved into the vrkit::util namespace in verrsion 0.47.
  *

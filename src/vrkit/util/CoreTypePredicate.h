@@ -44,10 +44,10 @@ namespace util
  * known at compile time. For example, this predicate could be used in
  * conjuction with configurable code that gets its types of interest at run
  * time. In the case when the types of interest are known statically at
- * compile time, use vrkit::CoreTypeSeqPredicate<T> instead.
+ * compile time, use vrkit::util::CoreTypeSeqPredicate<T> instead.
  *
  * @see vrkit::DynamicSceneObject
- * @see vrkit::CoreTypeSeqPredicate
+ * @see vrkit::util::CoreTypeSeqPredicate
  *
  * @note This class was moved into the vrkit::util namespace in version 0.47.
  *
