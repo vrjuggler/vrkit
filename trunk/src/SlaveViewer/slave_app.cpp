@@ -67,16 +67,19 @@ int main(int argc, char* argv[])
 
    vrj::Kernel* kernel  = vrj::Kernel::instance();
 
+#if __VJ_version < 2003000
    po::options_description generic("Generic options");
-#if __VJ_version >= 2003000
-   po::options_description& general_desc = kernel->getGeneralOptions();
+   generic.add_options()
+      ("help", "produce help message")
+      ;
+#else
+   po::options_description& generic      = kernel->getGeneralOptions();
    po::options_description& cluster_desc = kernel->getClusterOptions();
-   generic.add(general_desc).add(cluster_desc);
+   generic.add(cluster_desc);
 #endif
 
    generic.add_options()
       ("version,v", "print version string")
-      ("help", "produce help message")
       ;
 
    po::options_description config("Configuration");

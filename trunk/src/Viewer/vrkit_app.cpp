@@ -395,16 +395,16 @@ int main(int argc, char* argv[])
    {
       vrj::Kernel* kernel = vrj::Kernel::instance();  // Get the kernel
 
+#if __VJ_version < 2003000
       po::options_description generic("General options");
-#if __VJ_version >= 2003000
-      po::options_description& general_desc = kernel->getGeneralOptions();
-      po::options_description& cluster_desc = kernel->getClusterOptions();
-      generic.add(general_desc).add(cluster_desc);
-#endif
-
       generic.add_options()
          ("help", "produce help message")
          ;
+#else
+      po::options_description& generic      = kernel->getGeneralOptions();
+      po::options_description& cluster_desc = kernel->getClusterOptions();
+      generic.add(cluster_desc);
+#endif
 
       std::vector<std::string> jdef_dirs;
 
