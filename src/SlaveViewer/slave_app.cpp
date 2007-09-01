@@ -81,8 +81,10 @@ int main(int argc, char* argv[])
 
    po::options_description config("Configuration");
    config.add_options()
+#if __VJ_version < 2003000
       ("jconf,j", po::value< std::vector<std::string> >()->composing(),
        "VR Juggler config file")
+#endif
       ("addr,a", po::value<std::string>(&master_addr),
        "Master address and port number in the form address:port")
       ("root,r",
@@ -138,8 +140,7 @@ int main(int argc, char* argv[])
 #if __VJ_version >= 2003000
       // Intialize the kernel before loading config files.
       kernel->init(vm);
-#endif
-
+#else
       if ( vm.count("jconf") == 0 )
       {
          std::cout << "No VR Juggler configuration files given!" << std::endl;
@@ -156,6 +157,7 @@ int main(int argc, char* argv[])
             kernel->loadConfigFile(*i);
          }
       }
+#endif
 
       OSG::UInt32 trav_mask(0xffffffff);
 
