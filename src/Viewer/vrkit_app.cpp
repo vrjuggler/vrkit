@@ -30,6 +30,7 @@
 
 #include <vpr/vpr.h>
 #include <vpr/System.h>
+#include <vpr/Util/FileUtils.h>
 #include <jccl/Config/ConfigElement.h>
 #include <vrj/vrjParam.h>
 #include <vrj/Kernel/Kernel.h>
@@ -42,6 +43,7 @@
 #include <vrkit/DynamicSceneObject.h>
 #include <vrkit/DynamicSceneObjectTransform.h>
 #include <vrkit/WandInterface.h>
+#include <vrkit/Version.h>
 #include <vrkit/Exception.h>
 #include <vrkit/scenedata/EventData.h>
 #include <vrkit/scenedata/MaterialPoolData.h>
@@ -113,7 +115,7 @@ public:
 
    void setFilename(const std::string& filename)
    {
-      mFileName = filename;
+      mFileName = vpr::replaceEnvVars(filename);
    }
 
 private:
@@ -417,7 +419,7 @@ int main(int argc, char* argv[])
          ("defs,d", po::value< std::vector<std::string> >(&jdef_dirs),
           "Path to custom config definition (.jdef) files")
          ("file,f",
-          po::value<std::string>()->default_value("data/scenes/test_scene.osb"),
+          po::value<std::string>()->default_value("${VRKIT_DATA_DIR}/data/scenes/test_scene.osb"),
           "File to load in scene")
       ;
 
@@ -450,21 +452,21 @@ int main(int argc, char* argv[])
 
       if ( vm.count("defs") == 0 )
       {
-         std::string vrkit_base_dir;
-         vpr::System::getenv("VRKIT_BASE_DIR", vrkit_base_dir);
+         std::string vrkit_data_dir;
+         vpr::System::getenv("VRKIT_DATA_DIR", vrkit_data_dir);
 
-         if ( vrkit_base_dir.empty() )
+         if ( vrkit_data_dir.empty() )
          {
-            std::cerr << "WARNING: Environment variable VRKIT_BASE_DIR is\n"
+            std::cerr << "WARNING: Environment variable VRKIT_DATA_DIR is\n"
                       << "         not set or is set to an empty value.\n"
                       << "         Expect problems later." << std::endl;
             jdef_dirs.push_back(".");
          }
          else
          {
-            jdef_dirs.push_back(vrkit_base_dir +
-                                   std::string("/share/vrkit/definitions"));
-            jdef_dirs.push_back(".");
+            boost::filesystem::path vrkit_def_path = vrkit_data_dir;
+            vrkit_def_path= boost::filesystem::path(vrkit_def_path / "definitions");
+            jdef_dirs.push_back(vrkit_def_path.string());
          }
       }
 

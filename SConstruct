@@ -275,7 +275,7 @@ if not sca_util.hasHelpFlag():
                                               'JUGGLER_OPT'])
 
       if opt_env['versioning']:
-         build_env.AppendUnique(CPPDEFINES = ['VRKIT_VERSIONED_INSTALL'])
+         build_env.AppendUnique(CPPDEFINES = ['VRKIT_USE_VERSIONING'])
 
       # Enable boost auto-linking.
       if platform == 'win32':
