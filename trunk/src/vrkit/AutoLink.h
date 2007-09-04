@@ -20,7 +20,7 @@
 #define _VRKIT_AUTO_LINK_H_
 
 #if defined(WIN32) || defined(WIN64)
-//#  include <vrkit/Version.h>
+#  include <vrkit/Version.h>
 
 #  if defined(VRKIT_DEBUG) && defined(_DEBUG)
 #     define VRKIT_LIB_RT_OPT "_d"
@@ -28,9 +28,6 @@
 #     define VRKIT_LIB_RT_OPT ""
 #  endif
 
-#  pragma comment(lib, "vrkit" VRKIT_LIB_RT_OPT ".lib")
-
-/*
 #  if defined(VRKIT_DEBUG) && defined(_DEBUG)
 #     define VRKIT_LIB_RT_OPT "_d"
 #  else
@@ -49,7 +46,6 @@
 #  undef VRKIT_DO_STRINGIZE
 #  undef VRKIT_STRINGIZE
 #  undef VRKIT_LIB_RT_OPT
-*/
 #endif
 
 #endif /* _VRKIT_AUTO_LINK_H_ */
