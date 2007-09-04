@@ -32,6 +32,7 @@
 #endif
 
 #include <vrkit/Status.h>
+#include <vrkit/Version.h>
 #include <vrkit/plugin/Helpers.h>
 
 
@@ -117,11 +118,16 @@ std::string getPluginBaseDir()
    std::string vrkit_base_dir;
    vpr::System::getenv("VRKIT_BASE_DIR", vrkit_base_dir);
 
+   std::string vrkit_dir = "vrkit";
+#ifdef VRKIT_VERSIONED_INSTALL
+   vrkit_dir.append("-");
+   vrkit_dir.append(vrkit::getVersion());
+#endif
+
    if ( ! vrkit_base_dir.empty() )
    {
-      // TODO: Use a versioned vrkit subdirectory.
       plugin_dir =
-         fs::path(vrkit_base_dir, fs::native) / "lib" / "vrkit" / "plugins";
+         fs::path(vrkit_base_dir, fs::native) / "lib" / vrkit_dir / "plugins";
    }
 
    return plugin_dir.native_directory_string();
