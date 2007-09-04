@@ -148,7 +148,9 @@ vrkit_library_init()
                                    vrkit_versioned_dir_name;
 
       std::string vrkit_base_dir_env_var;
-      if( ! vpr::System::getenv("VRKIT_BASE_DIR", vrkit_base_dir_env_var) )
+      vpr::System::getenv("VRKIT_BASE_DIR", vrkit_base_dir_env_var);
+
+      if ( vrkit_base_dir_env_var.empty() )
       {
          vpr::System::setenv("VRKIT_BASE_DIR", vrkit_base_dir.string());
          VRKIT_STATUS << "VRKIT_BASE_DIR set to: " << vrkit_base_dir.string() << std::endl;
@@ -159,7 +161,9 @@ vrkit_library_init()
       }
 
       std::string vrkit_data_dir_env_var;
-      if( ! vpr::System::getenv("VRKIT_DATA_DIR", vrkit_data_dir_env_var) )
+      vpr::System::getenv("VRKIT_DATA_DIR", vrkit_data_dir_env_var);
+
+      if ( vrkit_data_dir_env_var.empty() )
       {
          vpr::System::setenv("VRKIT_DATA_DIR", vrkit_data_dir.string());
          VRKIT_STATUS << "VRKIT_DATA_DIR set to: " << vrkit_data_dir.string() << std::endl;
@@ -170,7 +174,9 @@ vrkit_library_init()
       }
 
       std::string vrkit_plugin_dir_env_var;
-      if( ! vpr::System::getenv("VRKIT_PLUGINS_DIR", vrkit_plugin_dir_env_var) )
+      vpr::System::getenv("VRKIT_PLUGINS_DIR", vrkit_plugin_dir_env_var);
+
+      if ( vrkit_plugin_dir_env_var.empty() )
       {
          vpr::System::setenv("VRKIT_PLUGINS_DIR", vrkit_plugins_dir.string());
          VRKIT_STATUS << "VRKIT_PLUGINS_DIR set to: " << vrkit_plugins_dir.string() << std::endl;
