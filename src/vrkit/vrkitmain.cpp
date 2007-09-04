@@ -126,6 +126,10 @@ extern "C" void __attribute ((constructor)) vrkit_library_init()
       vrkit_lib_file = fs::system_complete(vrkit_lib_file);
 
       fs::path vrkit_lib_path = vrkit_lib_file.branch_path();
+#if defined(VRKIT_DEBUG)
+      // The debug library is in <base_dir>/lib/debug.
+      vrkit_lib_path = vrkit_lib_path.branch_path();
+#endif
 
       //construct VRKIT_BASE_DIR, VRKIT_DATA_DIR, VRKIT_PLUGINS_DIR
       std::string vrkit_versioned_dir_name = "vrkit";
