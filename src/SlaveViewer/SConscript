@@ -42,7 +42,7 @@ if boost_options.isAvailable():
    # Windows.
    if platform != 'win32':
       po_lib = boost_options.getFullLibName('program_options', viewerEnv)
-      viewerEnv.Prepend(LIBS = ['vrkit' + shared_lib_suffix, po_lib])
+      viewerEnv.Prepend(LIBS = ['vrkit' + version_suffix + shared_lib_suffix, po_lib])
 
    appname = 'slaveViewer'
    slave_viewer_name = appname + runtime_suffix
@@ -57,7 +57,7 @@ if boost_options.isAvailable():
    if platform == 'win32':
       viewerEnv.Depends(slave_viewer_prog,
                          os.path.join(inst_paths['lib'],
-                                      'vrkit%s.lib' % shared_lib_suffix))
+                                      'vrkit%s%s.lib' % (version_suffix, shared_lib_suffix)))
 
    # This only needs to be done when building against VR Juggler 2.1.21 or
    # newer.

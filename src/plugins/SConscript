@@ -46,7 +46,7 @@ def makePlugin(srcDir, pluginName, instDir):
       #print "   srcs:", plugin_srcs
       #print "   defs:", def_files
 
-      lib_name = pluginName
+      lib_name = pluginName + shared_lib_suffix
 
       # We use inst_dir here instead of changing instDir because we do not
       # watch to modify the base installation directory. instDir gets
@@ -64,7 +64,7 @@ def makePlugin(srcDir, pluginName, instDir):
       if platform == 'win32':
          plugin_env.Depends(plugin_lib,
                             os.path.join(inst_paths['lib'],
-                                         'vrkit%s.lib' % shared_lib_suffix))
+                                         'vrkit%s%s.lib' % (version_suffix, shared_lib_suffix)))
          plugin_lib = [p for p in plugin_lib if str(p).endswith('.dll')]
 
       plugin_env.Install(inst_dir, plugin_lib)
@@ -95,7 +95,7 @@ plugin_env.Append(CPPPATH = inst_paths['include'],
 
 # On Windows, we use automatic linking.
 if platform != 'win32':
-   plugin_env.Prepend(LIBS = ['vrkit' + shared_lib_suffix])
+   plugin_env.Prepend(LIBS = ['vrkit' + version_suffix + shared_lib_suffix])
 
 # Add define since we are building.
 plugin_env.AppendUnique(CPPDEFINES = ['_VRKIT_PLUGIN_BUILD_',])

@@ -304,9 +304,7 @@ if not sca_util.hasHelpFlag():
       else:
          gl_libraries = ["GL"]
 
-      shared_lib_suffix = version_suffix
-
-      Export('build_env','full_build_dir', 'combo', 'shared_lib_suffix', 'runtime_suffix', 'inst_paths', 'variant_pass')
+      Export('build_env','full_build_dir', 'combo', 'version_suffix', 'shared_lib_suffix', 'runtime_suffix', 'inst_paths', 'variant_pass')
       SConscript(dirs=['src'], build_dir=full_build_dir, duplicate=0)
 
    # Get the source location of data files.

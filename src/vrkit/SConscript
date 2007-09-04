@@ -134,7 +134,7 @@ if platform == 'win32':
    vrkit_res = env.RES('vrkit.rc')
    src_files.append(vrkit_res)
 
-vrkit_lib_name = 'vrkit' + shared_lib_suffix
+vrkit_lib_name = 'vrkit' + version_suffix + shared_lib_suffix
 vrkit_lib = env.SharedLibrary(vrkit_lib_name, src_files)
 
 # Install the library, headers, and definitions
