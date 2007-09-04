@@ -43,31 +43,37 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
    {
       case DLL_PROCESS_ATTACH:
          {
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-            char* env_dir(NULL);
-            size_t len;
-            _dupenv_s(&env_dir, &len, "VRKIT_BASE_DIR");
-#else
-            const char* env_dir = std::getenv("VRKIT_BASE_DIR");
-#endif
+            char tmppath[1024];
+            std::memset(tmppath, 0, sizeof(tmppath));
+            GetModuleFileName(module, tmppath, sizeof(tmppath));
 
-            if ( NULL == env_dir )
+            try
             {
-               char tmppath[1024];
-               std::memset(tmppath, 0, sizeof(tmppath));
-               GetModuleFileName(module, tmppath, sizeof(tmppath));
-
-               try
-               {
-                  fs::path dll_path(tmppath, fs::native);
-                  fs::path base_dir = dll_path.branch_path().branch_path();
+               fs::path dll_path(tmppath, fs::native);
+               fs::path base_dir = dll_path.branch_path().branch_path();
 #if defined(VRKIT_DEBUG) && ! defined(_DEBUG)
-                  // The debug DLL linked against the release runtime is in
-                  // <base_dir>\lib\debug.
-                  base_dir = base_dir.branch_path();
+               // The debug DLL linked against the release runtime is in
+               // <base_dir>\lib\debug.
+               base_dir = base_dir.branch_path();
 #endif
-                  const std::string base_dir_str =
-                     base_dir.native_directory_string();
+               const std::string base_dir_str =
+                  base_dir.native_directory_string();
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+               char* env_dir(NULL);
+               size_t len;
+#else
+               char* env_dir(NULL);
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+               _dupenv_s(&env_dir, &len, "VRKIT_BASE_DIR");
+#else
+               env_dir = std::getenv("VRKIT_BASE_DIR");
+#endif
+
+               if ( NULL == env_dir )
+               {
 #if defined(_MSC_VER) && _MSC_VER >= 1400
                   _putenv_s("VRKIT_BASE_DIR", base_dir_str.c_str());
 #else
@@ -76,18 +82,72 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
                   putenv(env_stream.str().c_str());
 #endif
                }
-               catch (fs::filesystem_error& ex)
-               {
-                  std::cerr << "Automatic assignment of VRKIT_BASE_DIR "
-                            << "failed:\n" << ex.what() << std::endl;
-               }
-            }
 #if defined(_MSC_VER) && _MSC_VER >= 1400
-            else
-            {
-               std::free(env_dir);
-            }
+               else
+               {
+                  std::free(env_dir);
+               }
 #endif
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+               _dupenv_s(&env_dir, &len, "VRKIT_DATA_DIR");
+#else
+               env_dir = std::getenv("VRKIT_DATA_DIR");
+#endif
+
+               if ( NULL == env_dir )
+               {
+                  fs::path data_dir = base_dir / "share" / "vrkit";
+                  const std::string data_dir_str =
+                     data_dir.native_directory_string();
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+                  _putenv_s("VRKIT_DATA_DIR", data_dir_str.c_str());
+#else
+                  std::ostringstream env_stream;
+                  env_stream << "VRKIT_DATA_DIR=" << data_dir_str;
+                  putenv(env_stream.str().c_str());
+#endif
+               }
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+               else
+               {
+                  std::free(env_dir);
+               }
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+               _dupenv_s(&env_dir, &len, "VRKIT_PLUGINS_DIR");
+#else
+               env_dir = std::getenv("VRKIT_PLUGINS_DIR");
+#endif
+
+               if ( NULL == env_dir )
+               {
+                  fs::path plugin_dir = base_dir / "lib" / "vrkit" / "plugins";
+                  const std::string plugin_dir_str =
+                     plugin_dir.native_directory_string();
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+                  _putenv_s("VRKIT_PLUGINS_DIR", plugin_dir_str.c_str());
+#else
+                  std::ostringstream env_stream;
+                  env_stream << "VRKIT_PLUGINS_DIR=" << plugin_dir_str;
+                  putenv(env_stream.str().c_str());
+#endif
+               }
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+               else
+               {
+                  std::free(env_dir);
+               }
+#endif
+            }
+            catch (fs::filesystem_error& ex)
+            {
+               std::cerr << "Automatic assignment of vrkit environment "
+                         << "variables failed:\n" << ex.what() << std::endl;
+            }
          }
          break;
       default:
