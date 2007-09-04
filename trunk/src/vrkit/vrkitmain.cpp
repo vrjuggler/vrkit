@@ -136,9 +136,11 @@ vrkit_library_init()
          fs::path vrkit_base_dir = vrkit_lib_path.branch_path().branch_path();
 
          // Go from /base to base/lib/versioned_vrkit_dir/plugins
-         fs::path vrkit_plugins_dir = fs::path(vrkit_base_dir / "lib" / vrkit_versioned_dir_name / "plugins");
+         fs::path vrkit_plugins_dir = vrkit_base_dir / "lib" /
+                                         vrkit_versioned_dir_name / "plugins";
          // Go from /base to /base/share/versioned_vrkit_dir
-         fs::path vrkit_data_dir = fs::path(vrkit_base_dir / "share" / vrkit_versioned_dir_name);
+         fs::path vrkit_data_dir = vrkit_base_dir / "share" /
+                                      vrkit_versioned_dir_name;
 
          std::string vrkit_base_dir_env_var;
          if( ! vpr::System::getenv("VRKIT_BASE_DIR", vrkit_base_dir_env_var) )
