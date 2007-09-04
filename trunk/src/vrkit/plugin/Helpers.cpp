@@ -115,19 +115,13 @@ std::string getPluginBaseDir()
 {
    fs::path plugin_dir;
 
-   std::string vrkit_base_dir;
-   vpr::System::getenv("VRKIT_BASE_DIR", vrkit_base_dir);
+   std::string vrkit_plugins_dir;
+   vpr::System::getenv("VRKIT_PLUGINS_DIR", vrkit_plugins_dir);
 
-   std::string vrkit_dir = "vrkit";
-#ifdef VRKIT_VERSIONED_INSTALL
-   vrkit_dir.append("-");
-   vrkit_dir.append(vrkit::getVersion());
-#endif
-
-   if ( ! vrkit_base_dir.empty() )
+   if ( ! vrkit_plugins_dir.empty() )
    {
       plugin_dir =
-         fs::path(vrkit_base_dir, fs::native) / "lib" / vrkit_dir / "plugins";
+         fs::path(vrkit_plugins_dir, fs::native);
    }
 
    return plugin_dir.native_directory_string();
