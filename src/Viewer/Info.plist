@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>vrkit_app</string>
 	<key>CFBundleGetInfoString</key>
-	<string>vrkit 0.48.0. Copyright © 2005-2007 Allen Bierbaum, Aron Bierbaum, Patrick Hartling, and Daniel Shipton</string>
+	<string>vrkit 0.49.0. Copyright © 2005-2007 Allen Bierbaum, Aron Bierbaum, Patrick Hartling, and Daniel Shipton</string>
 	<key>CFBundleIconFile</key>
 	<string>vrkit.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -15,17 +15,17 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleLongVersionString</key>
-	<string>0.48.0, © 2005-2007 Allen Bierbaum, Aron Bierbaum, Patrick Hartling, and Daniel Shipton</string>
+	<string>0.49.0, © 2005-2007 Allen Bierbaum, Aron Bierbaum, Patrick Hartling, and Daniel Shipton</string>
 	<key>CFBundleName</key>
 	<string>Viewer</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.48</string>
+	<string>0.49</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>0.48.0</string>
+	<string>0.49.0</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
