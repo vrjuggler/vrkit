@@ -315,7 +315,12 @@ if not sca_util.hasHelpFlag():
          inst_paths["include_path_flag"] = "-I"
          inst_paths["lib_path_flag"]     = "-L"
 
-      vrkit_lib = "-lvrkit" + version_suffix
+      # Don't put a libname to link against on Windows because
+      # of automatic linking
+      vrkit_lib = ""
+      if platform != "win32":
+         vrkit_lig = "-lvrkit" + version_suffix
+
       inst_paths['flagpoll'] = pj(inst_paths['lib'], 'flagpoll')
 
       # Build up substitution map
