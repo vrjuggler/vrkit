@@ -112,11 +112,7 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
 
 namespace fs = boost::filesystem;
 
-extern "C"
-{
-
-void __attribute ((constructor))
-vrkit_library_init()
+extern "C" void __attribute ((constructor)) vrkit_library_init()
 {
    Dl_info info;
    info.dli_fname = 0;
@@ -186,7 +182,5 @@ vrkit_library_init()
          // VRKIT_PLUGINS_DIR set...check if path will match up
       }
    }
-}
-
 }
 #endif
