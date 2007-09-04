@@ -31,6 +31,7 @@ import SConsAddons.Options.Boost
 import SConsAddons.Options.VRJuggler.VRJ
 import SConsAddons.Options.OpenSG
 import SConsAddons.Variants as sca_variants
+import SConsAddons.Builders
 
 from SConsAddons.EnvironmentBuilder import EnvironmentBuilder
 import SConsAddons.Util as sca_util      # Get the utils
@@ -74,6 +75,8 @@ else:
 platform = GetPlatform()
 Export('GetPlatform', 'platform')
 unspecified_prefix = 'use-instlinks'
+
+SConsAddons.Builders.registerSubstBuilder(opt_env)
 
 # ---------- Options ------------ #
 options_cache_filename = 'options.cache.' + distutils.util.get_platform()
@@ -265,15 +268,16 @@ if not sca_util.hasHelpFlag():
    for combo in variant_helper.iterate(locals(), base_bldr, opt_env):
       opensg_options.apply(build_env, optimize = combo['type'] != 'debugrt')
 
+      vrkit_cxxflags = ''
       # If we are debug or debug runtime, then we define preprocessor symbols
       # to indicate as much.
       if combo['type'].startswith('debug'):
          build_env.AppendUnique(CPPDEFINES = ['VRKIT_DEBUG', 'JUGGLER_DEBUG'])
+
       # If we are optimized we want no debugging at all.
       elif combo['type'] == 'optimized':
          build_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'VRKIT_OPT',
                                               'JUGGLER_OPT'])
-
       if opt_env['versioning']:
          build_env.AppendUnique(CPPDEFINES = ['VRKIT_USE_VERSIONING'])
 
@@ -303,6 +307,44 @@ if not sca_util.hasHelpFlag():
          gl_libraries = ["opengl32"]
       else:
          gl_libraries = ["GL"]
+
+      if GetPlatform() == "win32":
+         inst_paths["include_path_flag"] = "/I"
+         inst_paths["lib_path_flag"]     = "/LIBPATH:"
+      else:
+         inst_paths["include_path_flag"] = "-I"
+         inst_paths["lib_path_flag"]     = "-L"
+
+      vrkit_lib = "-lvrkit" + version_suffix
+      inst_paths['flagpoll'] = pj(inst_paths['lib'], 'flagpoll')
+
+      # Build up substitution map
+      submap = {
+         '@prefix@'                    : inst_paths['base'],
+         '@exec_prefix@'               : '${prefix}',
+         '@vrkit_cxxflags@'            : vrkit_cxxflags,
+         '@include_path_flag@'         : inst_paths['include_path_flag'],
+         '@includedir@'                : inst_paths['include'],
+         '@share_dir@'                 : inst_paths['share'],
+         '@vrkit_libs@'                : vrkit_lib,
+         '@lib_path_flag@'             : inst_paths['lib_path_flag'],
+         '@libdir@'                    : inst_paths['lib'],
+         '@arch@'                      : combo['arch'],
+         '@version@'                   : vrkit_version_str
+      }
+
+      # Setup builder for flagpoll files
+      name_parts = ['vrkit',vrkit_version_str,combo['arch']]
+      if combo["type"] != "optimized":
+         name_parts.append(combo["type"])
+      if GetPlatform() == 'win32':
+         name_parts.append(combo["libtype"])
+      fpc_filename = "-".join(name_parts) + ".fpc"
+      vrkit_fpc   = build_env.SubstBuilder(pj(inst_paths['flagpoll'],
+                                              fpc_filename),
+                                           'vrkit.fpc.in', submap = submap)
+      build_env.AddPostAction(vrkit_fpc, Chmod('$TARGET', 0644))
+      build_env.Depends(vrkit_fpc, 'src/vrkit/Version.h')
 
       Export('build_env','full_build_dir', 'combo', 'version_suffix', 'shared_lib_suffix', 'runtime_suffix', 'inst_paths', 'variant_pass')
       SConscript(dirs=['src'], build_dir=full_build_dir, duplicate=0)

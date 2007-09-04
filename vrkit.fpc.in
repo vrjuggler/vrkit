@@ -1,0 +1,20 @@
+prefix= ${fp_file_cwd}/../..
+exec_prefix=@exec_prefix@
+cxxflags=@vrkit_cxxflags@
+includedir=@include_path_flag@@includedir@
+libs=@vrkit_libs@
+libdir=@lib_path_flag@@libdir@
+
+vrkit_share_dir = @share_dir@
+
+Name: vrkit
+Provides: vrkit
+Version: @version@
+Description: Library for writing feature-rich clustered VR applications using OpenSG and VR Juggler.
+URL: http://realityforge.vrsource.org/
+Requires: 
+Libs: ${libdir} ${libs}
+Cflags: ${includedir}
+Arch: @arch@
+prefix: ${prefix}
+
