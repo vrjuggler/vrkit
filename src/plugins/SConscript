@@ -45,7 +45,8 @@ def makePlugin(srcDir, pluginName, instDir):
       #print "Plugin: ", pluginName
       #print "   srcs:", plugin_srcs
       #print "   defs:", def_files
-      lib_name = pluginName + shared_lib_suffix
+
+      lib_name = pluginName
 
       # We use inst_dir here instead of changing instDir because we do not
       # watch to modify the base installation directory. instDir gets
