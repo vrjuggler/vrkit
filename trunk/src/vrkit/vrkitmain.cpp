@@ -26,7 +26,7 @@
 #include <boost/filesystem/exception.hpp>
 
 
-namespace fs = fs;
+namespace fs = boost::filesystem;
 
 /**
  * Windows DLL entry point function. This ensures that the environment
