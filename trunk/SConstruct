@@ -342,8 +342,6 @@ if not sca_util.hasHelpFlag():
       name_parts = ['vrkit',vrkit_version_str,combo['arch']]
       if combo["type"] != "optimized":
          name_parts.append(combo["type"])
-      if GetPlatform() == 'win32':
-         name_parts.append(combo["libtype"])
       fpc_filename = "-".join(name_parts) + ".fpc"
       vrkit_fpc   = build_env.SubstBuilder(pj(inst_paths['flagpoll'],
                                               fpc_filename),
