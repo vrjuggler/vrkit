@@ -43,6 +43,11 @@ SetOption('implicit_cache',1)
 SConsignFile()                      # Store all .sconsign stuff in single file
 
 # --- Main Build --- #
+VRKIT_VERSION = sca_util.GetVersionFromHeader('VRKIT', 'src/vrkit/Version.h')
+vrkit_version_str = '%i.%i.%i' % VRKIT_VERSION
+Export('VRKIT_VERSION')
+print 'Building vrkit version: %s' % vrkit_version_str
+
 if GetPlatform() == 'win32':
    # XXX: Temp hack to get msvs version setting
    if ARGUMENTS.has_key('MSVS_VERSION'):
@@ -76,6 +81,8 @@ opts = SConsAddons.Options.Options(files = [options_cache_filename, 'options.cus
                                    args= ARGUMENTS)
 
 build_options = {}
+build_options["versioning"] = sca_opts.BoolOption(
+   "versioning", "Install vrkit as a versioned install", True)
 build_options["install_prefix"] = sca_opts.SimpleOption(
     "prefix", "prefix", "Installation prefix", unspecified_prefix, None, None, None)
 #build_options["build_suffix"] = sca_opts.SimpleOption(
@@ -201,15 +208,28 @@ if not sca_util.hasHelpFlag():
          opt_env['INSTALL'] = sca_util.symlinkInstallFunc
       opt_env['prefix'] = pj( Dir('.').get_abspath(), base_build_dir, 'instlinks')
 
+   if opt_env['versioning']:
+      version_dot_suffix = ''
+      versioned_include_dir = ''
+      # We do not use a versioned header directory on Windows.
+      if not sys.platform.startswith('win'):
+         version_dot_suffix = "-%s.%s.%s" % VRKIT_VERSION
+         versioned_include_dir = "vrkit%s" % version_dot_suffix
+      version_suffix = "-%s_%s_%s" % VRKIT_VERSION
+   else:
+      version_suffix = ''
+      version_dot_suffix = ''
+      versioned_include_dir = ''
+
    # Setup a map with the paths that we will install everything to
    # - Note: this is used throughout the build to keep things consistent
    inst_paths = {}
    inst_paths['base'] = opt_env['prefix']
    inst_paths['bin'] = pj(inst_paths['base'], 'bin')
    inst_paths['lib'] = pj(inst_paths['base'],'lib')
-   inst_paths['lib_plugin'] = pj(inst_paths['lib'], 'vrkit', 'plugins')
-   inst_paths['include'] = pj(inst_paths['base'],'include')
-   inst_paths['share'] = pj(inst_paths['base'], 'share', 'vrkit')
+   inst_paths['lib_plugin'] = pj(inst_paths['lib'], 'vrkit%s' % version_dot_suffix, 'plugins')
+   inst_paths['include'] = pj(inst_paths['base'],'include', versioned_include_dir)
+   inst_paths['share'] = pj(inst_paths['base'], 'share', 'vrkit%s' % version_dot_suffix)
    inst_paths['definitions'] = pj(inst_paths['share'],'definitions')
    inst_paths['app_base'] = pj(inst_paths['share'],'apps')
    inst_paths['test_base'] = pj(inst_paths['share'],'test')
@@ -254,6 +274,9 @@ if not sca_util.hasHelpFlag():
          build_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'VRKIT_OPT',
                                               'JUGGLER_OPT'])
 
+      if opt_env['versioning']:
+         build_env.AppendUnique(CPPDEFINES = ['VRKIT_VERSIONED_INSTALL'])
+
       # Enable boost auto-linking.
       if platform == 'win32':
          build_env.Append(CPPDEFINES = ['BOOST_ALL_DYN_LINK'])
@@ -267,7 +290,7 @@ if not sca_util.hasHelpFlag():
       full_build_dir = pj(base_build_dir, combo_dir)
       print "Build Directory: ", full_build_dir
       print "Using prefix: ", opt_env["prefix"]
-      
+
       if platform == "win32":
          build_env.Append(LINKFLAGS = ['/OPT:NOREF'])
 
@@ -280,6 +303,8 @@ if not sca_util.hasHelpFlag():
          gl_libraries = ["opengl32"]
       else:
          gl_libraries = ["GL"]
+
+      shared_lib_suffix = version_suffix
 
       Export('build_env','full_build_dir', 'combo', 'shared_lib_suffix', 'runtime_suffix', 'inst_paths', 'variant_pass')
       SConscript(dirs=['src'], build_dir=full_build_dir, duplicate=0)
@@ -309,6 +334,6 @@ if not sca_util.hasHelpFlag():
       opt_env.InstallAs(pj(inst_paths['share'], 'data', base_fname), fname)
 
    # Aliases
-   opt_env.Alias('install', inst_paths['base'])                           
+   opt_env.Alias('install', inst_paths['base'])
 
 Help(help_text)
