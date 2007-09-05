@@ -64,7 +64,8 @@ def makePlugin(srcDir, pluginName, instDir):
       if platform == 'win32':
          plugin_env.Depends(plugin_lib,
                             os.path.join(inst_paths['lib'],
-                                         'vrkit%s%s.lib' % (version_suffix, shared_lib_suffix)))
+                                         'vrkit%s%s.lib' % (shared_lib_suffix,
+                                                            version_suffix)))
          plugin_lib = [p for p in plugin_lib if str(p).endswith('.dll')]
 
       plugin_env.Install(inst_dir, plugin_lib)
