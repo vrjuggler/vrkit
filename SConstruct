@@ -22,6 +22,7 @@
 
 import distutils.util
 import sys, os, re, string, glob, types
+import pickle
 pj = os.path.join
 
 sys.path.insert(0,pj('deps','scons-addons','src'))
@@ -46,6 +47,22 @@ SConsignFile()                      # Store all .sconsign stuff in single file
 # --- Main Build --- #
 VRKIT_VERSION = sca_util.GetVersionFromHeader('VRKIT', 'src/vrkit/Version.h')
 vrkit_version_str = '%i.%i.%i' % VRKIT_VERSION
+
+#compare versions and see if we need to wipe instlinks
+last_version_str = ''
+version_file_name = '.version_pickle'
+if os.path.exists(version_file_name):
+   ver_file = open(version_file_name, 'rb')
+   last_version_str = pickle.load(ver_file)
+   ver_file.close()
+
+vrkit_version_changed = False
+if last_version_str != vrkit_version_str:
+   vrkit_version_changed = True
+   ver_file = open(version_file_name, 'wb')
+   pickle.dump(vrkit_version_str, ver_file)
+   ver_file.close()
+
 Export('VRKIT_VERSION')
 print 'Building vrkit version: %s' % vrkit_version_str
 
@@ -209,7 +226,14 @@ if not sca_util.hasHelpFlag():
    if opt_env['prefix'] == unspecified_prefix:
       if hasattr(os,'symlink'):
          opt_env['INSTALL'] = sca_util.symlinkInstallFunc
-      opt_env['prefix'] = pj( Dir('.').get_abspath(), base_build_dir, 'instlinks')
+      opt_env['prefix'] = pj( Dir('.').get_abspath(),
+                              base_build_dir, 'instlinks')
+      if vrkit_version_changed:
+         print "Version change detected. Cleaning instlinks"
+         Execute(Delete(os.path.join(opt_env['prefix'], 'lib')))
+         if opt_env['versioning']:
+            Execute(Delete(os.path.join(opt_env['prefix'], 'include')))
+            Execute(Delete(os.path.join(opt_env['prefix'], 'share')))
 
    if opt_env['versioning']:
       version_dot_suffix = ''
