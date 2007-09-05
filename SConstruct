@@ -312,7 +312,7 @@ if not sca_util.hasHelpFlag():
 
       if GetPlatform() == "win32":
          inst_paths["include_path_flag"] = "/I"
-         inst_paths["lib_path_flag"]     = "/LIBPATH:"
+         inst_paths["lib_path_flag"]     = "/libpath:"
       else:
          inst_paths["include_path_flag"] = "-I"
          inst_paths["lib_path_flag"]     = "-L"
