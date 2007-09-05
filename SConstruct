@@ -238,9 +238,9 @@ if not sca_util.hasHelpFlag():
    inst_paths['app_base'] = pj(inst_paths['share'],'apps')
    inst_paths['test_base'] = pj(inst_paths['share'],'test')
 
-   print "Using prefix: ", inst_paths['base']
-   print "types: ",    variant_helper.variants["type"] 
-   print "archs: ",    variant_helper.variants["arch"] 
+   print "Using prefix:", inst_paths['base']
+   print "types:", variant_helper.variants["type"] 
+   print "archs:", variant_helper.variants["arch"] 
 
    # XXX: Hack around SConsAddons.Options.OpenSG.OpenSG not letting us provide
    # extra arguments to osg-config.  (Of course, if osg-config wasn't totally
@@ -288,13 +288,13 @@ if not sca_util.hasHelpFlag():
 
 #      if build_env.has_key('MSVS'):
 #         import pprint
-#         print "Found MSVS. using version: ", build_env['MSVS']['VERSION']
+#         print "Found MSVS. using version:", build_env['MSVS']['VERSION']
 #         pprint.pprint(build_env['MSVS'])
 
       # Determine the build dir for this variant
       full_build_dir = pj(base_build_dir, combo_dir)
-      print "Build Directory: ", full_build_dir
-      print "Using prefix: ", opt_env["prefix"]
+      print "Build Directory:", full_build_dir
+      print "Using prefix:", opt_env["prefix"]
 
       if platform == "win32":
          build_env.Append(LINKFLAGS = ['/OPT:NOREF'])
@@ -356,7 +356,7 @@ if not sca_util.hasHelpFlag():
 
    # Get the source location of data files.
    srcdir_abs_path = opt_env.Dir('data').srcnode().abspath
-   #print "src dir abs: ", srcdir_abs_path
+   #print "src dir abs:", srcdir_abs_path
    data_files = []
 
    # Collect all file arguments from the walk into dirs and files
