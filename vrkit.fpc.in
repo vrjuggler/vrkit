@@ -14,7 +14,7 @@ Description: Library for writing feature-rich clustered VR applications using Op
 URL: http://realityforge.vrsource.org/trac/vrkit/
 Requires: 
 Libs: ${libdir} ${libs}
-Cflags: ${includedir}
+Cflags: ${cxxflags} ${includedir}
 Arch: @arch@
 prefix: ${prefix}
 
