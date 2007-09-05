@@ -294,15 +294,19 @@ if not sca_util.hasHelpFlag():
       opensg_options.apply(build_env, optimize = combo['type'] != 'debugrt')
 
       vrkit_cxxflags = ''
+      vrkit_defines = []
       # If we are debug or debug runtime, then we define preprocessor symbols
       # to indicate as much.
       if combo['type'].startswith('debug'):
          build_env.AppendUnique(CPPDEFINES = ['VRKIT_DEBUG', 'JUGGLER_DEBUG'])
+         vrkit_defines.append('VRKIT_DEBUG')
 
       # If we are optimized we want no debugging at all.
       elif combo['type'] == 'optimized':
          build_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'VRKIT_OPT',
                                               'JUGGLER_OPT'])
+         vrkit_defines.append('VRKIT_OPT')
+
       if opt_env['versioning']:
          build_env.AppendUnique(CPPDEFINES = ['VRKIT_USE_VERSIONING'])
 
@@ -337,9 +341,14 @@ if not sca_util.hasHelpFlag():
       if GetPlatform() == "win32":
          inst_paths["include_path_flag"] = "/I"
          inst_paths["lib_path_flag"]     = "/libpath:"
+         define_flag = "/D"
       else:
          inst_paths["include_path_flag"] = "-I"
          inst_paths["lib_path_flag"]     = "-L"
+         define_flag = "-D"
+
+      for d in vrkit_defines:
+         vrkit_cxxflags = vrkit_cxxflags + ' %s%s' % (define_flag, d)
 
       # Don't put a libname to link against on Windows because
       # of automatic linking
