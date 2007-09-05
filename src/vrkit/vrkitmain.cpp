@@ -59,14 +59,9 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
                const std::string base_dir_str =
                   base_dir.native_directory_string();
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400
                char* env_dir(NULL);
+#if defined(_MSC_VER) && _MSC_VER >= 1400
                size_t len;
-#else
-               char* env_dir(NULL);
-#endif
-
-#if defined(_MSC_VER) && _MSC_VER >= 1400
                _dupenv_s(&env_dir, &len, "VRKIT_BASE_DIR");
 #else
                env_dir = std::getenv("VRKIT_BASE_DIR");
