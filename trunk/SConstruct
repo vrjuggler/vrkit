@@ -231,7 +231,8 @@ if not sca_util.hasHelpFlag():
    inst_paths['bin'] = pj(inst_paths['base'], 'bin')
    inst_paths['lib'] = pj(inst_paths['base'],'lib')
    inst_paths['lib_plugin'] = pj(inst_paths['lib'], 'vrkit%s' % version_dot_suffix, 'plugins')
-   inst_paths['include'] = pj(inst_paths['base'],'include', versioned_include_dir)
+   inst_paths['include'] = os.path.normpath(pj(inst_paths['base'], 'include',
+                                               versioned_include_dir))
    inst_paths['share'] = pj(inst_paths['base'], 'share', 'vrkit%s' % version_dot_suffix)
    inst_paths['definitions'] = pj(inst_paths['share'],'definitions')
    inst_paths['app_base'] = pj(inst_paths['share'],'apps')
@@ -299,7 +300,8 @@ if not sca_util.hasHelpFlag():
          build_env.Append(LINKFLAGS = ['/OPT:NOREF'])
 
       # Set the directory to install libraries into.
-      inst_paths["lib"] = pj(inst_paths["base"], "lib", lib_subdir)
+      inst_paths["lib"] = os.path.normpath(pj(inst_paths["base"], "lib",
+                                              lib_subdir))
 
       # Specify the OpenGL libraries.
       if platform == "win32":   
