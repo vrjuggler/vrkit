@@ -11,7 +11,7 @@ Name: vrkit
 Provides: vrkit
 Version: @version@
 Description: Library for writing feature-rich clustered VR applications using OpenSG and VR Juggler.
-URL: http://realityforge.vrsource.org/
+URL: http://realityforge.vrsource.org/trac/vrkit/
 Requires: 
 Libs: ${libdir} ${libs}
 Cflags: ${includedir}
