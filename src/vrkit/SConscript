@@ -137,7 +137,7 @@ if platform == 'win32':
 #if platform != 'win32':
 #   env.Append(LINKFLAGS = ['-Wl,-init,vrkit_init'])
 
-vrkit_lib_name = 'vrkit' + version_suffix + shared_lib_suffix
+vrkit_lib_name = 'vrkit' + shared_lib_suffix + version_suffix
 vrkit_lib = env.SharedLibrary(vrkit_lib_name, src_files)
 
 # Install the library, headers, and definitions
