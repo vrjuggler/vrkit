@@ -321,7 +321,7 @@ if not sca_util.hasHelpFlag():
       # of automatic linking
       vrkit_lib = ""
       if platform != "win32":
-         vrkit_lig = "-lvrkit" + version_suffix
+         vrkit_lib = "-lvrkit" + version_suffix
 
       inst_paths['flagpoll'] = pj(inst_paths['lib'], 'flagpoll')
 
