@@ -177,68 +177,89 @@ extern "C" void __attribute ((constructor)) vrkit_library_init()
    // NOTE: dladdr(3) really does return a non-zero value on success.
    if ( 0 != result )
    {
-      fs::path vrkit_lib_file(info.dli_fname, fs::native);
-      vrkit_lib_file = fs::system_complete(vrkit_lib_file);
+      try
+      {
+         fs::path lib_file(info.dli_fname, fs::native);
+         lib_file = fs::system_complete(lib_file);
 
-      fs::path vrkit_lib_path = vrkit_lib_file.branch_path();
-#if defined(VRKIT_DEBUG)
-      // The debug library is in <base_dir>/lib/debug.
-      vrkit_lib_path = vrkit_lib_path.branch_path();
-#endif
+         // Get the directory containing this shared library.
+         const fs::path lib_path = lib_file.branch_path();
 
-      //construct VRKIT_BASE_DIR, VRKIT_DATA_DIR, VRKIT_PLUGINS_DIR
-      std::string vrkit_versioned_dir_name = "vrkit";
+         // Start the search for the root of the vrkit installation in the
+         // parent of the directory containing this shared library.
+         fs::path base_dir = lib_path.branch_path();
+
+         // Use the lib subdirectory to figure out when we have found the root
+         // of the vrkit installation tree.
+         const fs::path lib_subdir(std::string("lib"));
+
+         bool found(false);
+         while ( ! found && ! base_dir.empty() )
+         {
+            try
+            {
+               if ( ! fs::exists(base_dir / lib_subdir) )
+               {
+                  base_dir = base_dir.branch_path();
+               }
+               else
+               {
+                  found = true;
+               }
+            }
+            catch (fs::filesystem_error&)
+            {
+               base_dir = base_dir.branch_path();
+            }
+         }
+         if( found )
+         {
+            // Construct VRKIT_DATA_DIR and VRKIT_PLUGINS_DIR
+            std::string vrkit_versioned_dir_name = "vrkit";
 #ifdef VRKIT_USE_VERSIONING
-      vrkit_versioned_dir_name.append("-");
-      vrkit_versioned_dir_name.append(vrkit::getVersion());
+            vrkit_versioned_dir_name.append("-");
+            vrkit_versioned_dir_name.append(vrkit::getVersion());
 #endif
-      // Go from base/lib/(debug/release) down to base
-      fs::path vrkit_base_dir = vrkit_lib_path.branch_path().branch_path();
 
-      // Go from /base to base/lib/versioned_vrkit_dir/plugins
-      fs::path vrkit_plugins_dir = vrkit_base_dir / "lib" /
-                                      vrkit_versioned_dir_name / "plugins";
-      // Go from /base to /base/share/versioned_vrkit_dir
-      fs::path vrkit_data_dir = vrkit_base_dir / "share" /
-                                   vrkit_versioned_dir_name;
+            // Go from /base to base/lib/versioned_vrkit_dir/plugins
+            fs::path plugins_dir = base_dir / "lib" /
+                                         vrkit_versioned_dir_name / "plugins";
+            // Go from /base to /base/share/versioned_vrkit_dir
+            fs::path data_dir = base_dir / "share" /
+                                         vrkit_versioned_dir_name;
 
-      std::string vrkit_base_dir_env_var;
-      vpr::System::getenv("VRKIT_BASE_DIR", vrkit_base_dir_env_var);
+            std::string vrkit_base_dir_env_var;
+            vpr::System::getenv("VRKIT_BASE_DIR", vrkit_base_dir_env_var);
+            if ( vrkit_base_dir_env_var.empty() )
+            {
+               vpr::System::setenv("VRKIT_BASE_DIR", base_dir.string());
+               VRKIT_STATUS << "VRKIT_BASE_DIR set to: "
+                            << base_dir.string() << std::endl;
+            }
 
-      if ( vrkit_base_dir_env_var.empty() )
-      {
-         vpr::System::setenv("VRKIT_BASE_DIR", vrkit_base_dir.string());
-         VRKIT_STATUS << "VRKIT_BASE_DIR set to: " << vrkit_base_dir.string() << std::endl;
+            std::string vrkit_data_dir_env_var;
+            vpr::System::getenv("VRKIT_DATA_DIR", vrkit_data_dir_env_var);
+            if ( vrkit_data_dir_env_var.empty() )
+            {
+               vpr::System::setenv("VRKIT_DATA_DIR", data_dir.string());
+               VRKIT_STATUS << "VRKIT_DATA_DIR set to: "
+                            << data_dir.string() << std::endl;
+            }
+
+            std::string vrkit_plugin_dir_env_var;
+            vpr::System::getenv("VRKIT_PLUGINS_DIR", vrkit_plugin_dir_env_var);
+            if ( vrkit_plugin_dir_env_var.empty() )
+            {
+               vpr::System::setenv("VRKIT_PLUGINS_DIR", plugins_dir.string());
+               VRKIT_STATUS << "VRKIT_PLUGINS_DIR set to: "
+                            << plugins_dir.string() << std::endl;
+            }
+         }
       }
-      else
+      catch (fs::filesystem_error& ex)
       {
-         // VRKIT_BASE_DIR set...check if path will match up
-      }
-
-      std::string vrkit_data_dir_env_var;
-      vpr::System::getenv("VRKIT_DATA_DIR", vrkit_data_dir_env_var);
-
-      if ( vrkit_data_dir_env_var.empty() )
-      {
-         vpr::System::setenv("VRKIT_DATA_DIR", vrkit_data_dir.string());
-         VRKIT_STATUS << "VRKIT_DATA_DIR set to: " << vrkit_data_dir.string() << std::endl;
-      }
-      else
-      {
-         // VRKIT_DATA_DIR set...check if path will match up
-      }
-
-      std::string vrkit_plugin_dir_env_var;
-      vpr::System::getenv("VRKIT_PLUGINS_DIR", vrkit_plugin_dir_env_var);
-
-      if ( vrkit_plugin_dir_env_var.empty() )
-      {
-         vpr::System::setenv("VRKIT_PLUGINS_DIR", vrkit_plugins_dir.string());
-         VRKIT_STATUS << "VRKIT_PLUGINS_DIR set to: " << vrkit_plugins_dir.string() << std::endl;
-      }
-      else
-      {
-         // VRKIT_PLUGINS_DIR set...check if path will match up
+         std::cerr << "Automatic assignment of VRKIT_BASE_DIR failed:\n"
+                   << ex.what() << std::endl;
       }
    }
 }
