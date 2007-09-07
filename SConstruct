@@ -238,10 +238,14 @@ if not sca_util.hasHelpFlag():
    if opt_env['versioning']:
       version_dot_suffix = ''
       versioned_include_dir = ''
-      # We do not use a versioned header directory on Windows.
+
+      # We do not use versioned directories on Windows. Only the DLL has
+      # version information in its name.
       if not sys.platform.startswith('win'):
          version_dot_suffix = "-%s.%s.%s" % VRKIT_VERSION
          versioned_include_dir = "vrkit%s" % version_dot_suffix
+         opt_env.AppendUnique(CPPDEFINES = ['VRKIT_USE_VERSIONING'])
+
       version_suffix = "-%s_%s_%s" % VRKIT_VERSION
    else:
       version_suffix = ''
@@ -306,9 +310,6 @@ if not sca_util.hasHelpFlag():
          build_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'VRKIT_OPT',
                                               'JUGGLER_OPT'])
          vrkit_defines.append('VRKIT_OPT')
-
-      if opt_env['versioning']:
-         build_env.AppendUnique(CPPDEFINES = ['VRKIT_USE_VERSIONING'])
 
       # Enable boost auto-linking.
       if platform == 'win32':
