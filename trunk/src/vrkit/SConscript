@@ -73,6 +73,17 @@ elif mingw_ffmpeg.isAvailable():
                                  'libavutil.a', 'libgcc.a', 'libmingwex.a'],
                     LIBS = ['ws2_32'])
 
+   # NOTE: The following does not actually work correctly. There will be
+   # either multiply defined symbols or unresolved symbols. It is hoped that
+   # a future version of the MinGW w64 support will resolve this, and maybe
+   # this extra bit for the 64-bit case will not be needed at all.
+   if combo['arch'] == 'x64':
+      env.AppendUnique(LINKFLAGS = ['libmsvcr80.a', 'libws2_32.a',
+                                    'libkernel32.a', 'libuser32.a'])
+#      env.AppendUnique(LINKFLAGS = ['libmingw32.a', 'libmsvcrt.a',
+#                                    'libws2_32.a', 'libkernel32.a',
+#                                    'libuser32.a'])
+
    # NOTE: FAAD and x264 are not included here on purpose. The use of those
    # libraries with FFmpeg requires that FFmpeg be licensed under the GPL,
    # which means that vrkit would also have to be licensed under the GPL in
