@@ -465,7 +465,7 @@ int main(int argc, char* argv[])
          }
          else
          {
-            const fs::path vrkit_data_path(vrkit_data_dir);
+            const fs::path vrkit_data_path(vrkit_data_dir, fs::native);
             jdef_dirs.push_back(
                (vrkit_data_path / "definitions").native_directory_string()
             );
