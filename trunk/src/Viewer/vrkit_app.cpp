@@ -388,6 +388,7 @@ vrkit::event::ResultType VrkitApp::objectsMovedSlot()
 int main(int argc, char* argv[])
 {
    namespace po = boost::program_options;
+   namespace fs = boost::filesystem;
 
    const int EXIT_ERR_MISSING_JCONF(1);
    const int EXIT_ERR_MISSING_APP_CONF(2);
@@ -464,9 +465,10 @@ int main(int argc, char* argv[])
          }
          else
          {
-            boost::filesystem::path vrkit_def_path = vrkit_data_dir;
-            vrkit_def_path= boost::filesystem::path(vrkit_def_path / "definitions");
-            jdef_dirs.push_back(vrkit_def_path.string());
+            const fs::path vrkit_data_path(vrkit_data_dir);
+            jdef_dirs.push_back(
+               (vrkit_data_path / "definitions").native_directory_string()
+            );
          }
       }
 
