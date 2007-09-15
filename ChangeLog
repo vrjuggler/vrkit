@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-09-15 patrick  Added vrkit::getBanner().
+                    -- VERSION -- 0.49.1
 2007-09-04 dshipton Introduced versioned installations. The environment
                     variables VRKIT_DATA_DIR and VRKIT_PLUGINS_DIR have been
                     added. All vrkit environment variables (VRKIT_BASE_DIR and

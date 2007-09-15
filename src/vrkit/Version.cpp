@@ -16,8 +16,25 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include <vrkit/Version.h>
 
-#define VERSION_NUM     0,49,1,0
-#define VERSION_STR     "0.49.1.0"
-#define COPYRIGHT_STR   "Copyright © 2005–2007"
+
+namespace vrkit
+{
+
+const char* getVersion()
+{
+   return VRKIT_XSTR(VRKIT_VERSION_STRING);
+}
+
+const char* getBanner()
+{
+   return
+      "vrkit " VRKIT_XSTR(VRKIT_VERSION_STRING) " is (C) Copyright 2005-2007\n"
+      "   by Allen Bierbaum, Aron Bierbuam, Patrick Hartling, "
+      "and Daniel Shipton\n"
+      "vrkit is released under the terms of the GNU Lesser General Public "
+      "License";
+}
+
+}

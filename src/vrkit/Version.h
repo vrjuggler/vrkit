@@ -19,6 +19,8 @@
 #ifndef _VRKIT_VERSION_H_
 #define _VRKIT_VERSION_H_
 
+#include <vrkit/Config.h>
+
 /**
  * This file contains two useful items.
  *    1. The preprocessor friendly VRKIT_VERSION "string". It is in the form
@@ -35,7 +37,7 @@
 // The major/minor/patch version (up to 3 digits each).
 #define VRKIT_VERSION_MAJOR    0
 #define VRKIT_VERSION_MINOR    49
-#define VRKIT_VERSION_PATCH    0
+#define VRKIT_VERSION_PATCH    1
 
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------------
@@ -121,10 +123,19 @@
 //--------------------------------------------------------------------------
 namespace vrkit
 {
-   inline const char* getVersion()
-   {
-      return VRKIT_XSTR(VRKIT_VERSION_STRING);
-   }
+
+/**
+ * Returns the "dotted" form of the vrkit version as a string.
+ */
+VRKIT_API(const char*) getVersion();
+
+/**
+ * Returns a banner describing the current vrkit version and copyright.
+ *
+ * @since 0.49.1
+ */
+VRKIT_API(const char*) getBanner();
+
 } // end namespace vrkit
 
 //--------------------------------------------------------------------------
