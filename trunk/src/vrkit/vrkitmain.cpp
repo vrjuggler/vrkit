@@ -163,8 +163,8 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
 
 #include <vpr/System.h>
 
-#include <vrkit/Status.h>
 #include <vrkit/Version.h>
+
 
 namespace fs = boost::filesystem;
 
@@ -238,8 +238,6 @@ extern "C" void __attribute ((constructor)) vrkit_library_init()
             if ( vrkit_base_dir_env_var.empty() )
             {
                vpr::System::setenv("VRKIT_BASE_DIR", base_dir.string());
-               VRKIT_STATUS << "VRKIT_BASE_DIR set to: "
-                            << base_dir.string() << std::endl;
             }
 
             std::string vrkit_data_dir_env_var;
@@ -247,8 +245,6 @@ extern "C" void __attribute ((constructor)) vrkit_library_init()
             if ( vrkit_data_dir_env_var.empty() )
             {
                vpr::System::setenv("VRKIT_DATA_DIR", data_dir.string());
-               VRKIT_STATUS << "VRKIT_DATA_DIR set to: "
-                            << data_dir.string() << std::endl;
             }
 
             std::string vrkit_plugin_dir_env_var;
@@ -256,8 +252,6 @@ extern "C" void __attribute ((constructor)) vrkit_library_init()
             if ( vrkit_plugin_dir_env_var.empty() )
             {
                vpr::System::setenv("VRKIT_PLUGINS_DIR", plugins_dir.string());
-               VRKIT_STATUS << "VRKIT_PLUGINS_DIR set to: "
-                            << plugins_dir.string() << std::endl;
             }
          }
       }
