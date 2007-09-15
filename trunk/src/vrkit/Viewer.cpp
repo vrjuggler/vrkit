@@ -34,6 +34,7 @@
 #include <vrkit/SceneObject.h>
 #include <vrkit/Status.h>
 #include <vrkit/WandInterface.h>
+#include <vrkit/Version.h>
 #include <vrkit/scenedata/EventData.h>
 #include <vrkit/isect/Strategy.h>
 #include <vrkit/viewer/Plugin.h>
@@ -78,6 +79,8 @@ void Viewer::init()
    OSG::ChangeList::setReadWriteDefault();
 
    OpenSGApp::init();
+
+   VRKIT_STATUS << getBanner() << std::endl;
 
    // Verify configuration has been loaded
    bool have_config = (mConfiguration.getAllConfigElements().size() > 0);
