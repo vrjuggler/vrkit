@@ -19,6 +19,12 @@ The following packages are required for compiling IOV on all platforms:
    * SCons 0.97 or newer
    * Flagpoll 0.9.1 or newer
 
+The environment variable FLAGPOLL_PATH must be set accordingly to be able
+to find the VR Juggler, GMTL, and CppDOM installations. On Windows, if PATH
+is set to include the bin and lib directories for the above dependencies
+(which is required anyway), then setting FLAGPOLL_PATH should not be
+necessary.
+
 Optional
 --------
 
@@ -45,6 +51,10 @@ To install IOV into, say /usr/local, run it this way:
 
    % scons prefix=/usr/local install
 
+The above does not include the options to provide the path to Boost and
+other dependencies. Read the output from runninng 'scons --help' to get
+more details.
+
 Building on Windows
 ===================
 
@@ -66,6 +76,10 @@ To force the use of Visual C++ 7.1, execute SCons as follows:
 To force the use of Visual C++ 8.0 (32-bit only), execute SCons as follows:
 
    > scons MSVS_VERSION=8.0 var_arch=ia32
+
+The above does not include the options to provide the path to Boost and
+other dependencies. Read the output from runninng 'scons --help' to get
+more details.
 
 64-bit Windows
 --------------
