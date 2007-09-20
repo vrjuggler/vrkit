@@ -67,8 +67,10 @@ public:
 
    /**
     * Start recording movie to the given file.
+    *
+    * @ returns True if recording was successfully started.
     */
-   void record();
+   bool record();
 
    /**
     * Pause the recording.

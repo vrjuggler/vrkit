@@ -178,16 +178,19 @@ void Recorder::startRecording()
 {
    if ( ! isRecording() )
    {
-      mVideoEncoder->record();
-      mCamera->setPixelFormat(mVideoEncoder->getPixelFormat());
-
-      if( mStereo )
+      // Ensure that recording actually started.
+      if (mVideoEncoder->record())
       {
-         OSG::beginEditCP(mStereoImageStorage);
-            mStereoImageStorage->set(mVideoEncoder->getPixelFormat(),
-                                     mCamera->getWidth() * 2,
-                                     mCamera->getHeight());
-         OSG::beginEditCP(mStereoImageStorage);
+         mCamera->setPixelFormat(mVideoEncoder->getPixelFormat());
+
+         if( mStereo )
+         {
+            OSG::beginEditCP(mStereoImageStorage);
+               mStereoImageStorage->set(mVideoEncoder->getPixelFormat(),
+                                        mCamera->getWidth() * 2,
+                                        mCamera->getHeight());
+            OSG::beginEditCP(mStereoImageStorage);
+         }
       }
    }
 }

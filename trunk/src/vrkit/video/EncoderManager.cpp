@@ -125,7 +125,7 @@ EncoderManagerPtr EncoderManager::init()
    return shared_from_this();
 }
 
-void EncoderManager::record()
+bool EncoderManager::record()
 {
    const OSG::UInt32 image_width(mStereo ? mWidth * 2 : mWidth);
    const OSG::UInt32 image_height(mHeight);
@@ -167,7 +167,9 @@ void EncoderManager::record()
 
       mRecording = true;
       mEncodingStarted();
+      return true;
    }
+   return false;
 }
 
 void EncoderManager::pause()
