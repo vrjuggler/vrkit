@@ -77,7 +77,7 @@ namespace
 
 const vpr::DebugCategory vrkitSLAVE_APP(
    vpr::GUID("c141b39d-403e-4999-aac0-1102c1471a9f"), "VRKIT_SLAVE_APP",
-   "SLAVE_APP:"
+   "vrkitSLAVE:"
 );
 
 const int SLAVE_DBG_LVL(vprDBG_STATE_LVL);
@@ -224,13 +224,17 @@ void SlaveViewer::initScene()
       }
    }
 
-   std::cout << "Slave: Connecting to addr: " << mMasterAddr << std::flush;
+   vprDEBUG(vrkitSLAVE_APP, vprDBG_CRITICAL_LVL)
+      << "Connecting to master at " << mMasterAddr << std::flush
+      << vprDEBUG_FLUSH;
    mChannel = mConnection->connectPoint(mMasterAddr);
-   std::cout << "[OK]" << std::endl;
+   vprDEBUG_CONT(vrkitSLAVE_APP, vprDBG_CRITICAL_LVL)
+      << " [OK]" << std::endl << vprDEBUG_FLUSH;
 
    if ( mChannel != -1 )
    {
-      std::cout << "Slave: Reading first of scene data: " << std::endl;
+      vprDEBUG(vrkitSLAVE_APP, vprDBG_CRITICAL_LVL)
+         << "Reading first of scene data: " << std::endl << vprDEBUG_FLUSH;
 
       mConnection->selectChannel();
 
@@ -262,8 +266,9 @@ void SlaveViewer::initScene()
       std::cout << "------" << std::endl;
       */
 
-      std::cout << "--- Searching for scene root (name is " << mRootNodeName
-                << ") ---" << std::endl;
+      vprDEBUG(vrkitSLAVE_APP, vprDBG_CRITICAL_LVL)
+         << "Searching for scene root (name is " << mRootNodeName
+         << ") ... " << std::flush << vprDEBUG_FLUSH;
 
       const std::vector<OSG::FieldContainerPtr>* fcs =
          OSG::FieldContainerFactory::the()->getFieldContainerStore();
@@ -278,7 +283,8 @@ void SlaveViewer::initScene()
 
             if ( node_name != NULL && std::string(node_name) == mRootNodeName )
             {
-               std::cout << "Found it." << std::endl;
+               vprDEBUG_CONT(vrkitSLAVE_APP, vprDBG_CRITICAL_LVL)
+                  << "Found it." << std::endl << vprDEBUG_FLUSH;
                mSceneRoot = node;
                break;
             }
@@ -287,29 +293,28 @@ void SlaveViewer::initScene()
 
       if ( OSG::NullFC == mSceneRoot.node() )
       {
-         std::cout << "NOT FOUND." << std::endl;
-         ::exit(-256);
+         vprDEBUG_CONT(vrkitSLAVE_APP, vprDBG_CRITICAL_LVL)
+            << "NOT FOUND! Exiting with error status -256." << std::endl
+            << vprDEBUG_FLUSH;
+         std::exit(-256);
       }
 
-      std::cout << "------" << std::endl;
-
-      OSG::NodePtr temp_node = mSceneRoot.node();
       /*
+      OSG::NodePtr temp_node = mSceneRoot.node();
       std::cout << "--- Verifying initial scene:" << std::endl;
       OSG::VerifyGraphOp verify_op;
       verify_op.setVerbose(true);
       verify_op.setRepair(true);
       verify_op.traverse(temp_node);
-      */
 
       //printGraph(temp_node);
-
+      */
    }
    else
    {
       std::cerr << "ERROR: Failed to connect to master!" << std::endl;
       OSG::osgExit();
-      ::exit(EXIT_ERR_CONNECT_FAIL);
+      std::exit(EXIT_ERR_CONNECT_FAIL);
    }
 }
 
@@ -320,9 +325,10 @@ void SlaveViewer::contextInit()
 #else
    vrj::OpenSGApp::contextInit();
 #endif
-   std::cout << "Changing render action traversal mask from "
-             << std::hex << mContextData->mRenderAction->getTravMask()
-             << " to " << mTravMask << std::dec << std::endl;
+   vprDEBUG(vrkitSLAVE_APP, vprDBG_STATE_LVL)
+      << "Changing render action traversal mask from " << std::hex
+      << mContextData->mRenderAction->getTravMask() << " to " << mTravMask
+      << std::dec << std::endl << vprDEBUG_FLUSH;
    mContextData->mRenderAction->setTravMask(mTravMask);
    initGl();
 }
