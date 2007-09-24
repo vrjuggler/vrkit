@@ -427,8 +427,11 @@ void SlaveViewer::readDataFromMaster(OSG::BinaryDataHandler& reader)
 
 void SlaveViewer::initGl()
 {
-   //glEnable(GL_NORMALIZE);
-
+   // VR Juggler 2.1.25 and beyond perform the necessary lighting of simulator
+   // components, so we do not have to do it ourselves.
+#if __VJ_version >= 2001025
+   glEnable(GL_NORMALIZE);
+#else
    GLfloat light0_ambient[]  = { 0.1f,  0.1f,  0.1f, 1.0f };
    GLfloat light0_diffuse[]  = { 0.7f,  0.7f,  0.7f, 1.0f };
    GLfloat light0_specular[] = { 1.0f,  1.0f,  1.0f, 1.0f };
@@ -458,6 +461,7 @@ void SlaveViewer::initGl()
    glEnable(GL_LIGHT0);
    glEnable(GL_COLOR_MATERIAL);
    glShadeModel(GL_SMOOTH);
+#endif
 }
 
 bool SlaveViewer::createdFunction(OSG::FieldContainerPtr& fcp,
