@@ -81,81 +81,83 @@ const vpr::DebugCategory vrkitSLAVE_APP(
 );
 
 const int SLAVE_DBG_LVL(vprDBG_STATE_LVL);
-//const int SLAVE_DBG_LVL(0);
 
-
-class travstate
+class TravState
 {
-  public:
+public:
+   TravState()
+      : mIndent(0)
+   {
+      /* Do nothing. */ ;
+   }
 
-    travstate( void ) : _indent(0) {}
+   OSG::Action::ResultE enter(OSG::NodePtr& node)
+   {
+      for ( OSG::UInt16 i = 0; i < mIndent; ++i )
+      {
+         std::cout << "    ";
+      }
 
-    OSG::Action::ResultE enter(OSG::NodePtr& node)
-    {
-        for(OSG::UInt16 i = 0; i < _indent; i++)
-        { std::cout << "    "; }
+      std::cout << "entering " << node << "  ";
 
-        std::cout << "entering " << node << "  ";
+      const char* node_name = OSG::getName(node);
 
-        const char* node_name = OSG::getName(node);
+      if ( NULL == node_name )
+      {
+         std::cout << "name: <NULL>   ";
+      }
+      else
+      {
+         std::cout << "name: " << node_name << "   ";
+      }
 
-        if ( NULL == node_name )
-        {
-           std::cout << "name: <NULL>   ";
-        }
-        else
-        {
-           std::cout << "name: " << node_name << "   ";
-        }
+      std::cout << " type:" << node->getType().getName().str() << " fc_id:"
+                << node.getFieldContainerId() << "  ";
 
-        std::cout << " type:" << node->getType().getName().str() << " fc_id:"
-             << node.getFieldContainerId() << "  ";
+      OSG::NodeCorePtr core = node->getCore();
+      std::cout << "core: " << core << "  ";
 
-        OSG::NodeCorePtr core = node->getCore();
-        std::cout << "core: " << core << "  ";
+      std::cout << std::endl;
 
-        std::cout << std::endl;
+      ++mIndent;
 
-        ++_indent;
-        return OSG::Action::Continue;
-    }
+      return OSG::Action::Continue;
+   }
 
-    OSG::Action::ResultE leave(OSG::NodePtr& node, OSG::Action::ResultE res)
-    {
-        --_indent;
+   OSG::Action::ResultE leave(OSG::NodePtr& node, OSG::Action::ResultE res)
+   {
+      --mIndent;
 
-        for(OSG::UInt16 i = 0; i < _indent; i++)
-        { std::cout << "    "; }
+      for ( OSG::UInt16 i = 0; i < mIndent; ++i )
+      {
+         std::cout << "    ";
+      }
 
-        std::cout << "leaving " << node << std::endl;
+      std::cout << "leaving " << node << std::endl;
 
-        // you should return the result that you're passed, to propagate Quits
-        return res;
-    }
+      // you should return the result that you're passed, to propagate Quits
+      return res;
+   }
 
-  private:
-
-    OSG::UInt16 _indent;
+private:
+   OSG::UInt16 mIndent;
 };
 
 // Nice helper method for printing out the graph.
 void printGraph(OSG::NodePtr node)
 {
-   travstate t;
+   TravState t;
    std::cout << "------- Scene: root: " << node << " ----------" << std::endl;
 
-   OSG::traverse(node,
-             OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<OSG::Action::ResultE,
-                                                 travstate,
-                                                 OSG::NodePtr>(
-                                                     &t,
-                                                     &travstate::enter),
-             OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<OSG::Action::ResultE,
-                                                 travstate,
-                                                 OSG::NodePtr,
-                                                 OSG::Action::ResultE>(
-                                                     &t,
-                                                     &travstate::leave));
+   OSG::traverse(
+      node,
+      OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
+         OSG::Action::ResultE, TravState, OSG::NodePtr
+      >(&t, &TravState::enter),
+      OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
+         OSG::Action::ResultE, TravState, OSG::NodePtr, OSG::Action::ResultE
+      >(&t, &TravState::leave)
+   );
    std::cout << "--------------------------------------------" << std::endl;
 }
 
