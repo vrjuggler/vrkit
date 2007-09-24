@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-09-24 patrick  Fixed a bug in the handling of the traversal mask setting
+                    in vrkit::SlaveViewer.
+                    -- VERSION -- 0.49.2
 2007-09-15 patrick  Added vrkit::getBanner().
                     -- VERSION -- 0.49.1
 2007-09-04 dshipton Introduced versioned installations. The environment

@@ -329,7 +329,13 @@ void SlaveViewer::contextInit()
       << "Changing render action traversal mask from " << std::hex
       << mContextData->mRenderAction->getTravMask() << " to " << mTravMask
       << std::dec << std::endl << vprDEBUG_FLUSH;
+
    mContextData->mRenderAction->setTravMask(mTravMask);
+   OSG::beginEditCP(mContextData->mViewport,
+                    OSG::Viewport::TravMaskFieldMask);
+      mContextData->mViewport->setTravMask(mTravMask);
+   OSG::endEditCP(mContextData->mViewport, OSG::Viewport::TravMaskFieldMask);
+
    initGl();
 }
 
