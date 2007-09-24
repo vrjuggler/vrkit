@@ -295,9 +295,9 @@ void VrkitApp::init()
 
 void VrkitApp::initGl()
 {
-   //glEnable(GL_NORMALIZE);
-
-#if __VJ_version < 2001025
+#if __VJ_version >= 2001025
+   glEnable(GL_NORMALIZE);
+#else
    GLfloat light0_ambient[]  = { 0.1f,  0.1f,  0.1f, 1.0f };
    GLfloat light0_diffuse[]  = { 0.7f,  0.7f,  0.7f, 1.0f };
    GLfloat light0_specular[] = { 1.0f,  1.0f,  1.0f, 1.0f };
