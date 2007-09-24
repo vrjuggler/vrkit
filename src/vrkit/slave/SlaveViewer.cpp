@@ -41,14 +41,14 @@
 
 /** @page SlaveCommunicationProtocol Slave Communication Protocol
  *
- * The vrkit viewer supports a remote slave protocol.  This allows slave
- * applications to connect to the main viewer to get scene graph
- * updates in a cluster configuration.
- *
- * This page documents the communication protocol used for this comm.
+ * The vrkit viewer supports a remote slave protocol. This allows slave
+ * applications (usually a subclass of vrkit::SlaveViewer) to connect to the
+ * main viewer to get scene graph updates in a cluster configuration. This
+ * page documents the communication protocol used for this communication.
  *
  * Notes:
- * - finish - This is a flag that is true when the slave should disconnect.
+ *   - finish: This is a flag that tells the slave to disconnect when set to
+ *             true.
  *
  * <pre>
  * Master                              Slave
@@ -69,7 +69,6 @@
  * send(userData), flush               recv(userData)
  * recv(userData) (for each)           send(userData), flush
  * </pre>
- *
  */
 
 
