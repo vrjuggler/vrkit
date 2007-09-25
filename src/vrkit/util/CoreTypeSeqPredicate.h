@@ -71,7 +71,16 @@ private:
     * boost::mpl::for_each<>().
     */
    template<typename T>
-   struct wrap { };
+   struct wrap
+   {
+#if defined(__GNUC__) && __GNUC__ < 4
+      template<typename U>
+      struct apply
+      {
+         typedef wrap<U> type;
+      };
+#endif
+   };
 
    /**
     * Performs a run-time comparision between two or more field container
