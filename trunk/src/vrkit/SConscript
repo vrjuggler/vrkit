@@ -35,7 +35,7 @@ env.AppendUnique(CPPDEFINES = ['_VRKIT_BUILD_'])
 if ffmpeg_options.isAvailable():
    env.AppendUnique(CPPDEFINES = ['VRKIT_WITH_FFMPEG'])
    ffmpeg_options.apply(env)
-elif mingw_ffmpeg.isAvailable():
+elif platform == "win32" and mingw_ffmpeg.isAvailable():
    # To compile against the FFmpeg libraries with Visual C++, we have to be
    # able to find the C99 inttypes headers. These are bundled with vrkit in
    # the src/vrkit/video/inttypes directory. The build, however, uses the
