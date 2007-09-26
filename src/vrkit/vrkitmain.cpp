@@ -220,14 +220,14 @@ extern "C" void __attribute ((constructor)) vrkitLibraryInit()
             fs::path lib_file(info.dli_fname, fs::native);
             lib_file = fs::system_complete(lib_file);
 
-#if defined(VPR_OS_IRIX) && defined(_ABIN32)
-            const std::string bit_suffix("32");
-#elif defined(VPR_OS_IRIX) && defined(_ABI64) || \
-      defined(VPR_OS_Linux) && defined(__x86_64__)
+/*
+#if defined(VPR_OS_Linux) && defined(__x86_64__)
             const std::string bit_suffix("64");
 #else
             const std::string bit_suffix("");
 #endif
+*/
+            const std::string bit_suffix("");
 
             // Get the directory containing this shared library.
             const fs::path lib_path = lib_file.branch_path();
