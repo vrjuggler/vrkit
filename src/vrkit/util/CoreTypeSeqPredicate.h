@@ -74,6 +74,11 @@ private:
    struct wrap
    {
 #if defined(__GNUC__) && __GNUC__ < 4
+      /**
+       * This type exists to fix compile errors with versions of GCC older
+       * than 4.0. It is used internally by MPL when wrap<T> is utilized by
+       * boost::mpl::for_each().
+       */
       template<typename U>
       struct apply
       {
