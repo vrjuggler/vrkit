@@ -189,6 +189,15 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
 
 namespace fs = boost::filesystem;
 
+/**
+ * Non-Windows shared library constructor. This ensures that the environment
+ * variable \c VRKIT_BASE_DIR is set as soon as this shared library is loaded.
+ * If it is not set, then it sets it based on an assumption about the
+ * structure of a vrkit installation. More specifically, an assumption is made
+ * that this shared library lives in the \c lib subdirectory of the vrkit
+ * installation. Therefore, the root of the vrkit installation is the parent
+ * of the directory containing this shared library.
+ */
 extern "C" void __attribute ((constructor)) vrkitLibraryInit()
 {
    fs::path base_dir;
