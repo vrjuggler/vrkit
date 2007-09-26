@@ -17,17 +17,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if defined(WIN32) || defined(WIN64)
-#include <windows.h>
+#  include <windows.h>
+#endif
+
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
 #include <string>
+
+#if ! defined(WIN32) && ! defined(WIN64)
+#  include <dlfcn.h>
+#endif
+
 #include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
 
 
 namespace fs = boost::filesystem;
 
+#if defined(WIN32) || defined(WIN64)
 /**
  * Windows DLL entry point function. This ensures that the environment
  * variable \c VRKIT_BASE_DIR is set as soon as this DLL is attached to the
@@ -172,22 +181,9 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
 
    return TRUE;
 }
-
-
-#else /* Non-windows or..Unix case. */
-#include <iostream>
-#include <cstdlib>
-#include <string>
-#include <dlfcn.h>
-
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/exception.hpp>
+#else
 
 #include <vrkit/Version.h>
-
-
-namespace fs = boost::filesystem;
 
 /**
  * Non-Windows shared library constructor. This ensures that the environment
@@ -312,4 +308,4 @@ extern "C" void __attribute ((constructor)) vrkitLibraryInit()
              plugin_dir.native_directory_string().c_str(), 0);
    }
 }
-#endif
+#endif  /* defined(WIN32) || defined(WIN64) */
