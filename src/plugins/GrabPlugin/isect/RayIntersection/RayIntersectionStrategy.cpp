@@ -350,8 +350,9 @@ enterFunc(SceneObjectPtr obj)
    OSG::Pnt3f vol_min, vol_max;
    root->getVolume().getBounds(vol_min, vol_max);
 
-   gmtl::AABoxf bbox(gmtl::Point3f(vol_min[0], vol_min[1], vol_min[2]),
-                     gmtl::Point3f(vol_max[0], vol_max[1], vol_max[2]));
+   gmtl::AABoxf bbox;
+   bbox.setMin(gmtl::Point3f(vol_min[0], vol_min[1], vol_min[2]));
+   bbox.setMax(gmtl::Point3f(vol_max[0], vol_max[1], vol_max[2]));
    unsigned int num_hits;
    float enter_val, exit_val;
 
