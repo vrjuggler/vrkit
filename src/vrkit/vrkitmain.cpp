@@ -43,32 +43,38 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
    {
       case DLL_PROCESS_ATTACH:
          {
-            char tmppath[1024];
-            std::memset(tmppath, 0, sizeof(tmppath));
-            GetModuleFileName(module, tmppath, sizeof(tmppath));
+            char* env_dir(NULL);
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+            size_t len;
+            _dupenv_s(&env_dir, &len, "VRKIT_BASE_DIR");
+#else
+            env_dir = std::getenv("VRKIT_BASE_DIR");
+#endif
 
             try
             {
-               fs::path dll_path(tmppath, fs::native);
-               fs::path base_dir = dll_path.branch_path().branch_path();
-#if defined(VRKIT_DEBUG) && ! defined(_DEBUG)
-               // The debug DLL linked against the release runtime is in
-               // <base_dir>\lib\debug.
-               base_dir = base_dir.branch_path();
-#endif
-               const std::string base_dir_str =
-                  base_dir.native_directory_string();
+               fs::path base_dir;
 
-               char* env_dir(NULL);
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-               size_t len;
-               _dupenv_s(&env_dir, &len, "VRKIT_BASE_DIR");
-#else
-               env_dir = std::getenv("VRKIT_BASE_DIR");
-#endif
-
+               // If VRKIT_BASE_DIR is not set, look up the path to this DLL
+               // and use it to provide a default setting for that environment
+               // variable.
                if ( NULL == env_dir )
                {
+                  char tmppath[1024];
+                  std::memset(tmppath, 0, sizeof(tmppath));
+                  GetModuleFileName(module, tmppath, sizeof(tmppath));
+
+                  const fs::path dll_path(tmppath, fs::native);
+                  base_dir = dll_path.branch_path().branch_path();
+#if defined(VRKIT_DEBUG) && ! defined(_DEBUG)
+                  // The debug DLL linked against the release runtime is in
+                  // <base_dir>\lib\debug.
+                  base_dir = base_dir.branch_path();
+#endif
+
+                  const std::string base_dir_str =
+                     base_dir.native_directory_string();
+
 #if defined(_MSC_VER) && _MSC_VER >= 1400
                   _putenv_s("VRKIT_BASE_DIR", base_dir_str.c_str());
 #else
@@ -77,12 +83,14 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
                   putenv(env_stream.str().c_str());
 #endif
                }
-#if defined(_MSC_VER) && _MSC_VER >= 1400
                else
                {
+                  base_dir = fs::path(env_dir, fs::native);
+#if defined(_MSC_VER) && _MSC_VER >= 1400
                   std::free(env_dir);
-               }
+                  env_dir = NULL;
 #endif
+               }
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
                _dupenv_s(&env_dir, &len, "VRKIT_DATA_DIR");
@@ -90,9 +98,11 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
                env_dir = std::getenv("VRKIT_DATA_DIR");
 #endif
 
+               // If VRKIT_DATA_DIR is not set, set a default relative to
+               // base_dir.
                if ( NULL == env_dir )
                {
-                  fs::path data_dir = base_dir / "share" / "vrkit";
+                  fs::path data_dir(base_dir / "share" / "vrkit");
                   const std::string data_dir_str =
                      data_dir.native_directory_string();
 
@@ -108,6 +118,7 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
                else
                {
                   std::free(env_dir);
+                  env_dir = NULL;
                }
 #endif
 
@@ -117,9 +128,11 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
                env_dir = std::getenv("VRKIT_PLUGINS_DIR");
 #endif
 
+               // If VRKIT_PLUGINS_DIR is not set, set a default relative to
+               // base_dir.
                if ( NULL == env_dir )
                {
-                  fs::path plugin_dir = base_dir / "lib" / "vrkit" / "plugins";
+                  fs::path plugin_dir(base_dir / "lib" / "vrkit" / "plugins");
                   const std::string plugin_dir_str =
                      plugin_dir.native_directory_string();
 
@@ -135,6 +148,7 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
                else
                {
                   std::free(env_dir);
+                  env_dir = NULL;
                }
 #endif
             }
@@ -142,6 +156,13 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
             {
                std::cerr << "Automatic assignment of vrkit environment "
                          << "variables failed:\n" << ex.what() << std::endl;
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+               if ( NULL != env_dir )
+               {
+                  std::free(env_dir);
+               }
+#endif
             }
          }
          break;
@@ -154,112 +175,132 @@ BOOL __stdcall DllMain(HINSTANCE module, DWORD reason, LPVOID reserved)
 
 
 #else /* Non-windows or..Unix case. */
-#include <dlfcn.h>
+#include <iostream>
+#include <cstdlib>
 #include <string>
+#include <dlfcn.h>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
-
-#include <vpr/System.h>
 
 #include <vrkit/Version.h>
 
 
 namespace fs = boost::filesystem;
 
-extern "C" void __attribute ((constructor)) vrkit_library_init()
+extern "C" void __attribute ((constructor)) vrkitLibraryInit()
 {
-   Dl_info info;
-   info.dli_fname = 0;
-   const int result =
+   fs::path base_dir;
+   const char* env_dir = std::getenv("VRKIT_BASE_DIR");
+
+   // If VRKIT_BASE_DIR is not set, look up the path to this shared library
+   // and use it to provide a default setting for that environment variable.
+   if ( NULL == env_dir )
+   {
+      Dl_info info;
+      info.dli_fname = 0;
+      const int result =
 #if defined(__GNUC__) && __GNUC_MAJOR__ < 4
-      dladdr((void*) &vrkit_library_init, &info);
+         dladdr((void*) &vrkitLibraryInit, &info);
 #else
-      dladdr(reinterpret_cast<void*>(&vrkit_library_init), &info);
+         dladdr(reinterpret_cast<void*>(&vrkitLibraryInit), &info);
 #endif
 
-   // NOTE: dladdr(3) really does return a non-zero value on success.
-   if ( 0 != result )
-   {
-      try
+      // NOTE: dladdr(3) really does return a non-zero value on success.
+      if ( 0 != result )
       {
-         fs::path lib_file(info.dli_fname, fs::native);
-         lib_file = fs::system_complete(lib_file);
-
-         // Get the directory containing this shared library.
-         const fs::path lib_path = lib_file.branch_path();
-
-         // Start the search for the root of the vrkit installation in the
-         // parent of the directory containing this shared library.
-         fs::path base_dir = lib_path.branch_path();
-
-         // Use the lib subdirectory to figure out when we have found the root
-         // of the vrkit installation tree.
-         const fs::path lib_subdir(std::string("lib"));
-
-         bool found(false);
-         while ( ! found && ! base_dir.empty() )
+         try
          {
-            try
+            fs::path lib_file(info.dli_fname, fs::native);
+            lib_file = fs::system_complete(lib_file);
+
+#if defined(VPR_OS_IRIX) && defined(_ABIN32)
+            const std::string bit_suffix("32");
+#elif defined(VPR_OS_IRIX) && defined(_ABI64) || \
+      defined(VPR_OS_Linux) && defined(__x86_64__)
+            const std::string bit_suffix("64");
+#else
+            const std::string bit_suffix("");
+#endif
+
+            // Get the directory containing this shared library.
+            const fs::path lib_path = lib_file.branch_path();
+
+            // Start the search for the root of the vrkit installation in the
+            // parent of the directory containing this shared library.
+            base_dir = lib_path.branch_path();
+
+            // Use the lib subdirectory to figure out when we have found the
+            // root of the vrkit installation tree.
+            const fs::path lib_subdir(std::string("lib") + bit_suffix);
+
+            bool found(false);
+            while ( ! found && ! base_dir.empty() )
             {
-               if ( ! fs::exists(base_dir / lib_subdir) )
+               try
+               {
+                  if ( ! fs::exists(base_dir / lib_subdir) )
+                  {
+                     base_dir = base_dir.branch_path();
+                  }
+                  else
+                  {
+                     found = true;
+                  }
+               }
+               catch (fs::filesystem_error&)
                {
                   base_dir = base_dir.branch_path();
                }
-               else
-               {
-                  found = true;
-               }
             }
-            catch (fs::filesystem_error&)
+
+            if ( found )
             {
-               base_dir = base_dir.branch_path();
+               setenv("VRKIT_BASE_DIR",
+                      base_dir.native_directory_string().c_str(), 1);
             }
          }
-         if( found )
+         catch (fs::filesystem_error& ex)
          {
-            // Construct VRKIT_DATA_DIR and VRKIT_PLUGINS_DIR
-            std::string vrkit_versioned_dir_name = "vrkit";
-#ifdef VRKIT_USE_VERSIONING
-            vrkit_versioned_dir_name.append("-");
-            vrkit_versioned_dir_name.append(vrkit::getVersion());
-#endif
-
-            // Go from /base to base/lib/versioned_vrkit_dir/plugins
-            fs::path plugins_dir = base_dir / "lib" /
-                                         vrkit_versioned_dir_name / "plugins";
-            // Go from /base to /base/share/versioned_vrkit_dir
-            fs::path data_dir = base_dir / "share" /
-                                         vrkit_versioned_dir_name;
-
-            std::string vrkit_base_dir_env_var;
-            vpr::System::getenv("VRKIT_BASE_DIR", vrkit_base_dir_env_var);
-            if ( vrkit_base_dir_env_var.empty() )
-            {
-               vpr::System::setenv("VRKIT_BASE_DIR", base_dir.string());
-            }
-
-            std::string vrkit_data_dir_env_var;
-            vpr::System::getenv("VRKIT_DATA_DIR", vrkit_data_dir_env_var);
-            if ( vrkit_data_dir_env_var.empty() )
-            {
-               vpr::System::setenv("VRKIT_DATA_DIR", data_dir.string());
-            }
-
-            std::string vrkit_plugin_dir_env_var;
-            vpr::System::getenv("VRKIT_PLUGINS_DIR", vrkit_plugin_dir_env_var);
-            if ( vrkit_plugin_dir_env_var.empty() )
-            {
-               vpr::System::setenv("VRKIT_PLUGINS_DIR", plugins_dir.string());
-            }
+            std::cerr << "Automatic assignment of VRKIT_BASE_DIR failed:\n"
+                      << ex.what() << std::endl;
          }
+      }
+   }
+   else
+   {
+      try
+      {
+         base_dir = fs::path(env_dir, fs::native);
       }
       catch (fs::filesystem_error& ex)
       {
-         std::cerr << "Automatic assignment of VRKIT_BASE_DIR failed:\n"
-                   << ex.what() << std::endl;
+         std::cerr << "Invalid path set in VRKIT_BASE_DIR environment "
+                   << "variable:\n" << ex.what() << std::endl;
       }
+   }
+
+   // If base_dir were empty, this would result in data_dir and plugin_dir
+   // being relative to the current working directory.
+   if ( ! base_dir.empty() )
+   {
+      std::string versioned_dir_name("vrkit");
+#if defined(VRKIT_USE_VERSIONING)
+      versioned_dir_name += std::string("-") +
+                               std::string(vrkit::getVersion());
+#endif
+
+      // Construct the values for VRKIT_DATA_DIR and VRKIT_PLUGINS_DIR.
+      const fs::path plugin_dir =
+         base_dir / "lib" / versioned_dir_name / "plugins";
+      const fs::path data_dir = base_dir / "share" / versioned_dir_name;
+
+      // We use the overwrite value of 0 as a way around testing whether the
+      // environment variable is already set.
+      setenv("VRKIT_DATA_DIR", data_dir.native_directory_string().c_str(), 0);
+      setenv("VRKIT_PLUGINS_DIR",
+             plugin_dir.native_directory_string().c_str(), 0);
    }
 }
 #endif
