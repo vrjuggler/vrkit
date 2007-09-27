@@ -126,7 +126,7 @@ opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.8.0",
 ffmpeg_options = \
    SConsAddons.Options.FlagPollBasedOption.FlagPollBasedOption("AvFormat",
                                                                "libavformat",
-                                                               "51.0.0",
+                                                               "51.12.0",
                                                                False, True)
 
 if "win32" == platform:
