@@ -47,9 +47,6 @@ Recorder::Recorder()
    , mEyeOffset(0.5)
    , mBorderSize(2.0)
    , mFrameDist(50.0)
-   , mStereo(false)
-   , mRecording(false)
-   , mPaused(false)
    , mDrawScale(1.0)
 {
    ;
@@ -62,8 +59,7 @@ RecorderPtr Recorder::create()
 
 Recorder::~Recorder()
 {
-   std::for_each(mEncoderConnections.begin(), mEncoderConnections.end(),
-                 boost::bind(&boost::signals::connection::disconnect, _1));
+   /* Do nothing. */ ;
 }
 
 void Recorder::contextInit(OSG::WindowPtr window)
@@ -96,27 +92,6 @@ RecorderPtr Recorder::init()
 
    mVideoEncoder = EncoderManager::create()->init();
 
-   mEncoderConnections.push_back(
-      mVideoEncoder->encodingStarted().connect(
-         boost::bind(&Recorder::encodingStarted, this)
-      )
-   );
-   mEncoderConnections.push_back(
-      mVideoEncoder->encodingPaused().connect(
-         boost::bind(&Recorder::encodingPaused, this)
-      )
-   );
-   mEncoderConnections.push_back(
-      mVideoEncoder->encodingResumed().connect(
-         boost::bind(&Recorder::encodingResumed, this)
-      )
-   );
-   mEncoderConnections.push_back(
-      mVideoEncoder->encodingStopped().connect(
-         boost::bind(&Recorder::encodingStopped, this)
-      )
-   );
-
    return shared_from_this();
 }
 
@@ -147,7 +122,6 @@ const Encoder::container_format_list_t& Recorder::getAvailableFormats() const
 
 void Recorder::setStereo(const bool stereo)
 {
-   mStereo = stereo;
    mVideoEncoder->setStereo(stereo);
 }
 
@@ -183,7 +157,7 @@ void Recorder::startRecording()
       {
          mCamera->setPixelFormat(mVideoEncoder->getPixelFormat());
 
-         if( mStereo )
+         if ( mVideoEncoder->inStereo() )
          {
             OSG::beginEditCP(mStereoImageStorage);
                mStereoImageStorage->set(mVideoEncoder->getPixelFormat(),
@@ -197,36 +171,27 @@ void Recorder::startRecording()
 
 void Recorder::pause()
 {
-   if( isRecording() && ! isPaused() )
-   {
-      mVideoEncoder->pause();
-   }
+   mVideoEncoder->pause();
 }
 
 void Recorder::resume()
 {
-   if( isRecording() && isPaused() )
-   {
-      mVideoEncoder->resume();
-   }
+   mVideoEncoder->resume();
 }
 
 void Recorder::endRecording()
 {
-   if( isRecording() )
-   {
-      mVideoEncoder->stop();
-   }
+   mVideoEncoder->stop();
 }
 
 bool Recorder::isRecording() const
 {
-   return mRecording;
+   return mVideoEncoder->isRecording();
 }
 
 bool Recorder::isPaused() const
 {
-   return mPaused;
+   return mVideoEncoder->isPaused();
 }
 
 void Recorder::setAspect(const OSG::Real32 aspect)
@@ -252,7 +217,7 @@ void Recorder::render(OSG::RenderAction* ra, const OSG::Matrix& camPos)
    }
 
    // If we are rendering stereo, then offset the camera position.
-   if (mStereo)
+   if ( mVideoEncoder->inStereo() )
    {
       OSG::Matrix offset;
       OSG::Matrix camera_pos;
@@ -506,31 +471,6 @@ void Recorder::generateDebugFrame()
       }
       mFrameRoot->addChild(frame);
    OSG::endEditCP(mFrameRoot);
-}
-
-void Recorder::encodingStarted()
-{
-   mRecordingStarted();
-   mRecording = true;
-}
-
-void Recorder::encodingPaused()
-{
-   mRecordingPaused();
-   mPaused = true;
-}
-
-void Recorder::encodingResumed()
-{
-   mRecordingResumed();
-   mPaused = false;
-}
-
-void Recorder::encodingStopped()
-{
-   mRecordingStopped();
-   mRecording = false;
-   mPaused    = false;
 }
 
 }

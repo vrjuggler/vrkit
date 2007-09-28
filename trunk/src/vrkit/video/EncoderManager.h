@@ -96,6 +96,17 @@ public:
    }
 
    /**
+    * Returns if we are recording but paused. If the returned value is true,
+    * then isRecording() will also return true.
+    *
+    * @since 0.49.3
+    */
+   bool isPaused() const
+   {
+      return mPaused;
+   }
+
+   /**
     * Returns the current set of available container formats
     * with their supported codecs.
     *
@@ -107,7 +118,15 @@ public:
 
    void setFilename(const std::string& filename);
 
-   void setStereo(bool isStereo);
+   void setStereo(const bool isStereo);
+
+   /**
+    * @since 0.49.3
+    */
+   bool inStereo() const
+   {
+      return mStereo;
+   }
 
    void setSize(const OSG::UInt32 width, const OSG::UInt32 height);
 
@@ -187,6 +206,7 @@ private:
    typedef std::map<std::string, EncoderPtr> encoder_map_t;
 
    bool                 mRecording;     /**< Whether we are currently recording. */
+   bool                 mPaused;        /**< Whether we are currently paused while recording. */
    bool                 mStereo;
    std::string		mFilename;
    OSG::UInt32		mFps;

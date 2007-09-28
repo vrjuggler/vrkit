@@ -60,6 +60,7 @@ namespace video
 
 EncoderManager::EncoderManager()
    : mRecording(false)
+   , mPaused(false)
    , mStereo(false)
    , mFilename("vrkit_movie.avi")
    , mFps(30)
@@ -174,18 +175,18 @@ bool EncoderManager::record()
 
 void EncoderManager::pause()
 {
-   if ( mRecording )
+   if ( mRecording && ! mPaused )
    {
-      mRecording = false;
+      mPaused = true;
       mEncodingPaused();
    }
 }
 
 void EncoderManager::resume()
 {
-   if ( ! mRecording )
+   if ( mPaused )
    {
-      mRecording = true;
+      mPaused = false;
       mEncodingResumed();
    }
 }
@@ -198,7 +199,9 @@ void EncoderManager::stop()
       mEncoder = EncoderPtr();
       mEncodingStopped();
    }
+
    mRecording = false;
+   mPaused    = false;
 }
 
 void EncoderManager::setFilename(const std::string& filename)
@@ -223,7 +226,7 @@ void EncoderManager::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
    mHeight= height;
 }
 
-void EncoderManager::setStereo(bool isStereo)
+void EncoderManager::setStereo(const bool isStereo)
 {
    mStereo = isStereo;
 }
