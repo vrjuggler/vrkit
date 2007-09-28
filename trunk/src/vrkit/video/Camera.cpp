@@ -82,21 +82,25 @@ CameraPtr Camera::init()
    mLeftImage = OSG::Image::create();
    mRightImage = OSG::Image::create();
 
-   // Setup FBO textures.
+   OSG::ImagePtr img;
+
+   // Set up FBO textures.
+   img = mLeftImage;
    OSG::beginEditCP(mLeftTexture);
       mLeftTexture->setMinFilter(GL_LINEAR);
       mLeftTexture->setMagFilter(GL_LINEAR);
       mLeftTexture->setTarget(GL_TEXTURE_2D);
       mLeftTexture->setInternalFormat(GL_RGBA8);
-      mLeftTexture->setImage(mLeftImage);
+      mLeftTexture->setImage(img);
    OSG::endEditCP(mLeftTexture);
 
+   img = mRightImage;
    OSG::beginEditCP(mRightTexture);
       mRightTexture->setMinFilter(GL_LINEAR);
       mRightTexture->setMagFilter(GL_LINEAR);
       mRightTexture->setTarget(GL_TEXTURE_2D);
       mRightTexture->setInternalFormat(GL_RGBA8);
-      mRightTexture->setImage(mRightImage);
+      mRightTexture->setImage(img);
    OSG::endEditCP(mRightTexture);
 
    mCurrentImage = mLeftImage;
