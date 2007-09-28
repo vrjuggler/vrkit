@@ -23,14 +23,11 @@
 
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/signal.hpp>
-#include <boost/signals/connection.hpp>
 
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGWindow.h>
 #include <OpenSG/OSGRenderAction.h>
 
-#include <vrkit/signal/Proxy.h>
 #include <vrkit/video/CameraPtr.h>
 #include <vrkit/video/EncoderManager.h>
 #include <vrkit/video/RecorderPtr.h>
@@ -43,7 +40,8 @@ namespace video
 {
 
 /**
- * Records a scene with a camera and video encoder to a file.
+ * Records a scene with a camera and video encoder to a file. This is the
+ * primary interface to the vrkit video capture features.
  *
  * @note This class was renamed from vrkit::VideoCamera and moved into the
  *       vrkit::video namespace in version 0.47.
@@ -88,12 +86,12 @@ public:
    void setFilename(const std::string& filename);
 
    /**
-    * Set the field of view for the video camera in degrees.
+    * Set the field of view for the recorder in degrees.
     */
    void setFov(const OSG::Real32 fov);
 
    /**
-    * Set the aspect ration for the video camera.
+    * Set the aspect ration for the recorder.
     */
    void setAspect(const OSG::Real32 aspect);
 
@@ -113,7 +111,7 @@ public:
    void setInterocularDistance(const OSG::Real32 interocular);
 
    /**
-    * Set the near and far plane for the video camera.
+    * Set the near and far plane for the recorder.
     */
    void setNearFar(const OSG::Real32 nearVal, const OSG::Real32 farVal);
 
@@ -157,13 +155,12 @@ public:
    void resume();
 
    /**
-    * Returns whether the video camera has started recording and has not
-    * ended.
+    * Returns whether the recorder has started recording and has not ended.
     */
    bool isRecording() const;
 
    /**
-    * Returns whether the video camera is recording and paused.
+    * Returns whether the recorder is recording and paused.
     */
    bool isPaused() const;
 
@@ -195,13 +192,13 @@ public:
 
    /**
     * Returns the root of the frame that surrounds what will be captured
-    * in the video camera.
+    * in the recorder.
     */
    OSG::NodePtr getFrame() const;
 
    /** @name Signal Accessors */
    //@{
-   typedef boost::signal<void ()> basic_signal_t;
+   typedef EncoderManager::basic_signal_t basic_signal_t;
 
    /**
     * Signal emitted when recording starts.
@@ -212,7 +209,7 @@ public:
     */
    signal::Proxy<basic_signal_t> recordingStarted()
    {
-      return signal::Proxy<basic_signal_t>(mRecordingStarted);
+      return mVideoEncoder->encodingStarted();
    }
 
    /**
@@ -224,7 +221,7 @@ public:
     */
    signal::Proxy<basic_signal_t> recordingPaused()
    {
-      return signal::Proxy<basic_signal_t>(mRecordingPaused);
+      return mVideoEncoder->encodingPaused();
    }
 
    /**
@@ -236,7 +233,7 @@ public:
     */
    signal::Proxy<basic_signal_t> recordingResumed()
    {
-      return signal::Proxy<basic_signal_t>(mRecordingResumed);
+      return mVideoEncoder->encodingResumed();
    }
 
    /**
@@ -248,7 +245,7 @@ public:
     */
    signal::Proxy<basic_signal_t> recordingStopped()
    {
-      return signal::Proxy<basic_signal_t>(mRecordingStopped);
+      return mVideoEncoder->encodingStopped();
    }
    //@}
 
@@ -260,59 +257,6 @@ private:
     */
    void setCameraPos(const OSG::Matrix& camPos);
 
-   /** @name Slots for vrkit::EncoderManager Signals */
-   //@{
-   /**
-    * Slot for the "encodingStarted" signal emitted by vrkit::EncoderManager.
-    * The "recordingStarted" signal is emitted by this object.
-    *
-    * @post \c mRecording is true. \c mPaused is false.
-    *
-    * @since 0.45.2
-    */
-   void encodingStarted();
-
-   /**
-    * Slot for the "encodingPaused" signal emitted by vrkit::EncoderManager.
-    * The "recordingPaused" signal is emitted by this object.
-    *
-    * @post \c mPaused is true.
-    *
-    * @since 0.45.2
-    */
-   void encodingPaused();
-
-   /**
-    * Slot for the "encodingResumed" signal emitted by vrkit::EncoderManager.
-    * The "recordingResumed" signal is emitted by this object.
-    *
-    * @post \c mPaused is false.
-    *
-    * @since 0.45.2
-    */
-   void encodingResumed();
-
-   /**
-    * Slot for the "encodingStopped" signal emitted by vrkit::EncoderManager.
-    * The "recordingStopped" signal is emitted by this object.
-    *
-    * @post \c mRecording and \c mPaused are both false.
-    *
-    * @since 0.45.2
-    */
-   void encodingStopped();
-   //@}
-
-   /** @name Signal Objects */
-   //@{
-   basic_signal_t mRecordingStarted;
-   basic_signal_t mRecordingPaused;
-   basic_signal_t mRecordingResumed;
-   basic_signal_t mRecordingStopped;
-   //@}
-
-   std::vector<boost::signals::connection> mEncoderConnections;
-
    CameraPtr                            mCamera;         /**< Camera used for rendering. */
    EncoderManagerPtr                    mVideoEncoder;
    OSG::ImagePtr                        mStereoImageStorage; /**< Temp storage for stereo image concatenation. */
@@ -321,9 +265,6 @@ private:
    OSG::Real32                          mEyeOffset;     /**< Interocular distance / 2 for stereo. */
    OSG::Real32                          mBorderSize;    /**< The width of the frame geometry. */
    OSG::Real32                          mFrameDist;     /**< The distance between the camera and the frame. */
-   bool                                 mStereo;        /**< If this camera should render/record in stereo. */
-   bool                                 mRecording;        /**< Whether the camera is recording. */
-   bool                                 mPaused;        /**< Whether the camera is paused. */
    float                                mDrawScale;   /**< Draw scale factor for the scene. */
 };
 
