@@ -219,8 +219,8 @@ EncoderPtr EncoderFFmpeg::init()
 void EncoderFFmpeg::startEncoding()
 {
 #if defined(VRKIT_DEBUG)
-   VRKIT_STATUS << "Creating a encoder. file: " << getFilename()
-             << " w: " << getWidth() << " h: " << getHeight() << std::endl;
+   VRKIT_STATUS << "Creating an encoder. file: " << getFilename()
+                << " w: " << getWidth() << " h: " << getHeight() << std::endl;
 #endif
 
    try
