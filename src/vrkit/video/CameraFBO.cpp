@@ -151,6 +151,7 @@ void CameraFBO::render(OSG::RenderAction* ra)
    glReadPixels(mFboVP->getPixelLeft(), mFboVP->getPixelBottom(),
                 source_width, source_height, mCurrentImage->getPixelFormat(),
                 GL_UNSIGNED_BYTE, mCurrentImage->getData());
+   checkGLError("after glReadPixels");
 
    // XXX: We don't really need to change the read buffer target since we
    //      are not reading from the pixel buffer anywhere else.
