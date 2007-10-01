@@ -112,7 +112,9 @@ void CameraFBO::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 {
    if( OSG::NullFC != mFboVP)
    {
-      Camera::setSize(width, height);
+      // Ensure that width and height are multiples of two. The values of
+      // mWidth and mHeight set by this call are used later in render().
+      Camera::setSize((width / 2) * 2, (height / 2) * 2);
 
       // Make sure this isn't the camera calling setsize from init
       // Resize the viewport.
@@ -140,17 +142,13 @@ void CameraFBO::render(OSG::RenderAction* ra)
 
    mFboVP->bind(ra->getWindow());
 
-   // Ensure that width and height are multiples of two.
-   const OSG::UInt32 source_width(mWidth / 2) * 2;
-   const OSG::UInt32 source_height(mHeight / 2) * 2;
-
    // If we are using an FBO, then we should change to the FBO buffer.
    glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
    checkGLError("before glReadPixels");
 
    // Read the buffer into an OpenSG image.
    glReadPixels(mFboVP->getPixelLeft(), mFboVP->getPixelBottom(),
-                source_width, source_height, mCurrentImage->getPixelFormat(),
+                mWidth, mHeight, mCurrentImage->getPixelFormat(),
                 GL_UNSIGNED_BYTE, mCurrentImage->getData());
    checkGLError("after glReadPixels");
 
