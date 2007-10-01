@@ -140,8 +140,9 @@ void CameraFBO::render(OSG::RenderAction* ra)
 
    mFboVP->bind(ra->getWindow());
 
-   OSG::UInt32 source_width = ( mWidth / 2 ) * 2;
-   OSG::UInt32 source_height = ( mHeight / 2 ) * 2;
+   // Ensure that width and height are multiples of two.
+   const OSG::UInt32 source_width(mWidth / 2) * 2;
+   const OSG::UInt32 source_height(mHeight / 2) * 2;
 
    // If we are using an FBO, then we should change to the FBO buffer.
    glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
