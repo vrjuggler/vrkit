@@ -143,19 +143,6 @@ void CameraFBO::render(OSG::RenderAction* ra)
    OSG::UInt32 source_width = ( mWidth / 2 ) * 2;
    OSG::UInt32 source_height = ( mHeight / 2 ) * 2;
 
-   OSG::UInt32 image_width = source_width;
-   OSG::UInt32 image_height = source_height;
-
-   // Tell the OpenGL driver the row length of the target image. This
-   // will result in the driver getting the array indices with the
-   // following formula. index = SP + (IR * RL) + IC.
-   // Where:
-   //   IR = Input pixel row.
-   //   IC = Input pixel column.
-   //   SP = GL_PACK_SKIP_PIXELS
-   //   RL = GL_PACK_ROW_LENGTH
-   glPixelStorei(GL_PACK_ROW_LENGTH, image_width);
-
    // If we are using an FBO, then we should change to the FBO buffer.
    glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
    checkGLError("before glReadPixels");
@@ -169,10 +156,6 @@ void CameraFBO::render(OSG::RenderAction* ra)
    //      are not reading from the pixel buffer anywhere else.
    // Double buffered.
    //glReadBuffer(GL_BACK);
-
-   // Restore the pixel storage settings to the default.
-   glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-   //glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
 
    mFboVP->stop(ra->getWindow());
 }
