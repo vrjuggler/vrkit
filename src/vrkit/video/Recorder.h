@@ -61,18 +61,15 @@ protected:
 public:
    static RecorderPtr create();
 
-   ~Recorder();
-
    /**
-    * Initialize the recorder.
+    * Initializes this video recorder.
+    *
+    * @return A pointer to this object is returned as a
+    *         vrkit::video::RecorderPtr object.
     */
    RecorderPtr init();
 
-   /**
-    * Called from the Viewer's context init so that we can set the
-    * correct window.
-    */
-   void contextInit(OSG::WindowPtr window);
+   ~Recorder();
 
    /** @name Video Encoder Format Management */
    //@{
@@ -98,6 +95,8 @@ public:
    void setFormat(const VideoEncoderFormat& format);
    //@}
 
+   /** @name Movie Attributes */
+   //@{
    /*
     * Set the filename to record the video to.
     */
@@ -139,6 +138,11 @@ public:
    void setSceneRoot(OSG::NodePtr root);
 
    /**
+    * Set the draw scale factor so we can generate correct visual aids
+    */
+   void setDrawScaleFactor(const float scale);
+
+   /**
     * Set whether to record video in stereo.
     */
    void setStereo(const bool stereo);
@@ -155,16 +159,14 @@ public:
     * Set the traversal mask for rendering if required.
     */
    void setTravMask(const OSG::UInt32 value);
+   //@}
 
+   /** @name Recording Controls */
+   //@{
    /**
     * Use the current configured settings to start recording video.
     */
    void startRecording();
-
-   /**
-    * End the current recording.
-    */
-   void endRecording();
 
    /**
     * Pause the current recording.
@@ -181,6 +183,11 @@ public:
    void resume();
 
    /**
+    * End the current recording.
+    */
+   void endRecording();
+
+   /**
     * Returns whether the recorder has started recording and has not ended.
     */
    bool isRecording() const
@@ -195,12 +202,30 @@ public:
    {
       return mPaused;
    }
+   //@}
+
+   /** @name Rendering Interface */
+   //@{
+   /**
+    * Sets the OpenSG window for the internal camera. This must be called
+    * during the initialization of an OpenGL context. Likely places for this
+    * are an override of vrkit::Viewer::contextInit() or the implementation
+    * of vrkit::Plugin::contextInit().
+    */
+   void contextInit(OSG::WindowPtr window);
 
    /*
     * Renders the current frame given a RenderAction and camera position.
+    * This must be invoked with an active OpenGL context. Likely places for
+    * making this call are overrides of the vrkit::Viewer draw methods
+    * (contextPreDraw(), draw(), and contextPostDraw()) or vrkit::Plugin draw
+    * methods.
     */
    void render(OSG::RenderAction* ra, const OSG::Matrix& camPos);
+   //@}
 
+   /** @name Recording Visual Cues */
+   //@{
    /**
     * Get a debug node that contains a plane with the Camera's texture
     * applied to it.
@@ -208,25 +233,21 @@ public:
    OSG::NodePtr getDebugPlane() const;
 
    /**
-    * Set the draw scale factor so we can generate correct visual aids
-    */
-   void setDrawScaleFactor(float scale);
-
-   /**
     * Set the border width for the debug frame.
     */
-   void setDebugFrameBorderWidth(float value);
+   void setDebugFrameBorderWidth(const float value);
 
    /**
     * Set the distance from the view the debug frame is.
     */
-   void setDebugFrameDistance(float value);
+   void setDebugFrameDistance(const float value);
 
    /**
     * Returns the root of the frame that surrounds what will be captured
     * in the recorder.
     */
    OSG::NodePtr getFrame() const;
+   //@}
 
    /** @name Signal Accessors */
    //@{
@@ -281,14 +302,14 @@ private:
     */
    bool startEncoder();
 
-   void writeFrame(OSG::ImagePtr img);
-
-   void generateDebugFrame();
-
    /**
     * Set the position of the camera.
     */
    void setCameraPos(const OSG::Matrix& camPos);
+
+   void writeFrame(OSG::ImagePtr img);
+
+   void generateDebugFrame();
 
    CameraPtr            mCamera;        /**< Camera used for rendering. */
    OSG::ImagePtr        mStereoImageStorage; /**< Temp storage for stereo image concatenation. */
