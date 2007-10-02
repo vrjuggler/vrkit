@@ -175,7 +175,7 @@ EncoderPtr EncoderDirectShow::init()
    // TODO: Support ASF (MEDIASUBTYPE_Asf) and other container formats that
    // can be handled by DirectShow. Figuring out what those other formats are
    // seems to be the hardest part.
-   container_format_info_t format_info;
+   ContainerFormatInfo format_info;
    format_info.mFormatName = "AVI";
    format_info.mFormatLongName = "Audio Video Interleave";
    format_info.mFileExtensions.push_back("avi");

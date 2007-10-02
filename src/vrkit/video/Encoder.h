@@ -53,9 +53,16 @@ protected:
 public:
    virtual ~Encoder();
 
+   /** @name Encoder Data Types */
+   //@{
    typedef std::vector<std::string> codec_list_t;
 
-   struct container_format_info_t
+   /**
+    * @since 0.50.0
+    *
+    * @note This was renamed from container_format_info_t in version 0.50.0
+    */
+   struct ContainerFormatInfo
    {
       std::string               mFormatName;
       std::string               mFormatLongName;
@@ -64,7 +71,12 @@ public:
       std::string               mEncoderName;
    };
 
-   struct encoder_parameters_t
+   /**
+    * @since 0.50.0
+    *
+    * @note This was renamed from encoder_parameters_t in version 0.50.0
+    */
+   struct EncoderParameters
    {
       std::string mContainerFormat;
       std::string mCodec;
@@ -74,13 +86,14 @@ public:
       vpr::Uint32 mFramesPerSecond;
    };
 
-   typedef std::vector<container_format_info_t> container_format_list_t;
+   typedef std::vector<ContainerFormatInfo> container_format_list_t;
+   //@}
 
    virtual EncoderPtr init() = 0;
 
    const container_format_list_t& getSupportedContainersAndCodecs() const;
 
-   void setEncodingParameters(const encoder_parameters_t& params);
+   void setEncodingParameters(const EncoderParameters& params);
 
    /**
     * @throw vrkit::RecordingException Thrown if starting recording fails.
@@ -109,7 +122,7 @@ protected:
    vpr::Uint32 getFramesPerSecond() const;
    //}
 
-   encoder_parameters_t         mEncoderParams;
+   EncoderParameters            mEncoderParams;
    container_format_list_t      mContainerFormatInfoList;
 };
 
