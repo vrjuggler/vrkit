@@ -81,7 +81,7 @@ public:
     *
     * @throw vrkit::PluginInterfaceException
     *           Thrown if \p pluginLib is not a valid dynamic code entity for
-    *           an vrkit::viewer::Plugin instance.
+    *           a vrkit::viewer::Plugin instance.
     */
    static bool validatePluginLib(vpr::LibraryPtr pluginLib);
 
