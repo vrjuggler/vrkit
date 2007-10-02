@@ -41,8 +41,11 @@ namespace mode
 {
 
 /**
- * A plugin is an abstract interface that allows for an extension point in the
- * system.  It is used to add capabilities to the application.
+ * A plug-in is an abstract interface that allows for an extension point in
+ * vrkit. It is used to add capabilities to the application. Mode components
+ * specifically are intended to \em interpret events. For example, an object
+ * intersection event could have two different interpretations by two
+ * (mutually exclusive) mode components.
  *
  * @note This class was renamed from vrkit::ModeComponent in version 0.47.
  *
