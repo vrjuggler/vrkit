@@ -48,7 +48,7 @@ namespace vrkit
  * Class to store the data for the scene.
  *
  * This is the main holder for all data that is part of the "model" pattern in
- * the application.  Because of this it is also that place where plugins
+ * the application.  Because of this it is also that place where plug-ins
  * and the application share data.
  *
  * Coordinate systems used:

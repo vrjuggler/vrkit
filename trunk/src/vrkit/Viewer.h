@@ -104,25 +104,28 @@ public:
 
    virtual ~Viewer();
 
-   /** Initialize (build) the viewer
-    * @post: All objects managed by the viewer are initialized
-    *        and setup.  (including the plugins)
-    * @note: Derived class implementations <b>MUST</b> call up to this method.
+   /**
+    * Initializes (builds) this viewer instance.
+    *
+    * @post All objects managed by the vrkit viewer are initialized and set
+    *       up (including the plug-ins).
+    *
+    * @note Derived class overrides \em must call this implementation.
     */
    virtual void init();
 
    /**
     * Intitializes the context and informs plug-ins of same.
     *
-    * @note Derived classes must call base class implementation.
+    * @note Derived class overrides \em must call this implementation.
     */
    virtual void contextInit();
 
    /**
     * Called at the beginning of each frame.
-    * Updates the plugins and then updates the scene graph over the network.
+    * Updates the plug-ins and then updates the scene graph over the network.
     *
-    * @note Derived class implementations \em MUST call up to this method.
+    * @note Derived class overrides \em must call this implementation.
     */
    virtual void preFrame();
 
@@ -136,24 +139,24 @@ public:
    virtual void latePreFrame();
 
    /**
-    * @note Derived classes must call base class implementation.
+    * @note Derived class overrides \em must call this implementation.
     */
    virtual void contextPreDraw();
 
    /**
-    * @note Derived classes must call base class implementation.
+    * @note Derived class overrides \em must call this implementation.
     */
    virtual void draw();
 
    /**
-    * @note Derived classes must call base class implementation.
+    * @note Derived class overrides \em must call this implementation.
     */
    virtual void contextPostDraw();
 
    /**
     * Called at the end of each frame.
     *
-    * @note Derived class implementations \em MUST call up to this method.
+    * @note Derived class overrides \em must call this implementation.
     */
    virtual void postFrame()
    {;}
@@ -175,12 +178,12 @@ public:
    const base_type::context_data& getContextData();
 
    /**
-    * @note Derived classes must call base class implementation.
+    * @note Derived class overrides \em must call this implementation.
     */
    virtual void contextClose();
 
    /**
-    * @note Derived classes must call base class implementation.
+    * @note Derived class overrides \em must call this implementation.
     */
    virtual void exit();
 
@@ -194,9 +197,13 @@ public:
       return getSceneObj()->getSceneRoot().node();
    }
 
-   /** Return reference to the current configuration.
-    * This can be used to add to the configuration.
-    * For example:  getConfiguration().loadConfigEltFile("file.jconf")
+   /**
+    * Returns the reference to the current configuration. This can be used to
+    * add to the configuration.
+    *
+    * \code
+    * getConfiguration().loadConfigEltFile("file.jconf");
+    * \encode
     */
    Configuration& getConfiguration()
    {
@@ -204,7 +211,7 @@ public:
    }
 
    /**
-    * Return the plugin factory being used by the core viewer object.
+    * Return the plug-in factory being used by the core viewer object.
     *
     * @since 0.36
     */
@@ -316,16 +323,10 @@ private:
    void config(jccl::ConfigElementPtr appCfg);
 
 private:
-   /** The user for the viewer.
-   * @link association
-   * @supplierCardinality 1*/
-   /*# User lnkUser */
+   /** The user for the viewer. */
    UserPtr     mUser;
 
-   /** The scene we are using.
-   * @link association
-   * @supplierCardinality 1*/
-   /*# Scene lnkScene; */
+   /** The scene we are using. */
    ScenePtr    mScene;
 
    /** @name Cluster Data Members */
@@ -345,10 +346,10 @@ private:
    plugin::RegistryPtr mPluginRegistry;
    //@}
 
-   /** List of plugins managed by the viewer.
-   * @link association
-   * @supplierCardinality 0..**/
-   /*# Plugin lnkPlugin; */
+   /**
+    * List of plug-ins managed by the viewer (implementations of
+    * vrkit::viewer::Plugin).
+    */
    std::vector<viewer::PluginPtr> mPlugins;
 
    /** The configuration for the system (and the viewer). */
