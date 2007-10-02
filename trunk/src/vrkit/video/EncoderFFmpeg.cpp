@@ -186,7 +186,7 @@ EncoderPtr EncoderFFmpeg::init()
                }
             }
 
-            Encoder::container_format_info_t new_format;
+            ContainerFormatInfo new_format;
             new_format.mFormatName = std::string(out_fmt->name);
             if( out_fmt->long_name != NULL )
             {

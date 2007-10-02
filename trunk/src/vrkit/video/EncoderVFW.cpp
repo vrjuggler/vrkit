@@ -104,7 +104,7 @@ void buildAndThrowAviError(const vpr::Uint32 errCode)
 
 EncoderPtr EncoderVFW::init()
 {
-   container_format_info_t format_info;
+   ContainerFormatInfo format_info;
    format_info.mFormatName = "AVI";
    format_info.mFormatLongName = "Audio Video Interleave";
    format_info.mFileExtensions.push_back("avi");

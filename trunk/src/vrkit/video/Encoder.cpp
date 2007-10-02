@@ -41,7 +41,7 @@ Encoder::getSupportedContainersAndCodecs() const
    return mContainerFormatInfoList;
 }
 
-void Encoder::setEncodingParameters(const encoder_parameters_t& params)
+void Encoder::setEncodingParameters(const EncoderParameters& params)
 {
    mEncoderParams = params;
 }
