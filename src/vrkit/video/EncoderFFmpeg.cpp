@@ -480,17 +480,16 @@ void EncoderFFmpeg::closeVideo()
 {
    avcodec_close(mVideoStream->codec);
 
-   av_free(mYuvFrame->data[0]);
    av_free(mYuvFrame);
    mYuvFrame = NULL;
 
-   av_free(mRgbFrame->data[0]);
    av_free(mRgbFrame);
    mRgbFrame = NULL;
 
    av_free(mVideoOutBuffer);
    mVideoOutBuffer = NULL;
 
+   // XXX: Memory leak.
    mVideoStream = NULL;
 }
 
