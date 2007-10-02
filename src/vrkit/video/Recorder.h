@@ -21,16 +21,20 @@
 
 #include <vrkit/Config.h>
 
+#include <map>
 #include <vector>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/signal.hpp>
 
+#include <OpenSG/OSGImage.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGWindow.h>
 #include <OpenSG/OSGRenderAction.h>
 
+#include <vrkit/signal/Proxy.h>
 #include <vrkit/video/CameraPtr.h>
-#include <vrkit/video/EncoderManager.h>
 #include <vrkit/video/RecorderPtr.h>
+#include <vrkit/video/Encoder.h>
 
 
 namespace vrkit
@@ -57,7 +61,7 @@ protected:
 public:
    static RecorderPtr create();
 
-   virtual ~Recorder();
+   ~Recorder();
 
    /**
     * Initialize the recorder.
@@ -70,15 +74,29 @@ public:
     */
    void contextInit(OSG::WindowPtr window);
 
+   /** @name Video Encoder Format Management */
+   //@{
    /**
-    * Returns the current set of available codes.
+    * Returns the current set of available container formats with their
+    * supported codecs.
     */
-   const Encoder::container_format_list_t& getAvailableFormats() const;
+   const Encoder::container_format_list_t& getAvailableFormats() const
+   {
+      return mVideoEncoderFormatList;
+   }
 
    /**
-    * Set the codec that the encoder should use.
+    * @since 0.50.0
     */
-   void setFormat(const EncoderManager::video_encoder_format_t& format);
+   struct VideoEncoderFormat
+   {
+      std::string mEncoderName;         /**< The name of the encoder to use */
+      std::string mContainerFormat;     /**< The container format for the output file */
+      std::string mCodec;               /**< The codec to use for encoding the rendered frames */
+   };
+
+   void setFormat(const VideoEncoderFormat& format);
+   //@}
 
    /*
     * Set the filename to record the video to.
@@ -126,6 +144,14 @@ public:
    void setStereo(const bool stereo);
 
    /**
+    * @since 0.50.0
+    */
+   bool inStereo() const
+   {
+      return mStereo;
+   }
+
+   /**
     * Set the traversal mask for rendering if required.
     */
    void setTravMask(const OSG::UInt32 value);
@@ -157,12 +183,18 @@ public:
    /**
     * Returns whether the recorder has started recording and has not ended.
     */
-   bool isRecording() const;
+   bool isRecording() const
+   {
+      return mRecording;
+   }
 
    /**
     * Returns whether the recorder is recording and paused.
     */
-   bool isPaused() const;
+   bool isPaused() const
+   {
+      return mPaused;
+   }
 
    /*
     * Renders the current frame given a RenderAction and camera position.
@@ -198,58 +230,59 @@ public:
 
    /** @name Signal Accessors */
    //@{
-   typedef EncoderManager::basic_signal_t basic_signal_t;
+   typedef boost::signal<void ()> basic_signal_t;
 
    /**
     * Signal emitted when recording starts.
-    *
-    * @see vrkit::EncoderManager::encodingStarted()
     *
     * @since 0.45.2
     */
    signal::Proxy<basic_signal_t> recordingStarted()
    {
-      return mVideoEncoder->encodingStarted();
+      return signal::Proxy<basic_signal_t>(mRecordingStarted);
    }
 
    /**
     * Signal emitted when recording is paused.
     *
-    * @see vrkit::EncoderManager::encodingPaused()
-    *
     * @since 0.45.2
     */
    signal::Proxy<basic_signal_t> recordingPaused()
    {
-      return mVideoEncoder->encodingPaused();
+      return signal::Proxy<basic_signal_t>(mRecordingPaused);
    }
 
    /**
     * Signal emitted when recording resumes after being paused.
     *
-    * @see vrkit::EncoderManager::encodingResumed()
-    *
     * @since 0.45.2
     */
    signal::Proxy<basic_signal_t> recordingResumed()
    {
-      return mVideoEncoder->encodingResumed();
+      return signal::Proxy<basic_signal_t>(mRecordingResumed);
    }
 
    /**
     * Signal emitted when recording stops.
     *
-    * @see vrkit::EncoderManager::encodingStopped()
-    *
     * @since 0.45.2
     */
    signal::Proxy<basic_signal_t> recordingStopped()
    {
-      return mVideoEncoder->encodingStopped();
+      return signal::Proxy<basic_signal_t>(mRecordingStopped);
    }
    //@}
 
 private:
+   /**
+    * Chooses the encoder to use and prepares it for encoding.
+    *
+    * @return True is returned if recording was successfully started.
+    */
+   bool startEncoder();
+
+   void writeFrame(OSG::ImagePtr img);
+
    void generateDebugFrame();
 
    /**
@@ -257,15 +290,37 @@ private:
     */
    void setCameraPos(const OSG::Matrix& camPos);
 
-   CameraPtr            mCamera;         /**< Camera used for rendering. */
-   EncoderManagerPtr    mVideoEncoder;
+   CameraPtr            mCamera;        /**< Camera used for rendering. */
    OSG::ImagePtr        mStereoImageStorage; /**< Temp storage for stereo image concatenation. */
    OSG::TransformRefPtr mTransform;     /**< The location and orientation of the camera. */
    OSG::NodeRefPtr      mFrameRoot;     /**< The frame that surrounds the captured scene. */
    OSG::Real32          mEyeOffset;     /**< Interocular distance / 2 for stereo. */
    OSG::Real32          mBorderSize;    /**< The width of the frame geometry. */
    OSG::Real32          mFrameDist;     /**< The distance between the camera and the frame. */
-   float                mDrawScale;   /**< Draw scale factor for the scene. */
+   float                mDrawScale;     /**< Draw scale factor for the scene. */
+
+   /** @name Signal Objects */
+   //@{
+   basic_signal_t mRecordingStarted;
+   basic_signal_t mRecordingPaused;
+   basic_signal_t mRecordingResumed;
+   basic_signal_t mRecordingStopped;
+   //@}
+
+   bool         mRecording;     /**< Whether we are currently recording. */
+   bool         mPaused;        /**< Whether we are currently paused while recording. */
+   bool         mStereo;
+   std::string  mFilename;
+   OSG::UInt32  mFps;
+   OSG::UInt32  mWidth;
+   OSG::UInt32  mHeight;
+   EncoderPtr   mEncoder;       /**< The current video encoder. */
+
+   typedef std::map<std::string, EncoderPtr> encoder_map_t;
+
+   encoder_map_t                        mEncoderMap;
+   VideoEncoderFormat                   mVideoEncoderParams;
+   Encoder::container_format_list_t     mVideoEncoderFormatList;
 };
 
 }

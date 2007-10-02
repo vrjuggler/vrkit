@@ -27,9 +27,38 @@
 #include <OpenSG/OSGSimpleGeometry.h>
 #include <OpenSG/OSGSimpleMaterial.h>
 
-#include <vrkit/video/EncoderManager.h>
+#include <vrkit/Status.h>
+#include <vrkit/Exception.h>
+
+#ifdef VRKIT_WITH_FFMPEG
+#  include <vrkit/video/EncoderFFmpeg.h>
+#endif
+
+#if defined(VRKIT_WITH_VFW)
+#  include <vrkit/video/EncoderVFW.h>
+#endif
+
+#if defined(VRKIT_WITH_DIRECT_SHOW)
+#  include <vrkit/video/EncoderDirectShow.h>
+#endif
+
 #include <vrkit/video/CameraFBO.h>
 #include <vrkit/video/Recorder.h>
+
+#define REGISTER_ENCODER(ENCODER)                                       \
+   EncoderPtr encoder_ ## ENCODER = ENCODER::create()->init();          \
+   mEncoderMap[ENCODER::getName()] = encoder_ ## ENCODER;               \
+                                                                        \
+   Encoder::container_format_list_t enc_fmt_list ## ENCODER =           \
+      encoder_ ## ENCODER->getSupportedContainersAndCodecs();           \
+   /* Register each container format list. */                           \
+   mVideoEncoderFormatList.insert(mVideoEncoderFormatList.end(),        \
+                                  enc_fmt_list ## ENCODER.begin(),      \
+                                  enc_fmt_list ## ENCODER.end());
+
+#ifndef GL_COLOR_ATTACHMENT0_EXT
+#  define GL_COLOR_ATTACHMENT0_EXT 0x8CE0
+#endif
 
 
 namespace vrkit
@@ -40,7 +69,6 @@ namespace video
 
 Recorder::Recorder()
    : mCamera()
-   , mVideoEncoder()
    , mStereoImageStorage(OSG::NullFC)
    , mTransform(OSG::NullFC)
    , mFrameRoot(OSG::NullFC)
@@ -48,6 +76,13 @@ Recorder::Recorder()
    , mBorderSize(2.0)
    , mFrameDist(50.0)
    , mDrawScale(1.0)
+   , mRecording(false)
+   , mPaused(false)
+   , mStereo(false)
+   , mFilename("vrkit_movie.avi")
+   , mFps(30)
+   , mWidth(512)
+   , mHeight(512)
 {
    ;
 }
@@ -59,7 +94,11 @@ RecorderPtr Recorder::create()
 
 Recorder::~Recorder()
 {
-   /* Do nothing. */ ;
+   if ( NULL != mEncoder.get() )
+   {
+      mEncoder->stopEncoding();
+      mEncoder = EncoderPtr();
+   }
 }
 
 void Recorder::contextInit(OSG::WindowPtr window)
@@ -90,7 +129,41 @@ RecorderPtr Recorder::init()
 
    assert(mCamera.get() != NULL);
 
-   mVideoEncoder = EncoderManager::create()->init();
+#ifdef VRKIT_WITH_FFMPEG
+   try
+   {
+      REGISTER_ENCODER(EncoderFFmpeg)
+   }
+   catch (Exception& ex)
+   {
+      VRKIT_STATUS << "Failed to register FFmpeg encoder:\n" << ex.what()
+                   << std::endl;
+   }
+#endif
+
+#ifdef VRKIT_WITH_VFW
+   try
+   {
+      REGISTER_ENCODER(EncoderVFW)
+   }
+   catch (Exception& ex)
+   {
+      VRKIT_STATUS << "Failed to register VFW encoder:\n" << ex.what()
+                   << std::endl;
+   }
+#endif
+
+#ifdef VRKIT_WITH_DIRECT_SHOW
+   try
+   {
+      REGISTER_ENCODER(EncoderDirectShow)
+   }
+   catch (Exception& ex)
+   {
+      VRKIT_STATUS << "Failed to register DirectShow encoder:\n" << ex.what()
+                   << std::endl;
+   }
+#endif
 
    return shared_from_this();
 }
@@ -102,27 +175,22 @@ void Recorder::setSceneRoot(OSG::NodePtr root)
 
 void Recorder::setFilename(const std::string& filename)
 {
-   mVideoEncoder->setFilename(filename);
+   mFilename = filename;
 }
 
 void Recorder::setFramesPerSecond(const OSG::UInt32 framesPerSecond)
 {
-   mVideoEncoder->setFramesPerSecond(framesPerSecond);
+   mFps = framesPerSecond;
 }
 
-void Recorder::setFormat(const EncoderManager::video_encoder_format_t& format)
+void Recorder::setFormat(const VideoEncoderFormat& format)
 {
-   mVideoEncoder->setFormat(format);
-}
-
-const Encoder::container_format_list_t& Recorder::getAvailableFormats() const
-{
-   return mVideoEncoder->getAvailableFormats();
+   mVideoEncoderParams = format;
 }
 
 void Recorder::setStereo(const bool stereo)
 {
-   mVideoEncoder->setStereo(stereo);
+   mStereo = stereo;
 }
 
 void Recorder::setTravMask(const OSG::UInt32 value)
@@ -138,7 +206,9 @@ void Recorder::setInterocularDistance(const OSG::Real32 interocular)
 void Recorder::setFrameSize(const OSG::UInt32 width, const OSG::UInt32 height)
 {
    mCamera->setSize(width, height);
-   mVideoEncoder->setSize(width, height);
+
+   mWidth  = width;
+   mHeight = height;
 
    generateDebugFrame(); //XXX
 }
@@ -153,15 +223,16 @@ void Recorder::startRecording()
    if ( ! isRecording() )
    {
       // Ensure that recording actually started.
-      if (mVideoEncoder->record())
+      if ( startEncoder() )
       {
-         mCamera->setPixelFormat(mVideoEncoder->getPixelFormat());
+         const OSG::Image::PixelFormat pix_format(mEncoder->getPixelFormat());
 
-         if ( mVideoEncoder->inStereo() )
+         mCamera->setPixelFormat(pix_format);
+
+         if ( inStereo() )
          {
             OSG::beginEditCP(mStereoImageStorage);
-               mStereoImageStorage->set(mVideoEncoder->getPixelFormat(),
-                                        mCamera->getWidth() * 2,
+               mStereoImageStorage->set(pix_format, mCamera->getWidth() * 2,
                                         mCamera->getHeight());
             OSG::beginEditCP(mStereoImageStorage);
          }
@@ -171,27 +242,33 @@ void Recorder::startRecording()
 
 void Recorder::pause()
 {
-   mVideoEncoder->pause();
+   if ( isRecording() && ! isPaused() )
+   {
+      mPaused = true;
+      mRecordingPaused();
+   }
 }
 
 void Recorder::resume()
 {
-   mVideoEncoder->resume();
+   if ( isPaused() )
+   {
+      mPaused = false;
+      mRecordingResumed();
+   }
 }
 
 void Recorder::endRecording()
 {
-   mVideoEncoder->stop();
-}
+   if ( isRecording() )
+   {
+      mEncoder->stopEncoding();
+      mEncoder = EncoderPtr();
+      mRecordingStopped();
+   }
 
-bool Recorder::isRecording() const
-{
-   return mVideoEncoder->isRecording();
-}
-
-bool Recorder::isPaused() const
-{
-   return mVideoEncoder->isPaused();
+   mRecording = false;
+   mPaused    = false;
 }
 
 void Recorder::setAspect(const OSG::Real32 aspect)
@@ -211,13 +288,13 @@ void Recorder::setNearFar(const OSG::Real32 nearVal, const OSG::Real32 farVal)
 
 void Recorder::render(OSG::RenderAction* ra, const OSG::Matrix& camPos)
 {
-   if (!isRecording() || isPaused() )
+   if ( ! isRecording() || isPaused() )
    {
       return;
    }
 
    // If we are rendering stereo, then offset the camera position.
-   if ( mVideoEncoder->inStereo() )
+   if ( inStereo() )
    {
       OSG::Matrix offset;
       OSG::Matrix camera_pos;
@@ -250,16 +327,13 @@ void Recorder::render(OSG::RenderAction* ra, const OSG::Matrix& camPos)
          );
       OSG::endEditCP(mStereoImageStorage);
 
-      mVideoEncoder->writeFrame(mStereoImageStorage);
+      writeFrame(mStereoImageStorage);
    }
    else
    {
       setCameraPos(camPos);
-
       mCamera->renderLeftEye(ra);
-
-      mVideoEncoder->writeFrame(mCamera->getLeftEyeImage());
-
+      writeFrame(mCamera->getLeftEyeImage());
    }
 }
 
@@ -351,6 +425,72 @@ void Recorder::setDebugFrameDistance(float value)
 {
    mFrameDist = value;
    generateDebugFrame();
+}
+
+bool Recorder::startEncoder()
+{
+#if 0
+   codec_map_t::const_iterator found = mCodecMap.find(mCodec);
+   if (mCodecMap.end() == found)
+   {
+      std::stringstream ss;
+      ss << "Can't find encoder for codec: " << mCodec;
+      throw Exception(ss.str(), VRKIT_LOCATION);
+   }
+#endif
+
+   if ( NULL != mEncoder.get() )
+   {
+      mEncoder->stopEncoding();
+      mEncoder = EncoderPtr();
+   }
+
+   bool started(false);
+
+   if ( mEncoderMap.count(mVideoEncoderParams.mEncoderName) > 0 )
+   {
+      encoder_map_t::const_iterator vid_encoder =
+         mEncoderMap.find(mVideoEncoderParams.mEncoderName);
+      mEncoder = (*vid_encoder).second;
+
+      Encoder::encoder_parameters_t encoder_params =
+         {
+            mVideoEncoderParams.mContainerFormat,
+            mVideoEncoderParams.mCodec,
+            mFilename,
+            mStereo ? mWidth * 2 : mWidth,
+            mHeight,
+            mFps
+         };
+
+      mEncoder->setEncodingParameters(encoder_params);
+      mEncoder->startEncoding();
+
+      mRecording = true;
+      mRecordingStarted();
+      started = true;
+   }
+
+   return started;
+}
+
+void Recorder::writeFrame(OSG::ImagePtr img)
+{
+   if ( ! mRecording )
+   {
+      return;
+   }
+
+   try
+   {
+      mEncoder->writeFrame(img->getData());
+   }
+   catch (std::exception& ex)
+   {
+      std::cerr << "Encoder failed to write frame; stopping encoding\n"
+                << ex.what() << std::endl;
+      endRecording();
+   }
 }
 
 // XXX: This has not been updated to behave correctly in stereo mode.
