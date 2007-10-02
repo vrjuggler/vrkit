@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-10-02 patrick  Fixed memory corruption problems in
+                    vrkit::video::EncoderFFmpeg.
 2007-09-24 patrick  Fixed a bug in the handling of the traversal mask setting
                     in vrkit::SlaveViewer.
                     -- VERSION -- 0.49.2
