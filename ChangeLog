@@ -1,5 +1,12 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-10-02 patrick  Merged the classes vrkit::video::Recorder and
+                    vrkit::video::EncoderManager into vrkit::video::Recorder.
+                    Renmaed vrkit::Encoder::container_format_info_t to
+                    vrkit::Encoder::ContainerFormatInfo and
+                    vrkit::Encoder::encoder_parameters_t to
+                    vrkit::Encoder::EncoderParameters.
+                    -- VERSION -- 0.50.0
 2007-10-02 patrick  Fixed memory corruption problems in
                     vrkit::video::EncoderFFmpeg.
 2007-09-24 patrick  Fixed a bug in the handling of the traversal mask setting
