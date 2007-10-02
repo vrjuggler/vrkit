@@ -92,20 +92,6 @@ RecorderPtr Recorder::create()
    return RecorderPtr(new Recorder);
 }
 
-Recorder::~Recorder()
-{
-   if ( NULL != mEncoder.get() )
-   {
-      mEncoder->stopEncoding();
-      mEncoder = EncoderPtr();
-   }
-}
-
-void Recorder::contextInit(OSG::WindowPtr window)
-{
-   mCamera->setWindow(window);
-}
-
 RecorderPtr Recorder::init()
 {
    // Create a transform to contain the location and orientation of the camera.
@@ -168,19 +154,13 @@ RecorderPtr Recorder::init()
    return shared_from_this();
 }
 
-void Recorder::setSceneRoot(OSG::NodePtr root)
+Recorder::~Recorder()
 {
-   mCamera->setSceneRoot(root);
-}
-
-void Recorder::setFilename(const std::string& filename)
-{
-   mFilename = filename;
-}
-
-void Recorder::setFramesPerSecond(const OSG::UInt32 framesPerSecond)
-{
-   mFps = framesPerSecond;
+   if ( NULL != mEncoder.get() )
+   {
+      mEncoder->stopEncoding();
+      mEncoder = EncoderPtr();
+   }
 }
 
 void Recorder::setFormat(const VideoEncoderFormat& format)
@@ -188,19 +168,24 @@ void Recorder::setFormat(const VideoEncoderFormat& format)
    mVideoEncoderParams = format;
 }
 
-void Recorder::setStereo(const bool stereo)
+void Recorder::setFilename(const std::string& filename)
 {
-   mStereo = stereo;
+   mFilename = filename;
 }
 
-void Recorder::setTravMask(const OSG::UInt32 value)
+void Recorder::setFov(const OSG::Real32 fov)
 {
-   mCamera->setTravMask(value);
+   mCamera->setFov(OSG::osgdegree2rad(fov));
 }
 
-void Recorder::setInterocularDistance(const OSG::Real32 interocular)
+void Recorder::setAspect(const OSG::Real32 aspect)
 {
-   mEyeOffset = interocular / 2.0f;
+   mCamera->setAspect(aspect);
+}
+
+void Recorder::setFramesPerSecond(const OSG::UInt32 framesPerSecond)
+{
+   mFps = framesPerSecond;
 }
 
 void Recorder::setFrameSize(const OSG::UInt32 width, const OSG::UInt32 height)
@@ -213,9 +198,35 @@ void Recorder::setFrameSize(const OSG::UInt32 width, const OSG::UInt32 height)
    generateDebugFrame(); //XXX
 }
 
-void Recorder::setCameraPos(const OSG::Matrix& camPos)
+void Recorder::setInterocularDistance(const OSG::Real32 interocular)
 {
-   mCamera->setPosition(camPos);
+   mEyeOffset = interocular / 2.0f;
+}
+
+void Recorder::setNearFar(const OSG::Real32 nearVal, const OSG::Real32 farVal)
+{
+   mCamera->setNearFar(nearVal, farVal);
+}
+
+void Recorder::setSceneRoot(OSG::NodePtr root)
+{
+   mCamera->setSceneRoot(root);
+}
+
+void Recorder::setDrawScaleFactor(const float scale)
+{
+   mDrawScale = scale;
+   generateDebugFrame();
+}
+
+void Recorder::setStereo(const bool stereo)
+{
+   mStereo = stereo;
+}
+
+void Recorder::setTravMask(const OSG::UInt32 value)
+{
+   mCamera->setTravMask(value);
 }
 
 void Recorder::startRecording()
@@ -271,19 +282,9 @@ void Recorder::endRecording()
    mPaused    = false;
 }
 
-void Recorder::setAspect(const OSG::Real32 aspect)
+void Recorder::contextInit(OSG::WindowPtr window)
 {
-   mCamera->setAspect(aspect);
-}
-
-void Recorder::setFov(const OSG::Real32 fov)
-{
-   mCamera->setFov(OSG::osgdegree2rad(fov));
-}
-
-void Recorder::setNearFar(const OSG::Real32 nearVal, const OSG::Real32 farVal)
-{
-   mCamera->setNearFar(nearVal, farVal);
+   mCamera->setWindow(window);
 }
 
 void Recorder::render(OSG::RenderAction* ra, const OSG::Matrix& camPos)
@@ -404,27 +405,21 @@ OSG::NodePtr Recorder::getDebugPlane() const
    return group_node;
 }
 
-OSG::NodePtr Recorder::getFrame() const
-{
-   return mFrameRoot;
-}
-
-void Recorder::setDrawScaleFactor(float scale)
-{
-   mDrawScale = scale;
-   generateDebugFrame();
-}
-
-void Recorder::setDebugFrameBorderWidth(float value)
+void Recorder::setDebugFrameBorderWidth(const float value)
 {
    mBorderSize = value;
    generateDebugFrame();
 }
 
-void Recorder::setDebugFrameDistance(float value)
+void Recorder::setDebugFrameDistance(const float value)
 {
    mFrameDist = value;
    generateDebugFrame();
+}
+
+OSG::NodePtr Recorder::getFrame() const
+{
+   return mFrameRoot;
 }
 
 bool Recorder::startEncoder()
@@ -453,7 +448,7 @@ bool Recorder::startEncoder()
          mEncoderMap.find(mVideoEncoderParams.mEncoderName);
       mEncoder = (*vid_encoder).second;
 
-      Encoder::encoder_parameters_t encoder_params =
+      Encoder::EncoderParameters encoder_params =
          {
             mVideoEncoderParams.mContainerFormat,
             mVideoEncoderParams.mCodec,
@@ -472,6 +467,11 @@ bool Recorder::startEncoder()
    }
 
    return started;
+}
+
+void Recorder::setCameraPos(const OSG::Matrix& camPos)
+{
+   mCamera->setPosition(camPos);
 }
 
 void Recorder::writeFrame(OSG::ImagePtr img)
