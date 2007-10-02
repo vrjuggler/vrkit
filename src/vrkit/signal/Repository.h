@@ -213,7 +213,7 @@ public:
 
    /**
     * Retrieves the signal container associated with the given identifier.
-    * The container is cast dynamically to an vrkit::signal::Container<T>
+    * The container is cast dynamically to a vrkit::signal::Container<T>
     * instantiation where \c T matches the template parameter \c SignalType.
     *
     * @pre The given identifier is for a registered signal container object.

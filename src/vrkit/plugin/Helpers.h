@@ -125,7 +125,7 @@ getDefaultSearchPath(const std::string& subdir = "",
                      const bool searchDebug = true);
 
 /**
- * Constructs and returns an vrkit plug-in search path made up of directories
+ * Constructs and returns a vrkit plug-in search path made up of directories
  * that are the composition of the default root directories and the given
  * subdirectories. The order of the paths involves several factors to handle
  * the case of debug-enabled builds and optimized builds with some degree of
