@@ -411,10 +411,12 @@ void VideoCapturePlugin::configure(jccl::ConfigElementPtr elt,
       );
    }
 
-   video::EncoderManager::video_encoder_format_t config;
-   config.mEncoderName     = encoder_name;
-   config.mContainerFormat = format_name;
-   config.mCodec           = codec_name;
+   const video::Recorder::VideoEncoderFormat config =
+      {
+         encoder_name,
+         format_name,
+         codec_name
+      };
    mVideoRecorder->setFormat(config);
 
    WandInterfacePtr wand_if =
