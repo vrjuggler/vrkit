@@ -35,8 +35,10 @@ namespace vrkit
 namespace video
 {
 
-/**
- * Renders a scene from a perspective camera into an FBO.
+/** \class CameraFBO CameraFBO.h vrkit/video/CameraFBO.h
+ *
+ * Renders a scene from a perspective camera into an FBO. This implementation
+ * is based on OpenSG 1.8 FBO viewports.
  *
  * @note This class was renamed from vrkit::FboCamera and moved into the
  *       vrkit::video namespace in version 0.47.

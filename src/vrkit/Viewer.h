@@ -66,17 +66,21 @@ typedef vrj::opensg::App OpenSGApp;
 typedef vrj::OpenSGApp OpenSGApp;
 #endif
 
-/**
- * Main viewer class.
- * This class controls the rest of the classes in the system.
+/** \class Viewer Viewer.h vrkit/Viewer.h
  *
- * It is an OpenSG VRJ application object that has been customized
- * and extended to support a "standard" usage scenario
- * across a wide-range of applications.  In effect it provides
- * a framework for VRJ OpenSG applications.
+ * The main application class. This class controls the rest of the components
+ * in a vrkit application.
  *
- * The viewer class supports a slave communication protocol
- * for clustering.  See @ref SlaveCommunicationProtocol
+ * vrkit::Viewer is an OpenSG VR Juggler application object that has been
+ * customized and extended to support a "standard" usage scenario across a
+ * wide range of applications. In effect it provides a framework for VR Juggler
+ * OpenSG applications.
+ *
+ * The viewer class supports a slave communication protocol for clustering. In
+ * a cluster configuration, this class is designed to act as the single server
+ * application instance. See @ref SlaveCommunicationProtocol
+ *
+ * @see vrkit::SlaveViewer
  */
 class VRKIT_CLASS_API Viewer
    : public OpenSGApp
@@ -203,7 +207,7 @@ public:
     *
     * \code
     * getConfiguration().loadConfigEltFile("file.jconf");
-    * \encode
+    * \endcode
     */
    Configuration& getConfiguration()
    {

@@ -27,7 +27,8 @@
 namespace vrkit
 {
 
-/**
+/** \class BadRecordingData BadRecordingData.h vrkit/exceptions/BadRecordingData.h
+ *
  * Exception thrown if an attempt is made to record OpenGL frames with bad
  * data.
  *

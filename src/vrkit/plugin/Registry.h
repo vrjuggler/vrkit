@@ -44,7 +44,12 @@ namespace plugin
 
 class Info;
 
-/**
+/** \class Registry Registry.h vrkit/plugin/Registry.h
+ *
+ * The centralized container for plug-in creators. The creators are held by
+ * vrkit::plugin::RegistryEntry objects, which will generally be handed as
+ * instantiations of vrkit::plugin::TypedRegistryEntry<T> or
+ * vrkit::plugin::TypedInitRegistryEntry<T,R>.
  *
  * @since 0.36
  */

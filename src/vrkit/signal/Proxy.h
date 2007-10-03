@@ -28,10 +28,11 @@ namespace vrkit
 namespace signal
 {
 
-/**
- * Simple proxy for \c boost::signal<...> instances that exposes only the
- * connect() member function. This allows for a (somewhat) cleaner interface to
- * accessing a \c boost::signal<...> instance that is a class data member
+/** \class Proxy Proxy.h vrkit/signal/Proxy.h
+ *
+ * Simple proxy for \c boost::signal<> instances that exposes only the
+ * connect() member function. This allows for a (somewhat) cleaner interface
+ * to accessing a \c boost::signal<> instance that is a class data member
  * without making that data member public. It is intended to be used for cases
  * when external classes need to connect a slot to a signal but the emitting
  * of the signal can only be performed by the holding class implementation.

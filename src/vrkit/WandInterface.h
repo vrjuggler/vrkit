@@ -37,7 +37,8 @@
 namespace vrkit
 {
 
-/**
+/** \class WandInterface WandInterface.h vrkit/WandInterface.h
+ *
  * Simple, configurable interface for a wand.
  */
 class VRKIT_CLASS_API WandInterface : public DeviceInterface

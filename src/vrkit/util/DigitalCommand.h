@@ -69,7 +69,8 @@ namespace util
  * @see vrkit::WandInterface
  */
 
-/**
+/** \class DigitalCommand DigitalCommand.h vrkit/util/DigitalCommand.h
+ *
  * This class represents a combination of one or more digital buttons
  * (identified by an integer index corresponding to a digital button defined
  * by vrkit::WandInterface) as a "command." A configuration string defines the

@@ -34,12 +34,13 @@ namespace vrkit
 namespace plugin
 {
 
-/**
+/** \class Module Module.h vrkit/plugin/Module.h
+ *
  * A wrapper around a vpr::LibraryPtr object that refers to a dynamically
  * loaded code unit containing a plug-in designed for use with vrkit.
  *
  * @see vrkit::AbsstractPlugin
- * @see vrkit::PluginRepository
+ * @see vrkit::plugin::Repository
  *
  * @since 0.36
  */

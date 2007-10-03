@@ -27,7 +27,10 @@
 namespace vrkit
 {
 
-/** Exception when loading a plug-in. */
+/** \class PluginLoadError PluginLoadError.h vrkit/exceptions/PluginLoadError.h
+ *
+ * Exception thrown when loading a plug-in fails.
+ */
 class VRKIT_CLASS_API PluginLoadError : public PluginException
 {
 public:

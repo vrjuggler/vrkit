@@ -34,7 +34,8 @@
 namespace vrkit
 {
 
-/**
+/** \class SignalData SignalData.h vrkit/scenedata/SignalData.h
+ *
  * A signal emitter that exists as vrkit scene data.
  *
  * @see vrkit::signal::Emitter

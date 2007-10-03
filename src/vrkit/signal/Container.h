@@ -33,7 +33,8 @@ namespace vrkit
 namespace signal
 {
 
-/**
+/** \class Container Container.h vrkit/signal/Container.h
+ *
  * This is the real signal container type. vrkit::signal::ContainerBase is
  * used so that vrkit::signal::Repository can operate in terms of an abstract
  * base type without needing to know all possible instantiations of this

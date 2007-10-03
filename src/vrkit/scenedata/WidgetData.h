@@ -35,6 +35,9 @@
 namespace vrkit
 {
 
+/** \class WidgetData WidgetData.h vrkit/scenedata/WidgetData.h
+ *
+ */
 class VRKIT_CLASS_API WidgetData : public SceneData
 {
 public:

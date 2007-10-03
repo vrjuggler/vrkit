@@ -43,7 +43,8 @@ namespace vrkit
 namespace video
 {
 
-/**
+/** \class Recorder Recorder.h vrkit/video/Recorder.h
+ *
  * Records a scene with a camera and video encoder to a file. This is the
  * primary interface to the vrkit video capture features.
  *

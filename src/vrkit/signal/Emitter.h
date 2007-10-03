@@ -35,7 +35,8 @@ namespace vrkit
 namespace signal
 {
 
-/**
+/** \class Emitter Emitter.h vrkit/signal/Emitter.h
+ *
  * A generic signal emitter. The signals are identified by a unique constant
  * as defined in the enumerated type \p SignalListContainer::signals. The range
  * of signals must be specified as the template parameters \p SignalBegin and

@@ -32,7 +32,8 @@ namespace vrkit
 namespace signal
 {
 
-/**
+/** \class ContainerBase ContainerBase.h vrkit/signal/ContainerBase.h
+ *
  * The base class for all signal containers that can be registered with the
  * signal repository. For all intents and purposes, this is an abstract base
  * class, although it does not define any pure virtual methods. Instead, it

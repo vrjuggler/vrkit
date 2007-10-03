@@ -35,7 +35,8 @@
 namespace vrkit
 {
 
-/**
+/** \class SceneObject SceneObject.h vrkit/SceneObject.h
+ *
  * Base type for objects in the scene. Such objects correspond to a subtree
  * in the scene graph but exist as a higher level concept. Exactly what defines
  * an object in the scene is up to the application programmer. One use of this

@@ -27,7 +27,8 @@
 namespace vrkit
 {
 
-/**
+/** \class RecordingConfigError RecordingConfigError.h vrkit/exceptions/RecordingConfigError.h
+ *
  * Exception thrown if an attempt is made to record OpenGL frames with an
  * invalid encoder configuration.
  *

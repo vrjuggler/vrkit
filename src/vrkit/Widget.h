@@ -39,6 +39,10 @@
 namespace vrkit
 {
 
+/** \class Widget Widget.h vrkit/Widget.h
+ *
+ * Base class for all 3D user interface widgets.
+ */
 class VRKIT_CLASS_API Widget
    : private boost::noncopyable
    , public StaticSceneObject

@@ -33,7 +33,8 @@
 namespace vrkit
 {
 
-/**
+/** \class StaticSceneObject StaticSceneObject.h vrkit/StaticSceneObject.h
+ *
  * A scene object whose children and parent are determined statically through
  * construction of a tree of scene objects. This construction is performed
  * using the addChild() method.

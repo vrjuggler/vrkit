@@ -31,7 +31,8 @@
 namespace vrkit
 {
 
-/**
+/** \class ViewPlatform ViewPlatform.h vrkit/ViewPlatform.h
+ *
  * This class holds the position of the virtual environment in the virtual
  * world. It is the sort of "magic carpet" that the user is moving around on.
  * The view platform corresponds to the physical display system that the

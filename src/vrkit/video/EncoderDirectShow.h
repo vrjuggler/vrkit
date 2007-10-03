@@ -45,7 +45,8 @@ namespace video
 class ByteSource;
 class ByteStream;
 
-/**
+/** \class EncoderDirectShow EncoderDirectShow.h vrkit/video/EncoderDirectShow.h
+ *
  * Video encoder implementation for DirectShow. This class provides the link
  * between OpenGL and DirectShow so that the OpenGL frame buffer can be used
  * as input for a DirectShow filter graph.

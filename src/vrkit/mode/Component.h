@@ -40,7 +40,8 @@ namespace vrkit
 namespace mode
 {
 
-/**
+/** \class Component Component.h vrkit/mode/Component.h
+ *
  * A plug-in is an abstract interface that allows for an extension point in
  * vrkit. It is used to add capabilities to the application. Mode components
  * specifically are intended to \em interpret events. For example, an object

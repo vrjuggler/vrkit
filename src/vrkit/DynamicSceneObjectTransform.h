@@ -30,7 +30,8 @@
 namespace vrkit
 {
 
-/**
+/** \class DynamicSceneObjectTransform DynamicSceneObjectTransform.h vrkit/DynamicSceneObjectTransform.h
+ *
  * A scene object whose children and parent are determined on the fly when
  * they are requested.
  *

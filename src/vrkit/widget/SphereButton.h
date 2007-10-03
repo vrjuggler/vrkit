@@ -35,7 +35,8 @@ namespace vrkit
 namespace widget
 {
 
-/**
+/** \class SphereButton SphereButton.h vrkit/widget/SphereButton.h
+ *
  * @note This class was moved into the vrkit::widget namespace in version 0.47.
  */
 class VRKIT_CLASS_API SphereButton : public Widget

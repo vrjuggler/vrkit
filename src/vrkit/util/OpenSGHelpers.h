@@ -29,6 +29,9 @@ namespace vrkit
 namespace util
 {
 
+/** \struct CoredNodePred CoredNodePred.h vrkit/util/OpenSGHelpers.h
+ *
+ */
 struct CoredNodePred
 {
    typedef bool result_type;
@@ -39,6 +42,9 @@ struct CoredNodePred
    }
 };
 
+/** \struct CoredNode2NodePred CoredNode2NodePred.h vrkit/util/OpenSGHelpers.h
+ *
+ */
 struct CoredNode2NodePred
 {
    typedef bool result_type;

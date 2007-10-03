@@ -46,7 +46,8 @@ namespace vrkit
 namespace grab
 {
 
-/**
+/** \class Strategy Strategy.h vrkit/grab/Strategy.h
+ *
  * A pluggable strategy for determining which scene object(s) to grab.
  *
  * @note This class was renamed from vrkit::GrabStrategy in version 0.47.

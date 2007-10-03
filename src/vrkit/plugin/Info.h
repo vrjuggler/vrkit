@@ -32,7 +32,8 @@ namespace vrkit
 namespace plugin
 {
 
-/**
+/** \class Info Info.h vrkit/plugin/Info.h
+ *
  * This type provides metadata about plug-in types that are loaded and used by
  * vrkit applications. In this version, the metadata that can be attached to
  * a plug-in type is restricted to the following pre-defined kinds:

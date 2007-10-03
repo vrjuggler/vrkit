@@ -41,7 +41,8 @@ namespace vrkit
 namespace util
 {
 
-/**
+/** \class EventSoundPlayer EventSoundPlayer.h vrkit/util/EventSoundPlayer.h
+ *
  * Plays sounds in response to signals emitted by vrkit::EventData.
  *
  * @note This class was moved into the vrkit::util namespace in version 0.47.

@@ -40,7 +40,10 @@ namespace vrkit
 namespace video
 {
 
-/**
+/** \class Encoder Encoder.h vrkit/video/Encoder.h
+ *
+ * This is the abstract base class for all video encoder implementations.
+ *
  * @note This class was moved into the vrkit::video namespace in version 0.47.
  */
 class VRKIT_CLASS_API Encoder

@@ -28,7 +28,8 @@
 namespace vrkit
 {
 
-/**
+/** \class InterfaceTrader InterfaceTrader.h vrkit/InterfaceTrader.h
+ *
  * Class for creating a desired IO interface based on requirements. This will
  * be an implementation of the Product Trader pattern (when complete).
  *

@@ -42,7 +42,8 @@ namespace vrkit
 namespace isect
 {
 
-/**
+/** \class Strategy Strategy.h vrkit/isect/Strategy.h
+ *
  * A pluggable strategy for detecting intersection with a scene object.
  *
  * @note This class was renamed from vrkit::IntersectionStrategy in version

@@ -44,7 +44,8 @@ namespace vrkit
    typedef OSG::GroupNodePtr     CoredGroupPtr;
    typedef OSG::TransformNodePtr CoredTransformPtr;
 
-/**
+/** \class Scene Scene.h vrkit/Scene.h
+ *
  * Class to store the data for the scene.
  *
  * This is the main holder for all data that is part of the "model" pattern in

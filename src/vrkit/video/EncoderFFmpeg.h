@@ -43,7 +43,11 @@ namespace vrkit
 namespace video
 {
 
-/**
+/** \class EncoderFFmpeg EncoderFFmpeg.h vrkit/video/EncoderFFmpeg.h
+ *
+ * This is the video encoder implementation based on the FFmpeg libraries
+ * (libavcodec, libavformat, etc.).
+ *
  * @note This class was renamed from vrkit::FfmpegEncoder and moved into the
  *       vrkit::video namespace in version 0.47.
  */

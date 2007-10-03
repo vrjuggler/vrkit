@@ -44,7 +44,8 @@ namespace vrkit
 namespace util
 {
 
-/**
+/** \class BasicHighlighter BasicHighlighter.h vrkit/util/BasicHighlighter.h
+ *
  * Object highlighter that responds to the signals defined in
  * vrkit::EventData. User applications must instantiate and initialize an
  * object of this type in order for object highlighting to be available in

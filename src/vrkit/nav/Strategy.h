@@ -31,7 +31,8 @@ namespace vrkit
 namespace nav
 {
 
-/**
+/** \class Strategy Strategy.h vrkit/nav/Strategy.h
+ *
  * @note This class was renamed from vrkit::NavPlugin in version 0.47.
  *
  * @todo This class should work in the same manner as vrkit::grab::Strategy or
