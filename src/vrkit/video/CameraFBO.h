@@ -63,7 +63,7 @@ public:
 
    void setSceneRoot(OSG::NodePtr root);
 
-   void render(osg::RenderAction*);
+   void render(osg::RenderAction* ra);
 
    void setTravMask(const OSG::UInt32 value);
 
