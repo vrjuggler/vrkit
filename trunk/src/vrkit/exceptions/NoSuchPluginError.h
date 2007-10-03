@@ -27,7 +27,10 @@
 namespace vrkit
 {
 
-/** Exception when we can't find a plug-in. */
+/** \class NoSuchPluginError NoSuchPluginError.h vrkit/exceptions/NoSuchPluginError.h
+ *
+ * Exception thrown when we can't find a plug-in.
+ */
 class VRKIT_CLASS_API NoSuchPluginError : public PluginException
 {
 public:

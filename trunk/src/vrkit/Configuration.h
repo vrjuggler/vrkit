@@ -30,7 +30,8 @@
 namespace vrkit
 {
 
-/**
+/** \class Configuration Configuration.h vrkit/Configuration.h
+ *
  * Class for capturing all the configuration for the viewer app and system.
  *
  * This class holds a (set of) jccl::Configuration(s) for getting JCCL-style

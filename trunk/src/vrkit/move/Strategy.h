@@ -43,7 +43,8 @@ namespace vrkit
 namespace move
 {
 
-/**
+/** \class Strategy Strategy.h vrkit/move/Strategy.h
+ *
  * A pluggable strategy for moving grabbed scene objects.
  *
  * @note This class was renamed from vrkit::MoveStrategy in version 0.47.

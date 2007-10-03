@@ -40,7 +40,8 @@ namespace vrkit
 namespace plugin
 {
 
-/**
+/** \class TypedRegistryEntry TypedRegistryEntry.h vrkit/plugin/TypedRegistryEntry.h
+ *
  * @note This class was moved into the vrkit::plugin namespace in version 0.47.
  *
  * @since 0.36

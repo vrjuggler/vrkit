@@ -31,7 +31,8 @@
 namespace vrkit
 {
 
-/**
+/** \class MaterialPoolData MaterialPoolData.h vrkit/scenedata/MaterialPoolData.h
+ *
  * Provides a central store for a single instance of OSG::MaterialPool. This
  * is used by the Material Chooser Plug-in. Code wishing to register materials
  * for use by the that plug-in must do so through this class.

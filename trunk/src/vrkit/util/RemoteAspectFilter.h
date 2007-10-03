@@ -34,7 +34,8 @@ namespace vrkit
 namespace util
 {
 
-/**
+/** \class RemoteAspectFilter RemoteAspectFilter.h vrkit/util/RemoteAspectFilter.h
+ *
  * @note This class was moved into the vrkit::util namespace in version 0.47.
  *
  * @since 0.19.0

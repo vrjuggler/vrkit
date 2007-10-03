@@ -34,7 +34,8 @@
 namespace vrkit
 {
 
-/**
+/** \class Status Status.h vrkit/Status.h
+ *
  * Status output class.
  */
 class VRKIT_CLASS_API Status

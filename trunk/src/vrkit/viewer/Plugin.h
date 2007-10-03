@@ -39,9 +39,12 @@ namespace vrkit
 namespace viewer
 {
 
-/**
+/** \class Plugin Plugin.h vrkit/viewer/Plugin.h
+ *
  * A plug-in is an abstract interface that allows for an extension point in
- * the system.  It is used to add capabilities to the application.
+ * the system. It is used to add capabilities to the application. This type of
+ * plug-in is one that is handled directly by vrkit::Viewer. Typically, these
+ * are the most generic kind of plug-in.
  *
  * @note This class was moved into the vrkit::viewer namespace in version 0.47.
  */

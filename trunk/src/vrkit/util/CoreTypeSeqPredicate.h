@@ -33,7 +33,8 @@ namespace vrkit
 namespace util
 {
 
-/**
+/** \class CoreTypeSeqPredicate CoreTypeSeqPredicate.h vrkit/util/CoreTypeSeqPredicate.h
+ *
  * A predicate designed for use with vrkit::DynamicSceneObject but that is
  * surely usable in other contexts. This predicate identifies node
  * relationships based on the type of the node core. The recognized core types

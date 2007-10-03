@@ -54,7 +54,8 @@ namespace vrkit
 
 class Configuration;
 
-/**
+/** \class User User.h vrkit/User.h
+ *
  * This class holds all information related to a user of the application.
  * This includes devices they are using and their position in the virtual
  * world.

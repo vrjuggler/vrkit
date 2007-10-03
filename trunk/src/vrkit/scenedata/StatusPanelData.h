@@ -35,6 +35,9 @@
 namespace vrkit
 {
 
+/** \class StatusPanelData StatusPanelData.h vrkit/scenedata/StatusPanelData.h
+ *
+ */
 class VRKIT_CLASS_API StatusPanelData : public SceneData
 {
 public:

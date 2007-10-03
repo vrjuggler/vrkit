@@ -36,11 +36,11 @@
 namespace vrkit
 {
 
-/** Helper class that implements builder pattern
- * for creating UI data in OpenSG.
+/** \class UiBuilder UiBuilder.h vrkit/UiBuilder.h
  *
- * This class is designed to work with 2D data.
- * Assumes working in x,y plane with z out.
+ * Helper class that implements builder pattern for creating UI data in
+ * OpenSG. This class is designed to work with 2D data. It assumes working in
+ * the XY plane with Z out.
  */
 class VRKIT_CLASS_API UiBuilder
 {

@@ -27,7 +27,10 @@
 namespace vrkit
 {
 
-/** Base exception for plug-in handling. */
+/** \class PluginException PluginException.h vrkit/exceptions/PluginException.h
+ *
+ * Base exception type for plug-in error handling.
+ */
 class VRKIT_CLASS_API PluginException : public Exception
 {
 public:

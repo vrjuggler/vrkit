@@ -43,7 +43,8 @@ namespace vrkit
 namespace util
 {
 
-/**
+/** \class HighlightCoreFinder HighlightCoreFinder.h vrkit/util/HighlightCoreFinder.h
+ *
  * Helper class used by vrkit::util::GeometryHighlightTraverser to find node
  * cores that support the use of materials. Instances of this class can be
  * used by external code to pre-traverse a sub-tree of the scene graph in

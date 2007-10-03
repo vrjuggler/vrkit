@@ -33,6 +33,10 @@ namespace vrkit
 namespace plugin
 {
 
+/** \class Creator Creator.h vrkit/plugin/Creator.h
+ *
+ * This is the real class that is used for instantiating plug-in types.
+ */
 template<typename PLUGIN_TYPE>
 class Creator : public CreatorBase
 {
@@ -51,6 +55,13 @@ public:
       /* Do nothing. */ ;
    }
 
+   /**
+    * Invokes the plug-in creator functor and returns the created object.
+    * The object type will be \c PLUGIN_TYPE which is most likely a subclass
+    * of vrkit::AbstractPlugin. The object itself is contained in a Boost
+    * shared pointer. The memory for the object will be allocated by the
+    * shared library (DLL) that contains the code for the plug-in.
+    */
    plugin_ptr_t createPlugin() const
    {
       return mCreator();

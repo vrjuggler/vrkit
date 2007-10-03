@@ -35,7 +35,8 @@
 namespace vrkit
 {
 
-/**
+/** \class DynamicSceneObject DynamicSceneObject.h vrkit/DynamicSceneObject.h
+ *
  * A scene object whose children and parent are determined on the fly when
  * they are requested.
  *

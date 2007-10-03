@@ -29,7 +29,10 @@
 namespace vrkit
 {
 
-/** @interface */
+/** \class SceneData SceneData.h vrkit/SceneData.h
+ *
+ * The base class for all "scene data" managed by vrkit::Scene.
+ */
 class VRKIT_CLASS_API SceneData
    : public boost::enable_shared_from_this<SceneData>
 {

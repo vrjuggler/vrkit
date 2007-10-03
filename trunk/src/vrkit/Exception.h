@@ -43,7 +43,8 @@
 namespace vrkit
 {
 
-/**
+/** \class Exception Exception.h vrkit/Exception.h
+ *
  * Base exception type for all vrkit exceptions.
  */
 class VRKIT_CLASS_API Exception : public std::runtime_error

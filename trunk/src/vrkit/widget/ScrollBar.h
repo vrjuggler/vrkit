@@ -34,7 +34,8 @@ namespace vrkit
 namespace widget
 {
 
-/**
+/** \class ScrollBar ScrollBar.h vrkit/widget/ScrollBar.h
+ *
  * @note This class was moved into the vrkit::widget namespace in version 0.47.
  */
 class VRKIT_CLASS_API ScrollBar : public Widget

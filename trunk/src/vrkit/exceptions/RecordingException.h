@@ -27,7 +27,8 @@
 namespace vrkit
 {
 
-/**
+/** \class RecordingException RecordingException.h vrkit/exceptions/RecordingException.h
+ *
  * Base recording exception type. All exception types associated with video
  * capture should derive from this class.
  *

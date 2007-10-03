@@ -37,7 +37,8 @@
 namespace vrkit
 {
 
-/**
+/** \class GrabSignalData GrabSignalData.h vrkit/scenedata/GrabSignalData.h
+ *
  * Scene data used for centralized access to signals emitted when various
  * grab events occur. Currently, these signals are emitted by a strategy
  * plug-in (vrkit::SignalGrabStrategy) used by the Grab Plug-in.

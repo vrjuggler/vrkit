@@ -37,9 +37,11 @@ enum ResultType
    CONTINUE = 1      /**< Indicates that signal processing should continue */
 };
 
-/**
+/** \struct ResultOperator Event.h vrkit/scenedata/Event.h
+ *
  * Combiner that evaluate an InputIterator sequence until it gets a return
- * value of DONE. This allows a signal to be consumed.
+ * value of vrkit::event::ResultType::DONE. This allows a signal to be
+ * consumed.
  */
 struct ResultOperator
 {

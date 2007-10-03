@@ -39,7 +39,8 @@ namespace vrkit
 namespace video
 {
 
-/**
+/** \class Camera Camera.h vrkit/video/Camera.h
+ *
  * Base Camera class.
  *
  * @note This class was moved into vrkit::video namespace in version 0.47.

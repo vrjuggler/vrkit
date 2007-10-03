@@ -33,7 +33,8 @@ namespace vrkit
 namespace widget
 {
 
-/**
+/** \class Frame Frame.h vrkit/widget/Frame.h
+ *
  * @note This class was moved into the vrkit::widget namespace in version 0.47.
  */
 class VRKIT_CLASS_API Frame : public Widget

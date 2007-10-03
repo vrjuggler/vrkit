@@ -40,7 +40,8 @@
 namespace vrkit
 {
 
-/**
+/** \class EventData EventData.h vrkit/scenedata/EventData.h
+ *
  * Contains event signals that you can register with to recieve events
  * when they are activated.
  */

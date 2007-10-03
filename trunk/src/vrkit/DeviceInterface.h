@@ -25,7 +25,8 @@ namespace vrkit
 
 class InterfaceTrader;
 
-/**
+/** \class DeviceInterface DeviceInterface.h vrkit/DeviceInterface.h
+ *
  * @interface
  */
 class VRKIT_CLASS_API DeviceInterface

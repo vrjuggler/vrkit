@@ -217,7 +217,8 @@ CComPtr<IType> query(CComPtr<CType> obj, REFIID iid)
 typedef CComPtr<class ByteSource> ByteSourcePtr;
 typedef CComPtr<class ByteStream> ByteStreamPtr;
 
-/**
+/** \class ByteSource DirectShowSource.h vrkit/video/DirectShowSource.h
+ *
  * Provides a filter accepting an array of bytes as input to a DirectShow
  * filter graph.
  *
@@ -290,7 +291,8 @@ private:
    CCritSec             mLock;          /**< Critical section lock. */
 };
 
-/**
+/** \class ByteStream DirectShowSource.h vrkit/video/DirectShowSource.h
+ *
  * Provides an output pin for vrkit::ByteSource. This is where the work of
  * translating the array of bytes (typically from an OpenGL frame buffer) is
  * done.

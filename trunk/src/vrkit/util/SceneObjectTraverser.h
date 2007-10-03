@@ -33,7 +33,8 @@ namespace vrkit
 namespace util
 {
 
-/**
+/** \class SceneObjectTraverser SceneObjectTraverser.h vrkit/util/SceneObjectTraverser.h
+ *
  * Basic traverser functions for vrkit scene objects.
  *
  * @note This class was moved into the vrkit::util namespace in version 0.47.

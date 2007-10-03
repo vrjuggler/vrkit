@@ -39,7 +39,10 @@ namespace vrkit
 namespace video
 {
 
-/**
+/** \class EncoderVFW EncoderVFW.h vrkit/video/EncoderVFW.h
+ *
+ * This is the video encoder implementation based on Video for Windows.
+ *
  * @note This class was renamed from vrkit::VfwEncoder and moved into the
  *       vrkit::video namespace in version 0.47.
  */

@@ -42,12 +42,12 @@
 namespace vrkit
 {
 
-/** Viewer class/app for the slave side of cluster communication.
+/** \class SlaveViewer SlaveViewer.h vrkit/slave/SlaveViewer.h
  *
+ * Viewer class/app for the slave side of cluster communication.
  * This class implements the slave side of the cluster protocol.
  *
- * See: @ref SlaveCommunicationProtocol
- *
+ * See @ref SlaveCommunicationProtocol
  */
 class VRKIT_CLASS_API SlaveViewer
 #if __VJ_version >= 2003011

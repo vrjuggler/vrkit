@@ -39,7 +39,14 @@ class Module;
 
 }
 
-/**
+/** \class AbstractPlugin AbstractPlugin.h vrkit/AbstractPlugin.h
+ *
+ * This is the base class for all plug-in types handled by vrkit components.
+ *
+ * @see vrkit::plugin::Registry
+ * @see vrkit::plugin::RegistryEntry
+ * @see vrkit::plugin::Creator
+ *
  * @since 0.36
  */
 class VRKIT_CLASS_API AbstractPlugin : private boost::noncopyable

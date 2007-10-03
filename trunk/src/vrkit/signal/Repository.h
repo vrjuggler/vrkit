@@ -114,7 +114,8 @@ namespace signal
  * @see vrkit::Scene
  */
 
-/**
+/** \class Repository Repository.h vrkit/signal/Repository.h
+ *
  * Centrailzed storage for signals. This is typically used for inter-plug-in
  * communication where one plug-in emits a signal and one or more other
  * plug-ins are interested in receiving the signal. Signals are identified and
@@ -204,8 +205,7 @@ public:
     *
     * @param id The identifier for the signal container to be retrieved.
     *
-    * @throw std::invalid_argument is thrown if \p id is not a registered
-    *        signal.
+    * @throw std::invalid_argument Thrown if \p id is not a registered signal.
     *
     * @since 0.34
     */
@@ -220,11 +220,12 @@ public:
     *
     * @param id The identifier for the signal container to be retrieved.
     *
-    * @throw std::invalid_argument is thrown if \p id is not a registered
-    *        signal.
-    * @throw std::bad_cast is thrown if the signal associated with the given
-    *        identifier cannot be cast dynamically to a container for the
-    *        given signal type.
+    * @throw std::invalid_argument
+    *           Thrown if \p id is not a registered signal.
+    * @throw std::bad_cast
+    *           Thrown if the signal associated with the given identifier
+    *           cannot be cast dynamically to a container for the given signal
+    *           type.
     *
     * @note This method returns a reference to an instantiation of
     *       vrkit::signal::Container<SignalType>. If the calling code wishes

@@ -30,7 +30,8 @@ namespace vrkit
 namespace plugin
 {
 
-/**
+/** \class CreatorBase CreatorBase.h vrkit/plugin/CreatorBase.h
+ *
  * Base class for plug-in creators. It does not actually create anything but
  * instead serves to allow derived types to be used in polymorphic contexts.
  * This class cannot be instantiated directly.

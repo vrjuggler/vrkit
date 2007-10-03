@@ -27,7 +27,8 @@
 namespace vrkit
 {
 
-/**
+/** \class PluginTypeNameException PluginTypeNameException.h vrkit/exceptions/PluginTypeNameException.h
+ *
  * @since 0.36
  */
 class VRKIT_CLASS_API PluginTypeNameException : public PluginException
