@@ -199,6 +199,14 @@ extern "C" void __attribute ((constructor)) vrkitLibraryInit()
    fs::path base_dir;
    const char* env_dir = std::getenv("VRKIT_BASE_DIR");
 
+#if (defined(__linux__) || defined(__linux)) && defined(__x86_64__)
+   const std::string bit_suffix("64");
+#else
+   const std::string bit_suffix("");
+#endif
+
+   const fs::path lib_subdir(std::string("lib") + bit_suffix);
+
    // If VRKIT_BASE_DIR is not set, look up the path to this shared library
    // and use it to provide a default setting for that environment variable.
    if ( NULL == env_dir )
@@ -220,15 +228,6 @@ extern "C" void __attribute ((constructor)) vrkitLibraryInit()
             fs::path lib_file(info.dli_fname, fs::native);
             lib_file = fs::system_complete(lib_file);
 
-/*
-#if defined(VPR_OS_Linux) && defined(__x86_64__)
-            const std::string bit_suffix("64");
-#else
-            const std::string bit_suffix("");
-#endif
-*/
-            const std::string bit_suffix("");
-
             // Get the directory containing this shared library.
             const fs::path lib_path = lib_file.branch_path();
 
@@ -236,15 +235,13 @@ extern "C" void __attribute ((constructor)) vrkitLibraryInit()
             // parent of the directory containing this shared library.
             base_dir = lib_path.branch_path();
 
-            // Use the lib subdirectory to figure out when we have found the
-            // root of the vrkit installation tree.
-            const fs::path lib_subdir(std::string("lib") + bit_suffix);
-
             bool found(false);
             while ( ! found && ! base_dir.empty() )
             {
                try
                {
+                  // Use the lib(64) subdirectory to figure out when we have
+                  // found the root of the vrkit installation tree.
                   if ( ! fs::exists(base_dir / lib_subdir) )
                   {
                      base_dir = base_dir.branch_path();
@@ -298,7 +295,7 @@ extern "C" void __attribute ((constructor)) vrkitLibraryInit()
 
       // Construct the values for VRKIT_DATA_DIR and VRKIT_PLUGINS_DIR.
       const fs::path plugin_dir =
-         base_dir / "lib" / versioned_dir_name / "plugins";
+         base_dir / lib_subdir / versioned_dir_name / "plugins";
       const fs::path data_dir = base_dir / "share" / versioned_dir_name;
 
       // We use the overwrite value of 0 as a way around testing whether the
