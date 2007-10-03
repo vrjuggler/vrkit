@@ -328,9 +328,17 @@ if not sca_util.hasHelpFlag():
       if platform == "win32":
          build_env.Append(LINKFLAGS = ['/OPT:NOREF'])
 
+      lib_arch_subdir = "lib"
+      if combo['arch'] == "x64":
+         lib_arch_subdir = "lib64"
+
       # Set the directory to install libraries into.
-      inst_paths["lib"] = os.path.normpath(pj(inst_paths["base"], "lib",
-                                              lib_subdir))
+      base_lib_dir             = os.path.normpath(pj(inst_paths["base"],
+                                                     lib_arch_subdir))
+      inst_paths["lib"]        = os.path.normpath(pj(base_lib_dir, lib_subdir))
+      inst_paths['lib_plugin'] = \
+         os.path.normpath(pj(base_lib_dir, "vrkit%s" % version_dot_suffix,
+                             'plugins'))
 
       # Specify the OpenGL libraries.
       if platform == "win32":   

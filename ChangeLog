@@ -1,5 +1,6 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-10-03 patrick  Install libraries into the lib64 directory on Linux/amd64.
 2007-10-02 patrick  Merged the classes vrkit::video::Recorder and
                     vrkit::video::EncoderManager into vrkit::video::Recorder.
                     Renmaed vrkit::Encoder::container_format_info_t to
