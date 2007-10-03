@@ -120,8 +120,7 @@ std::string getPluginBaseDir()
 
    if ( ! vrkit_plugins_dir.empty() )
    {
-      plugin_dir =
-         fs::path(vrkit_plugins_dir, fs::native);
+      plugin_dir = fs::path(vrkit_plugins_dir, fs::native);
    }
 
    return plugin_dir.native_directory_string();
