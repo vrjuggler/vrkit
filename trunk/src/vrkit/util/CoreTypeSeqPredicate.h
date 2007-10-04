@@ -23,6 +23,7 @@
 
 #include <boost/mpl/for_each.hpp>
 
+#include <OpenSG/OSGNode.h>
 #include <OpenSG/OSGNodeCore.h>
 #include <OpenSG/OSGFieldContainerType.h>
 
