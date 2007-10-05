@@ -218,6 +218,7 @@ void ModelSwapPlugin::update(ViewerPtr)
       {
          unsigned int num_models = mSwitchNode->getNChildren();
          unsigned int cur_model = mSwitchCore->getChoice();
+         OSG::CPEditor sce(mSwitchCore, OSG::Switch::ChoiceFieldMask);
          mSwitchCore->setChoice((cur_model + 1) % num_models);
       }
    }
