@@ -195,15 +195,28 @@ EncoderPtr EncoderFFmpeg::init()
             if( out_fmt->extensions != NULL )
             {
                std::string extensions(out_fmt->extensions);
-               std::vector<std::string> extensions_vector;
-               boost::algorithm::split(extensions_vector, extensions,
+               std::vector<std::string> temp_vec;
+               boost::algorithm::split(temp_vec, extensions,
                                        boost::algorithm::is_any_of(","));
-               new_format.mFileExtensions = extensions_vector;
+
+               new_format.mFileExtensions.reserve(temp_vec.size());
+
+               // Ensure that new_format.mFileExtensions contains only
+               // non-empty, well-formed file extensions.
+               typedef std::vector<std::string>::iterator iter_type;
+               for ( iter_type s = temp_vec.begin(); s != temp_vec.end(); ++s )
+               {
+                  boost::trim(*s);
+                  if ( ! (*s).empty() )
+                  {
+                     new_format.mFileExtensions.push_back(*s);
+                  }
+               }
             }
 
             // Keep only unique codec names
             Encoder::codec_list_t::iterator new_end =
-                  std::unique(allowable_codecs.begin(), allowable_codecs.end());
+               std::unique(allowable_codecs.begin(), allowable_codecs.end());
             allowable_codecs.erase(new_end, allowable_codecs.end());
 
             new_format.mCodecList = allowable_codecs;
