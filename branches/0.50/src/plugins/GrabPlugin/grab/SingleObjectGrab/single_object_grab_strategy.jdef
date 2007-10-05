@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="single_object_grab_strategy" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="Single Object Grab Strategy">
+      <abstract>false</abstract>
+      <help>Configuration for the Single Object Grab Strategy plug-in that can be used by the vrkit Grab Plug-in. This will only be used if the vrkit Grab Plug-in is configured to use the Single Object Grab Strategy as its grab strategy.</help>
+      <category>/vrkit/</category>
+      <property valuetype="string" variable="false" name="grab_button_nums">
+         <help>Describe the button state that causes grabbing. The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <value label="Grab Button Number(s)" defaultvalue="" />
+      </property>
+      <property valuetype="string" variable="false" name="release_button_nums">
+         <help>Describe the button state that deactivates grabbing. The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <value label="Release Button Number(s)" defaultvalue="" />
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>
+
