@@ -59,11 +59,11 @@ public:
 
    CameraPtr init();
 
-   void setSize(const osg::UInt32 width, const osg::UInt32 height);
+   void setSize(const OSG::UInt32 width, const OSG::UInt32 height);
 
    void setSceneRoot(OSG::NodePtr root);
 
-   void render(osg::RenderAction* ra);
+   void render(OSG::RenderAction* ra);
 
    void setTravMask(const OSG::UInt32 value);
 
