@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="vrkit_material_chooser_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="vrkit Material Chooser Plug-in">
+      <abstract>false</abstract>
+      <help>Configures the vrkit Material Chooser Plug-in, a plug-in that regisrters an instance of &lt;tt&gt;vrkit::widget::MaterialChooser&lt;/tt&gt; for use in an application. For this plug-in to be useful, it usually has to be used in conjunction with the Widget Plug-in and the Pick Plug-in.</help>
+      <category>/vrkit/</category>
+      <property valuetype="float" variable="false" name="size">
+         <help>Initial size of the material chooser panel in feet.</help>
+         <value label="Width (Feet)" defaultvalue="2.0"/>
+         <value label="Height (Feet)" defaultvalue="3.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="position">
+         <help>Initial position of the lower left corner of the material chooser panel.</help>
+         <value label="X (Feet)" defaultvalue="0.0"/>
+         <value label="Y (Feet)" defaultvalue="0.0"/>
+         <value label="Z (Feet)" defaultvalue="0.0"/>
+      </property>
+      <property valuetype="float" variable="false" name="rotation">
+         <help>Initial rotation of the material chooser panel in degrees.</help>
+         <value label="X Rotation" defaultvalue="0.0"/>
+         <value label="Y Rotation" defaultvalue="0.0"/>
+         <value label="Z Rotation" defaultvalue="0.0"/>
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>
+
