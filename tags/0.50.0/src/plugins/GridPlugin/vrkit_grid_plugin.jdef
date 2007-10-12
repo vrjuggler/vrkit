@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="vrkit_grid_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="vrkit Grid Plug-In">
+      <abstract>false</abstract>
+      <help />
+      <parent />
+      <category>/vrkit/</category>
+      <property valuetype="string" variable="false" name="activate_button_nums">
+         <help>Describe the button state that activates/deactivates the grids. The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <value label="Activate Button Number(s)" defaultvalue="" />
+      </property>
+      <property valuetype="string" variable="false" name="cycle_button_nums">
+         <help>Describe the button state that cycles the grid selection. The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <value label="Cycle Button Number(s)" defaultvalue="" />
+      </property>
+      <property valuetype="string" variable="false" name="hide_button_nums">
+         <help>Describe the button state that hides the grid. The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <value label="Show/Hide Button Number(s)" defaultvalue="" />
+      </property>
+      <property valuetype="string" variable="false" name="reset_button_nums">
+         <help>Describe the button state that resets the position of the selected grid. The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <value label="Reset Button Number(s)" defaultvalue="" />
+      </property>
+      <property valuetype="integer" variable="false" name="analog_index">
+         <help />
+         <value label="Analog Index" defaultvalue="-1" />
+      </property>
+      <property valuetype="float" variable="false" name="forward_slide_value">
+         <help>Sets the analog data value to use for sliding the selected grid forward along its Z-axis. Valid values are either 0.0 or 1.0. By setting the forward value to one of these, the reverse slide value is automatically assumed to be the other. For example, with a DirectX or Linux game controller, the forward slide direction should be 1.0. With an InterSense IS-900 wand, the forward slide directino should be 0.0.</help>
+         <value label="Forward Slide Value" defaultvalue="1.0"/>
+         <enumeration editable="false">
+            <enum label="1.0" value="1.0"/>
+            <enum label="0.0" value="0.0"/>
+         </enumeration>
+      </property>
+      <property valuetype="configelement" variable="true" name="grids">
+         <help />
+         <value label="Grid" />
+         <allowed_type>grid</allowed_type>
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>
+

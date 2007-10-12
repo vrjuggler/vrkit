@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings configuration.version="3.0"?>
+<configuration xmlns="http://www.vrjuggler.org/jccl/xsd/3.0/configuration" name="/home/patrick/src/pro/Assembly/src/external/common/OpenSG/VRJ/Viewer/viewer.jconf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.0/configuration http://www.vrjuggler.org/jccl/xsd/3.0/configuration.xsd">
+   <elements>
+      <vrkit_viewer name="Viewer" version="4">
+         <root_name>RootNode</root_name>
+         <plugin>ModeSwitchPlugin</plugin>
+         <plugin>StatusPanelPlugin</plugin>
+         <isect_strategy>Point Intersection</isect_strategy>
+      </vrkit_viewer>
+      <vrkit_wand_interface name="Wand Interface" version="1">
+         <position_name>VJWand</position_name>
+         <digital_name>VJButton0</digital_name>
+         <digital_name>VJButton1</digital_name>
+         <digital_name>VJButton2</digital_name>
+         <digital_name>VJButton3</digital_name>
+         <digital_name>VJButton4</digital_name>
+         <digital_name>VJButton5</digital_name>
+         <analog_name>VJAnalog0</analog_name>
+         <analog_name>VJAnalog1</analog_name>
+         <analog_name>VJAnalog2</analog_name>
+         <analog_name>VJAnalog3</analog_name>
+      </vrkit_wand_interface>
+      <wand_nav_plugin name="Viewer Wand Nav" version="3">
+         <max_velocity>5.0</max_velocity>
+         <acceleration>0.05</acceleration>
+         <enable_deceleration>true</enable_deceleration>
+         <deceleration>0.05</deceleration>
+         <rotation_sensitivity>0.5</rotation_sensitivity>
+         <forward_button_nums>1+</forward_button_nums>
+         <reverse_button_nums />
+         <rotate_button_nums>2+</rotate_button_nums>
+         <nav_mode_button_nums>1^ &amp; 2^</nav_mode_button_nums>
+         <reset_button_nums>0+ &amp; 1+</reset_button_nums>
+         <initial_mode>Fly</initial_mode>
+      </wand_nav_plugin>
+      <viewpoints_plugin name="Viewpoints Plug-in" version="2">
+         <control_command_exp />
+         <units_to_meters>1.0</units_to_meters>
+         <viewpoints>
+            <viewpoints_vp name="Position 1" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 2" version="1">
+               <position>20.0</position>
+               <position>0.0</position>
+               <position>-10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>-90.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 3" version="1">
+               <position>-20.0</position>
+               <position>0.0</position>
+               <position>-10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>90.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="Position 4" version="1">
+               <position>10.0</position>
+               <position>0.0</position>
+               <position>10.0</position>
+               <rotation>0.0</rotation>
+               <rotation>10.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 30" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>30.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 60" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>60.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 90" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>90.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 120" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>120.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 150" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>150.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+         <viewpoints>
+            <viewpoints_vp name="L 180" version="1">
+               <position>0.0</position>
+               <position>0.0</position>
+               <position>0.0</position>
+               <rotation>0.0</rotation>
+               <rotation>180.0</rotation>
+               <rotation>0.0</rotation>
+            </viewpoints_vp>
+         </viewpoints>
+      </viewpoints_plugin>
+      <mode_switch_plugin name="Mode Switch Plug-in" version="2">
+         <swap_button_nums>3^</swap_button_nums>
+         <plugins>
+            <mode_plugin_def name="Nav Plug-in" version="1">
+               <plugin>WandNavPlugin</plugin>
+               <active_modes>0</active_modes>
+            </mode_plugin_def>
+         </plugins>
+         <plugins>
+            <mode_plugin_def name="Grab Plug-in" version="1">
+               <plugin>GrabPlugin</plugin>
+               <active_modes>0</active_modes>
+            </mode_plugin_def>
+         </plugins>
+         <plugins>
+            <mode_plugin_def name="Video Capture Plug-in" version="1">
+               <plugin>VideoCapturePlugin</plugin>
+               <active_modes>0</active_modes>
+               <active_modes>1</active_modes>
+            </mode_plugin_def>
+         </plugins>
+         <mode_names>Navigation/Grab Mode</mode_names>
+         <mode_names>Video Capture Mode</mode_names>
+      </mode_switch_plugin>
+      <status_panel_plugin name="StatusPanel" version="2">
+         <grab_command_exp />
+         <initial_size>8.0</initial_size>
+         <initial_size>12.0</initial_size>
+         <initial_pos>5.0</initial_pos>
+         <initial_pos>5.0</initial_pos>
+         <initial_pos>-5.0</initial_pos>
+         <initial_rot>0.0</initial_rot>
+         <initial_rot>0.0</initial_rot>
+         <initial_rot>0.0</initial_rot>
+      </status_panel_plugin>
+      <vrkit_grab_plugin name="Grab Plug-in" version="6">
+         <grab_strategy>Single Object Grab</grab_strategy>
+         <move_strategy>Slide Move</move_strategy>
+         <move_strategy>Basic Move</move_strategy>
+      </vrkit_grab_plugin>
+      <slide_move_strategy name="Slide Move Strategy" version="2">
+         <analog_input>1</analog_input>
+         <slide_target>Intersection Point</slide_target>
+         <forward_slide_value>1.0</forward_slide_value>
+         <slide_epsilon>0.1</slide_epsilon>
+      </slide_move_strategy>
+      <ray_intersection_strategy name="Ray Intersection Strategy" version="2">
+         <ray_length>10.0</ray_length>
+         <ray_width>2.0</ray_width>
+         <ray_diffuse_color>1.0</ray_diffuse_color>
+         <ray_diffuse_color>0.0</ray_diffuse_color>
+         <ray_diffuse_color>0.0</ray_diffuse_color>
+         <ray_ambient_color>1.0</ray_ambient_color>
+         <ray_ambient_color>0.0</ray_ambient_color>
+         <ray_ambient_color>0.0</ray_ambient_color>
+         <triangle_intersect>false</triangle_intersect>
+      </ray_intersection_strategy>
+      <basic_highlighter name="Basic Highlighter" version="2">
+         <enable_highlight_shaders>true</enable_highlight_shaders>
+         <intersect_color>1.0</intersect_color>
+         <intersect_color>1.0</intersect_color>
+         <intersect_color>0.0</intersect_color>
+         <intersect_shader>${VRKIT_DATA_DIR}/data/shaders/highlight.vs</intersect_shader>
+         <intersect_shader>${VRKIT_DATA_DIR}/data/shaders/highlight.fs</intersect_shader>
+         <intersect_shader_scale>1.0</intersect_shader_scale>
+         <intersect_shader_exponent>1.0</intersect_shader_exponent>
+         <choose_color>0.0</choose_color>
+         <choose_color>1.0</choose_color>
+         <choose_color>1.0</choose_color>
+         <choose_shader>${VRKIT_DATA_DIR}/data/shaders/highlight.vs</choose_shader>
+         <choose_shader>${VRKIT_DATA_DIR}/data/shaders/highlight.fs</choose_shader>
+         <choose_shader_scale>1.0</choose_shader_scale>
+         <choose_shader_exponent>1.0</choose_shader_exponent>
+         <grab_color>1.0</grab_color>
+         <grab_color>0.0</grab_color>
+         <grab_color>1.0</grab_color>
+         <grab_shader>${VRKIT_DATA_DIR}/data/shaders/highlight.vs</grab_shader>
+         <grab_shader>${VRKIT_DATA_DIR}/data/shaders/highlight.fs</grab_shader>
+         <grab_shader_scale>1.0</grab_shader_scale>
+         <grab_shader_exponent>1.0</grab_shader_exponent>
+      </basic_highlighter>
+      <vrkit_app name="vrkit Application" version="2">
+         <enable_grabbing>true</enable_grabbing>
+         <core_type>Transform</core_type>
+         <save_scene_command_exp>5^</save_scene_command_exp>
+      </vrkit_app>
+      <event_sound_player name="Event Sound Player" version="1">
+         <intersect_sound_name>intersect</intersect_sound_name>
+         <select_sound_name>select</select_sound_name>
+      </event_sound_player>
+      <single_object_grab_strategy name="Single Object Grab Strategy" version="1">
+         <grab_button_nums>0^</grab_button_nums>
+         <release_button_nums>0^</release_button_nums>
+      </single_object_grab_strategy>
+      <vrkit_video_capture_plugin name="Video Capture Plug-in" version="1">
+         <output_file>vrkit_movie.avi</output_file>
+         <encoder>FFmpeg</encoder>
+         <codec />
+         <resolution>1024</resolution>
+         <resolution>768</resolution>
+         <fov>60.0</fov>
+         <fps>60</fps>
+         <stereo_recording>false</stereo_recording>
+         <show_view_frame>true</show_view_frame>
+         <view_frame_distance>5.0</view_frame_distance>
+         <view_frame_border_size>0.25</view_frame_border_size>
+         <show_debug_frame>false</show_debug_frame>
+         <debug_frame_translation>0.0</debug_frame_translation>
+         <debug_frame_translation>0.0</debug_frame_translation>
+         <debug_frame_translation>0.0</debug_frame_translation>
+         <debug_frame_rotation>0.0</debug_frame_rotation>
+         <debug_frame_rotation>0.0</debug_frame_rotation>
+         <debug_frame_rotation>0.0</debug_frame_rotation>
+         <camera_proxy>VJWand</camera_proxy>
+         <start_command_exp>4^</start_command_exp>
+         <pause_command_exp />
+         <resume_command_exp />
+         <stop_command_exp>5^</stop_command_exp>
+      </vrkit_video_capture_plugin>
+   </elements>
+</configuration>
+

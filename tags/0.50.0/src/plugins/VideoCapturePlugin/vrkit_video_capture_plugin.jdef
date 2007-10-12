@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="vrkit_video_capture_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="vrkit Video Capture Plug-In">
+      <abstract>false</abstract>
+      <help>Plug-in to a vrkit viewer application for performing live video capture. The video from a tracked device is capture and rendered to a movie file. A wand is expected to be tracked and have digital input sources (buttons).</help>
+      <category>/vrkit/</category>
+      <property valuetype="string" variable="false" name="output_file">
+         <help>The name of the file where the movie will be written.</help>
+         <value label="Output File" defaultvalue="vrkit_movie.avi" />
+      </property>
+      <property valuetype="string" variable="false" name="encoder">
+         <help>The name of the vrkit encoder to use for converting the OpenGL frame buffer into movie frames.</help>
+         <value label="vrkit Encoder" defaultvalue="FFmpeg" />
+         <enumeration editable="false">
+            <enum label="FFmpeg" value="FFmpeg Encoder" />
+            <enum label="DirectShow" value="DirectShow Encoder" />
+            <enum label="Video for Windows" value="Video for Windows Encoder" />
+         </enumeration>
+      </property>
+      <property valuetype="string" variable="false" name="codec">
+         <help>The name of the codec for the encoder to use. An empty value indicates that the default codec for the chosen output file format (the container format) should be used.</help>
+         <value label="Codec" defaultvalue="" />
+      </property>
+      <property valuetype="integer" variable="false" name="resolution">
+         <help>The resolution of the movie that will be created.</help>
+         <value label="Video Width" defaultvalue="512" />
+         <value label="Video Height" defaultvalue="512" />
+      </property>
+      <property valuetype="float" variable="false" name="fov">
+         <help>Field of view for the recording.</help>
+         <value label="Field of View (degrees)" defaultvalue="60.0" />
+      </property>
+      <property valuetype="integer" variable="false" name="fps">
+         <help>Frames per second.</help>
+         <value label="Frames Per Second" defaultvalue="60" />
+      </property>
+      <property valuetype="boolean" variable="false" name="stereo_recording">
+         <help>Enable a stereo recording.</help>
+         <value label="Stereo Recording?" defaultvalue="false" />
+      </property>
+      <property valuetype="boolean" variable="false" name="show_view_frame">
+         <help>Enable display of the visible area frame during recording.</help>
+         <value label="Show Video Frame" defaultvalue="false" />
+      </property>
+      <property valuetype="float" variable="false" name="view_frame_distance">
+         <help>Sets the location for the view frame in terms of its distance from the camera attachment point. The units of measurement used are those of the application.</help>
+         <value label="View Frame Distance" defaultvalue="5.0" />
+      </property>
+      <property valuetype="float" variable="false" name="view_frame_border_size">
+         <help>Sets the size of the view frame border. The units of measurement used are those of the application.</help>
+         <value label="View Frame Border Size" defaultvalue="0.25" />
+      </property>
+      <property valuetype="boolean" variable="false" name="show_debug_frame">
+         <help>Enable display of the debugging frame that shows what is being recorded within the virtual space.</help>
+         <value label="Show Debug Frame" defaultvalue="false" />
+      </property>
+      <property valuetype="float" variable="false" name="debug_frame_translation">
+         <help />
+         <value label="Debug Frame X Translation" defaultvalue="0.0" />
+         <value label="Debug Frame Y Translation" defaultvalue="0.0" />
+         <value label="Debug Frame Z Translation" defaultvalue="0.0" />
+      </property>
+      <property valuetype="float" variable="false" name="debug_frame_rotation">
+         <help />
+         <value label="Debug Frame X Rotation" defaultvalue="0.0" />
+         <value label="Debug Frame Y Rotation" defaultvalue="0.0" />
+         <value label="Debug Frame Z Rotation" defaultvalue="0.0" />
+      </property>
+      <property valuetype="configelementpointer" variable="false" name="camera_proxy">
+         <help>Identify the position proxy (or alias for a position proxy) to which the camera is attached. This defines the point of view for the video camera, and htus, a likely value would be the position proxy for the user's head (such as "VJHead"). If no value is set here, then the position proxy for the user's head will be used as the attachment point for the camera.</help>
+         <value label="Camera Position Attachment" />
+         <allowed_type>alias</allowed_type>
+         <allowed_type>position_proxy</allowed_type>
+      </property>
+      <property valuetype="string" variable="false" name="start_command_exp">
+         <help>Describe the button state that causes recording to start. The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <value label="Start Command" defaultvalue="0^" />
+      </property>
+      <property valuetype="string" variable="false" name="pause_command_exp">
+         <help>Describe the button state that causes recording to be paused. The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <value label="Pause Command" defaultvalue="" />
+      </property>
+      <property valuetype="string" variable="false" name="resume_command_exp">
+         <help>Describe the button state that causes a paused recording to resume. The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <value label="Resume Command" defaultvalue="" />
+      </property>
+      <property valuetype="string" variable="false" name="stop_command_exp">
+         <help>Describe the button state that causes recording to stop. The state can be any combination of buttons and button states configured as a boolean expression. The button indices are zero-based and are based on the configuration of the vrkit wand interface configuration. That is, they are indices into the collection of digital buttons configured for use by the vrkit wand interface. The four button states, and associated (unary) state operator, are as follows: on (+), off (-), toggle on (^), and toggle off (v). The boolean operators, and associated (binary) state operator, are as folows: and (&amp;), inclusive or (|), and exclusive or (^). Expressions can be grouped using paretheses and negated using the unary ! operator. An empty string indicates that this action should be disabled.</help>
+         <value label="Stop Command" defaultvalue="1^" />
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>
+
