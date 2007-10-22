@@ -18,9 +18,10 @@
 
 #include <vrkit/Config.h>
 
-#include <iostream>
+#include <sstream>
 
 #include <vrkit/Configuration.h>
+#include <vrkit/exceptions/ConfigurationException.h>
 
 
 namespace vrkit
@@ -38,7 +39,9 @@ void Configuration::loadConfigEltFile(const std::string& filename)
 
    if ( ! cfg_loaded )
    {
-      std::cerr << "WARNING: Failed to load our configuration!" << std::endl;
+      std::ostringstream msg_stream;
+      msg_stream << "WARNING: Failed to load '" << filename << "'!";
+      throw ConfigurationException(msg_stream.str(), VRKIT_LOCATION);
    }
    else
    {
