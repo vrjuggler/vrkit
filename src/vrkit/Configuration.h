@@ -44,6 +44,14 @@ public:
    /**
     * Loads the named configuration element file and adds it to the list of
     * elts.
+    *
+    * @param filename The Juggler configuration file to load.
+    *
+    * @throw vrkit::ConfigurationException
+    *           Thrown if the named file cannot be loaded.
+    *
+    * @note This method was changed in version 0.50.1 to throw an exception
+    *       when loading a configuration file fails.
     */
    void loadConfigEltFile(const std::string& filename);
 
