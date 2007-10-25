@@ -207,14 +207,9 @@ void VrkitApp::init()
    OSG::NodeRefPtr model_root;
 
    // Load the model to use
-   if ( mFileName.empty() )
+   if ( ! mFileName.empty() )
    {
-      std::cout << "Loading fake geometry." << std::endl;
-      model_root = OSG::makeTorus(0.75f, 2.1f, 21, 21);
-   }
-   else
-   {
-      std::cout << "Loading scene: " << mFileName << std::endl;
+      VRKIT_STATUS << "Loading scene: " << mFileName << std::endl;
       model_root = OSG::SceneFileHandler::the().read(mFileName.c_str());
 
       if ( OSG::NullFC == model_root )
@@ -229,9 +224,12 @@ void VrkitApp::init()
    // something to work with if it is configured to be used.
    // XXX: This is a little clunky, and it might be better if this were done
    // by vrkit::Viewer::addObject().
-   vrkit::MaterialPoolDataPtr mat_pool =
-      scene->getSceneData<vrkit::MaterialPoolData>();
-   mat_pool->getMaterialPool()->add(model_root);
+   if ( OSG::NullFC != model_root )
+   {
+      vrkit::MaterialPoolDataPtr mat_pool =
+         scene->getSceneData<vrkit::MaterialPoolData>();
+      mat_pool->getMaterialPool()->add(model_root);
+   }
 
    // --- Light setup --- //
    // - Add directional light for scene
@@ -262,9 +260,12 @@ void VrkitApp::init()
 
    // --- Set up Scene -- //
    // add the loaded scene to the light node, so that it is lit by the light
-   OSG::beginEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
-      light_node.node()->addChild(model_root);
-   OSG::endEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
+   if ( OSG::NullFC != model_root )
+   {
+      OSG::beginEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
+         light_node.node()->addChild(model_root);
+      OSG::endEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
+   }
 
    // create the root part of the scene
    OSG::TransformNodePtr scene_transform_root = scene->getTransformRoot();
@@ -274,7 +275,7 @@ void VrkitApp::init()
       scene_transform_root.node()->addChild(light_node);
    OSG::endEditCP(scene_transform_root.node(), OSG::Node::ChildrenFieldMask);
 
-   if ( mEnableGrab )
+   if ( mEnableGrab && OSG::NullFC != model_root )
    {
       if ( mCoreTypes.empty() )
       {
@@ -419,8 +420,7 @@ int main(int argc, char* argv[])
           "Viewer configuration file")
          ("defs,d", po::value< std::vector<std::string> >(&jdef_dirs),
           "Path to custom config definition (.jdef) files")
-         ("file,f",
-          po::value<std::string>()->default_value("${VRKIT_DATA_DIR}/data/scenes/test_scene.osb"),
+         ("file,f", po::value<std::string>(),
           "File to load in scene")
       ;
 
