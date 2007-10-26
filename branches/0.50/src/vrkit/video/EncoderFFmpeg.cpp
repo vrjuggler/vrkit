@@ -351,8 +351,10 @@ void EncoderFFmpeg::startEncoding()
       }
 
       // Set the correct bitrate.
-      // XXX: This overwrites the value set in addVideoStream(). Is that really
-      // the behavior that we want?
+      // XXX: What is the purpose of this? A different bit rate value is set
+      // in addVideoStream(), and this does not seem to relate to it in any
+      // way. Moreover, changing this value does nothing to the quality of the
+      // encoded movie, but changing the value set in addVideoStream() does.
       mVideoStream->codec->bit_rate = bitrate * 1000;
 
       // Write the stream header, if any.
@@ -406,7 +408,8 @@ void EncoderFFmpeg::addVideoStream(AVCodec* codec)
    mVideoStream->codec->codec_type = CODEC_TYPE_VIDEO;
    avcodec_get_context_defaults2(mVideoStream->codec, CODEC_TYPE_VIDEO);
    // put sample parameters
-   mVideoStream->codec->bit_rate = 400000;
+   // XXX: This should not be hard coded.
+   mVideoStream->codec->bit_rate = 8388608;     // 8192 kb/s
 
    // Resolution must be a multiple of two
    mVideoStream->codec->width  = getWidth();
