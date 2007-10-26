@@ -124,13 +124,11 @@ void EncoderFFmpeg::stopEncoding()
    {
       closeVideo();
    }
-   // XXX:Don't add audio for now,
-   /*
+
    if (NULL != mAudioStream)
    {
       closeAudio();
    }
-   */
 
    if (NULL != mFormatContext)
    {
@@ -173,7 +171,9 @@ EncoderPtr EncoderFFmpeg::init()
             allowable_codecs.clear();
             if( out_fmt->codec_tag != NULL )
             {
-               for(const AVCodecTag* tag = out_fmt->codec_tag[0]; tag->id != CODEC_ID_NONE; tag++)
+               for ( const AVCodecTag* tag = out_fmt->codec_tag[0];
+                     tag->id != CODEC_ID_NONE;
+                     ++tag )
                {
                   AVCodec* current_codec = avcodec_find_encoder((CodecID)tag->id);
                   if(current_codec != NULL)
@@ -238,6 +238,7 @@ void EncoderFFmpeg::startEncoding()
 
    try
    {
+      // XXX: This should not be hard coded.
       const vpr::Uint32 bitrate = 1400;
 
       if ( ! getContainerFormat().empty() )
@@ -247,8 +248,9 @@ void EncoderFFmpeg::startEncoding()
 
       if ( NULL == mFormatOut )
       {
-         VRKIT_STATUS << "Container format invalid or not specified. Falling back to..." << std::endl;
-         VRKIT_STATUS << "Trying to guess container format from filename: " << getFilename() << std::endl;
+         VRKIT_STATUS << "Container format invalid or not specified.\n"
+                      << "Trying to guess container format from file name: "
+                      << getFilename() << std::endl;
          mFormatOut = guess_format(NULL, getFilename().c_str(), NULL);
       }
 
@@ -256,7 +258,7 @@ void EncoderFFmpeg::startEncoding()
       if ( NULL == mFormatOut )
       {
          VRKIT_STATUS << "Could not deduce output format from file extension; "
-                      << "using MPEG." << std::endl;
+                      << "using AVI." << std::endl;
          mFormatOut = guess_format("avi", NULL, NULL);
       }
 
@@ -275,8 +277,9 @@ void EncoderFFmpeg::startEncoding()
       {
          throw Exception("Memory error.", VRKIT_LOCATION);
       }
-      mFormatContext->oformat = mFormatOut;
-      mFormatContext->max_delay = (int)(0.7 * AV_TIME_BASE);
+
+      mFormatContext->oformat   = mFormatOut;
+      mFormatContext->max_delay = static_cast<int>(0.7 * AV_TIME_BASE);
       std::strncpy(mFormatContext->filename, getFilename().c_str(),
                    sizeof(mFormatContext->filename));
 
@@ -309,13 +312,10 @@ void EncoderFFmpeg::startEncoding()
 
       addVideoStream(codec);
 
-      // XXX:Don't add audio for now,
-      /*
-      if (mFormatOut->audio_codec != CODEC_ID_NONE)
+      if ( mFormatOut->audio_codec != CODEC_ID_NONE )
       {
          addAudioStream();
       }
-      */
 
       // Set the output parameters (must be done even if no
       // parameters).
@@ -334,13 +334,10 @@ void EncoderFFmpeg::startEncoding()
          openVideo(codec);
       }
 
-      // XXX:Don't add audio for now,
-      /*
       if ( NULL != mAudioStream )
       {
          openAudio();
       }
-      */
 
       // Open the output file, if needed.
       if (!(mFormatOut->flags & AVFMT_NOFILE))
@@ -354,6 +351,8 @@ void EncoderFFmpeg::startEncoding()
       }
 
       // Set the correct bitrate.
+      // XXX: This overwrites the value set in addVideoStream(). Is that really
+      // the behavior that we want?
       mVideoStream->codec->bit_rate = bitrate * 1000;
 
       // Write the stream header, if any.
@@ -369,6 +368,8 @@ void EncoderFFmpeg::startEncoding()
 // Add an audio output stream
 void EncoderFFmpeg::addAudioStream()
 {
+   // TODO: Add audio support.
+/*
    mAudioStream = av_new_stream(mFormatContext, 1);
    if (NULL == mAudioStream)
    {
@@ -384,15 +385,12 @@ void EncoderFFmpeg::addAudioStream()
    acc->bit_rate = 64000;
    acc->sample_rate = 44100;
    acc->channels = 2;
+*/
 }
 
 // Add a video output stream
 void EncoderFFmpeg::addVideoStream(AVCodec* codec)
 {
-   vpr::Uint32 width = getWidth();
-   vpr::Uint32 height = getHeight();
-   vpr::Uint32 fps = getFramesPerSecond();
-
    // Create a new video stream to write data to.
    mVideoStream = av_new_stream(mFormatContext, 0);
    if ( NULL == mVideoStream )
@@ -404,47 +402,45 @@ void EncoderFFmpeg::addVideoStream(AVCodec* codec)
    // XXX: Should we be discarding this?
    mVideoStream->discard = AVDISCARD_NONKEY;
 
-   AVCodecContext* vcc = mVideoStream->codec;
-   vcc->codec_id = codec->id;
-   vcc->codec_type = CODEC_TYPE_VIDEO;
+   mVideoStream->codec->codec_id   = codec->id;
+   mVideoStream->codec->codec_type = CODEC_TYPE_VIDEO;
    avcodec_get_context_defaults2(mVideoStream->codec, CODEC_TYPE_VIDEO);
    // put sample parameters
-   vcc->bit_rate = 400000;
+   mVideoStream->codec->bit_rate = 400000;
 
    // Resolution must be a multiple of two
-   vcc->width = width;
-   vcc->height = height;
+   mVideoStream->codec->width  = getWidth();
+   mVideoStream->codec->height = getHeight();
 
    // Time base: this is the fundamental unit of time (in seconds) in terms
    // of which frame timestamps are represented. for fixed-fps content,
    // timebase should be 1/framerate and timestamp increments should be
    // identically 1.
-   //vcc->time_base.den = STREAM_FRAME_RATE;
-   vcc->time_base.den = fps;
-   vcc->time_base.num = 1;
-   //vcc->discard = AVDISCARD_NONKEY;
-   vcc->gop_size = 12; /* emit one intra frame every twelve frames at most */
-   vcc->pix_fmt = STREAM_PIX_FMT;
-//   vcc->rate_emu
+   mVideoStream->codec->time_base.den = getFramesPerSecond();
+   mVideoStream->codec->time_base.num = 1;
+   // Emit one intra frame every twelve frames at most.
+   mVideoStream->codec->gop_size = 12;
+   mVideoStream->codec->pix_fmt = STREAM_PIX_FMT;
+//   mVideoStream->codec->rate_emu
 
-   if ( vcc->codec_id == CODEC_ID_MPEG2VIDEO )
+   if ( mVideoStream->codec->codec_id == CODEC_ID_MPEG2VIDEO )
    {
       // just for testing, we also add B frames
-      vcc->max_b_frames = 2;
+      mVideoStream->codec->max_b_frames = 2;
    }
 
-   if ( vcc->codec_id == CODEC_ID_MPEG1VIDEO )
+   if ( mVideoStream->codec->codec_id == CODEC_ID_MPEG1VIDEO )
    {
       // Needed to avoid using macroblocks in which some coeffs overflow.
       // This does not happen with normal video, it just happens here as
       // the motion of the chroma plane does not match the luma plane. */
-      vcc->mb_decision = 2;
+      mVideoStream->codec->mb_decision = 2;
    }
 
    // Some formats want stream headers to be separate
    if ( mFormatContext->oformat->flags & AVFMT_GLOBALHEADER )
    {
-      vcc->flags |= CODEC_FLAG_GLOBAL_HEADER;
+      mVideoStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
    }
 }
 
@@ -469,7 +465,8 @@ void EncoderFFmpeg::openVideo(AVCodec* codec)
       // they're freed appropriately (such as using av_free for buffers
       // allocated with av_malloc)
       mVideoOutBufferSize = getWidth() * getHeight();
-      mVideoOutBuffer= (unsigned char*)av_malloc(mVideoOutBufferSize);
+      mVideoOutBuffer =
+         reinterpret_cast<unsigned char*>(av_malloc(mVideoOutBufferSize));
    }
 
    // allformat_ctxate the encoded raw picture */
@@ -508,6 +505,8 @@ void EncoderFFmpeg::closeVideo()
 
 void EncoderFFmpeg::openAudio()
 {
+   // TODO: Add audio support.
+#if 0
    AVCodecContext* acc = mAudioStream->codec;
 
    // Find the audio encoder.
@@ -532,7 +531,8 @@ void EncoderFFmpeg::openAudio()
    */
 
    mAudioOutBufferSize = 10000;
-   mAudioOutBuffer = (unsigned char*)av_malloc(mAudioOutBufferSize);
+   mAudioOutBuffer =
+      reinterpret_cast<unsigned char*>(av_malloc(mAudioOutBufferSize));
 
    // Ugly hack for PCM codecs (will be removed ASAP with new PCM
    // support to compute the input frame size in samples.
@@ -555,11 +555,18 @@ void EncoderFFmpeg::openAudio()
    {
       audio_input_frame_size = acc->frame_size;
    }
-   mAudioSamples = (int16_t*)av_malloc(audio_input_frame_size * 2 * acc->channels);
+
+   mAudioSamples =
+      reinterpret_cast<int16_t*>(
+         av_malloc(audio_input_frame_size * 2 * acc->channels)
+      );
+#endif
 }
 
 void EncoderFFmpeg::closeAudio()
 {
+   // TODO: Add audio support.
+/*
    avcodec_close(mAudioStream->codec);
    av_free(mAudioSamples);
    av_free(mAudioOutBuffer);
@@ -567,6 +574,7 @@ void EncoderFFmpeg::closeAudio()
    mAudioSamples = NULL;
    mAudioOutBuffer = NULL;
    mAudioStream = NULL;
+*/
 }
 
 AVFrame* EncoderFFmpeg::allocFrame(const int pixFormat, const int width,
