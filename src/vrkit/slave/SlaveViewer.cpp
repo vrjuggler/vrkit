@@ -169,12 +169,7 @@ namespace vrkit
 SlaveViewer::SlaveViewer(const std::string& masterAddr,
                          const std::string& rootNodeName,
                          const OSG::UInt32 travMask)
-   :
-#if __VJ_version >= 2003011
-     vrj::opensg::App()
-#else
-     vrj::OpenSGApp()
-#endif
+   : OpenSGApp()
    , mDrawScaleFactor(gadget::PositionUnitConversion::ConvertToFeet)
    , mMasterAddr(masterAddr)
    , mRootNodeName(rootNodeName)

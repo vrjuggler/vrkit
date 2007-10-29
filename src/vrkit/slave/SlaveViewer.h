@@ -42,6 +42,12 @@
 namespace vrkit
 {
 
+#if __VJ_version >= 2003011
+typedef vrj::opensg::App OpenSGApp;
+#else
+typedef vrj::OpenSGApp OpenSGApp;
+#endif
+
 /** \class SlaveViewer SlaveViewer.h vrkit/slave/SlaveViewer.h
  *
  * Viewer class/app for the slave side of cluster communication.
@@ -50,11 +56,7 @@ namespace vrkit
  * See @ref SlaveCommunicationProtocol
  */
 class VRKIT_CLASS_API SlaveViewer
-#if __VJ_version >= 2003011
-   : public vrj::opensg::App
-#else
-   : public vrj::OpenSGApp
-#endif
+   : public OpenSGApp
 {
 public:
    /**
