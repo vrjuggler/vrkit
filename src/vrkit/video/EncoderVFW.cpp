@@ -290,7 +290,7 @@ void EncoderVFW::SetErrorMessage(LPCTSTR lpszErrorMessage)
    _tcsncpy(mErrorMsg, lpszErrorMessage, __countof(mErrorMsg)-1);
 }
 
-void EncoderVFW::writeFrame(vpr::Uint8* data)
+void EncoderVFW::writeFrame(const vpr::Uint8* data)
 {
    if ( NULL == mCompressedVideoStream )
    {

@@ -85,11 +85,13 @@ void StatusPanelViewOriginal::initialize(const float metersToAppUnits,
    OSG::setName(mPanelGeomCore, "PanelGeomCore");
    OSG::setName(mTextGeomCore, "TextGeomCore");
 
+#if OSG_MAJOR_VERSION < 2
    OSG::CPEditor rpne(mRootPanelNode);
    OSG::CPEditor pgne(mPanelGeomNode);
    OSG::CPEditor pgce(mPanelGeomCore);
    OSG::CPEditor tgne(mTextGeomNode);
    OSG::CPEditor tgce(mTextGeomCore);
+#endif
 
    mPanelGeomNode->setCore(mPanelGeomCore);
    mTextGeomNode->setCore(mTextGeomCore);
@@ -102,27 +104,41 @@ void StatusPanelViewOriginal::initialize(const float metersToAppUnits,
    //mFont = new UiBuilder::Font("MONO", OSG::TextFace::STYLE_PLAIN, 64);
 
    OSG::ChunkMaterialPtr text_mat =
+#if OSG_MAJOR_VERSION < 2
       OSG::ChunkMaterialPtr::dcast(mTextGeomCore->getMaterial());
+#else
+      OSG::cast_dynamic<OSG::ChunkMaterialPtr>(mTextGeomCore->getMaterial());
+#endif
    vprASSERT(OSG::NullFC != text_mat);
 
    mClipRight = OSG::ClipPlaneChunk::create();
-   beginEditCP(mClipRight);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor cre(mClipRight,
+                     OSG::ClipPlaneChunk::EquationFieldMask  |
+                        OSG::ClipPlaneChunk::EnableFieldMask |
+                        OSG::ClipPlaneChunk::BeaconFieldMask);
+#endif
    mClipRight->setEquation(OSG::Vec4f(-1, 0, 0, mPanWidth));      // X clip plane <= right size
    mClipRight->setEnable(true);
    mClipRight->setBeacon(mTextGeomNode);
-   endEditCP(mClipRight);
 
    mClipBottom = OSG::ClipPlaneChunk::create();
-   beginEditCP(mClipBottom);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor cbe(mClipBottom,
+                     OSG::ClipPlaneChunk::EquationFieldMask  |
+                        OSG::ClipPlaneChunk::EnableFieldMask |
+                        OSG::ClipPlaneChunk::BeaconFieldMask);
+#endif
    mClipBottom->setEquation(OSG::Vec4f(0, 1, 0, 0));         // Y clip plane on Y>=0
    mClipBottom->setEnable(true);
    mClipBottom->setBeacon(mTextGeomNode);
-   endEditCP(mClipBottom);
 
-   OSG::beginEditCP(text_mat);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor tme(text_mat, OSG::ChunkMaterial::ChunksFieldMask);
+#endif
    text_mat->addChunk(mClipBottom);
    text_mat->addChunk(mClipRight);
-   OSG::endEditCP(text_mat);
+
    setDirty();
 }
 
@@ -130,7 +146,6 @@ void StatusPanelViewOriginal::setDirty()
 {
    mIsDirty = true;
 }
-
 
 void StatusPanelViewOriginal::update()
 {
@@ -274,13 +289,15 @@ void StatusPanelViewOriginal::updatePanelScene()
                     mTextColor, status_pan_scale, text_spacing);
 
    // -- Update the materials and other properties --- //
-   beginEditCP(mClipRight);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor cre(mClipRight, OSG::ClipPlaneChunk::EquationFieldMask);
+#endif
    mClipRight->setEquation(OSG::Vec4f(-1, 0, 0, mPanWidth));      // X clip plane <= right size
-   endEditCP(mClipRight);
 
-   beginEditCP(mClipBottom);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor cbe(mClipBottom, OSG::ClipPlaneChunk::EquationFieldMask);
+#endif
    mClipBottom->setEquation(OSG::Vec4f(0, 1, 0, 0));         // Y clip plane on Y>=0
-   endEditCP(mClipBottom);
 
    // --- Draw debug outlines --- //
    if ( mDrawDebug )

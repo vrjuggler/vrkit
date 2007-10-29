@@ -24,6 +24,10 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include <OpenSG/OSGFBOViewport.h>
+#if OSG_MAJOR_VERSION >= 2
+#  include <OpenSG/OSGFrameBufferObject.h>
+#  include <OpenSG/OSGTextureBuffer.h>
+#endif
 
 #include <vrkit/video/Camera.h>
 #include <vrkit/video/CameraFBOPtr.h>
@@ -63,7 +67,7 @@ public:
 
    void setSceneRoot(OSG::NodePtr root);
 
-   void render(OSG::RenderAction* ra);
+   void render(render_action_t* ra);
 
    void setTravMask(const OSG::UInt32 value);
 
@@ -76,7 +80,12 @@ public:
    }
 
 private:
-   OSG::FBOViewportPtr                  mFboVP;         /**< FBOViewport that we use to render to an FBO. */
+   OSG::FBOViewportPtr          mFboVP;         /**< FBOViewport that we use to render to an FBO. */
+
+#if OSG_MAJOR_VERSION >= 2
+   OSG::FrameBufferObjectRefPtr mFBO;
+   OSG::TextureBufferRefPtr     mTexBuffer;
+#endif
 };
 
 }

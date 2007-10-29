@@ -157,7 +157,11 @@ void VrkitApp::preFrame()
    if ( mSaveCmd() )
    {
       OSG::GroupNodePtr root = getSceneObj()->getSceneRoot();
+#if OSG_MAJOR_VERSION < 2
       OSG::SceneFileHandler::the().write(root, "scene.osb");
+#else
+      OSG::SceneFileHandler::the()->write(root, "scene.osb");
+#endif
    }
 }
 
@@ -210,7 +214,12 @@ void VrkitApp::init()
    if ( ! mFileName.empty() )
    {
       VRKIT_STATUS << "Loading scene: " << mFileName << std::endl;
-      model_root = OSG::SceneFileHandler::the().read(mFileName.c_str());
+      model_root =
+#if OSG_MAJOR_VERSION < 2
+         OSG::SceneFileHandler::the().read(mFileName.c_str());
+#else
+         OSG::SceneFileHandler::the()->read(mFileName.c_str());
+#endif
 
       if ( OSG::NullFC == model_root )
       {
@@ -228,7 +237,11 @@ void VrkitApp::init()
    {
       vrkit::MaterialPoolDataPtr mat_pool =
          scene->getSceneData<vrkit::MaterialPoolData>();
+#if OSG_MAJOR_VERSION < 2
       mat_pool->getMaterialPool()->add(model_root);
+#else
+      mat_pool->getMaterialPool()->addContainer(model_root);
+#endif
    }
 
    // --- Light setup --- //
@@ -241,39 +254,42 @@ void VrkitApp::init()
    OSG::Matrix light_pos;
    light_pos.setTransform(OSG::Vec3f(2.0f, 5.0f, 4.0f));
 
-   OSG::beginEditCP(light_beacon, OSG::Transform::MatrixFieldMask);
-      light_beacon->setMatrix(light_pos);
-   OSG::endEditCP(light_beacon, OSG::Transform::MatrixFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor lbe(light_beacon.core(), OSG::Transform::MatrixFieldMask);
+#endif
+   light_beacon->setMatrix(light_pos);
 
    // Set up light node.
-   OSG::beginEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
-      light_node.node()->addChild(light_beacon);
-   OSG::endEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor lne(light_node.node(), OSG::Node::ChildrenFieldMask);
+#endif
+   light_node.node()->addChild(light_beacon);
 
-   OSG::beginEditCP(light_node);
-      light_node->setAmbient(0.9f, 0.8f, 0.8f, 1.0f);
-      light_node->setDiffuse(0.6f, 0.6f, 0.6f, 1.0f);
-      light_node->setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-      light_node->setDirection(0.0f, 0.0f, 1.0f);
-      light_node->setBeacon(light_beacon);
-   OSG::endEditCP(light_node);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor lnce(light_node.core());
+#endif
+   light_node->setAmbient(0.9f, 0.8f, 0.8f, 1.0f);
+   light_node->setDiffuse(0.6f, 0.6f, 0.6f, 1.0f);
+   light_node->setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+   light_node->setDirection(0.0f, 0.0f, 1.0f);
+   light_node->setBeacon(light_beacon);
 
    // --- Set up Scene -- //
    // add the loaded scene to the light node, so that it is lit by the light
    if ( OSG::NullFC != model_root )
    {
-      OSG::beginEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
-         light_node.node()->addChild(model_root);
-      OSG::endEditCP(light_node.node(), OSG::Node::ChildrenFieldMask);
+      light_node.node()->addChild(model_root);
    }
 
    // create the root part of the scene
    OSG::TransformNodePtr scene_transform_root = scene->getTransformRoot();
 
    // Set up the root node
-   OSG::beginEditCP(scene_transform_root.node(), OSG::Node::ChildrenFieldMask);
-      scene_transform_root.node()->addChild(light_node);
-   OSG::endEditCP(scene_transform_root.node(), OSG::Node::ChildrenFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor stre(scene_transform_root.node(),
+                      OSG::Node::ChildrenFieldMask);
+#endif
+   scene_transform_root.node()->addChild(light_node);
 
    if ( mEnableGrab && OSG::NullFC != model_root )
    {

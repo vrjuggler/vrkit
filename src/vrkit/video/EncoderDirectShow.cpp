@@ -323,7 +323,7 @@ void EncoderDirectShow::stopEncoding()
    }
 }
 
-void EncoderDirectShow::writeFrame(vpr::Uint8* data)
+void EncoderDirectShow::writeFrame(const vpr::Uint8* data)
 {
    mByteStream->grabFrame(getWidth(), getHeight(), data);
 }

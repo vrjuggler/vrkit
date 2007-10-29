@@ -38,10 +38,11 @@ void ViewPlatform::update(ViewerPtr viewer)
    OSG::Matrix new_xform;
    gmtl::set(new_xform, getCurPosInv());        // vp_M_vw
 
-   // Set the new transformation on the scene graph
-   OSG::beginEditCP(xform_node);
-      xform_node->setMatrix(new_xform);
-   OSG::endEditCP(xform_node);
+   // Set the new transformation on the scene graph.
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor xnce(xform_node.core(), OSG::Transform::MatrixFieldMask);
+#endif
+   xform_node->setMatrix(new_xform);
 }
 
 }

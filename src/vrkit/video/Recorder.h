@@ -29,13 +29,20 @@
 #include <OpenSG/OSGImage.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGWindow.h>
-#include <OpenSG/OSGRenderAction.h>
 
 #include <vrkit/signal/Proxy.h>
 #include <vrkit/video/CameraPtr.h>
 #include <vrkit/video/RecorderPtr.h>
 #include <vrkit/video/Encoder.h>
 
+
+OSG_BEGIN_NAMESPACE
+#if OSG_MAJOR_VERSION < 2
+class RenderAction;
+#else
+class RenderTraversalAction;
+#endif
+OSG_END_NAMESPACE
 
 namespace vrkit
 {
@@ -215,6 +222,12 @@ public:
     */
    void contextInit(OSG::WindowPtr window);
 
+#if OSG_MAJOR_VERSION < 2
+   typedef OSG::RenderAction render_action_t;
+#else
+   typedef OSG::RenderTraversalAction render_action_t;
+#endif
+
    /*
     * Renders the current frame given a RenderAction and camera position.
     * This must be invoked with an active OpenGL context. Likely places for
@@ -222,7 +235,7 @@ public:
     * (contextPreDraw(), draw(), and contextPostDraw()) or vrkit::Plugin draw
     * methods.
     */
-   void render(OSG::RenderAction* ra, const OSG::Matrix& camPos);
+   void render(render_action_t* ra, const OSG::Matrix& camPos);
    //@}
 
    /** @name Recording Visual Cues */

@@ -243,17 +243,19 @@ void WidgetPlugin::update(ViewerPtr viewer)
 
       WidgetData::widget_list_t widgets = mWidgetData->getWidgets();
 
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor dre(decorator_root.node(), OSG::Node::ChildrenFieldMask);
+#endif
+
       // Add all widgets to decorator
       WidgetData::widget_list_t::iterator w;
       for ( w = widgets.begin(); w != widgets.end(); ++w )
       {
-         OSG::beginEditCP(decorator_root.node(), OSG::Node::ChildrenFieldMask);
-            if (decorator_root.node()->findChild((*w)->getRoot()))
-            {
-               decorator_root.node()->subChild((*w)->getRoot());
-            }
-            decorator_root.node()->addChild((*w)->getRoot());
-         OSG::endEditCP(decorator_root.node(), OSG::Node::ChildrenFieldMask);
+         if (decorator_root.node()->findChild((*w)->getRoot()))
+         {
+            decorator_root.node()->subChild((*w)->getRoot());
+         }
+         decorator_root.node()->addChild((*w)->getRoot());
          //(*g)->setVisible(mGridsVisible);
       }
    }

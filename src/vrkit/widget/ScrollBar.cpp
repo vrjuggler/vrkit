@@ -61,11 +61,12 @@ WidgetPtr ScrollBar::init(const float metersToAppUnits)
    addChild(mCurrentButton);
 
    // Add buttons to OpenSG graph.
-   OSG::beginEditCP(mRootWidgetNode.node());
-      mRootWidgetNode.node()->addChild(mUpButton->getRoot());
-      mRootWidgetNode.node()->addChild(mDownButton->getRoot());
-      mRootWidgetNode.node()->addChild(mCurrentButton->getRoot());
-   OSG::endEditCP(mRootWidgetNode.node());
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor rwne(mRootWidgetNode.node(), OSG::Node::ChildrenFieldMask);
+#endif
+   mRootWidgetNode.node()->addChild(mUpButton->getRoot());
+   mRootWidgetNode.node()->addChild(mDownButton->getRoot());
+   mRootWidgetNode.node()->addChild(mCurrentButton->getRoot());
 
    mUpButton->mClickedSignal.connect(
       boost::bind(&ScrollBar::onButtonClicked, this, true)

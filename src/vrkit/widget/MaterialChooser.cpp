@@ -44,9 +44,13 @@ MaterialChooser::MaterialChooser()
 
 WidgetPtr MaterialChooser::init(const float metersToAppUnits)
 {
-   mMaterialPool = OSG::MaterialPool::create();
+   mMaterialPool = pool_t::create();
 
    WidgetPtr myself = Frame::init(metersToAppUnits);
+
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor rwne(mRootWidgetNode.node(), OSG::Node::ChildrenFieldMask);
+#endif
 
    for ( int i = 0; i < mVNum; ++i )
    {
@@ -55,9 +59,7 @@ WidgetPtr MaterialChooser::init(const float metersToAppUnits)
          SphereButtonPtr sb = SphereButton::create();
          addChild(sb);
          sb->init(mMetersToAppUnits);
-         OSG::beginEditCP(mRootWidgetNode.node());
-            mRootWidgetNode.node()->addChild(sb->getRoot());
-         OSG::endEditCP(mRootWidgetNode.node());
+         mRootWidgetNode.node()->addChild(sb->getRoot());
          mMaterialButtons.push_back(sb);
       }
    }
@@ -73,9 +75,7 @@ WidgetPtr MaterialChooser::init(const float metersToAppUnits)
    mScrollBar = ScrollBar::create();
    addChild(mScrollBar);
    mScrollBar->init(mMetersToAppUnits);
-   OSG::beginEditCP(mRootWidgetNode.node());
-      mRootWidgetNode.node()->addChild(mScrollBar->getRoot());
-   OSG::endEditCP(mRootWidgetNode.node());
+   mRootWidgetNode.node()->addChild(mScrollBar->getRoot());
 
    mScrollBar->mValueChangedSignal.connect(
       boost::bind(&MaterialChooser::onScrolled, this, _1)
@@ -89,14 +89,29 @@ WidgetPtr MaterialChooser::init(const float metersToAppUnits)
 event::ResultType MaterialChooser::onScrolled(int value)
 {
    int current_row = value;
-   int num_materials = mMaterialPool->getCount();
+#if OSG_MAJOR_VERSION >= 2
+   std::vector<OSG::MaterialPtr> mats = getMaterials();
+#endif
+   const OSG::UInt32 num_materials =
+#if OSG_MAJOR_VERSION < 2
+      mMaterialPool->getCount();
+#else
+      mats.size();
+#endif
+
    for ( unsigned int i = 0; i < mMaterialButtons.size(); ++i )
    {
-      int mat_index = current_row * 3 + i;
-      if (mat_index < num_materials)
+      const unsigned int mat_index = current_row * 3 + i;
+      if ( mat_index < num_materials )
       {
          std::cout << "Mat Index: " << mat_index << std::endl;
-         mMaterialButtons[i]->setMaterial(mMaterialPool->get(mat_index));
+         mMaterialButtons[i]->setMaterial(
+#if OSG_MAJOR_VERSION < 2
+            mMaterialPool->get(mat_index)
+#else
+            mats[mat_index]
+#endif
+         );
       }
       else
       {
@@ -116,13 +131,25 @@ event::ResultType MaterialChooser::onButtonClicked(unsigned int index)
    int current_row = mScrollBar->value();
    unsigned int mat_index = current_row * 3 + index;
 
-   if ( mat_index >= mMaterialPool->getCount() )
+   const OSG::UInt32 num_materials =
+#if OSG_MAJOR_VERSION < 2
+      mMaterialPool->getCount();
+#else
+      mMaterialPool->getNContainers();
+#endif
+
+   if ( mat_index >= num_materials )
    {
       selected_material = OSG::NullFC;
    }
    else
    {
-      selected_material = mMaterialPool->get(mat_index);
+      selected_material =
+#if OSG_MAJOR_VERSION < 2
+         mMaterialPool->get(mat_index);
+#else
+         getMaterials()[mat_index];
+#endif
       const char* mat_name = OSG::getName(selected_material);
       if ( NULL != mat_name )
       {
@@ -135,7 +162,7 @@ event::ResultType MaterialChooser::onButtonClicked(unsigned int index)
    return event::CONTINUE;
 }
 
-void MaterialChooser::setMaterialPool(OSG::MaterialPoolPtr matPool)
+void MaterialChooser::setMaterialPool(pool_ptr_t matPool)
 {
    mMaterialPool = matPool;
    materialsChanged();
@@ -143,13 +170,27 @@ void MaterialChooser::setMaterialPool(OSG::MaterialPoolPtr matPool)
 
 void MaterialChooser::materialsChanged()
 {
-   std::set<OSG::MaterialPtr> mats = mMaterialPool->get();
-   typedef std::set<OSG::MaterialPtr>::iterator iter_type;
+#if OSG_MAJOR_VERSION < 2
+   const std::set<OSG::MaterialPtr>& mats = mMaterialPool->get();
+   typedef std::set<OSG::MaterialPtr>::const_iterator iter_type;
+#else
+   std::vector<OSG::MaterialPtr> mats = getMaterials();
+   typedef std::vector<OSG::MaterialPtr>::iterator iter_type;
+#endif
 
    for ( iter_type m = mats.begin(); m != mats.end(); ++m )
    {
       std::string mat_str("<NULL>");
+
+#if OSG_MAJOR_VERSION < 2
       const char* mat_name = OSG::getName(*m);
+#else
+      const char* mat_name =
+         OSG::getName(
+            OSG::cast_dynamic<OSG::AttachmentContainerPtr>(*m)
+         );
+#endif
+
       if (NULL != mat_name)
       {
          mat_str = mat_name;
@@ -157,7 +198,12 @@ void MaterialChooser::materialsChanged()
       std::cout << "Material: " << mat_str << std::endl;
    }
 
-   OSG::UInt32 num_materials = mMaterialPool->getCount();
+   const OSG::UInt32 num_materials =
+#if OSG_MAJOR_VERSION < 2
+      mMaterialPool->getCount();
+#else
+      mats.size();
+#endif
    int num_rows = num_materials/mHNum;
 
    if ( num_materials % mHNum > 0 )
@@ -214,6 +260,27 @@ void MaterialChooser::setWidthHeight(const float w, const float h,
    mScrollBar->setWidthHeight(mBorderWidth, mHeight, 0.0f);
    mScrollBar->update();
 }
+
+#if OSG_MAJOR_VERSION >= 2
+std::vector<OSG::MaterialPtr> MaterialChooser::getMaterials()
+{
+   std::vector<OSG::MaterialPtr> materials;
+
+   const OSG::MFFieldContainerPtr& containers = mMaterialPool->getContainers();
+   typedef OSG::MFFieldContainerPtr::const_iterator iter_type;
+
+   // Count the containers that are derived from OSG::Material.
+   for ( iter_type c = containers.begin(); c != containers.end(); ++c )
+   {
+      if ( (*c)->getType().isDerivedFrom(OSG::Material::getClassType()) )
+      {
+         materials.push_back(OSG::cast_dynamic<OSG::MaterialPtr>(*c));
+      }
+   }
+
+   return materials;
+}
+#endif
 
 } // namespace widget
 
