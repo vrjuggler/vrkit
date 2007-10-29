@@ -324,11 +324,8 @@ void SlaveViewer::initScene()
 
 void SlaveViewer::contextInit()
 {
-#if __VJ_version >= 2003011
-   vrj::opensg::App::contextInit();
-#else
-   vrj::OpenSGApp::contextInit();
-#endif
+   OpenSGApp::contextInit();
+
    vprDEBUG(vrkitSLAVE_APP, vprDBG_STATE_LVL)
       << "Changing render action traversal mask from " << std::hex
       << mContextData->mRenderAction->getTravMask() << " to " << mTravMask
@@ -418,11 +415,8 @@ void SlaveViewer::exit()
    mSceneRoot = OSG::NullFC;
    shutdown();
    mMaybeNamedFcs.clear();
-#if __VJ_version >= 2003011
-   vrj::opensg::App::exit();
-#else
-   vrj::OpenSGApp::exit();
-#endif
+
+   OpenSGApp::exit();
 }
 
 void SlaveViewer::sendDataToMaster(OSG::BinaryDataHandler& writer)
