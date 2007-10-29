@@ -35,6 +35,8 @@
 #include <gadget/Type/Position/PositionUnitConversion.h>
 
 #include <vrkit/ExitCodes.h>
+#include <vrkit/Status.h>
+#include <vrkit/Version.h>
 #include <vrkit/slave/SlaveViewer.h>
 
 //OSG_USING_NAMESPACE
@@ -188,6 +190,13 @@ SlaveViewer::SlaveViewer(const std::string& masterAddr,
 SlaveViewer::~SlaveViewer()
 {
    shutdown();
+}
+
+void SlaveViewer::init()
+{
+   OpenSGApp::init();
+
+   VRKIT_STATUS << getBanner() << std::endl;
 }
 
 void SlaveViewer::initScene()

@@ -84,6 +84,8 @@ public:
 
    virtual ~SlaveViewer();
 
+   virtual void init();
+
    virtual void initScene();
 
    virtual OSG::NodePtr getScene()
