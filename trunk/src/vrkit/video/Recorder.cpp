@@ -20,7 +20,9 @@
 #include <boost/bind.hpp>
 
 #include <OpenSG/OSGGeometry.h>
-#include <OpenSG/OSGGeoPropPtrs.h>
+#if OSG_MAJOR_VERSION < 2
+#  include <OpenSG/OSGGeoPropPtrs.h>
+#endif
 #include <OpenSG/OSGImage.h>
 #include <OpenSG/OSGMergeGraphOp.h>
 #include <OpenSG/OSGGraphOpSeq.h>
@@ -98,15 +100,17 @@ RecorderPtr Recorder::init()
    mTransform = OSG::Transform::create();
 
    OSG::NodePtr beacon = OSG::Node::create();
-   OSG::beginEditCP(beacon);
-      beacon->setCore(mTransform);
-   OSG::endEditCP(beacon);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor be(beacon, OSG::Node::CoreFieldMask);
+#endif
+   beacon->setCore(mTransform);
 
    // Create the frame root.
    mFrameRoot = OSG::Node::create();
-   OSG::beginEditCP(mFrameRoot);
-      mFrameRoot->setCore(mTransform);
-   OSG::endEditCP(mFrameRoot);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor fre(mFrameRoot, OSG::Node::CoreFieldMask);
+#endif
+   mFrameRoot->setCore(mTransform);
 
    mStereoImageStorage = OSG::Image::create();
 
@@ -175,7 +179,13 @@ void Recorder::setFilename(const std::string& filename)
 
 void Recorder::setFov(const OSG::Real32 fov)
 {
-   mCamera->setFov(OSG::osgdegree2rad(fov));
+   mCamera->setFov(
+#if OSG_MAJOR_VERSION < 2
+      OSG::osgdegree2rad(fov)
+#else
+      OSG::osgDegree2Rad(fov)
+#endif
+   );
 }
 
 void Recorder::setAspect(const OSG::Real32 aspect)
@@ -242,10 +252,11 @@ void Recorder::startRecording()
 
          if ( inStereo() )
          {
-            OSG::beginEditCP(mStereoImageStorage);
-               mStereoImageStorage->set(pix_format, mCamera->getWidth() * 2,
-                                        mCamera->getHeight());
-            OSG::beginEditCP(mStereoImageStorage);
+#if OSG_MAJOR_VERSION < 2
+            OSG::CPEditor sise(mStereoImageStorage);
+#endif
+            mStereoImageStorage->set(pix_format, mCamera->getWidth() * 2,
+                                     mCamera->getHeight());
          }
       }
    }
@@ -287,7 +298,7 @@ void Recorder::contextInit(OSG::WindowPtr window)
    mCamera->setWindow(window);
 }
 
-void Recorder::render(OSG::RenderAction* ra, const OSG::Matrix& camPos)
+void Recorder::render(render_action_t* ra, const OSG::Matrix& camPos)
 {
    if ( ! isRecording() || isPaused() )
    {
@@ -318,15 +329,15 @@ void Recorder::render(OSG::RenderAction* ra, const OSG::Matrix& camPos)
       const OSG::UInt32 width = mCamera->getWidth();
       const OSG::UInt32 height = mCamera->getHeight();
 
-      OSG::beginEditCP(mStereoImageStorage);
-         mStereoImageStorage->setSubData(
-            0, 0, 0, width, height, 1, mCamera->getLeftEyeImage()->getData()
-         );
-         mStereoImageStorage->setSubData(
-            width, 0, 0, width, height, 1,
-            mCamera->getRightEyeImage()->getData()
-         );
-      OSG::endEditCP(mStereoImageStorage);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor sise(mStereoImageStorage);
+#endif
+      mStereoImageStorage->setSubData(
+         0, 0, 0, width, height, 1, mCamera->getLeftEyeImage()->getData()
+      );
+      mStereoImageStorage->setSubData(
+         width, 0, 0, width, height, 1, mCamera->getRightEyeImage()->getData()
+      );
 
       writeFrame(mStereoImageStorage);
    }
@@ -342,39 +353,47 @@ OSG::NodePtr Recorder::getDebugPlane() const
 {
    // Create material for left eye.
    OSG::SimpleMaterialPtr left_mat = OSG::SimpleMaterial::create();
-   OSG::beginEditCP(left_mat);
-      left_mat->addChunk(mCamera->getLeftTexture());
-      left_mat->setSpecular(OSG::Color3f(0.7f, 0.7f, 0.7f));
-      left_mat->setDiffuse(OSG::Color3f(0.22f, 0.2f, 0.2f));
-   OSG::endEditCP(left_mat);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor lme(left_mat);
+#endif
+   left_mat->addChunk(mCamera->getLeftTexture());
+#if OSG_MAJOR_VERSION >= 2
+   left_mat->addChunk(mCamera->getLeftTextureEnv());
+#endif
+   left_mat->setSpecular(OSG::Color3f(0.7f, 0.7f, 0.7f));
+   left_mat->setDiffuse(OSG::Color3f(0.22f, 0.2f, 0.2f));
 
    // Create material for right eye.
    OSG::SimpleMaterialPtr right_mat = OSG::SimpleMaterial::create();
-   OSG::beginEditCP(right_mat);
-      right_mat->addChunk(mCamera->getRightTexture());
-      right_mat->setSpecular(OSG::Color3f(0.7f, 0.7f, 0.7f));
-      right_mat->setDiffuse(OSG::Color3f(0.22f, 0.2f, 0.2f));
-   OSG::endEditCP(right_mat);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor rme(right_mat);
+#endif
+   right_mat->addChunk(mCamera->getRightTexture());
+#if OSG_MAJOR_VERSION >= 2
+   right_mat->addChunk(mCamera->getRightTextureEnv());
+#endif
+   right_mat->setSpecular(OSG::Color3f(0.7f, 0.7f, 0.7f));
+   right_mat->setDiffuse(OSG::Color3f(0.22f, 0.2f, 0.2f));
 
    // Create geometry for left eye.
    OSG::GeometryPtr left_geom = OSG::makePlaneGeo(5, 5, 2, 2);
    OSG::NodePtr left_node = OSG::Node::create();
-   OSG::beginEditCP(left_geom);
-      left_geom->setMaterial(left_mat);
-   OSG::endEditCP(left_geom);
-   OSG::beginEditCP(left_node);
-      left_node->setCore(left_geom);
-   OSG::endEditCP(left_node);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor lge(left_geom, OSG::Geometry::MaterialFieldMask);
+   OSG::CPEditor lne(left_node, OSG::Node::CoreFieldMask);
+#endif
+   left_geom->setMaterial(left_mat);
+   left_node->setCore(left_geom);
 
    // Create geometry for right eye.
    OSG::GeometryPtr right_geom = OSG::makePlaneGeo(5, 5, 2, 2);
    OSG::NodePtr right_node = OSG::Node::create();
-   OSG::beginEditCP(right_geom);
-      right_geom->setMaterial(right_mat);
-   OSG::endEditCP(right_geom);
-   OSG::beginEditCP(right_node);
-      right_node->setCore(right_geom);
-   OSG::endEditCP(right_node);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor rge(right_geom, OSG::Geometry::MaterialFieldMask);
+   OSG::CPEditor rne(right_node, OSG::Node::CoreFieldMask);
+#endif
+   right_geom->setMaterial(right_mat);
+   right_node->setCore(right_geom);
 
    // Create the xforms for each eye's geometry.
    OSG::Matrix leftm, rightm;
@@ -386,22 +405,27 @@ OSG::NodePtr Recorder::getDebugPlane() const
    // Create the transform nodes for each eye's geometry.
    OSG::TransformNodePtr left_xform = OSG::TransformNodePtr::create();
    OSG::TransformNodePtr right_xform = OSG::TransformNodePtr::create();
-   OSG::beginEditCP(left_xform);
-   OSG::beginEditCP(right_xform);
-      left_xform->setMatrix(leftm);
-      right_xform->setMatrix(rightm);
-      left_xform.node()->addChild(left_node);
-      right_xform.node()->addChild(right_node);
-   OSG::endEditCP(left_xform);
-   OSG::endEditCP(right_xform);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor lxe(left_xform.node(), OSG::Node::ChildrenFieldMask);
+   OSG::CPEditor lxce(left_xform.core(), OSG::Transform::MatrixFieldMask);
+   OSG::CPEditor rxe(right_xform.node(), OSG::Node::ChildrenFieldMask);
+   OSG::CPEditor rxce(right_xform.core(), OSG::Transform::MatrixFieldMask);
+#endif
+   left_xform->setMatrix(leftm);
+   right_xform->setMatrix(rightm);
+   left_xform.node()->addChild(left_node);
+   right_xform.node()->addChild(right_node);
 
-   OSG::GroupPtr group = OSG::Group::create();
    OSG::NodePtr group_node = OSG::Node::create();
-   OSG::beginEditCP(group_node);
-      group_node->setCore(group);
-      group_node->addChild(left_xform.node());
-      group_node->addChild(right_xform.node());
-   OSG::endEditCP(group_node);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor gne(
+      group_node, OSG::Node::ChildrenFieldMask | OSG::Node::CoreFieldMask
+   );
+#endif
+   group_node->setCore(OSG::Group::create());
+   group_node->addChild(left_xform.node());
+   group_node->addChild(right_xform.node());
+
    return group_node;
 }
 
@@ -497,8 +521,15 @@ void Recorder::writeFrame(OSG::ImagePtr img)
 void Recorder::generateDebugFrame()
 {
    // The size of the internal frame.
-   OSG::Real32 frame_height = 2.0 * (OSG::osgtan(mCamera->getFov()/2.0) * mFrameDist);
-   OSG::Real32 frame_width = frame_height * mCamera->getAspect();
+   const OSG::Real32 fov_tan(
+#if OSG_MAJOR_VERSION < 2
+      OSG::osgtan(mCamera->getFov() / 2.0)
+#else
+      OSG::osgTan(mCamera->getFov() / 2.0)
+#endif
+   );
+   const OSG::Real32 frame_height(2.0 * fov_tan * mFrameDist);
+   const OSG::Real32 frame_width(frame_height * mCamera->getAspect());
 
    // =============
    // |           |
@@ -524,28 +555,31 @@ void Recorder::generateDebugFrame()
 
    // Create material for the frame.
    OSG::SimpleMaterialPtr mat = OSG::SimpleMaterial::create();
-   OSG::beginEditCP(mat);
+   {
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor me(mat);
+#endif
       //mat->setLit(false);
       //mat->setDiffuse(OSG::Color3f(1.0f, 0.0f, 0.0f));
       //mat->setAmbient(OSG::Color3f(0.2f, 0.2f, 0.2f));
       mat->setDiffuse(OSG::Color3f(0.8f, 0.0f, 0.0f));
       //mat->setSpecular(OSG::Color3f(0.2f, 0.2f, 0.2f));
       //mat->setShininess(2);
-   OSG::endEditCP(mat);
+   }
 
    // Set the material for all parts of the frame.
-   OSG::beginEditCP(top);
-   OSG::beginEditCP(bottom);
-   OSG::beginEditCP(left);
-   OSG::beginEditCP(right);
+   {
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor te(top.core(), OSG::Geometry::MaterialFieldMask);
+      OSG::CPEditor be(bottom.core(), OSG::Geometry::MaterialFieldMask);
+      OSG::CPEditor le(left.core(), OSG::Geometry::MaterialFieldMask);
+      OSG::CPEditor re(right.core(), OSG::Geometry::MaterialFieldMask);
+#endif
       top->setMaterial(mat);
       bottom->setMaterial(mat);
       left->setMaterial(mat);
       right->setMaterial(mat);
-   OSG::endEditCP(top);
-   OSG::endEditCP(bottom);
-   OSG::endEditCP(left);
-   OSG::endEditCP(right);
+   }
 
    // We need to pull the frame in half the border size to ensure that we don't
    // see it.
@@ -570,10 +604,13 @@ void Recorder::generateDebugFrame()
    leftm.setTranslate(-xoffset, 0.0, zoffset);
    rightm.setTranslate(xoffset, 0.0, zoffset);
 
-   OSG::beginEditCP(top_xform);
-   OSG::beginEditCP(bottom_xform);
-   OSG::beginEditCP(left_xform);
-   OSG::beginEditCP(right_xform);
+   {
+#if OSG_MAJOR_VERSION  <2
+      OSG::CPEditor txe(top_xform.core(), OSG::Transform::MatrixFieldMask);
+      OSG::CPEditor bxe(bottom_xform.core(), OSG::Transform::MatrixFieldMask);
+      OSG::CPEditor lxe(left_xform.core(), OSG::Transform::MatrixFieldMask);
+      OSG::CPEditor rxe(right_xform.core(), OSG::Transform::MatrixFieldMask);
+#endif
       top_xform->setMatrix(topm);
       bottom_xform->setMatrix(bottomm);
       left_xform->setMatrix(leftm);
@@ -583,34 +620,36 @@ void Recorder::generateDebugFrame()
       bottom_xform.node()->addChild(bottom.node());
       left_xform.node()->addChild(left.node());
       right_xform.node()->addChild(right.node());
-   OSG::endEditCP(top_xform);
-   OSG::endEditCP(bottom_xform);
-   OSG::endEditCP(left_xform);
-   OSG::endEditCP(right_xform);
+   }
 
    // Create a node that will contain all geometry after the the merge op.
    OSG::NodePtr frame = OSG::Node::create();
-   OSG::GroupPtr frame_group = OSG::Group::create();
-   OSG::beginEditCP(frame);
-      frame->setCore(frame_group);
+   {
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor fe(
+         frame, OSG::Node::CoreFieldMask | OSG::Node::ChildrenFieldMask
+      );
+#endif
+      frame->setCore(OSG::Group::create());
       frame->addChild(top_xform.node());
       frame->addChild(bottom_xform.node());
       frame->addChild(left_xform.node());
       frame->addChild(right_xform.node());
-   OSG::endEditCP(frame);
+   }
 
    // Merge all geometry into one node.
    OSG::MergeGraphOp merge;
    merge.traverse(frame);
 
    // Remove old geometry and add new.
-   OSG::beginEditCP(mFrameRoot);
-      while (mFrameRoot->getNChildren() > 0)
-      {
-         mFrameRoot->subChild(0);
-      }
-      mFrameRoot->addChild(frame);
-   OSG::endEditCP(mFrameRoot);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor fre(mFrameRoot, OSG::Node::ChildrenFieldMask);
+#endif
+   while (mFrameRoot->getNChildren() > 0)
+   {
+      mFrameRoot->subChild(0);
+   }
+   mFrameRoot->addChild(frame);
 }
 
 }

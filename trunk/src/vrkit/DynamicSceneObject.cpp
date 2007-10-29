@@ -16,6 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <boost/bind.hpp>
+
 #include <vrkit/DynamicSceneObject.h>
 
 
@@ -49,7 +51,11 @@ init(OSG::NodePtr node, boost::function<bool (OSG::NodePtr)> predicate,
       // destroyed if structural changes have to occur.
       OSG::NodeCoreRefPtr root_node_core(node->getCore());
       OSG::TransformPtr xform_core =
+#if OSG_MAJOR_VERSION < 2
          OSG::TransformPtr::dcast(root_node_core.get());
+#else
+         OSG::cast_dynamic<OSG::TransformPtr>(root_node_core.get());
+#endif
 
       // If root does not currently have a transform core, then we need to
       // create a new node to hold the core of root and give root a transform
@@ -61,32 +67,34 @@ init(OSG::NodePtr node, boost::function<bool (OSG::NodePtr)> predicate,
       {
          // Step 1: Create the transform core and assign it to node.
          mTransformCore = OSG::Transform::create();
-         OSG::beginEditCP(node, OSG::Node::CoreFieldMask);
-            node->setCore(mTransformCore);
-         OSG::endEditCP(node, OSG::Node::CoreFieldMask);
+#if OSG_MAJOR_VERSION < 2
+         OSG::CPEditor ne(
+            node, OSG::Node::CoreFieldMask | OSG::Node::ChildrenFieldMask
+         );
+#endif
+         node->setCore(mTransformCore);
 
          // Step 2: Create a new node in the scene graph and give it the old
          // core from node.
          OSG::NodeRefPtr new_child(OSG::Node::create());
-         OSG::beginEditCP(new_child, OSG::Node::CoreFieldMask);
-            new_child->setCore(root_node_core);
-         OSG::endEditCP(new_child, OSG::Node::CoreFieldMask);
+#if OSG_MAJOR_VERSION < 2
+         OSG::CPEditor nce(
+            new_child, OSG::Node::CoreFieldMask | OSG::Node::ChildrenFieldMask
+         );
+#endif
+         new_child->setCore(root_node_core);
 
          // Step 3: Move the children of node to new_child.
          const OSG::UInt32 num_children(node->getNChildren());
-         OSG::beginEditCP(new_child, OSG::Node::ChildrenFieldMask);
-            for ( OSG::UInt32 c = 0; c < num_children; ++c )
-            {
-               // NOTE: A side effect of this is that the child will be
-               // removed from node. As such, using child #0 here is correct.
-               new_child->addChild(node->getChild(0));
-            }
-         OSG::endEditCP(new_child, OSG::Node::ChildrenFieldMask);
+         for ( OSG::UInt32 c = 0; c < num_children; ++c )
+         {
+            // NOTE: A side effect of this is that the child will be
+            // removed from node. As such, using child #0 here is correct.
+            new_child->addChild(node->getChild(0));
+         }
 
          // Step 4: Add new_child as a child of node.
-         OSG::beginEditCP(node, OSG::Node::ChildrenFieldMask);
-            node->addChild(new_child);
-         OSG::endEditCP(node, OSG::Node::ChildrenFieldMask);
+         node->addChild(new_child);
       }
       else
       {
@@ -102,7 +110,12 @@ init(OSG::NodePtr node, boost::function<bool (OSG::NodePtr)> predicate,
       // If node has a core of type OSG::Transform, then this will make it
       // available for use in moving this object. Otherwise, it will
       // (re)assign mTransformCore the value of OSG::NullFC.
-      mTransformCore = OSG::TransformPtr::dcast(root_node_core);
+      mTransformCore =
+#if OSG_MAJOR_VERSION < 2
+         OSG::TransformPtr::dcast(root_node_core);
+#else
+         OSG::cast_dynamic<OSG::TransformPtr>(root_node_core);
+#endif
    }
 
    return boost::dynamic_pointer_cast<DynamicSceneObject>(shared_from_this());
@@ -110,16 +123,21 @@ init(OSG::NodePtr node, boost::function<bool (OSG::NodePtr)> predicate,
 
 OSG::DynamicVolume& DynamicSceneObject::getVolume(const bool update)
 {
+#if OSG_MAJOR_VERSION < 2
    return getRoot()->getVolume(update);
+#else
+   return getRoot()->editVolume(update);
+#endif
 }
 
 void DynamicSceneObject::moveTo(const OSG::Matrix& matrix)
 {
    if ( OSG::NullFC != mTransformCore )
    {
-      OSG::beginEditCP(mTransformCore, OSG::Transform::MatrixFieldMask);
-         mTransformCore->setMatrix(matrix);
-      OSG::endEditCP(mTransformCore, OSG::Transform::MatrixFieldMask);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor tce(mTransformCore, OSG::Transform::MatrixFieldMask);
+#endif
+      mTransformCore->setMatrix(matrix);
    }
 }
 
@@ -195,7 +213,7 @@ SceneObjectPtr DynamicSceneObject::getChild(const unsigned int childIndex)
    return (getChildren()[childIndex]);
 }
 
-OSG::Action::ResultE DynamicSceneObject::enter(OSG::NodePtr& node)
+OSG::Action::ResultE DynamicSceneObject::enter(traverse_node_type node)
 {
    if ( isSceneObject(node) )
    {
@@ -210,17 +228,19 @@ OSG::Action::ResultE DynamicSceneObject::enter(OSG::NodePtr& node)
 
 std::vector<SceneObjectPtr> DynamicSceneObject::getChildren()
 {
-   //if (mChildren.empty())
-   {
    mChildren.clear();
 
    // Traverse over all children.
    OSG::traverse(
       getRoot()->getMFChildren()->getValues(),
+#if OSG_MAJOR_VERSION < 2
       OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
          OSG::Action::ResultE, DynamicSceneObject, OSG::NodePtr
-      >(this, &DynamicSceneObject::enter));
-   }
+      >(this, &DynamicSceneObject::enter)
+#else
+      boost::bind(&DynamicSceneObject::enter, this, _1)
+#endif
+   );
 
    return mChildren;
 }

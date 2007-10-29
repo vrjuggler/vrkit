@@ -18,9 +18,13 @@
 
 #include <sstream>
 
-#include <OpenSG/OSGGeoPropPTypes.h>
 #include <OpenSG/OSGSimpleGeometry.h>
 #include <OpenSG/OSGSimpleMaterial.h>
+#if OSG_MAJOR_VERSION < 2
+#  include <OpenSG/OSGGeoPropPTypes.h>
+#else
+#  include <OpenSG/OSGGeoProperties.h>
+#endif
 
 #include <gmtl/Math.h>
 #include <gmtl/External/OpenSGConvert.h>
@@ -148,28 +152,39 @@ OSG::NodeRefPtr Grid::getRoot() const
 
 bool Grid::isVisible()
 {
+#if OSG_MAJOR_VERSION < 2
    return mRoot.node()->getActive();
+#else
+   return mRoot.node()->getTravMask() != 0;
+#endif
 }
 
 void Grid::setVisible(const bool visible)
 {
-   OSG::beginEditCP(mRoot.node(), OSG::Node::TravMaskFieldMask);
-      mRoot.node()->setActive(visible);
-   OSG::endEditCP(mRoot.node(), OSG::Node::TravMaskFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor re(mRoot.node(), OSG::Node::TravMaskFieldMask);
+   mRoot.node()->setActive(visible);
+#else
+   mRoot.node()->setTravMask(visible);
+#endif
 }
 
 void Grid::setSelected(const bool selected)
 {
-   OSG::beginEditCP(mPlaneNode.node(), OSG::Node::TravMaskFieldMask);
-      mPlaneNode.node()->setActive(selected);
-   OSG::endEditCP(mPlaneNode.node(), OSG::Node::TravMaskFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor pne(mPlaneNode.node(), OSG::Node::TravMaskFieldMask);
+   mPlaneNode.node()->setActive(selected);
+#else
+   mPlaneNode.node()->setTravMask(selected);
+#endif
 }
 
 void Grid::move(const OSG::Matrix& xform)
 {
-   OSG::beginEditCP(mRoot, OSG::Transform::MatrixFieldMask);
-      mRoot->setMatrix(xform);
-   OSG::endEditCP(mRoot, OSG::Transform::MatrixFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor rce(mRoot.core(), OSG::Transform::MatrixFieldMask);
+#endif
+   mRoot->setMatrix(xform);
 }
 
 void Grid::move(const gmtl::Matrix44f& xform)
@@ -197,29 +212,36 @@ void Grid::initGeometry(const OSG::Real32 width, const OSG::Real32 height,
                         const OSG::Color3f& color)
 {
    OSG::SimpleMaterialPtr plane_mat = OSG::SimpleMaterial::create();
-   const OSG::UInt32 mat_mask = OSG::SimpleMaterial::AmbientFieldMask |
-                                OSG::SimpleMaterial::DiffuseFieldMask |
-                                OSG::SimpleMaterial::LitFieldMask |
-                                OSG::SimpleMaterial::TransparencyFieldMask;
 
-   OSG::beginEditCP(plane_mat, mat_mask);
-      plane_mat->setLit(false);
-      plane_mat->setAmbient(color);
-      plane_mat->setDiffuse(color);
-      plane_mat->setTransparency(0.90f);
-   OSG::endEditCP(plane_mat, mat_mask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor pme(plane_mat,
+                     OSG::SimpleMaterial::AmbientFieldMask         |
+                        OSG::SimpleMaterial::DiffuseFieldMask      |
+                        OSG::SimpleMaterial::LitFieldMask          |
+                        OSG::SimpleMaterial::TransparencyFieldMask);
+#endif
+   plane_mat->setLit(false);
+   plane_mat->setAmbient(color);
+   plane_mat->setDiffuse(color);
+   plane_mat->setTransparency(0.90f);
 
    OSG::SimpleMaterialPtr line_mat =
+#if OSG_MAJOR_VERSION < 2
       OSG::SimpleMaterialPtr::dcast(OSG::deepClone(plane_mat));
+#else
+      OSG::cast_dynamic<OSG::SimpleMaterialPtr>(OSG::deepClone(plane_mat));
+#endif
 
-   OSG::beginEditCP(line_mat, OSG::SimpleMaterial::TransparencyFieldMask);
-      line_mat->setTransparency(0.0f);
-   OSG::endEditCP(line_mat, OSG::SimpleMaterial::TransparencyFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor lme(line_mat, OSG::SimpleMaterial::TransparencyFieldMask);
+#endif
+   line_mat->setTransparency(0.0f);
 
    mPlaneNode = OSG::makePlaneGeo(width, height, 1, 1);
-   OSG::beginEditCP(mPlaneNode, OSG::Geometry::MaterialFieldMask);
-      mPlaneNode->setMaterial(plane_mat);
-   OSG::endEditCP(mPlaneNode, OSG::Geometry::MaterialFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor pne(mPlaneNode.core(), OSG::Geometry::MaterialFieldMask);
+#endif
+   mPlaneNode->setMaterial(plane_mat);
 
    const float half_width(width / 2.0f);
    const float half_height(height / 2.0f);
@@ -262,62 +284,68 @@ void Grid::initGeometry(const OSG::Real32 width, const OSG::Real32 height,
    move(xform);
 
    OSG::GeoPTypesPtr type = OSG::GeoPTypesUI8::create();
-   OSG::beginEditCP(type, OSG::GeoPTypesUI8::GeoPropDataFieldMask);
-      type->addValue(GL_LINES);
-   OSG::endEditCP(type, OSG::GeoPTypesUI8::GeoPropDataFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor te(type, OSG::GeoPTypesUI8::GeoPropDataFieldMask);
+#endif
+   type->addValue(GL_LINES);
 
    unsigned int vertex_count(0);
 
    OSG::GeoPositions3fPtr pos = OSG::GeoPositions3f::create();
-   OSG::beginEditCP(pos, OSG::GeoPositions3f::GeoPropDataFieldMask);
-      for ( float i = -half_width; i <= half_width; i += granularity )
-      {
-         pos->addValue(OSG::Pnt3f(i, -half_height, 0.0f));
-         pos->addValue(OSG::Pnt3f(i, half_height, 0.0f));
-         vertex_count += 2;
-      }
-      for ( float i = -half_height; i <= half_height; i += granularity )
-      {
-         pos->addValue(OSG::Pnt3f(-half_width, i, 0.0f));
-         pos->addValue(OSG::Pnt3f(half_width, i, 0.0f));
-         vertex_count += 2;
-      }
-   OSG::endEditCP(pos, OSG::GeoPositions3f::GeoPropDataFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor pe(pos, OSG::GeoPositions3f::GeoPropDataFieldMask);
+#endif
+   for ( float i = -half_width; i <= half_width; i += granularity )
+   {
+      pos->addValue(OSG::Pnt3f(i, -half_height, 0.0f));
+      pos->addValue(OSG::Pnt3f(i, half_height, 0.0f));
+      vertex_count += 2;
+   }
+   for ( float i = -half_height; i <= half_height; i += granularity )
+   {
+      pos->addValue(OSG::Pnt3f(-half_width, i, 0.0f));
+      pos->addValue(OSG::Pnt3f(half_width, i, 0.0f));
+      vertex_count += 2;
+   }
 
 //   std::cout << "vertex_count = " << vertex_count << std::endl;
 
    OSG::GeoPLengthsPtr length = OSG::GeoPLengthsUI32::create();
-   OSG::beginEditCP(length, OSG::GeoPLengthsUI32::GeoPropDataFieldMask);
-      length->addValue(vertex_count);
-   OSG::endEditCP(length, OSG::GeoPLengthsUI32::GeoPropDataFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor le(length, OSG::GeoPLengthsUI32::GeoPropDataFieldMask);
+#endif
+   length->addValue(vertex_count);
 
    OSG::GeoNormals3fPtr norms = OSG::GeoNormals3f::create();
-   OSG::beginEditCP(norms, OSG::GeoNormals3f::GeoPropDataFieldMask);
-      for ( unsigned int i = 0; i < vertex_count; ++i )
-      {
-         norms->addValue(OSG::Vec3f(0.0f, 0.0f, 1.0f));
-      }
-   OSG::endEditCP(norms, OSG::GeoNormals3f::GeoPropDataFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor ne(norms, OSG::GeoNormals3f::GeoPropDataFieldMask);
+#endif
+   for ( unsigned int i = 0; i < vertex_count; ++i )
+   {
+      norms->addValue(OSG::Vec3f(0.0f, 0.0f, 1.0f));
+   }
 
    mGridNode = OSG::Geometry::create();
-   const OSG::UInt32 geom_mask = OSG::Geometry::TypesFieldMask |
-                                 OSG::Geometry::LengthsFieldMask |
-                                 OSG::Geometry::PositionsFieldMask |
-                                 OSG::Geometry::NormalsFieldMask |
-                                 OSG::Geometry::MaterialFieldMask;
 
-   OSG::beginEditCP(mGridNode, geom_mask);
-      mGridNode->setTypes(type);
-      mGridNode->setLengths(length);
-      mGridNode->setPositions(pos);
-      mGridNode->setNormals(norms);
-      mGridNode->setMaterial(line_mat);
-   OSG::endEditCP(mGridNode, geom_mask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor gnce(mGridNode.core(),
+                      OSG::Geometry::TypesFieldMask        |
+                         OSG::Geometry::LengthsFieldMask   |
+                         OSG::Geometry::PositionsFieldMask |
+                         OSG::Geometry::NormalsFieldMask   |
+                         OSG::Geometry::MaterialFieldMask);
+#endif
+   mGridNode->setTypes(type);
+   mGridNode->setLengths(length);
+   mGridNode->setPositions(pos);
+   mGridNode->setNormals(norms);
+   mGridNode->setMaterial(line_mat);
 
-   OSG::beginEditCP(mRoot.node(), OSG::Node::ChildrenFieldMask);
-      mRoot.node()->addChild(mGridNode);
-      mRoot.node()->addChild(mPlaneNode);
-   OSG::endEditCP(mRoot.node(), OSG::Node::ChildrenFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor re(mRoot.node(), OSG::Node::ChildrenFieldMask);
+#endif
+   mRoot.node()->addChild(mGridNode);
+   mRoot.node()->addChild(mPlaneNode);
 
    setSelected(false);
 }

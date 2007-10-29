@@ -108,9 +108,10 @@ viewer::PluginPtr GridPlugin::init(ViewerPtr viewer)
    {
       OSG::GroupNodePtr decorator_root =
          viewer->getSceneObj()->getDecoratorRoot();
-      OSG::beginEditCP(decorator_root.node(), OSG::Node::ChildrenFieldMask);
-         decorator_root.node()->addChild((*g)->getRoot());
-      OSG::endEditCP(decorator_root.node(), OSG::Node::ChildrenFieldMask);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor dre(decorator_root.node(), OSG::Node::ChildrenFieldMask);
+#endif
+      decorator_root.node()->addChild((*g)->getRoot());
       (*g)->setVisible(mGridsVisible);
    }
 

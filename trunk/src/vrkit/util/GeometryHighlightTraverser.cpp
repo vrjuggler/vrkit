@@ -18,6 +18,7 @@
 
 #include <sstream>
 #include <algorithm>
+#include <boost/bind.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -119,29 +120,36 @@ void addHighlight(CorePtr core, OSG::MaterialRefPtr newMat)
       }
 
       mpass_mat = OSG::MultiPassMaterial::create();
-      OSG::beginEditCP(mpass_mat,
-                       OSG::MultiPassMaterial::MaterialsFieldMask);
-         mpass_mat->addMaterial(mat);
-      OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor mme(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+#endif
+      mpass_mat->addMaterial(mat);
 
       // Replace the material for the geometry core with the new
       // multi-pass material.
-      OSG::beginEditCP(core, CorePtr::StoredObjectType::MaterialFieldMask);
-         core->setMaterial(mpass_mat);
-      OSG::endEditCP(core, CorePtr::StoredObjectType::MaterialFieldMask);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor ce(core, CorePtr::StoredObjectType::MaterialFieldMask);
+#endif
+      core->setMaterial(mpass_mat);
    }
    // If we already have a multi-pass material, we will use it for
    // mpass_mat.
    else
    {
-      mpass_mat = OSG::MultiPassMaterialPtr::dcast(mat);
+      mpass_mat =
+#if OSG_MAJOR_VERSION < 2
+         OSG::MultiPassMaterialPtr::dcast(mat);
+#else
+         OSG::cast_dynamic<OSG::MultiPassMaterialPtr>(mat);
+#endif
    }
 
 //   std::cout << "Ading material " << newMat << std::endl;
    // Now, we add the highlight material.
-   OSG::beginEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
-      mpass_mat->addMaterial(newMat);
-   OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor mme(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+#endif
+   mpass_mat->addMaterial(newMat);
 }
 
 template<typename CorePtr>
@@ -160,7 +168,12 @@ void swapHighlight(CorePtr core, OSG::MaterialRefPtr oldMat,
       throw vrkit::Exception(msg_stream.str(), VRKIT_LOCATION);
    }
 
-   OSG::MultiPassMaterialPtr mpass_mat = OSG::MultiPassMaterialPtr::dcast(mat);
+   OSG::MultiPassMaterialPtr mpass_mat =
+#if OSG_MAJOR_VERSION < 2
+      OSG::MultiPassMaterialPtr::dcast(mat);
+#else
+      OSG::cast_dynamic<OSG::MultiPassMaterialPtr>(mat);
+#endif
 
    // mat is supposed to be a multi-pass material. If it is not, then
    // something has gone wrong. In this case, either someone is mis-using
@@ -176,11 +189,11 @@ void swapHighlight(CorePtr core, OSG::MaterialRefPtr oldMat,
 
    if ( mpass_mat->hasMaterial(oldMat) )
    {
-      OSG::beginEditCP(mpass_mat,
-                       OSG::MultiPassMaterial::MaterialsFieldMask);
-         mpass_mat->subMaterial(oldMat);
-         mpass_mat->addMaterial(newMat);
-      OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor mme(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+#endif
+      mpass_mat->subMaterial(oldMat);
+      mpass_mat->addMaterial(newMat);
    }
 }
 
@@ -192,32 +205,45 @@ void removeHighlight(CorePtr core, OSG::MaterialRefPtr oldMaterial)
    if ( OSG::NullFC != mat )
    {
       OSG::MultiPassMaterialPtr mpass_mat =
+#if OSG_MAJOR_VERSION < 2
          OSG::MultiPassMaterialPtr::dcast(mat);
+#else
+         OSG::cast_dynamic<OSG::MultiPassMaterialPtr>(mat);
+#endif
 
       // Ensure that mpass_mat has the given material to be removed and
       // then remove it.
       if ( OSG::NullFC != mpass_mat && mpass_mat->hasMaterial(oldMaterial) )
       {
 //         std::cout << "Removing material " << oldMaterial << std::endl;
-         OSG::beginEditCP(mpass_mat,
-                          OSG::MultiPassMaterial::MaterialsFieldMask);
-            mpass_mat->subMaterial(oldMaterial);
-         OSG::endEditCP(mpass_mat, OSG::MultiPassMaterial::MaterialsFieldMask);
+#if OSG_MAJOR_VERSION < 2
+         OSG::CPEditor mme(mpass_mat,
+                           OSG::MultiPassMaterial::MaterialsFieldMask);
+#endif
+         mpass_mat->subMaterial(oldMaterial);
 
          // If the number of materials remaining in mpass_mat is 1, then we
          // have reached the point where we need to restore the original
          // material.
-         OSG::MFMaterialPtr& materials(mpass_mat->getMaterials());
-         if ( materials.getSize() == 1 )
+         const OSG::MFMaterialPtr& materials(mpass_mat->getMaterials());
+         const OSG::UInt32 materials_size =
+#if OSG_MAJOR_VERSION < 2
+            materials.getSize();
+#else
+            materials.size();
+#endif
+
+         if ( materials_size == 1 )
          {
             OSG::MaterialRefPtr orig_mat(mpass_mat->getMaterials(0));
 //            std::cout << "Restoring original material " << orig_mat.get()
 //                      << std::endl;
             // Restore the material back to whatever it was originally.
-            OSG::beginEditCP(core,
+#if OSG_MAJOR_VERSION < 2
+            OSG::CPEditor ce(core,
                              CorePtr::StoredObjectType::MaterialFieldMask);
-               core->setMaterial(orig_mat);
-            OSG::endEditCP(core, CorePtr::StoredObjectType::MaterialFieldMask);
+#endif
+            core->setMaterial(orig_mat);
          }
       }
    }
@@ -236,9 +262,14 @@ void HighlightCoreFinder::traverse(OSG::NodePtr node, callback_t callback)
    reset();
    mCallback = callback;
    OSG::traverse(node,
+#if OSG_MAJOR_VERSION < 2
                  OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
                     OSG::Action::ResultE, HighlightCoreFinder, OSG::NodePtr
-                 >(this, &HighlightCoreFinder::enter));
+                 >(this, &HighlightCoreFinder::enter)
+#else
+                 boost::bind(&HighlightCoreFinder::enter, this, _1)
+#endif
+   );
 }
 
 void HighlightCoreFinder::reset()
@@ -246,7 +277,7 @@ void HighlightCoreFinder::reset()
    mCores.clear();
 }
 
-OSG::Action::ResultE HighlightCoreFinder::enter(OSG::NodePtr& node)
+OSG::Action::ResultE HighlightCoreFinder::enter(traverse_node_type node)
 {
    OSG::NodeCorePtr core = node->getCore();
    OSG::FieldContainerType& core_fct = core->getType();
@@ -317,9 +348,11 @@ createSHLMaterial(const std::string& vertexShaderFile,
       {
          // CPEditor for shlChunk. This is important because an exception may
          // be thrown while editing shlChunk.
+#if OSG_MAJOR_VERSION < 2
          OSG::CPEditor sce(shlChunk,
                            OSG::ShaderChunk::VertexProgramFieldMask |
-                           OSG::ShaderChunk::FragmentProgramFieldMask);
+                              OSG::ShaderChunk::FragmentProgramFieldMask);
+#endif
 
          if ( ! shlChunk->readVertexProgram(vs_file) )
          {
@@ -332,24 +365,33 @@ createSHLMaterial(const std::string& vertexShaderFile,
          }
       }
 
-      OSG::beginEditCP(shlChunk);
-         uniform_map_t::iterator ui;
-         for ( ui = uniformParams.begin(); ui != uniformParams.end(); ++ui )
+      {
+#if OSG_MAJOR_VERSION < 2
+         OSG::CPEditor sce(shlChunk);
+#endif
+         typedef uniform_map_t::iterator iter_type;
+         for ( iter_type ui = uniformParams.begin();
+               ui != uniformParams.end();
+               ++ui )
          {
             UniformVisitor visitor(shlChunk, (*ui).first.c_str());
             boost::apply_visitor(visitor, (*ui).second);
          }
-      OSG::endEditCP(shlChunk);
+      }
 
       OSG::ChunkMaterialRefPtr chunk_material(OSG::ChunkMaterial::create());
-      OSG::beginEditCP(chunk_material, OSG::ChunkMaterial::ChunksFieldMask);
+      {
+#if OSG_MAJOR_VERSION < 2
+         OSG::CPEditor cme(chunk_material,
+                           OSG::ChunkMaterial::ChunksFieldMask);
+#endif
          chunk_material->addChunk(shlChunk);
-         std::vector<OSG::StateChunkRefPtr>::const_iterator ci;
-         for ( ci = chunks.begin(); ci != chunks.end(); ++ci )
+         typedef std::vector<OSG::StateChunkRefPtr>::const_iterator iter_type;
+         for ( iter_type ci = chunks.begin(); ci != chunks.end(); ++ci )
          {
             chunk_material->addChunk(*ci);
          }
-      OSG::endEditCP(chunk_material, OSG::ChunkMaterial::ChunksFieldMask);
+      }
 
       OSG::MaterialRefPtr material(chunk_material.get());
       id = registerMaterial(material);
@@ -367,26 +409,27 @@ createScribeMaterial(const bool isLit, const unsigned int frontMode,
    // Set up the highlight materials.
    OSG::SimpleMaterialPtr mat = OSG::SimpleMaterial::create();
 
-   OSG::beginEditCP(mat, OSG::SimpleMaterial::LitFieldMask |
-                         OSG::SimpleMaterial::DiffuseFieldMask);
-      mat->setLit(isLit);
-      mat->setDiffuse(diffuseColor);
-   OSG::endEditCP(mat, OSG::SimpleMaterial::LitFieldMask |
-                       OSG::SimpleMaterial::DiffuseFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor me(mat,
+                    OSG::SimpleMaterial::LitFieldMask |
+                       OSG::SimpleMaterial::DiffuseFieldMask |
+                       OSG::SimpleMaterial::ChunksFieldMask);
+#endif
+   mat->setLit(isLit);
+   mat->setDiffuse(diffuseColor);
 
    OSG::PolygonChunkPtr scribe_chunk = OSG::PolygonChunk::create();
-   OSG::beginEditCP(scribe_chunk);
-      scribe_chunk->setFrontMode(frontMode);
-      scribe_chunk->setOffsetLine(offsetLine);
-      scribe_chunk->setOffsetFill(offsetFill);
-      scribe_chunk->setOffsetPoint(offsetPoint);
-      scribe_chunk->setOffsetFactor(offsetFactor);
-      scribe_chunk->setOffsetBias(offsetBias);
-   OSG::endEditCP(scribe_chunk);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor sce(scribe_chunk);
+#endif
+   scribe_chunk->setFrontMode(frontMode);
+   scribe_chunk->setOffsetLine(offsetLine);
+   scribe_chunk->setOffsetFill(offsetFill);
+   scribe_chunk->setOffsetPoint(offsetPoint);
+   scribe_chunk->setOffsetFactor(offsetFactor);
+   scribe_chunk->setOffsetBias(offsetBias);
 
-   OSG::beginEditCP(mat, OSG::SimpleMaterial::ChunksFieldMask);
-      mat->addChunk(scribe_chunk);
-   OSG::endEditCP(mat, OSG::SimpleMaterial::ChunksFieldMask);
+   mat->addChunk(scribe_chunk);
 
    return registerMaterial(OSG::MaterialRefPtr(mat));
 }
@@ -451,11 +494,25 @@ addHighlightMaterial(const std::vector<OSG::NodeCoreRefPtr>& cores,
 
       if ( core_fct.isDerivedFrom(OSG::Geometry::getClassType()) )
       {
-         addHighlight(OSG::GeometryPtr::dcast((*c).get()), material);
+         addHighlight(
+#if OSG_MAJOR_VERSION < 2
+            OSG::GeometryPtr::dcast((*c).get()),
+#else
+            OSG::cast_dynamic<OSG::GeometryPtr>((*c).get()),
+#endif
+            material
+         );
       }
       else if ( core_fct.isDerivedFrom(OSG::MaterialGroup::getClassType()) )
       {
-         addHighlight(OSG::MaterialGroupPtr::dcast((*c).get()), material);
+         addHighlight(
+#if OSG_MAJOR_VERSION < 2
+            OSG::MaterialGroupPtr::dcast((*c).get()),
+#else
+            OSG::cast_dynamic<OSG::MaterialGroupPtr>((*c).get()),
+#endif
+            material
+         );
       }
    }
 }
@@ -495,13 +552,25 @@ swapHighlightMaterial(const std::vector<OSG::NodeCoreRefPtr>& cores,
       {
          if ( core_fct.isDerivedFrom(OSG::Geometry::getClassType()) )
          {
-            swapHighlight(OSG::GeometryPtr::dcast((*c).get()), old_mat,
-                          new_mat);
+            swapHighlight(
+#if OSG_MAJOR_VERSION < 2
+               OSG::GeometryPtr::dcast((*c).get()),
+#else
+               OSG::cast_dynamic<OSG::GeometryPtr>((*c).get()),
+#endif
+               old_mat, new_mat
+            );
          }
          else if ( core_fct.isDerivedFrom(OSG::MaterialGroup::getClassType()) )
          {
-            swapHighlight(OSG::MaterialGroupPtr::dcast((*c).get()), old_mat,
-                          new_mat);
+            swapHighlight(
+#if OSG_MAJOR_VERSION < 2
+               OSG::MaterialGroupPtr::dcast((*c).get()),
+#else
+               OSG::cast_dynamic<OSG::MaterialGroupPtr>((*c).get()),
+#endif
+               old_mat, new_mat
+            );
          }
       }
       catch (Exception& ex)
@@ -536,11 +605,25 @@ removeHighlightMaterial(const std::vector<OSG::NodeCoreRefPtr>& cores,
 
       if ( core_fct.isDerivedFrom(OSG::Geometry::getClassType()) )
       {
-         removeHighlight(OSG::GeometryPtr::dcast((*c).get()), old_mat);
+         removeHighlight(
+#if OSG_MAJOR_VERSION < 2
+            OSG::GeometryPtr::dcast((*c).get()),
+#else
+            OSG::cast_dynamic<OSG::GeometryPtr>((*c).get()),
+#endif
+            old_mat
+         );
       }
       else if ( core_fct.isDerivedFrom(OSG::MaterialGroup::getClassType()) )
       {
-         removeHighlight(OSG::MaterialGroupPtr::dcast((*c).get()), old_mat);
+         removeHighlight(
+#if OSG_MAJOR_VERSION < 2
+            OSG::MaterialGroupPtr::dcast((*c).get()),
+#else
+            OSG::cast_dynamic<OSG::MaterialGroupPtr>((*c).get()),
+#endif
+            old_mat
+         );
       }
    }
 }
@@ -553,36 +636,40 @@ void GeometryHighlightTraverser::createDefaultMaterials()
    OSG::SimpleMaterialPtr highlight0_mat =
       OSG::SimpleMaterial::create();
 
-   OSG::beginEditCP(highlight0_mat);
-      highlight0_mat->setLit(false);
-      highlight0_mat->setDiffuse(OSG::Color3f(1.0f, 1.0f, 0.0f));
-   OSG::endEditCP(highlight0_mat);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor h0me(highlight0_mat,
+                      OSG::SimpleMaterial::LitFieldMask |
+                         OSG::SimpleMaterial::DiffuseFieldMask |
+                         OSG::SimpleMaterial::ChunksFieldMask);
+#endif
+   highlight0_mat->setLit(false);
+   highlight0_mat->setDiffuse(OSG::Color3f(1.0f, 1.0f, 0.0f));
 
    OSG::SimpleMaterialPtr highlight1_mat =
       OSG::SimpleMaterial::create();
 
-   OSG::beginEditCP(highlight1_mat);
-      highlight1_mat->setLit(false);
-      highlight1_mat->setDiffuse(OSG::Color3f(1.0f, 0.0f, 1.0f));
-   OSG::endEditCP(highlight1_mat);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor h1me(highlight1_mat,
+                      OSG::SimpleMaterial::LitFieldMask |
+                         OSG::SimpleMaterial::DiffuseFieldMask |
+                         OSG::SimpleMaterial::ChunksFieldMask);
+#endif
+   highlight1_mat->setLit(false);
+   highlight1_mat->setDiffuse(OSG::Color3f(1.0f, 0.0f, 1.0f));
 
    OSG::PolygonChunkPtr scribe_chunk = OSG::PolygonChunk::create();
-   OSG::beginEditCP(scribe_chunk);
-      scribe_chunk->setFrontMode(GL_LINE);
-      scribe_chunk->setOffsetLine(true);
-      scribe_chunk->setOffsetFill(false);
-      scribe_chunk->setOffsetPoint(false);
-      scribe_chunk->setOffsetFactor(0.05f);
-      scribe_chunk->setOffsetBias(1.0f);
-   OSG::endEditCP(scribe_chunk);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor sce(scribe_chunk);
+#endif
+   scribe_chunk->setFrontMode(GL_LINE);
+   scribe_chunk->setOffsetLine(true);
+   scribe_chunk->setOffsetFill(false);
+   scribe_chunk->setOffsetPoint(false);
+   scribe_chunk->setOffsetFactor(0.05f);
+   scribe_chunk->setOffsetBias(1.0f);
 
-   OSG::beginEditCP(highlight0_mat);
-      highlight0_mat->addChunk(scribe_chunk);
-   OSG::endEditCP(highlight0_mat);
-
-   OSG::beginEditCP(highlight1_mat);
-      highlight1_mat->addChunk(scribe_chunk);
-   OSG::endEditCP(highlight1_mat);
+   highlight0_mat->addChunk(scribe_chunk);
+   highlight1_mat->addChunk(scribe_chunk);
 
    mMaterials[HIGHLIGHT0] = highlight0_mat;
    mMaterials[HIGHLIGHT1] = highlight1_mat;

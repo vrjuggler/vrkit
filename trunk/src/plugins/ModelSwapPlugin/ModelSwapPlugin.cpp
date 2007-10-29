@@ -143,26 +143,33 @@ viewer::PluginPtr ModelSwapPlugin::init(ViewerPtr viewer)
    mSwitchNode = OSG::Node::create();
    mSwitchCore = OSG::Switch::create();
 
-   OSG::beginEditCP(mSwitchNode);
-      mSwitchNode->setCore(mSwitchCore);
-      const unsigned int num_models(elt->getNum(model_tkn));
-      for ( unsigned int i = 0; i < num_models; ++i )
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor sne(mSwitchNode,
+                     OSG::Node::CoreFieldMask | OSG::Node::ChildrenFieldMask);
+#endif
+   mSwitchNode->setCore(mSwitchCore);
+   const unsigned int num_models(elt->getNum(model_tkn));
+   for ( unsigned int i = 0; i < num_models; ++i )
+   {
+      std::string model_path = elt->getProperty<std::string>(model_tkn, i);
+      OSG::NodeRefPtr model_node(
+#if OSG_MAJOR_VERSION < 2
+         OSG::SceneFileHandler::the().read(model_path.c_str())
+#else
+         OSG::SceneFileHandler::the()->read(model_path.c_str())
+#endif
+      );
+
+      if ( model_node != OSG::NullFC )
       {
-         std::string model_path = elt->getProperty<std::string>(model_tkn, i);
-         OSG::NodeRefPtr model_node(
-            OSG::SceneFileHandler::the().read(model_path.c_str())
-         );
-
-         if ( model_node != OSG::NullFC )
-         {
-            mSwitchNode->addChild(model_node);
-         }
+         mSwitchNode->addChild(model_node);
       }
-   OSG::endEditCP(mSwitchNode);
+   }
 
-   OSG::beginEditCP(mSwitchCore);
-      mSwitchCore->setChoice(0);
-   OSG::endEditCP(mSwitchCore);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor sce(mSwitchCore, OSG::Switch::ChoiceFieldMask);
+#endif
+   mSwitchCore->setChoice(0);
 
    // Set up the model switch transform
    float xt = elt->getProperty<float>(position_tkn, 0);
@@ -189,23 +196,27 @@ viewer::PluginPtr ModelSwapPlugin::init(ViewerPtr viewer)
    OSG::NodeRefPtr xform_node(OSG::Node::create());
    OSG::TransformRefPtr xform_core(OSG::Transform::create());
 
-   OSG::beginEditCP(xform_core);
-      xform_core->setMatrix(xform_mat_osg);
-   OSG::endEditCP(xform_core);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor xce(xform_core, OSG::Transform::MatrixFieldMask);
+#endif
+   xform_core->setMatrix(xform_mat_osg);
 
-   OSG::beginEditCP(xform_node);
-      xform_node->setCore(xform_core);
-      xform_node->addChild(mSwitchNode);
-   OSG::endEditCP(xform_node);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor xne(xform_node,
+                     OSG::Node::CoreFieldMask | OSG::Node::ChildrenFieldMask);
+#endif
+   xform_node->setCore(xform_core);
+   xform_node->addChild(mSwitchNode);
 
    // add switchable scene to the scene root
    ScenePtr scene = viewer->getSceneObj();
 
    OSG::TransformNodePtr scene_xform_root = scene->getTransformRoot();
 
-   OSG::beginEditCP(scene_xform_root);
-      scene_xform_root.node()->addChild(xform_node);
-   OSG::endEditCP(scene_xform_root);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor sxre(scene_xform_root.node(), OSG::Node::ChildrenFieldMask);
+#endif
+   scene_xform_root.node()->addChild(xform_node);
 
    return shared_from_this();
 }
@@ -218,7 +229,9 @@ void ModelSwapPlugin::update(ViewerPtr)
       {
          unsigned int num_models = mSwitchNode->getNChildren();
          unsigned int cur_model = mSwitchCore->getChoice();
+#if OSG_MAJOR_VERSION < 2
          OSG::CPEditor sce(mSwitchCore, OSG::Switch::ChoiceFieldMask);
+#endif
          mSwitchCore->setChoice((cur_model + 1) % num_models);
       }
    }

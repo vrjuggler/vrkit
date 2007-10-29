@@ -175,9 +175,11 @@ viewer::PluginPtr StatusPanelPlugin::init(ViewerPtr viewer)
       OSG::Matrix xform_osg;
       gmtl::set(xform_osg, xform_mat);
 
-      OSG::beginEditCP(mPanelXformNode);
-         mPanelXformNode->setMatrix(xform_osg);
-      OSG::endEditCP(mPanelXformNode);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor pxnce(mPanelXformNode.core(),
+                          OSG::Transform::MatrixFieldMask);
+#endif
+      mPanelXformNode->setMatrix(xform_osg);
    }
 
    // Add everything to the tree
@@ -186,21 +188,19 @@ viewer::PluginPtr StatusPanelPlugin::init(ViewerPtr viewer)
 
    mPanelVisSwitchNode = OSG::SwitchNodePtr::create();
 
-   OSG::beginEditCP(mPanelVisSwitchNode);
-      mPanelVisSwitchNode.node()->addChild(mStatusPanelView.getPanelRoot());
-   OSG::endEditCP(mPanelVisSwitchNode);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor pvsne(mPanelVisSwitchNode.node(),
+                       OSG::Node::ChildrenFieldMask);
+   OSG::CPEditor pvsnce(mPanelVisSwitchNode.core(),
+                        OSG::Switch::ChoiceFieldMask);
+   OSG::CPEditor pxne(mPanelXformNode.node(), OSG::Node::ChildrenFieldMask);
+   OSG::CPEditor dre(dec_root.node(), OSG::Node::ChildrenFieldMask);
+#endif
 
-   OSG::beginEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
-      mPanelVisSwitchNode->setChoice(OSG::Switch::ALL);
-   OSG::endEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
-
-   OSG::beginEditCP(mPanelXformNode);
-      mPanelXformNode.node()->addChild(mPanelVisSwitchNode.node());
-   OSG::endEditCP(mPanelXformNode);
-
-   OSG::beginEditCP(dec_root);
-      dec_root.node()->addChild(mPanelXformNode.node());
-   OSG::endEditCP(dec_root);
+   mPanelVisSwitchNode.node()->addChild(mStatusPanelView.getPanelRoot());
+   mPanelVisSwitchNode->setChoice(OSG::Switch::ALL);
+   mPanelXformNode.node()->addChild(mPanelVisSwitchNode.node());
+   dec_root.node()->addChild(mPanelXformNode.node());
 
    // Register visibility signal with vrkit::signal::Repository.
    signal::RepositoryPtr sig_repos =
@@ -279,10 +279,12 @@ void StatusPanelPlugin::update(ViewerPtr)
 
 void StatusPanelPlugin::setVisibility(bool visible)
 {
-   OSG::beginEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
-      mPanelVisSwitchNode->setChoice(visible ? OSG::Switch::ALL
-                                             : OSG::Switch::NONE);
-   OSG::endEditCP(mPanelVisSwitchNode, OSG::Switch::ChoiceFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor pvsnce(mPanelVisSwitchNode.core(),
+                        OSG::Switch::ChoiceFieldMask);
+#endif
+   mPanelVisSwitchNode->setChoice(visible ? OSG::Switch::ALL
+                                          : OSG::Switch::NONE);
 }
 
 } // namespace vrkit

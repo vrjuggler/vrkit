@@ -17,10 +17,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
+#include <boost/bind.hpp>
 
 #include <OpenSG/OSGGeometry.h>
 #include <OpenSG/OSGTransform.h>
-#include <OpenSG/OSGTypedFunctors.h>
+#if OSG_MAJOR_VERSION < 2
+#  include <OpenSG/OSGTypedFunctors.h>
+#endif
+#include <OpenSG/OSGTypeFactory.h>
+#include <OpenSG/OSGRemoteAspect.h>
 
 #include <vrkit/util/OpenSGHelpers.h>
 #include <vrkit/util/RemoteAspectFilter.h>
@@ -56,19 +61,31 @@ RemoteAspectFilterPtr RemoteAspectFilter::init(OSG::RemoteAspect* remoteAspect)
 
    // Setup the aspect callbacks
    OSG::RemoteAspect::Functor changed =
+#if OSG_MAJOR_VERSION < 2
       OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
          bool, RemoteAspectFilter, OSG::FieldContainerPtr, OSG::RemoteAspect*
       >(this, &RemoteAspectFilter::changedFunction);
+#else
+      boost::bind(&RemoteAspectFilter::changedFunction, this, _1, _2);
+#endif
 
    OSG::RemoteAspect::Functor destroyed =
+#if OSG_MAJOR_VERSION < 2
       OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
          bool, RemoteAspectFilter, OSG::FieldContainerPtr, OSG::RemoteAspect*
       >(this, &RemoteAspectFilter::destroyedFunction);
+#else
+      boost::bind(&RemoteAspectFilter::destroyedFunction, this, _1, _2);
+#endif
 
    OSG::RemoteAspect::Functor created =
+#if OSG_MAJOR_VERSION < 2
       OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
          bool, RemoteAspectFilter, OSG::FieldContainerPtr, OSG::RemoteAspect*
       >(this, &RemoteAspectFilter::createdFunction);
+#else
+      boost::bind(&RemoteAspectFilter::createdFunction, this, _1, _2);
+#endif
 
    // Register interest for all types
    const OSG::UInt32 type_count(OSG::TypeFactory::the()->getNumTypes());
@@ -105,7 +122,7 @@ void RemoteAspectFilter::addDestroyedCallback(OSG::FieldContainerPtr fcp,
    mDestroyedCallbacks.insert(callback_map_t::value_type(fcp, callback));
 }
 
-bool RemoteAspectFilter::createdFunction(OSG::FieldContainerPtr& fcp,
+bool RemoteAspectFilter::createdFunction(field_container_ptr_type fcp,
                                          OSG::RemoteAspect*)
 {
    if ( OSG::Node::getClassType() == fcp->getType() )
@@ -126,8 +143,12 @@ bool RemoteAspectFilter::createdFunction(OSG::FieldContainerPtr& fcp,
    }
 
    std::cout << "Created: " << fcp->getType().getName() << " "
-             << fcp.getFieldContainerId() << std::endl
-             << "   name: " << vrkit::util::getName(fcp) << std::endl;
+#if OSG_MAJOR_VERSION < 2
+             << fcp.getFieldContainerId()
+#else
+             << OSG::getContainerId(fcp)
+#endif
+             << "\n   name: " << vrkit::util::getName(fcp) << std::endl;
 
    typedef callback_map_t::const_iterator iter_type;
    typedef std::pair<iter_type, iter_type> range_type;
@@ -147,9 +168,8 @@ bool RemoteAspectFilter::createdFunction(OSG::FieldContainerPtr& fcp,
    return true;
 }
 
-/** \brief Default destroyed functor
- */
-bool RemoteAspectFilter::destroyedFunction(OSG::FieldContainerPtr& fcp,
+// Default destroyed functor.
+bool RemoteAspectFilter::destroyedFunction(field_container_ptr_type fcp,
                                            OSG::RemoteAspect*)
 {
    if ( OSG::Node::getClassType() == fcp->getType() )
@@ -170,8 +190,12 @@ bool RemoteAspectFilter::destroyedFunction(OSG::FieldContainerPtr& fcp,
    }
 
    std::cout << "Destroyed: " << fcp->getType().getName() << " "
-             << fcp.getFieldContainerId() << std::endl
-             << "   name: " << vrkit::util::getName(fcp) << std::endl;
+#if OSG_MAJOR_VERSION < 2
+             << fcp.getFieldContainerId()
+#else
+             << OSG::getContainerId(fcp)
+#endif
+             << "\n   name: " << vrkit::util::getName(fcp) << std::endl;
 
    typedef callback_map_t::const_iterator iter_type;
    typedef std::pair<iter_type, iter_type> range_type;
@@ -191,12 +215,16 @@ bool RemoteAspectFilter::destroyedFunction(OSG::FieldContainerPtr& fcp,
    return true;
 }
 
-bool RemoteAspectFilter::changedFunction(OSG::FieldContainerPtr& fcp,
+bool RemoteAspectFilter::changedFunction(field_container_ptr_type fcp,
                                          OSG::RemoteAspect*)
 {
    std::cout << "Changed: " << fcp->getType().getName() << " "
-             << fcp.getFieldContainerId() << std::endl
-             << "   name: " << vrkit::util::getName(fcp) << std::endl;
+#if OSG_MAJOR_VERSION < 2
+             << fcp.getFieldContainerId()
+#else
+             << OSG::getContainerId(fcp)
+#endif
+             << "\n   name: " << vrkit::util::getName(fcp) << std::endl;
 
    typedef callback_map_t::const_iterator iter_type;
    typedef std::pair<iter_type, iter_type> range_type;

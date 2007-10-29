@@ -47,10 +47,11 @@ ScenePtr Scene::init()
    OSG::setName(mDecoratorRoot.node(), "Decorator Root");
    OSG::setName(mTransformRoot.node(), "Transform Root");
 
-   OSG::beginEditCP(mSceneRoot);
-      mSceneRoot.node()->addChild(mDecoratorRoot.node());
-      mSceneRoot.node()->addChild(mTransformRoot.node());
-   OSG::endEditCP(mSceneRoot);
+#if OSG_MAJOR_VERSION < 2
+   OSG::beginEditCP(mSceneRoot.node(), OSG::Node::ChildrenFieldMask);
+#endif
+   mSceneRoot.node()->addChild(mDecoratorRoot.node());
+   mSceneRoot.node()->addChild(mTransformRoot.node());
 
    return shared_from_this();
 }

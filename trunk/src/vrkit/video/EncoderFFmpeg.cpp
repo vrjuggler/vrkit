@@ -604,7 +604,7 @@ AVFrame* EncoderFFmpeg::allocFrame(const int pixFormat, const int width,
    return picture;
 }
 
-void EncoderFFmpeg::writeFrame(vpr::Uint8* data)
+void EncoderFFmpeg::writeFrame(const vpr::Uint8* data)
 {
    double audio_pts, video_pts = 0.0;
 
@@ -635,12 +635,14 @@ void EncoderFFmpeg::writeFrame(vpr::Uint8* data)
       return;
    }
 
-   avpicture_fill((AVPicture*) mRgbFrame, data, PIX_FMT_RGB24, getWidth(),
+   avpicture_fill(reinterpret_cast<AVPicture*>(mRgbFrame),
+                  const_cast<vpr::Uint8*>(data), PIX_FMT_RGB24, getWidth(),
                   getHeight());
 
    // convert rgb to yuv420
-   img_convert((AVPicture*) mYuvFrame, mVideoStream->codec->pix_fmt,
-               (AVPicture*) mRgbFrame, PIX_FMT_RGB24,
+   img_convert(reinterpret_cast<AVPicture*>(mYuvFrame),
+               mVideoStream->codec->pix_fmt,
+               reinterpret_cast<AVPicture*>(mRgbFrame), PIX_FMT_RGB24,
                mVideoStream->codec->width, mVideoStream->codec->height);
 
    // Flip yuv-buffer horizontal -> opengl has other order

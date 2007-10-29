@@ -191,29 +191,41 @@ viewer::PluginPtr LogoPlugin::init(ViewerPtr viewer)
 
          OSG::SimpleTexturedMaterialPtr mat =
             OSG::SimpleTexturedMaterial::create();
+#if OSG_MAJOR_VERSION < 2
          OSG::CPEditor me(mat);
+#endif
          mat->setImage(image);
          mat->setLit(false);
          mat->setMagFilter(GL_LINEAR);
          mat->setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
 
          OSG::GeometryPtr geom = OSG::makePlaneGeo(1.0, 1.0, 1,1);
+#if OSG_MAJOR_VERSION < 2
          OSG::CPEditor ge(geom);
+#endif
          geom->setMaterial(mat);
 
          model_root = OSG::Node::create();
+#if OSG_MAJOR_VERSION < 2
          OSG::CPEditor ne(model_root);
+#endif
          model_root->setCore(geom);
       }
       // we have model file
       else if ( ! model_name.empty() )
       {
          VRKIT_STATUS << "      Loading model: " << model_name << std::endl;
-         model_root = OSG::SceneFileHandler::the().read(model_name.c_str());
+         model_root =
+#if OSG_MAJOR_VERSION < 2
+            OSG::SceneFileHandler::the().read(model_name.c_str());
+#else
+            OSG::SceneFileHandler::the()->read(model_name.c_str());
+#endif
       }
       else
       {
-         VRKIT_STATUS << "      Missing data file.  skipping." << std::endl;
+         VRKIT_STATUS << "      Missing data file name.  Skipping."
+                      << std::endl;
          continue;         // Goto next logo
       }
 
@@ -222,10 +234,12 @@ viewer::PluginPtr LogoPlugin::init(ViewerPtr viewer)
       OSG::Matrix xform_mat_osg;
       gmtl::set(xform_mat_osg, xform_mat);
 
-      OSG::beginEditCP(xform_node);
-         xform_node->setMatrix(xform_mat_osg);
-         xform_node.node()->addChild(model_root);
-      OSG::endEditCP(xform_node);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor xnce(xform_node.core(), OSG::Transform::MatrixFieldMask);
+      OSG::CPEditor xne(xform_node.node(), OSG::Node::ChildrenFieldMask);
+#endif
+      xform_node->setMatrix(xform_mat_osg);
+      xform_node.node()->addChild(model_root);
 
       // Now flatten it
       OSG::NodePtr xform_node_ptr = xform_node.node();
@@ -245,12 +259,13 @@ viewer::PluginPtr LogoPlugin::init(ViewerPtr viewer)
 
    OSG::GroupNodePtr dec_root = scene->getDecoratorRoot();
 
-   OSG::beginEditCP(dec_root);
-      for(unsigned i=0; i<mLogos.size(); ++i)
-      {
-         dec_root.node()->addChild(mLogos[i].xformNode);
-      }
-   OSG::endEditCP(dec_root);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor dre(dec_root.node(), OSG::Node::ChildrenFieldMask);
+#endif
+   for ( unsigned int i = 0; i < mLogos.size(); ++i )
+   {
+      dec_root.node()->addChild(mLogos[i].xformNode);
+   }
 
    return shared_from_this();
 }

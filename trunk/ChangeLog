@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-10-29 patrick  Added OpenSG 2.0 support. The use of either OpenSG 1.8 or
+                    OpenSG 2.0 is made at compile time.
+                    -- VERSION -- 0.51.0
 2007-10-03 patrick  Install libraries into the lib64 directory on Linux/amd64.
 2007-10-02 patrick  Merged the classes vrkit::video::Recorder and
                     vrkit::video::EncoderManager into vrkit::video::Recorder.

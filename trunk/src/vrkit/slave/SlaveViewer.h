@@ -126,11 +126,20 @@ public:
 private:
    void initGl();
 
-   bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+#if OSG_MAJOR_VERSION < 2
+   typedef OSG::FieldContainerPtr& field_container_ptr_type;
+#else
+   typedef OSG::FieldContainerPtrConstArg field_container_ptr_type;
+#endif
 
-   bool changedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+   bool createdFunction(field_container_ptr_type fcp,
+                        OSG::RemoteAspect* aspect);
 
-   bool destroyedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+   bool changedFunction(field_container_ptr_type fcp,
+                        OSG::RemoteAspect* aspect);
+
+   bool destroyedFunction(field_container_ptr_type fcp,
+                          OSG::RemoteAspect* aspect);
 
    void shutdown();
 

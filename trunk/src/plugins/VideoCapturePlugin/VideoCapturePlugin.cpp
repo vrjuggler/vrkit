@@ -158,17 +158,16 @@ viewer::PluginPtr VideoCapturePlugin::init(ViewerPtr viewer)
       // We have to put a transform node above the view frame node so that
       // it can be moved relative to the camera attachment transformation.
       OSG::NodeRefPtr frame_node(mViewFrameNode.node());
-      OSG::beginEditCP(frame_node, OSG::Node::ChildrenFieldMask);
-         frame_node->addChild(frame_xform.node());
-      OSG::endEditCP(frame_node, OSG::Node::ChildrenFieldMask);
 
-      OSG::beginEditCP(frame_xform.node(), OSG::Node::ChildrenFieldMask);
-         frame_xform.node()->addChild(mVideoRecorder->getFrame());
-      OSG::endEditCP(frame_xform.node(), OSG::Node::ChildrenFieldMask);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor fne(frame_node, OSG::Node::ChildrenFieldMask);
+      OSG::CPEditor fxe(frame_xform.node(), OSG::Node::ChildrenFieldMask);
+      OSG::CPEditor dne(decorator_node, OSG::Node::ChildrenFieldMask);
+#endif
 
-      OSG::beginEditCP(decorator_node, OSG::Node::ChildrenFieldMask);
-         decorator_node->addChild(mViewFrameNode.node());
-      OSG::endEditCP(decorator_node, OSG::Node::ChildrenFieldMask);
+      frame_node->addChild(frame_xform.node());
+      frame_xform.node()->addChild(mVideoRecorder->getFrame());
+      decorator_node->addChild(mViewFrameNode.node());
    }
 
    if ( mShowDebugFrame )
@@ -177,24 +176,27 @@ viewer::PluginPtr VideoCapturePlugin::init(ViewerPtr viewer)
       mDebugFrameNode = OSG::Switch::create();
 
       OSG::NodePtr frame_xform_node = OSG::Node::create();
-      OSG::beginEditCP(frame_xform_node, OSG::Node::CoreFieldMask);
-         frame_xform_node->setCore(mDebugFrameXform);
-      OSG::endEditCP(frame_xform_node, OSG::Node::CoreFieldMask);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor fxne(
+         frame_xform_node,
+         OSG::Node::CoreFieldMask | OSG::Node::ChildrenFieldMask
+      );
+#endif
+      frame_xform_node->setCore(mDebugFrameXform);
 
       // We have to put a transform node above the view frame node so that
       // it can be positioned according to the user configuration.
       OSG::NodeRefPtr debug_node(mDebugFrameNode.node());
-      OSG::beginEditCP(debug_node, OSG::Node::ChildrenFieldMask);
-         debug_node->addChild(frame_xform_node);
-      OSG::endEditCP(debug_node, OSG::Node::ChildrenFieldMask);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor dbgne(debug_node, OSG::Node::ChildrenFieldMask);
+#endif
+      debug_node->addChild(frame_xform_node);
 
-      OSG::beginEditCP(frame_xform_node, OSG::Node::ChildrenFieldMask);
-         frame_xform_node->addChild(mVideoRecorder->getDebugPlane());
-      OSG::endEditCP(frame_xform_node, OSG::Node::ChildrenFieldMask);
-
-      OSG::beginEditCP(decorator_node, OSG::Node::ChildrenFieldMask);
-         decorator_node->addChild(mDebugFrameNode.node());
-      OSG::endEditCP(decorator_node, OSG::Node::ChildrenFieldMask);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor dne(decorator_node, OSG::Node::ChildrenFieldMask);
+#endif
+      frame_xform_node->addChild(mVideoRecorder->getDebugPlane());
+      decorator_node->addChild(mDebugFrameNode.node());
    }
 
    mConnections.push_back(
@@ -247,12 +249,19 @@ void VideoCapturePlugin::contextPreDraw(ViewerPtr viewer)
    OSG::Matrix4f head_trans;
    gmtl::set(head_trans, mCameraProxy->getData(viewer->getDrawScaleFactor()));
 
-   OSG::beginEditCP(mViewFrameXform, OSG::Transform::MatrixFieldMask);
-      mViewFrameXform->setMatrix(head_trans);
-   OSG::endEditCP(mViewFrameXform, OSG::Transform::MatrixFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor vfxe(mViewFrameXform, OSG::Transform::MatrixFieldMask);
+#endif
+   mViewFrameXform->setMatrix(head_trans);
 
    const Viewer::base_type::context_data& c_data = viewer->getContextData();
-   c_data.mRenderAction->setWindow(c_data.mWin.getCPtr());
+   c_data.mRenderAction->setWindow(
+#if OSG_MAJOR_VERSION < 2
+      c_data.mWin.getCPtr()
+#else
+      OSG::getCPtr(c_data.mWin)
+#endif
+   );
    mVideoRecorder->render(c_data.mRenderAction, head_trans);
 }
 
@@ -399,9 +408,10 @@ void VideoCapturePlugin::configure(jccl::ConfigElementPtr elt,
 
       mDebugFrameXform = OSG::Transform::create();
 
-      OSG::beginEditCP(mDebugFrameXform, OSG::Transform::MatrixFieldMask);
-         mDebugFrameXform->setMatrix(xform_osg);
-      OSG::endEditCP(mDebugFrameXform, OSG::Transform::MatrixFieldMask);
+#if OSG_MAJOR_VERSION < 2
+      OSG::CPEditor dfxe(mDebugFrameXform, OSG::Transform::MatrixFieldMask);
+#endif
+      mDebugFrameXform->setMatrix(xform_osg);
 
       mVideoRecorder->setDebugFrameDistance(
          elt->getProperty<float>(view_frame_dist_prop)
@@ -485,16 +495,18 @@ void VideoCapturePlugin::recordingStopped()
 
 void VideoCapturePlugin::show(OSG::SwitchNodePtr switchNode)
 {
-   OSG::beginEditCP(switchNode, OSG::Switch::ChoiceFieldMask);
-      switchNode->setChoice(OSG::Switch::ALL);
-   OSG::endEditCP(switchNode, OSG::Switch::ChoiceFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor snce(switchNode.core(), OSG::Switch::ChoiceFieldMask);
+#endif
+   switchNode->setChoice(OSG::Switch::ALL);
 }
 
 void VideoCapturePlugin::hide(OSG::SwitchNodePtr switchNode)
 {
-   OSG::beginEditCP(switchNode, OSG::Switch::ChoiceFieldMask);
-      switchNode->setChoice(OSG::Switch::NONE);
-   OSG::endEditCP(switchNode, OSG::Switch::ChoiceFieldMask);
+#if OSG_MAJOR_VERSION < 2
+   OSG::CPEditor snce(switchNode.core(), OSG::Switch::ChoiceFieldMask);
+#endif
+   switchNode->setChoice(OSG::Switch::NONE);
 }
 
 }

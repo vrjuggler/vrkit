@@ -19,7 +19,15 @@
 #ifndef _VRKIT_MATERIAL_POOL_DATA_H_
 #define _VRKIT_MATERIAL_POOL_DATA_H_
 
-#include <OpenSG/OSGMaterialPool.h>
+#include <vrkit/Config.h>
+
+#include <OpenSG/OSGConfig.h>
+
+#if OSG_MAJOR_VERSION < 2
+#  include <OpenSG/OSGMaterialPool.h>
+#else
+#  include <OpenSG/OSGContainerPool.h>
+#endif
 
 #include <vpr/vpr.h>
 #include <vpr/Util/GUID.h>
@@ -33,9 +41,10 @@ namespace vrkit
 
 /** \class MaterialPoolData MaterialPoolData.h vrkit/scenedata/MaterialPoolData.h
  *
- * Provides a central store for a single instance of OSG::MaterialPool. This
- * is used by the Material Chooser Plug-in. Code wishing to register materials
- * for use by the that plug-in must do so through this class.
+ * Provides a central store for a single instance of OSG::MaterialPool for
+ * OpenSG 1.8 or OSG::ContainerPool for OpenSG 2.0. This is used by the
+ * Material Chooser Plug-in. Code wishing to register materials for use by
+ * that plug-in must do so through this class.
  *
  * @since 0.48.2
  */
@@ -45,6 +54,28 @@ private:
    MaterialPoolData();
 
 public:
+   /**
+    * @name Material Pool Types
+    *
+    * OpenSG 1.8/2.0 compatibility typedefs. These are mainly for internal
+    * use, but they can be used in user-level code to help bridge the
+    * differences between OpenSG 1.8 and 2.0.
+    *
+    * @see getMaterialPool()
+    *
+    * @since 0.51.0
+    */
+   //@{
+#if OSG_MAJOR_VERSION < 2
+   typedef OSG::MaterialPool       pool_t;
+   typedef OSG::MaterialPool::Ptr  pool_ptr_t;
+#else
+   typedef OSG::ContainerPool      pool_t;
+   typedef OSG::ContainerPoolPtr   pool_ptr_t;
+#endif
+   typedef OSG::RefPtr<pool_ptr_t> pool_ref_ptr_t;
+   //@}
+
    static const vpr::GUID type_guid;
 
    static MaterialPoolDataPtr create()
@@ -54,10 +85,10 @@ public:
 
    virtual ~MaterialPoolData();
 
-   OSG::MaterialPoolRefPtr getMaterialPool();
+   pool_ref_ptr_t getMaterialPool();
 
 private:
-   OSG::MaterialPoolRefPtr mMaterialPool;
+   pool_ref_ptr_t mMaterialPool;
 };
 
 }
