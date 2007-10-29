@@ -59,6 +59,9 @@ class VRKIT_CLASS_API SlaveViewer
    : public OpenSGApp
 {
 public:
+   /** @since 0.50.1 */
+   typedef OpenSGApp base_type;
+
    /**
     * Constructs a new slave viewer application object instance.
     *
