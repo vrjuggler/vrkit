@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-10-30 patrick  vrkit::Viewer now keeps track of frame rate information.
+                    This can be accessed using the new method
+                    vrkit::Viewer::getFrameRateStats().
 2007-10-30 patrick  Fixed encoding bugs in vrkit::video::EncoderFFmpeg.
                     -- VERSION -- 0.50.1
 2007-10-03 patrick  Install libraries into the lib64 directory on Linux/amd64.
