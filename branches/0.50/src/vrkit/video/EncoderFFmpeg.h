@@ -94,15 +94,12 @@ private:
    AVFrame* allocFrame(const int pixFormat, const int width,
                        const int height);
 
+   /** @name Video Handling */
+   //@{
    /**
     * Add a video stream to the format context.
     */
    void addVideoStream(AVCodec* codec);
-
-   /**
-    * Add an audio stream to the format context.
-    */
-   void addAudioStream();
 
    /**
     * Open the video stream.
@@ -110,19 +107,28 @@ private:
    void openVideo(AVCodec* codec);
 
    /**
+    * Close the video stream.
+    */
+   void closeVideo();
+   //@}
+
+   /** @name Audio Handling */
+   //@{
+   /**
+    * Add an audio stream to the format context.
+    */
+   void addAudioStream();
+
+   /**
     * Open the audio stream.
     */
    void openAudio();
 
    /**
-    * Close the video stream.
-    */
-   void closeVideo();
-
-   /**
     * Close the audio stream.
     */
    void closeAudio();
+   //@}
 
 private:
    AVFormatContext*  mFormatContext;
