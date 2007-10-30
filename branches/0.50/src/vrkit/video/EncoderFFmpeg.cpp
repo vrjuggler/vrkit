@@ -52,10 +52,11 @@ extern "C"
 #define STREAM_PIX_FMT PIX_FMT_YUV420P // default pix_fmt
 
 
-typedef struct AVCodecTag {
-    int id;
-    unsigned int tag;
-} AVCodecTag;
+struct AVCodecTag
+{
+   int id;
+   unsigned int tag;
+};
 
 namespace vrkit
 {
@@ -259,7 +260,7 @@ void EncoderFFmpeg::startEncoding()
       {
 #if defined(VRKIT_DEBUG)
          VRKIT_STATUS << "Invalid codec specified for this container. "
-                   << "Falling back to default." << std::endl;
+                      << "Falling back to default." << std::endl;
 #endif
          codec = avcodec_find_encoder(mFormatOut->video_codec);
       }
