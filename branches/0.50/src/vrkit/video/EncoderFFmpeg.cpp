@@ -379,20 +379,6 @@ void EncoderFFmpeg::writeFrame(vpr::Uint8* data)
       return;
    }
 
-   double audio_pts(0.0);
-
-   // Compute current audio and video time
-   if ( NULL != mAudioStream )
-   {
-      audio_pts = static_cast<double>(mAudioStream->pts.val) *
-                     mAudioStream->time_base.num / mAudioStream->time_base.den;
-   }
-
-   // We know that mVideoStream is not NULL at this point.
-   double video_pts =
-      static_cast<double>(mVideoStream->pts.val) *
-         mVideoStream->time_base.num / mVideoStream->time_base.den;
-
    avpicture_fill(reinterpret_cast<AVPicture*>(mRgbFrame), data,
                   PIX_FMT_RGB24, getWidth(), getHeight());
 
