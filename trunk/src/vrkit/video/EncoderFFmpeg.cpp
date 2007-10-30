@@ -98,12 +98,12 @@ EncoderFFmpeg::codec_list_t EncoderFFmpeg::getCodecs()
 
    // Get a list of all codecs.
    codec_list_t codecs;
-   for (AVCodec* p = ::first_avcodec; p != NULL; p = p->next)
+   for ( AVCodec* p = ::first_avcodec; p != NULL; p = p->next )
    {
       // We only care about video encoders.
-      if (CODEC_TYPE_VIDEO == p->type && NULL != p->encode)
+      if ( CODEC_TYPE_VIDEO == p->type && NULL != p->encode )
       {
-         codecs.push_back(std::string(p->name));
+         codecs.push_back(p->name);
       }
    }
 
@@ -123,41 +123,44 @@ EncoderPtr EncoderFFmpeg::init()
    avcodec_register_all();
    av_register_all();
 
-   AVOutputFormat *out_fmt;
    Encoder::codec_list_t allowable_codecs;
-   for( out_fmt = ::first_oformat; out_fmt != NULL; out_fmt = out_fmt->next )
+   for ( AVOutputFormat* out_fmt = ::first_oformat;
+         out_fmt != NULL;
+         out_fmt = out_fmt->next )
    {
-      if(out_fmt->name != NULL)
+      if ( NULL != out_fmt->name )
       {
-         if( out_fmt->video_codec != CODEC_ID_NONE )
+         if ( CODEC_ID_NONE != out_fmt->video_codec )
          {
             allowable_codecs.clear();
-            if( out_fmt->codec_tag != NULL )
+            if ( NULL != out_fmt->codec_tag )
             {
                for ( const AVCodecTag* tag = out_fmt->codec_tag[0];
                      tag->id != CODEC_ID_NONE;
                      ++tag )
                {
-                  AVCodec* current_codec = avcodec_find_encoder((CodecID)tag->id);
-                  if(current_codec != NULL)
+                  AVCodec* current_codec =
+                     avcodec_find_encoder(static_cast<CodecID>(tag->id));
+                  if ( NULL != current_codec )
                   {
-                     if(current_codec->type == CODEC_TYPE_VIDEO)
+                     if ( CODEC_TYPE_VIDEO == current_codec->type )
                      {
-                        allowable_codecs.push_back(std::string(current_codec->name));
+                        allowable_codecs.push_back(current_codec->name);
                      }
                   }
                }
             }
 
             ContainerFormatInfo new_format;
-            new_format.mFormatName = std::string(out_fmt->name);
-            if( out_fmt->long_name != NULL )
+            new_format.mFormatName = out_fmt->name;
+            if ( NULL != out_fmt->long_name )
             {
-               new_format.mFormatLongName = std::string(out_fmt->long_name);
+               new_format.mFormatLongName = out_fmt->long_name;
             }
-            if( out_fmt->extensions != NULL )
+
+            if ( NULL != out_fmt->extensions )
             {
-               std::string extensions(out_fmt->extensions);
+               const std::string extensions(out_fmt->extensions);
                std::vector<std::string> temp_vec;
                boost::algorithm::split(temp_vec, extensions,
                                        boost::algorithm::is_any_of(","));
@@ -202,7 +205,7 @@ void EncoderFFmpeg::startEncoding()
    try
    {
       // XXX: This should not be hard coded.
-      const vpr::Uint32 bitrate = 1400;
+      const vpr::Uint32 bitrate(1400);
 
       if ( ! getContainerFormat().empty() )
       {
@@ -303,9 +306,11 @@ void EncoderFFmpeg::startEncoding()
       }
 
       // Open the output file, if needed.
-      if (!(mFormatOut->flags & AVFMT_NOFILE))
+      if ( ! (mFormatOut->flags & AVFMT_NOFILE) )
       {
-         if (url_fopen(&mFormatContext->pb, getFilename().c_str(), URL_WRONLY) < 0)
+         const int result = url_fopen(&mFormatContext->pb,
+                                      getFilename().c_str(), URL_WRONLY);
+         if ( result < 0)
          {
             std::ostringstream msg_stream;
             msg_stream << "Coult not open " << getFilename();
@@ -333,29 +338,29 @@ void EncoderFFmpeg::startEncoding()
 void EncoderFFmpeg::stopEncoding()
 {
    // Close each codec.
-   if (NULL != mVideoStream)
+   if ( NULL != mVideoStream )
    {
       closeVideo();
    }
 
-   if (NULL != mAudioStream)
+   if ( NULL != mAudioStream )
    {
       closeAudio();
    }
 
-   if (NULL != mFormatContext)
+   if ( NULL != mFormatContext )
    {
       // Write the trailer, if any
       av_write_trailer(mFormatContext);
 
       // free the streams
-      for(unsigned int i = 0; i < mFormatContext->nb_streams; i++)
+      for ( unsigned int i = 0; i < mFormatContext->nb_streams; ++i )
       {
          av_freep(&mFormatContext->streams[i]->codec);
          av_freep(&mFormatContext->streams[i]);
       }
 
-      if (!(mFormatOut->flags & AVFMT_NOFILE))
+      if ( ! (mFormatOut->flags & AVFMT_NOFILE) )
       {
          // close the output file
          url_fclose(&mFormatContext->pb);
@@ -369,34 +374,25 @@ void EncoderFFmpeg::stopEncoding()
 
 void EncoderFFmpeg::writeFrame(const vpr::Uint8* data)
 {
-   double audio_pts, video_pts = 0.0;
+   // Early out if we don't have a video stream.
+   if ( NULL == mVideoStream )
+   {
+      return;
+   }
+
+   double audio_pts(0.0);
 
    // Compute current audio and video time
-   if ( mAudioStream )
+   if ( NULL != mAudioStream )
    {
       audio_pts = static_cast<double>(mAudioStream->pts.val) *
                      mAudioStream->time_base.num / mAudioStream->time_base.den;
    }
-   else
-   {
-      audio_pts = 0.0;
-   }
 
-   if (mVideoStream)
-   {
-      video_pts = static_cast<double>(mVideoStream->pts.val) *
-                     mVideoStream->time_base.num / mVideoStream->time_base.den;
-   }
-   else
-   {
-      video_pts = 0.0;
-   }
-
-   // Early out if we don't have a video stream.
-   if (NULL == mVideoStream)
-   {
-      return;
-   }
+   // We know that mVideoStream is not NULL at this point.
+   double video_pts =
+      static_cast<double>(mVideoStream->pts.val) *
+         mVideoStream->time_base.num / mVideoStream->time_base.den;
 
    avpicture_fill(reinterpret_cast<AVPicture*>(mRgbFrame),
                   const_cast<vpr::Uint8*>(data), PIX_FMT_RGB24, getWidth(),
@@ -415,37 +411,44 @@ void EncoderFFmpeg::writeFrame(const vpr::Uint8* data)
    // always yuv420p ...
    if ( mFlipBeforeEncode )
    {
-      unsigned char* s;
-      unsigned char* d;
-
+      // XXX: What is the source of this magic number? There must be some
+      // better way to allocate this memory.
       static unsigned char b[24000];
 
-      for (s= mYuvFrame->data[0], d= mYuvFrame->data[1]-mYuvFrame->linesize[0];
-           s < d; s+= mYuvFrame->linesize[0], d-= mYuvFrame->linesize[0])
+      for ( unsigned char *s = mYuvFrame->data[0],
+                          *d = mYuvFrame->data[1] - mYuvFrame->linesize[0];
+            s < d;
+            s += mYuvFrame->linesize[0], d -= mYuvFrame->linesize[0] )
       {
-         memcpy(b, s, mYuvFrame->linesize[0]);
-         memcpy(s, d, mYuvFrame->linesize[0]);
-         memcpy(d, b, mYuvFrame->linesize[0]);
+         std::memcpy(b, s, mYuvFrame->linesize[0]);
+         std::memcpy(s, d, mYuvFrame->linesize[0]);
+         std::memcpy(d, b, mYuvFrame->linesize[0]);
       }
 
-      for (s= mYuvFrame->data[1], d= mYuvFrame->data[2]-mYuvFrame->linesize[2];
-           s < d; s+= mYuvFrame->linesize[1], d-= mYuvFrame->linesize[1])
+      for ( unsigned char *s = mYuvFrame->data[1],
+                          *d = mYuvFrame->data[2] - mYuvFrame->linesize[2];
+            s < d;
+            s += mYuvFrame->linesize[1], d -= mYuvFrame->linesize[1])
       {
-         memcpy(b, s, mYuvFrame->linesize[1]);
-         memcpy(s, d, mYuvFrame->linesize[1]);
-         memcpy(d, b, mYuvFrame->linesize[1]);
+         std::memcpy(b, s, mYuvFrame->linesize[1]);
+         std::memcpy(s, d, mYuvFrame->linesize[1]);
+         std::memcpy(d, b, mYuvFrame->linesize[1]);
       }
 
-      for (s= mYuvFrame->data[2], d= mYuvFrame->data[2]+(mYuvFrame->data[2]-mYuvFrame->data[1]-mYuvFrame->linesize[2]);
-           s < d; s+= mYuvFrame->linesize[2], d-= mYuvFrame->linesize[2])
+      for ( unsigned char *s = mYuvFrame->data[2],
+                          *d = mYuvFrame->data[2] +
+                                  (mYuvFrame->data[2] - mYuvFrame->data[1] -
+                                   mYuvFrame->linesize[2]);
+            s < d;
+            s += mYuvFrame->linesize[2], d -= mYuvFrame->linesize[2])
       {
-         memcpy(b, s, mYuvFrame->linesize[2]);
-         memcpy(s, d, mYuvFrame->linesize[2]);
-         memcpy(d, b, mYuvFrame->linesize[2]);
+         std::memcpy(b, s, mYuvFrame->linesize[2]);
+         std::memcpy(s, d, mYuvFrame->linesize[2]);
+         std::memcpy(d, b, mYuvFrame->linesize[2]);
       }
    }
 
-   int status = 0;
+   int status(0);
 
    if ( mFormatContext->oformat->flags & AVFMT_RAWPICTURE )
    {
@@ -454,10 +457,10 @@ void EncoderFFmpeg::writeFrame(const vpr::Uint8* data)
       AVPacket pkt;
       av_init_packet(&pkt);
 
-      pkt.flags |= PKT_FLAG_KEY;
-      pkt.stream_index = mVideoStream->index;
-      pkt.data = (uint8_t *)mYuvFrame;
-      pkt.size = sizeof(AVPicture);
+      pkt.flags        |= PKT_FLAG_KEY;
+      pkt.stream_index  = mVideoStream->index;
+      pkt.data          = reinterpret_cast<uint8_t*>(mYuvFrame);
+      pkt.size          = sizeof(AVPicture);
 
       status = av_interleaved_write_frame(mFormatContext, &pkt);
    }
@@ -485,8 +488,8 @@ void EncoderFFmpeg::writeFrame(const vpr::Uint8* data)
          }
 
          pkt.stream_index = mVideoStream->index;
-         pkt.data = mVideoOutBuffer;
-         pkt.size = out_size;
+         pkt.data         = mVideoOutBuffer;
+         pkt.size         = out_size;
 
          // Write the compressed frame in the media file.
          status = av_interleaved_write_frame(mFormatContext, &pkt);
@@ -513,22 +516,26 @@ AVFrame* EncoderFFmpeg::allocFrame(const int pixFormat, const int width,
 {
    AVFrame* picture = avcodec_alloc_frame();
    avcodec_get_frame_defaults(picture);
-   if (NULL == picture)
+
+   if ( NULL == picture )
    {
       throw RecordingException("Error allocating frame.", VRKIT_LOCATION);
    }
 
-   int size = avpicture_get_size(pixFormat, width, height);
-   unsigned char* picture_buf = (unsigned char*)av_malloc(size);
+   const int size = avpicture_get_size(pixFormat, width, height);
+   unsigned char* picture_buf =
+      reinterpret_cast<unsigned char*>(av_malloc(size));
 
-   if (NULL == picture_buf)
+   if ( NULL == picture_buf )
    {
       av_free(picture);
       throw RecordingException("Error allocating picture buffer.",
                                VRKIT_LOCATION);
    }
 
-   avpicture_fill((AVPicture*)picture, picture_buf, pixFormat, width, height);
+   avpicture_fill(reinterpret_cast<AVPicture*>(picture), picture_buf,
+                  pixFormat, width, height);
+
    return picture;
 }
 
@@ -537,6 +544,7 @@ void EncoderFFmpeg::addVideoStream(AVCodec* codec)
 {
    // Create a new video stream to write data to.
    mVideoStream = av_new_stream(mFormatContext, 0);
+
    if ( NULL == mVideoStream )
    {
       throw RecordingException("Could not allocate video stream.",
@@ -565,16 +573,16 @@ void EncoderFFmpeg::addVideoStream(AVCodec* codec)
    mVideoStream->codec->time_base.num = 1;
    // Emit one intra frame every twelve frames at most.
    mVideoStream->codec->gop_size = 12;
-   mVideoStream->codec->pix_fmt = STREAM_PIX_FMT;
+   mVideoStream->codec->pix_fmt  = STREAM_PIX_FMT;
 //   mVideoStream->codec->rate_emu
 
-   if ( mVideoStream->codec->codec_id == CODEC_ID_MPEG2VIDEO )
+   if ( CODEC_ID_MPEG2VIDEO == mVideoStream->codec->codec_id )
    {
       // just for testing, we also add B frames
       mVideoStream->codec->max_b_frames = 2;
    }
 
-   if ( mVideoStream->codec->codec_id == CODEC_ID_MPEG1VIDEO )
+   if ( CODEC_ID_MPEG1VIDEO == mVideoStream->codec->codec_id )
    {
       // Needed to avoid using macroblocks in which some coeffs overflow.
       // This does not happen with normal video, it just happens here as
@@ -655,20 +663,21 @@ void EncoderFFmpeg::addAudioStream()
    // TODO: Add audio support.
 /*
    mAudioStream = av_new_stream(mFormatContext, 1);
-   if (NULL == mAudioStream)
+
+   if ( NULL == mAudioStream )
    {
       throw RecordingException("Could not allocate audio stream.",
                                VRKIT_LOCATION);
    }
 
    AVCodecContext* acc = mAudioStream->codec;
-   acc->codec_id = mFormatOut->audio_codec;
-   acc->codec_type = CODEC_TYPE_AUDIO;
+   acc->codec_id       = mFormatOut->audio_codec;
+   acc->codec_type     = CODEC_TYPE_AUDIO;
 
    // Put sample parameters
-   acc->bit_rate = 64000;
+   acc->bit_rate    = 64000;
    acc->sample_rate = 44100;
-   acc->channels = 2;
+   acc->channels    = 2;
 */
 }
 
@@ -680,7 +689,7 @@ void EncoderFFmpeg::openAudio()
 
    // Find the audio encoder.
    AVCodec* codec = avcodec_find_encoder(acc->codec_id);
-   if (!codec)
+   if ( NULL == codec )
    {
       throw RecordingException("Audio codec not found.", VRKIT_LOCATION);
    }
@@ -705,7 +714,7 @@ void EncoderFFmpeg::openAudio()
 
    // Ugly hack for PCM codecs (will be removed ASAP with new PCM
    // support to compute the input frame size in samples.
-   if (acc->frame_size <= 1)
+   if ( acc->frame_size <= 1 )
    {
       audio_input_frame_size = mAudioOutBufferSize / acc->channels;
       switch(mAudioStream->codec->codec_id)
