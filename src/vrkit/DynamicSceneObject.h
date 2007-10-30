@@ -214,13 +214,7 @@ public:
    //@}
 
 private:
-#if OSG_MAJOR_VERSION < 2
-   typedef OSG::NodePtr& traverse_node_type;
-#else
-   typedef OSG::NodePtrConstArg traverse_node_type;
-#endif
-
-   OSG::Action::ResultE enter(traverse_node_type node);
+   OSG::Action::ResultE enter(OSG::NodePtr& node);
 
    OSG::NodeRefPtr      mRootNode;      /**< Root node of this scene object. */
    OSG::TransformRefPtr mTransformCore;

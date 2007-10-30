@@ -124,19 +124,13 @@ private:
       /* Do nothing. */ ;
    }
 
-#if OSG_MAJOR_VERSION < 2
-   typedef OSG::NodePtr& traverse_node_type;
-#else
-   typedef OSG::NodePtrConstArg traverse_node_type;
-#endif
-
    /**
     * Traversal enter method. This is invoked from the OpenSG traverser to
     * build a list of all OSG::MaterialGroup and OSG::Geometry cores.
     *
     * @param node The current node being visited by the traverser.
     */
-   OSG::Action::ResultE enter(traverse_node_type node);
+   OSG::Action::ResultE enter(OSG::NodePtr& node);
 
    callback_t mCallback;        /**< The callback invoked by enter() */
 

@@ -36,11 +36,11 @@ MaterialPoolData::~MaterialPoolData()
    /* Do nothing. */ ;
 }
 
-MaterialPoolData::pool_ref_ptr_t MaterialPoolData::getMaterialPool()
+OSG::MaterialPoolRefPtr MaterialPoolData::getMaterialPool()
 {
    if ( OSG::NullFC == mMaterialPool )
    {
-      mMaterialPool = pool_t::create();
+      mMaterialPool = OSG::MaterialPool::create();
    }
 
    return mMaterialPool;

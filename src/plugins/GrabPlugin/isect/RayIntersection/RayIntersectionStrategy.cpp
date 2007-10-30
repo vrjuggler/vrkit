@@ -86,27 +86,13 @@ VRKIT_PLUGIN_API(vrkit::plugin::CreatorBase*) getIntersectionStrategyCreator()
 namespace
 {
 
-#if OSG_MAJOR_VERSION < 2
-typedef OSG::CNodePtr& enter_t;
-#else
-typedef OSG::NodeCorePtrConstArg enter_t;
-#endif
-
-OSG::Action::ResultE geometryEnter(enter_t nodeCore, OSG::Action* action)
+OSG::Action::ResultE geometryEnter(OSG::CNodePtr& node, OSG::Action* action)
 {
    OSG::IntersectAction* ia =
       boost::polymorphic_downcast<OSG::IntersectAction*>(action);
-   OSG::NodePtr hit_node(ia->getHitObject());
-   OSG::GeometryPtr core =
-#if OSG_MAJOR_VERSION < 2
-      OSG::GeometryPtr::dcast(hit_node->getCore());
-//   OSG::Geometry* core =
-//      boost::polymorphic_downcast<OSG::Geometry*>(
-//         hit_node->getCore().getCPtr()
-//      );
-#else
-      OSG::cast_dynamic<OSG::GeometryPtr>(nodeCore);
-#endif
+   OSG::NodePtr n(node);
+   OSG::Geometry* core =
+      boost::polymorphic_downcast<OSG::Geometry*>(n->getCore().getCPtr());
 
    OSG::TriangleIterator it;
 
@@ -118,11 +104,7 @@ OSG::Action::ResultE geometryEnter(enter_t nodeCore, OSG::Action* action)
       if ( ia->getLine().intersect(it.getPosition(0), it.getPosition(1),
                                    it.getPosition(2), t, &norm) )
       {
-#if OSG_MAJOR_VERSION < 2
-         ia->setHit(t, hit_node, it.getIndex(), norm);
-#else
-         ia->setHit(t, hit_node, it.getIndex(), norm, ia->getHitLine());
-#endif
+         ia->setHit(t, n, it.getIndex(), norm);
       }
    }
 
@@ -173,13 +155,9 @@ isect::StrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
    {
       OSG::IntersectAction::registerEnterDefault(
          OSG::Geometry::getClassType(),
-#if OSG_MAJOR_VERSION < 2
          OSG::osgTypedFunctionFunctor2CPtrRef<
             OSG::Action::ResultE, OSG::CNodePtr, OSG::Action*
          >(geometryEnter)
-#else
-         &geometryEnter
-#endif
       );
    }
 
@@ -190,10 +168,9 @@ isect::StrategyPtr RayIntersectionStrategy::init(ViewerPtr viewer)
 
    OSG::GroupNodePtr decorator_root =
       viewer->getSceneObj()->getDecoratorRoot();
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor dre(decorator_root.node(), OSG::Node::ChildrenFieldMask);
-#endif
-   decorator_root.node()->addChild(mSwitchNode);
+   OSG::beginEditCP(decorator_root.node());
+      decorator_root.node()->addChild(mSwitchNode);
+   OSG::endEditCP(decorator_root.node());
    setVisible(true);
 
    // Register visibility signal with vrkit::signal::Repository.
@@ -236,19 +213,15 @@ void RayIntersectionStrategy::update(ViewerPtr viewer)
    start_pt = mSelectionRay.getPosition();
    end_pt = start_pt + mSelectionRay.getDirection() * mRayLength;
 
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor gpe(mGeomPts);
-#endif
-   mGeomPts->setValue(start_pt, 0);
-   mGeomPts->setValue(  end_pt, 1);
+   OSG::beginEditCP(mGeomPts);
+      mGeomPts->setValue(start_pt, 0);
+      mGeomPts->setValue(  end_pt, 1);
+   OSG::endEditCP(mGeomPts);
 }
 
 void RayIntersectionStrategy::setVisible(const bool visible)
 {
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor snce(mSwitchNode.core(), OSG::Switch::ChoiceFieldMask);
-#endif
-
+   OSG::beginEditCP(mSwitchNode);
    if ( visible )
    {
       mSwitchNode->setChoice(OSG::Switch::ALL);
@@ -257,6 +230,7 @@ void RayIntersectionStrategy::setVisible(const bool visible)
    {
       mSwitchNode->setChoice(OSG::Switch::NONE);
    }
+   OSG::endEditCP(mSwitchNode);
 }
 
 void RayIntersectionStrategy::initGeom()
@@ -268,12 +242,9 @@ void RayIntersectionStrategy::initGeom()
    OSG::MaterialChunkPtr mat_chunk = OSG::MaterialChunk::create();
    OSG::LineChunkPtr line_chunk = OSG::LineChunk::create();
 
-#if OSG_MAJOR_VERSION < 2
    OSG::CPEditor cme(chunk_mat);
    OSG::CPEditor mce(mat_chunk);
    OSG::CPEditor lce(line_chunk);
-#endif
-
    mat_chunk->setLit(true);
    mat_chunk->setDiffuse(mRayDiffuse);
    mat_chunk->setAmbient(mRayAmbient);
@@ -282,49 +253,42 @@ void RayIntersectionStrategy::initGeom()
    chunk_mat->addChunk(line_chunk);
 
    mGeomPts = OSG::GeoPositions3f::create();
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor gpe(mGeomPts);
-#endif
-   mGeomPts->addValue(OSG::Pnt3f(0.0f, 0.0f, 0.0f));
-   mGeomPts->addValue(OSG::Pnt3f(0.0f, 0.0f, 0.0f));
+   OSG::beginEditCP(mGeomPts);
+     mGeomPts->addValue(OSG::Pnt3f(0.0f, 0.0f, 0.0f));
+     mGeomPts->addValue(OSG::Pnt3f(0.0f, 0.0f, 0.0f));
+   OSG::endEditCP(mGeomPts);
 
    OSG::GeoIndicesUI32Ptr index = OSG::GeoIndicesUI32::create();
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor ie(index);
-#endif
-   index->addValue(0);
-   index->addValue(1);
+   OSG::beginEditCP(index);
+     index->addValue(0);
+     index->addValue(1);
+   OSG::endEditCP(index);
 
    OSG::GeoPLengthsUI32Ptr lens = OSG::GeoPLengthsUI32::create();
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor le(lens);
-#endif
-   lens->addValue(2);
+   OSG::beginEditCP(lens);
+     lens->addValue(2);
+   OSG::endEditCP(lens);
 
    OSG::GeoPTypesUI8Ptr type = OSG::GeoPTypesUI8::create();
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor te(type);
-#endif
-   type->addValue(GL_LINES);
+   OSG::beginEditCP(type);
+     type->addValue(GL_LINES);
+   OSG::endEditCP(type);
 
    mGeomNode = OSG::GeometryNodePtr::create();
 
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor gnce(mGeomNode.core());
-#endif
-   mGeomNode->setPositions(mGeomPts);
-   mGeomNode->setIndices(index);
-   mGeomNode->setLengths(lens);
-   mGeomNode->setTypes(type);
-   mGeomNode->setMaterial(chunk_mat);
+   OSG::beginEditCP(mGeomNode);
+     mGeomNode->setPositions(mGeomPts);
+     mGeomNode->setIndices(index);
+     mGeomNode->setLengths(lens);
+     mGeomNode->setTypes(type);
+     mGeomNode->setMaterial(chunk_mat);
+   OSG::endEditCP(mGeomNode);
 
    mSwitchNode = OSG::SwitchNodePtr::create();
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor sne(mSwitchNode.node(), OSG::Node::ChildrenFieldMask);
-   OSG::CPEditor snce(mSwitchNode.core(), OSG::Switch::ChoiceFieldMask);
-#endif
-   mSwitchNode.node()->addChild(mGeomNode);
-   mSwitchNode->setChoice(OSG::Switch::ALL);
+   OSG::beginEditCP(mSwitchNode);
+      mSwitchNode.node()->addChild(mGeomNode);
+      mSwitchNode->setChoice(OSG::Switch::ALL);
+   OSG::endEditCP(mSwitchNode);
 }
 
 SceneObjectPtr RayIntersectionStrategy::
@@ -418,10 +382,9 @@ enterFunc(SceneObjectPtr obj)
          // Temporarily allow intersection traversal into current scene
          // object.
          OSG::UInt32 trav_mask = obj->getRoot()->getTravMask();
-#if OSG_MAJOR_VERSION < 2
-         OSG::CPEditor ore(obj->getRoot(), OSG::Node::TravMaskFieldMask);
-#endif
-         obj->getRoot()->setTravMask(trav_mask | 128);
+         OSG::beginEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
+            obj->getRoot()->setTravMask(trav_mask | 128);
+         OSG::endEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
 
          OSG::IntersectAction* action(OSG::IntersectAction::create());
          action->setTravMask(128);
@@ -439,7 +402,9 @@ enterFunc(SceneObjectPtr obj)
 
          // Disable intersection traversal into current scene object.
          trav_mask = obj->getRoot()->getTravMask();
-         obj->getRoot()->setTravMask(trav_mask & ~128);
+         OSG::beginEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
+            obj->getRoot()->setTravMask(trav_mask & ~128);
+         OSG::endEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
 
          delete action;
       }

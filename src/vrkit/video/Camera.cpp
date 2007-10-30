@@ -32,11 +32,6 @@ Camera::Camera()
    , mLeftTexture(OSG::NullFC)
    , mRightTexture(OSG::NullFC)
    , mCurrentTexture(OSG::NullFC)
-#if OSG_MAJOR_VERSION >= 2
-   , mLeftTexEnv(OSG::NullFC)
-   , mRightTexEnv(OSG::NullFC)
-   , mCurrentTexEnv(OSG::NullFC)
-#endif
    , mLeftImage(OSG::NullFC)
    , mRightImage(OSG::NullFC)
    , mCurrentImage(OSG::NullFC)
@@ -58,49 +53,31 @@ CameraPtr Camera::init()
    mTransform = OSG::Transform::create();
 
    OSG::NodePtr beacon = OSG::Node::create();
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor be(beacon, OSG::Node::CoreFieldMask);
-#endif
-   beacon->setCore(mTransform);
+   OSG::beginEditCP(beacon);
+      beacon->setCore(mTransform);
+   OSG::endEditCP(beacon);
 
-   mLeftTexture = tex_chunk_t::create();
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor lte(mLeftTexture);
-   mLeftTexture->setEnvMode(GL_MODULATE);
-#else
-   mLeftTexEnv = OSG::TextureEnvChunk::create();
-   mLeftTexEnv->setEnvMode(GL_MODULATE);
-#endif
+   // Create the FBO textures.
+   mLeftTexture = OSG::TextureChunk::create();
+   OSG::beginEditCP(mLeftTexture);
+      mLeftTexture->setEnvMode(GL_MODULATE);
+   OSG::endEditCP(mLeftTexture);
 
-   mRightTexture = tex_chunk_t::create();
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor rte(mRightTexture);
-   mRightTexture->setEnvMode(GL_MODULATE);
-#else
-   mRightTexEnv = OSG::TextureEnvChunk::create();
-   mRightTexEnv->setEnvMode(GL_MODULATE);
-#endif
+   mRightTexture = OSG::TextureChunk::create();
+   OSG::beginEditCP(mRightTexture);
+      mRightTexture->setEnvMode(GL_MODULATE);
+   OSG::endEditCP(mRightTexture);
 
    mCurrentTexture = mLeftTexture;
-#if OSG_MAJOR_VERSION >= 2
-   mCurrentTexEnv = mLeftTexEnv;
-#endif
 
    // setup camera
    mCamera = OSG::PerspectiveCamera::create();
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor ce(mCamera);
-#endif
-   mCamera->setFov(
-#if OSG_MAJOR_VERSION < 2
-      OSG::osgdegree2rad(60.0)
-#else
-      OSG::osgDegree2Rad(60.0)
-#endif
-   );
-   mCamera->setNear(0.01);
-   mCamera->setFar(10000);
-   mCamera->setBeacon(beacon);
+   OSG::beginEditCP(mCamera);
+      mCamera->setFov(OSG::osgdegree2rad(60.0));
+      mCamera->setNear(0.01);
+      mCamera->setFar(10000);
+      mCamera->setBeacon(beacon);
+   OSG::endEditCP(mCamera);
 
    mLeftImage = OSG::Image::create();
    mRightImage = OSG::Image::create();
@@ -109,18 +86,22 @@ CameraPtr Camera::init()
 
    // Set up FBO textures.
    img = mLeftImage;
-   mLeftTexture->setMinFilter(GL_LINEAR);
-   mLeftTexture->setMagFilter(GL_LINEAR);
-   mLeftTexture->setTarget(GL_TEXTURE_2D);
-   mLeftTexture->setInternalFormat(GL_RGBA8);
-   mLeftTexture->setImage(img);
+   OSG::beginEditCP(mLeftTexture);
+      mLeftTexture->setMinFilter(GL_LINEAR);
+      mLeftTexture->setMagFilter(GL_LINEAR);
+      mLeftTexture->setTarget(GL_TEXTURE_2D);
+      mLeftTexture->setInternalFormat(GL_RGBA8);
+      mLeftTexture->setImage(img);
+   OSG::endEditCP(mLeftTexture);
 
    img = mRightImage;
-   mRightTexture->setMinFilter(GL_LINEAR);
-   mRightTexture->setMagFilter(GL_LINEAR);
-   mRightTexture->setTarget(GL_TEXTURE_2D);
-   mRightTexture->setInternalFormat(GL_RGBA8);
-   mRightTexture->setImage(img);
+   OSG::beginEditCP(mRightTexture);
+      mRightTexture->setMinFilter(GL_LINEAR);
+      mRightTexture->setMagFilter(GL_LINEAR);
+      mRightTexture->setTarget(GL_TEXTURE_2D);
+      mRightTexture->setInternalFormat(GL_RGBA8);
+      mRightTexture->setImage(img);
+   OSG::endEditCP(mRightTexture);
 
    mCurrentImage = mLeftImage;
 
@@ -137,14 +118,14 @@ OSG::UInt32 Camera::getHeight() const
    return mHeight;
 }
 
-void Camera::renderLeftEye(render_action_t* ra)
+void Camera::renderLeftEye(OSG::RenderAction* ra)
 {
    mCurrentTexture = mLeftTexture;
    mCurrentImage = mLeftImage;
    render(ra);
 }
 
-void Camera::renderRightEye(render_action_t* ra)
+void Camera::renderRightEye(OSG::RenderAction* ra)
 {
    mCurrentTexture = mRightTexture;
    mCurrentImage = mRightImage;
@@ -159,48 +140,43 @@ void Camera::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 
 void Camera::setPixelFormat(const OSG::Image::PixelFormat pixelFormat)
 {
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor lie(mLeftImage);
-   OSG::CPEditor rie(mRightImage);
-#endif
-   mLeftImage->set(pixelFormat, mWidth, mHeight);
-   mRightImage->set(pixelFormat, mWidth, mHeight);
+   OSG::beginEditCP(mLeftImage);
+      mLeftImage->set(pixelFormat, mWidth, mHeight);
+   OSG::endEditCP(mLeftImage);
+
+   OSG::beginEditCP(mRightImage);
+      mRightImage->set(pixelFormat, mWidth, mHeight);
+   OSG::endEditCP(mRightImage);
 }
 
 void Camera::setPosition(const OSG::Matrix& camPos)
 {
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor te(mTransform, OSG::Transform::MatrixFieldMask);
-#endif
-   mTransform->setMatrix(camPos);
+   OSG::beginEditCP(mTransform, OSG::Transform::MatrixFieldMask);
+      mTransform->setMatrix(camPos);
+   OSG::endEditCP(mTransform, OSG::Transform::MatrixFieldMask);
 }
 
 void Camera::setAspect(const OSG::Real32 aspect)
 {
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor ce(mCamera, OSG::PerspectiveCamera::AspectFieldMask);
-#endif
-   mCamera->setAspect(aspect);
+   OSG::beginEditCP(mCamera);
+      mCamera->setAspect(aspect);
+   OSG::endEditCP(mCamera);
 }
 
 void Camera::setFov(const OSG::Real32 fov)
 {
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor ce(mCamera, OSG::PerspectiveCamera::FovFieldMask);
-#endif
-   mCamera->setFov(fov);
+   OSG::beginEditCP(mCamera);
+      mCamera->setFov(fov);
+   OSG::endEditCP(mCamera);
 }
 
 void Camera::setNearFar(const OSG::Real32 nearVal,
                                 const OSG::Real32 farVal)
 {
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor ce(mCamera,
-                    OSG::PerspectiveCamera::NearFieldMask |
-                       OSG::PerspectiveCamera::FarFieldMask);
-#endif
-   mCamera->setNear(nearVal);
-   mCamera->setFar(farVal);
+   OSG::beginEditCP(mCamera);
+      mCamera->setNear(nearVal);
+      mCamera->setFar(farVal);
+   OSG::endEditCP(mCamera);
 }
 
 void Camera::setWindow(OSG::WindowPtr window)
@@ -208,27 +184,15 @@ void Camera::setWindow(OSG::WindowPtr window)
    mWindow = window;
 }
 
-Camera::tex_chunk_ptr_t Camera::getLeftTexture() const
+OSG::TextureChunkPtr Camera::getLeftTexture() const
 {
    return mLeftTexture;
 }
 
-Camera::tex_chunk_ptr_t Camera::getRightTexture() const
+OSG::TextureChunkPtr Camera::getRightTexture() const
 {
    return mRightTexture;
 }
-
-#if OSG_MAJOR_VERSION >= 2
-OSG::TextureEnvChunkPtr Camera::getLeftTextureEnv() const
-{
-   return mLeftTexEnv;
-}
-
-OSG::TextureEnvChunkPtr Camera::getRightTextureEnv() const
-{
-   return mRightTexEnv;
-}
-#endif
 
 OSG::ImagePtr Camera::getLeftEyeImage() const
 {

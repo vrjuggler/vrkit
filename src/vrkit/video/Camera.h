@@ -25,25 +25,13 @@
 
 #include <OpenSG/OSGImage.h>
 #include <OpenSG/OSGPerspectiveCamera.h>
-#if OSG_MAJOR_VERSION < 2
-#  include <OpenSG/OSGTextureChunk.h>
-#else
-#  include <OpenSG/OSGTextureObjChunk.h>
-#  include <OpenSG/OSGTextureEnvChunk.h>
-#endif
+#include <OpenSG/OSGRenderAction.h>
+#include <OpenSG/OSGTextureChunk.h>
 #include <OpenSG/OSGTransform.h>
 #include <OpenSG/OSGWindow.h>
 
 #include <vrkit/video/CameraPtr.h>
 
-
-OSG_BEGIN_NAMESPACE
-#if OSG_MAJOR_VERSION < 2
-class RenderAction;
-#else
-class RenderTraversalAction;
-#endif
-OSG_END_NAMESPACE
 
 namespace vrkit
 {
@@ -79,30 +67,9 @@ public:
 
    virtual void setSceneRoot(OSG::NodePtr root) = 0;
 
-   /**
-    * @name Render Action Type
-    *
-    * OpenSG 1.8/2.0 compatibility typedefs. These are mainly for internal
-    * use, but they can be used in user-level code to help bridge the
-    * differences between OpenSG 1.8 and 2.0.
-    *
-    * @see renderLeftEye()
-    * @see renderRightEye()
-    * @see render()
-    *
-    * @since 0.51.0
-    */
-   //@{
-#if OSG_MAJOR_VERSION < 2
-   typedef OSG::RenderAction render_action_t;
-#else
-   typedef OSG::RenderTraversalAction render_action_t;
-#endif
-   //@}
+   virtual void renderLeftEye(OSG::RenderAction* ra);
 
-   virtual void renderLeftEye(render_action_t* ra);
-
-   virtual void renderRightEye(render_action_t* ra);
+   virtual void renderRightEye(OSG::RenderAction* ra);
 
    /**
     * Set the field of view for the camera.
@@ -133,43 +100,8 @@ public:
 
    virtual void setWindow(OSG::WindowPtr window);
 
-   /**
-    * @name Texture Chunk Types
-    *
-    * OpenSG 1.8/2.0 compatibility typedefs. These are mainly for internal
-    * use, but they can be used in user-level code to help bridge the
-    * differences between OpenSG 1.8 and 2.0.
-    *
-    * @see getLeftTexture()
-    * @see getRightTexture()
-    *
-    * @since 0.51.0
-    */
-   //@{
-#if OSG_MAJOR_VERSION < 2
-   typedef OSG::TextureChunk            tex_chunk_t;
-   typedef OSG::TextureChunkPtr         tex_chunk_ptr_t;
-#else
-   typedef OSG::TextureObjChunk         tex_chunk_t;
-   typedef OSG::TextureObjChunkPtr      tex_chunk_ptr_t;
-#endif
-   typedef OSG::RefPtr<tex_chunk_ptr_t> tex_chunk_ref_ptr_t;
-   //@}
-
-   virtual tex_chunk_ptr_t getLeftTexture() const;
-   virtual tex_chunk_ptr_t getRightTexture() const;
-
-#if OSG_MAJOR_VERSION >= 2
-   /**
-    * @since 0.51.0
-    */
-   virtual OSG::TextureEnvChunkPtr getLeftTextureEnv() const;
-
-   /**
-    * @since 0.51.0
-    */
-   virtual OSG::TextureEnvChunkPtr getRightTextureEnv() const;
-#endif
+   virtual OSG::TextureChunkPtr getLeftTexture() const;
+   virtual OSG::TextureChunkPtr getRightTexture() const;
 
    virtual OSG::ImagePtr getLeftEyeImage() const;
    virtual OSG::ImagePtr getRightEyeImage() const;
@@ -187,17 +119,12 @@ public:
 
 protected:
 
-   virtual void render(render_action_t* ra) = 0;
+   virtual void render(OSG::RenderAction* ra) = 0;
 
    OSG::TransformRefPtr       mTransform;     /**< The location and orientation of the camera. */
-   tex_chunk_ref_ptr_t        mLeftTexture;   /**< Texture that the FBO renders into. */
-   tex_chunk_ref_ptr_t        mRightTexture;  /**< Texture that the FBO renders into. */
-   tex_chunk_ref_ptr_t        mCurrentTexture;  /**< Texture that the FBO renders into. */
-#if OSG_MAJOR_VERSION >= 2
-   OSG::TextureEnvChunkRefPtr mLeftTexEnv;
-   OSG::TextureEnvChunkRefPtr mRightTexEnv;
-   OSG::TextureEnvChunkRefPtr mCurrentTexEnv;
-#endif
+   OSG::TextureChunkRefPtr    mLeftTexture;   /**< Texture that the FBO renders into. */
+   OSG::TextureChunkRefPtr    mRightTexture;  /**< Texture that the FBO renders into. */
+   OSG::TextureChunkRefPtr    mCurrentTexture;  /**< Texture that the FBO renders into. */
    OSG::ImageRefPtr           mLeftImage;
    OSG::ImageRefPtr           mRightImage;
    OSG::ImageRefPtr           mCurrentImage;

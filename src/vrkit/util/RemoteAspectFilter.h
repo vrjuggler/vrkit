@@ -23,12 +23,10 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>
 
+#include <OpenSG/OSGRemoteAspect.h>
+
 #include <vrkit/util/RemoteAspectFilterPtr.h>
 
-
-OSG_BEGIN_NAMESPACE
-class RemoteAspect;
-OSG_END_NAMESPACE
 
 namespace vrkit
 {
@@ -56,7 +54,7 @@ public:
 
    ~RemoteAspectFilter();
 
-   typedef boost::function<void (OSG::FieldContainerPtr)> callback_t;
+   typedef boost::function< void (OSG::FieldContainerPtr)> callback_t;
 
    void addChangedCallback(OSG::FieldContainerPtr fcp, callback_t callback);
    void addCreatedCallback(OSG::FieldContainerPtr fcp, callback_t callback);
@@ -71,20 +69,9 @@ public:
 
    /** @name OpenSG RemoteAspect callbacks */
    //@{
-#if OSG_MAJOR_VERSION < 2
-   typedef OSG::FieldContainerPtr& field_container_ptr_type;
-#else
-   typedef OSG::FieldContainerPtrConstArg field_container_ptr_type;
-#endif
-
-   bool createdFunction(field_container_ptr_type fcp,
-                        OSG::RemoteAspect* aspect);
-
-   bool changedFunction(field_container_ptr_type fcp,
-                        OSG::RemoteAspect* aspect);
-
-   bool destroyedFunction(field_container_ptr_type fcp,
-                          OSG::RemoteAspect* aspect);
+   bool createdFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+   bool destroyedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
+   bool changedFunction(OSG::FieldContainerPtr& fcp, OSG::RemoteAspect*);
    //@}
 
 protected:

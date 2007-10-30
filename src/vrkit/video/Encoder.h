@@ -109,7 +109,7 @@ public:
     * @throw vrkit::RecordingException
     *           Thrown if writing the given frame data fails.
     */
-   virtual void writeFrame(const vpr::Uint8* data) = 0;
+   virtual void writeFrame(vpr::Uint8* data) = 0;
 
    virtual OSG::Image::PixelFormat getPixelFormat() const;
 

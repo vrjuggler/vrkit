@@ -24,13 +24,7 @@
 #include <vector>
 #include <boost/signal.hpp>
 
-#include <OpenSG/OSGConfig.h>
-
-#if OSG_MAJOR_VERSION < 2
-#  include <OpenSG/OSGMaterialPool.h>
-#else
-#  include <OpenSG/OSGContainerPool.h>
-#endif
+#include <OpenSG/OSGMaterialPool.h>
 
 #include <vrkit/scenedata/Event.h>
 #include <vrkit/widget/Frame.h>
@@ -76,29 +70,7 @@ public:
 public:  // Configuration params //
    virtual void setWidthHeight(const float w, const float h,
                                const float borderWidth = 0.0f);
-
-   /**
-    * @name Material Pool Types
-    *
-    * OpenSG 1.8/2.0 compatibility typedefs. These are mainly for internal
-    * use, but they can be used in user-level code to help bridge the
-    * differences between OpenSG 1.8 and 2.0.
-    *
-    * @see setMaterialPool()
-    *
-    * @since 0.51.0
-    */
-   //@{
-#if OSG_MAJOR_VERSION < 2
-   typedef OSG::MaterialPool     pool_t;
-   typedef OSG::MaterialPoolPtr  pool_ptr_t;
-#else
-   typedef OSG::ContainerPool    pool_t;
-   typedef OSG::ContainerPoolPtr pool_ptr_t;
-#endif
-   //@}
-
-   void setMaterialPool(pool_ptr_t matPool);
+   void setMaterialPool(OSG::MaterialPoolPtr matPool);
 
    // SLOTS
    void materialsChanged();
@@ -111,17 +83,7 @@ public:  // Configuration params //
    event::ResultType onScrolled(int value);
 
 protected:
-#if OSG_MAJOR_VERSION >= 2
-   /**
-    * Extracts only field containers of type OSG::MaterialPtr (or a subclass
-    * thereof) from \c mMaterialPool.
-    *
-    * @since 0.51.0
-    */
-   std::vector<OSG::MaterialPtr> getMaterials();
-#endif
-
-   pool_ptr_t                   mMaterialPool;
+   OSG::MaterialPoolPtr         mMaterialPool;
    std::vector<SphereButtonPtr> mMaterialButtons;
    ScrollBarPtr                 mScrollBar;
    int   mHNum;

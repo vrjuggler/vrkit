@@ -135,153 +135,142 @@ viewer::PluginPtr ModelLoaderPlugin::init(ViewerPtr viewer)
    ScenePtr scene = viewer->getSceneObj();
    OSG::TransformNodePtr scene_xform_root = scene->getTransformRoot();
 
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor sxre(scene_xform_root.node(), OSG::Node::ChildrenFieldMask);
-#endif
-
-   const unsigned int num_models(elt->getNum(models_tkn));
-   for ( unsigned int i = 0; i < num_models; ++i )
-   {
-      jccl::ConfigElementPtr model_elt =
-         elt->getProperty<jccl::ConfigElementPtr>(models_tkn, i);
-      vprASSERT(model_elt.get() != NULL);
-      const std::string model_path =
-         model_elt->getProperty<std::string>(path_tkn);
-      OSG::NodeRefPtr model_node(
-#if OSG_MAJOR_VERSION < 2
-         OSG::SceneFileHandler::the().read(model_path.c_str())
-#else
-         OSG::SceneFileHandler::the()->read(model_path.c_str())
-#endif
-      );
-
-      if ( model_node != OSG::NullFC )
+   OSG::beginEditCP(scene_xform_root.node(), OSG::Node::ChildrenFieldMask);
+      const unsigned int num_models(elt->getNum(models_tkn));
+      for ( unsigned int i = 0; i < num_models; ++i )
       {
-         // Set up the model switch transform
-         const float xt =
-            model_elt->getProperty<float>(position_tkn, 0) * to_meters;
-         const float yt =
-            model_elt->getProperty<float>(position_tkn, 1) * to_meters;
-         const float zt =
-            model_elt->getProperty<float>(position_tkn, 2) * to_meters;
+         jccl::ConfigElementPtr model_elt =
+            elt->getProperty<jccl::ConfigElementPtr>(models_tkn, i);
+         vprASSERT(model_elt.get() != NULL);
+         const std::string model_path =
+            model_elt->getProperty<std::string>(path_tkn);
+         OSG::NodeRefPtr model_node(
+            OSG::SceneFileHandler::the().read(model_path.c_str())
+         );
 
-         const float xr = model_elt->getProperty<float>(rotation_tkn, 0);
-         const float yr = model_elt->getProperty<float>(rotation_tkn, 1);
-         const float zr = model_elt->getProperty<float>(rotation_tkn, 2);
-
-         gmtl::Coord3fXYZ coord;
-         coord.pos().set(xt,yt,zt);
-         coord.rot().set(gmtl::Math::deg2Rad(xr), gmtl::Math::deg2Rad(yr),
-                         gmtl::Math::deg2Rad(zr));
-
-         // Set at T*R
-         OSG::Matrix xform_mat_osg;
-         gmtl::set(xform_mat_osg, gmtl::make<gmtl::Matrix44f>(coord));
-
-         OSG::NodeRefPtr child_root;
-
-         // If this model is supposed to be grabbable, we create a vrkit
-         // dynamic scene object for it. As a result, we can be assured
-         // that the root node will have a core of type OSG::Transform.
-         if ( model_elt->getProperty<bool>(grabbing_tkn) )
+         if ( model_node != OSG::NullFC )
          {
-            std::vector<OSG::FieldContainerType*> core_types;
-            const unsigned int num_types = model_elt->getNum(core_type_tkn);
-            for ( unsigned int t = 0; t < num_types; ++t )
-            {
-               const std::string type_name = 
-                  model_elt->getProperty<std::string>(core_type_tkn, i);
-               OSG::FieldContainerType* fct =
-                  OSG::FieldContainerFactory::the()->findType(
-                     type_name.c_str()
-                  );
+            // Set up the model switch transform
+            const float xt =
+               model_elt->getProperty<float>(position_tkn, 0) * to_meters;
+            const float yt =
+               model_elt->getProperty<float>(position_tkn, 1) * to_meters;
+            const float zt =
+               model_elt->getProperty<float>(position_tkn, 2) * to_meters;
 
-               if ( NULL != fct )
+            const float xr = model_elt->getProperty<float>(rotation_tkn, 0);
+            const float yr = model_elt->getProperty<float>(rotation_tkn, 1);
+            const float zr = model_elt->getProperty<float>(rotation_tkn, 2);
+
+            gmtl::Coord3fXYZ coord;
+            coord.pos().set(xt,yt,zt);
+            coord.rot().set(gmtl::Math::deg2Rad(xr), gmtl::Math::deg2Rad(yr),
+                            gmtl::Math::deg2Rad(zr));
+
+            // Set at T*R
+            OSG::Matrix xform_mat_osg;
+            gmtl::set(xform_mat_osg, gmtl::make<gmtl::Matrix44f>(coord));
+
+            OSG::NodeRefPtr child_root;
+
+            // If this model is supposed to be grabbable, we create a vrkit
+            // dynamic scene object for it. As a result, we can be assured
+            // that the root node will have a core of type OSG::Transform.
+            if ( model_elt->getProperty<bool>(grabbing_tkn) )
+            {
+               std::vector<OSG::FieldContainerType*> core_types;
+               const unsigned int num_types = model_elt->getNum(core_type_tkn);
+               for ( unsigned int t = 0; t < num_types; ++t )
                {
-                  core_types.push_back(fct);
+                  const std::string type_name = 
+                     model_elt->getProperty<std::string>(core_type_tkn, i);
+                  OSG::FieldContainerType* fct =
+                     OSG::FieldContainerFactory::the()->findType(
+                        type_name.c_str()
+                     );
+
+                  if ( NULL != fct )
+                  {
+                     core_types.push_back(fct);
+                  }
+                  else
+                  {
+                     VRKIT_STATUS << "Skipping unknown type '" << type_name
+                                  << "'" << std::endl;
+                  }
+               }
+
+               DynamicSceneObjectPtr scene_obj;
+
+               if ( ! core_types.empty() )
+               {
+                  util::CoreTypePredicate pred(core_types);
+                  scene_obj = DynamicSceneObject::create()->init(model_node,
+                                                                 pred, true);
                }
                else
                {
-                  VRKIT_STATUS << "Skipping unknown type '" << type_name
-                               << "'" << std::endl;
+                  scene_obj =
+                     DynamicSceneObjectTransform::create()->init(model_node);
+               }
+
+               // scene_obj's root will be added as a child of
+               // scene_xform_root.
+               child_root = scene_obj->getRoot();
+               scene_obj->moveTo(xform_mat_osg);
+               viewer->addObject(scene_obj);
+            }
+            // If this model is not supposed to be grabbable, we examine the
+            // core of the root node.
+            else
+            {
+               OSG::NodeCorePtr root_core = model_node->getCore();
+               OSG::TransformPtr xform_core =
+                  OSG::TransformPtr::dcast(root_core);
+
+               // If model_node's core is of type OSG::Transform, then we set
+               // set the matrix on that core to be xform_mat_osg.
+               if ( OSG::NullFC != xform_core )
+               {
+                  OSG::beginEditCP(xform_core,
+                                   OSG::Transform::MatrixFieldMask);
+                     xform_core->setMatrix(xform_mat_osg);
+                  OSG::endEditCP(xform_core, OSG::Transform::MatrixFieldMask);
+
+                  // model_node will be added as a child of scene_xform_root.
+                  child_root = model_node;
+               }
+               // If model_node's core is not of type OSG::Transform, then we
+               // need to make a new node with an OSG::Transform core and make
+               // it the parent of model_node.
+               else
+               {
+                  OSG::TransformNodePtr xform_node(OSG::Transform::create());
+
+                  OSG::beginEditCP(xform_node,
+                                   OSG::Transform::MatrixFieldMask);
+                     xform_node->setMatrix(xform_mat_osg);
+                  OSG::endEditCP(xform_node, OSG::Transform::MatrixFieldMask);
+
+                  OSG::beginEditCP(xform_node.node(),
+                                   OSG::Node::ChildrenFieldMask);
+                     xform_node.node()->addChild(model_node);
+                  OSG::endEditCP(xform_node.node(),
+                                 OSG::Node::ChildrenFieldMask);
+
+                  // xform_node will be added as a child of scene_xform_root.
+                  child_root = xform_node.node();
                }
             }
 
-            DynamicSceneObjectPtr scene_obj;
+            vprASSERT(child_root != OSG::NullFC);
 
-            if ( ! core_types.empty() )
-            {
-               util::CoreTypePredicate pred(core_types);
-               scene_obj = DynamicSceneObject::create()->init(model_node,
-                                                              pred, true);
-            }
-            else
-            {
-               scene_obj =
-                  DynamicSceneObjectTransform::create()->init(model_node);
-            }
-
-            // scene_obj's root will be added as a child of
-            // scene_xform_root.
-            child_root = scene_obj->getRoot();
-            scene_obj->moveTo(xform_mat_osg);
-            viewer->addObject(scene_obj);
+            // The OSG::{begin,end}EditCP() calls for scene_xform_root wrap
+            // the for loop that we are in.
+            scene_xform_root.node()->addChild(child_root);
          }
-         // If this model is not supposed to be grabbable, we examine the
-         // core of the root node.
-         else
-         {
-            OSG::NodeCorePtr root_core = model_node->getCore();
-            OSG::TransformPtr xform_core =
-#if OSG_MAJOR_VERSION < 2
-               OSG::TransformPtr::dcast(root_core);
-#else
-               OSG::cast_dynamic<OSG::TransformPtr>(root_core);
-#endif
-
-            // If model_node's core is of type OSG::Transform, then we set
-            // set the matrix on that core to be xform_mat_osg.
-            if ( OSG::NullFC != xform_core )
-            {
-#if OSG_MAJOR_VERSION < 2
-               OSG::CPEditor xce(xform_core, OSG::Transform::MatrixFieldMask);
-#endif
-               xform_core->setMatrix(xform_mat_osg);
-
-               // model_node will be added as a child of scene_xform_root.
-               child_root = model_node;
-            }
-            // If model_node's core is not of type OSG::Transform, then we
-            // need to make a new node with an OSG::Transform core and make
-            // it the parent of model_node.
-            else
-            {
-               OSG::TransformNodePtr xform_node(OSG::Transform::create());
-
-#if OSG_MAJOR_VERSION < 2
-               OSG::CPEditor xnce(xform_node.core(),
-                                  OSG::Transform::MatrixFieldMask);
-#endif
-               xform_node->setMatrix(xform_mat_osg);
-
-#if OSG_MAJOR_VERSION < 2
-               OSG::CPEditor xne(xform_node.node(),
-                                 OSG::Node::ChildrenFieldMask);
-#endif
-               xform_node.node()->addChild(model_node);
-
-               // xform_node will be added as a child of scene_xform_root.
-               child_root = xform_node.node();
-            }
-         }
-
-         vprASSERT(child_root != OSG::NullFC);
-
-         // The OSG::{begin,end}EditCP() calls for scene_xform_root wrap
-         // the for loop that we are in.
-         scene_xform_root.node()->addChild(child_root);
       }
-   }
+   OSG::endEditCP(scene_xform_root.node(), OSG::Node::ChildrenFieldMask);
 
    return shared_from_this();
 }

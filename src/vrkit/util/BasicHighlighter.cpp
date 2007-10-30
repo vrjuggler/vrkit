@@ -127,13 +127,10 @@ BasicHighlighterPtr BasicHighlighter::init(ViewerPtr viewer)
 
          OSG::BlendChunkRefPtr blend_chunk;
          blend_chunk = OSG::BlendChunk::create();
-#if OSG_MAJOR_VERSION < 2
-         OSG::CPEditor bce(blend_chunk,
-                           OSG::BlendChunk::SrcFactorFieldMask |
-                              OSG::BlendChunk::DestFactorFieldMask);
-#endif
-         blend_chunk->setSrcFactor(GL_SRC_ALPHA);
-         blend_chunk->setDestFactor(GL_ONE);
+         OSG::beginEditCP(blend_chunk);
+            blend_chunk->setSrcFactor(GL_SRC_ALPHA);
+            blend_chunk->setDestFactor(GL_ONE);
+         OSG::endEditCP(blend_chunk);
 
          chunks.push_back(OSG::StateChunkRefPtr(blend_chunk.get()));
 

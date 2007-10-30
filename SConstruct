@@ -31,7 +31,6 @@ import SConsAddons.Options as sca_opts   # Get the modular options stuff
 import SConsAddons.Options.Boost
 import SConsAddons.Options.VRJuggler.VRJ
 import SConsAddons.Options.OpenSG
-import SConsAddons.Options.OpenSG2
 import SConsAddons.Variants as sca_variants
 import SConsAddons.Builders
 
@@ -120,11 +119,9 @@ boost_options = SConsAddons.Options.Boost.Boost("boost", "1.33.0",
                                                 autoLink = True)
 
 vrj_options = SConsAddons.Options.VRJuggler.VRJ.VRJ("VR Juggler", "2.0.1")
-opensg1_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.8.0",
-                                                    required = False,
-                                                    useCppPath = True)
-opensg2_options = SConsAddons.Options.OpenSG2.OpenSG2("opensg2", "2.0.0",
-                                                      required = False)
+opensg_options = SConsAddons.Options.OpenSG.OpenSG("opensg", "1.8.0",
+                                                   required = True,
+                                                   useCppPath = True)
 
 ffmpeg_options = \
    SConsAddons.Options.FlagPollBasedOption.FlagPollBasedOption("AvFormat",
@@ -161,12 +158,11 @@ if "win32" == platform:
    opts.Add("platform_sdk", "Microsoft Platform SDK location",
             default = r"C:\Program Files\Microsoft Platform SDK")
 
-Export('boost_options', 'ffmpeg_options', 'vrj_options')
+Export('boost_options','opensg_options', 'ffmpeg_options', 'vrj_options')
 
 opts.AddOption(boost_options)
 opts.AddOption(vrj_options)
-opts.AddOption(opensg1_options)
-opts.AddOption(opensg2_options)
+opts.AddOption(opensg_options)
 opts.AddOption(ffmpeg_options)
 
 # Create variant helper and builder. We only vary on type (optimized/debug)
@@ -209,32 +205,6 @@ if not sca_util.hasHelpFlag():
       opts.Save(options_cache_filename, opt_env)
    except LookupError, le:
       pass
-
-   if not opensg1_options.isAvailable() and not opensg2_options.isAvailable():
-      print "Either OpenSG 1.8 or OpenSG 2.0 must be available"
-      sys.exit(1)
-   elif opensg1_options.isAvailable() and opensg2_options.isAvailable():
-      print "Cannot build against both OpenSG 1.8 and OpenSG 2.0"
-      sys.exit(2)
-   else:
-      if opensg1_options.isAvailable():
-         opensg_options = opensg1_options
-         opensg_libs    = ['System']
-
-         # XXX: Hack around SConsAddons.Options.OpenSG.OpenSG not letting us
-         # provide extra arguments to osg-config.  (Of course, if osg-config
-         # wasn't totally braindead on Mac OS X, this wouldn't be such a
-         # problem.)
-         if GetPlatform() == 'darwin':
-            mac_opts = \
-               os.popen(opensg1_options.osgconfig_cmd + " --cflags System").read()
-            opensg1_options.found_cflags = mac_opts.strip().split(" ")
-
-      else:
-         opensg_options = opensg2_options
-         opensg_libs    = ['Drawable', 'FileIO', 'ImageFileIO', 'Cluster',
-                           'Text', 'Util']
-      Export('opensg_options')
 
    # -- Common builder settings
    variant_helper.readOptions(opt_env)
@@ -300,6 +270,13 @@ if not sca_util.hasHelpFlag():
    print "types:", variant_helper.variants["type"] 
    print "archs:", variant_helper.variants["arch"] 
 
+   # XXX: Hack around SConsAddons.Options.OpenSG.OpenSG not letting us provide
+   # extra arguments to osg-config.  (Of course, if osg-config wasn't totally
+   # braindead on Mac OS X, this wouldn't be such a problem.)
+   if GetPlatform() == 'darwin':
+      mac_opts = os.popen(opensg_options.osgconfig_cmd + " --cflags System").read()
+      opensg_options.found_cflags = mac_opts.strip().split(" ")
+
    # Setup the build environment
    # Add local directory to path and the "root" directory for this project
    vrj_options.apply(opt_env)
@@ -318,8 +295,7 @@ if not sca_util.hasHelpFlag():
 
    # ----- FOR EACH VARIANT ----- #
    for combo in variant_helper.iterate(locals(), base_bldr, opt_env):
-      opensg_options.apply(build_env, libs = opensg_libs,
-                           buildType = combo['type'])
+      opensg_options.apply(build_env, optimize = combo['type'] != 'debugrt')
 
       vrkit_cxxflags = ''
       vrkit_defines = []
