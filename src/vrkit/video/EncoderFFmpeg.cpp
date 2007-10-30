@@ -467,7 +467,8 @@ void EncoderFFmpeg::openVideo(AVCodec* codec)
       // as long as they're aligned enough for the architecture, and
       // they're freed appropriately (such as using av_free for buffers
       // allocated with av_malloc)
-      mVideoOutBufferSize = getWidth() * getHeight();
+      mVideoOutBufferSize = avpicture_get_size(vcc->pix_fmt, vcc->width,
+                                               vcc->height);
       mVideoOutBuffer =
          reinterpret_cast<unsigned char*>(av_malloc(mVideoOutBufferSize));
    }
