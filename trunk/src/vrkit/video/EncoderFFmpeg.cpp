@@ -473,7 +473,7 @@ void EncoderFFmpeg::openVideo(AVCodec* codec)
          reinterpret_cast<unsigned char*>(av_malloc(mVideoOutBufferSize));
    }
 
-   // allformat_ctxate the encoded raw picture */
+   // Allocate the encoded raw picture.
    mYuvFrame = allocFrame(vcc->pix_fmt, vcc->width, vcc->height);
    if ( NULL == mYuvFrame )
    {
@@ -650,7 +650,7 @@ void EncoderFFmpeg::writeFrame(const vpr::Uint8* data)
    // why not the rgb-buffer? yuv has smaller size
    //
    // TODO: check pixFormat and do the right thing, its not
-   // alway yuf420 ...
+   // always yuv420p ...
    if ( mFlipBeforeEncode )
    {
       unsigned char* s;
@@ -685,7 +685,7 @@ void EncoderFFmpeg::writeFrame(const vpr::Uint8* data)
 
    int status = 0;
 
-   if (mFormatContext->oformat->flags & AVFMT_RAWPICTURE)
+   if ( mFormatContext->oformat->flags & AVFMT_RAWPICTURE )
    {
       // Raw video case. The API will change slightly in the near
       // future for that.
@@ -712,6 +712,8 @@ void EncoderFFmpeg::writeFrame(const vpr::Uint8* data)
          AVPacket pkt;
          av_init_packet(&pkt);
 
+         // Rescale the presentation time stamp from the codec to be in terms
+         // of the container.
          pkt.pts = av_rescale_q(vcc->coded_frame->pts, vcc->time_base,
                                 mVideoStream->time_base);
 
