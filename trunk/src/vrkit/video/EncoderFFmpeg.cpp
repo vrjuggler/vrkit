@@ -727,6 +727,12 @@ void EncoderFFmpeg::writeFrame(const vpr::Uint8* data)
          // Write the compressed frame in the media file.
          status = av_interleaved_write_frame(mFormatContext, &pkt);
       }
+      else if ( out_size < 0 )
+      {
+         std::ostringstream msg_stream;
+         msg_stream << "Failed to encode frame " << mFrameCount;
+         throw RecordingException(msg_stream.str(), VRKIT_LOCATION);
+      }
    }
 
    if ( status != 0 )
