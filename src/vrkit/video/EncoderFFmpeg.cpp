@@ -111,47 +111,9 @@ EncoderFFmpeg::codec_list_t EncoderFFmpeg::getCodecs()
 }
 #endif
 
-
 EncoderFFmpeg::~EncoderFFmpeg()
 {
    stopEncoding();
-}
-
-void EncoderFFmpeg::stopEncoding()
-{
-   // Close each codec.
-   if (NULL != mVideoStream)
-   {
-      closeVideo();
-   }
-
-   if (NULL != mAudioStream)
-   {
-      closeAudio();
-   }
-
-   if (NULL != mFormatContext)
-   {
-      // Write the trailer, if any
-      av_write_trailer(mFormatContext);
-
-      // free the streams
-      for(unsigned int i = 0; i < mFormatContext->nb_streams; i++)
-      {
-         av_freep(&mFormatContext->streams[i]->codec);
-         av_freep(&mFormatContext->streams[i]);
-      }
-
-      if (!(mFormatOut->flags & AVFMT_NOFILE))
-      {
-         // close the output file
-         url_fclose(&mFormatContext->pb);
-      }
-
-      // free the stream
-      av_free(mFormatContext);
-      mFormatContext = NULL;
-   }
 }
 
 EncoderPtr EncoderFFmpeg::init()
@@ -367,242 +329,41 @@ void EncoderFFmpeg::startEncoding()
    }
 }
 
-// Add an audio output stream
-void EncoderFFmpeg::addAudioStream()
+void EncoderFFmpeg::stopEncoding()
 {
-   // TODO: Add audio support.
-/*
-   mAudioStream = av_new_stream(mFormatContext, 1);
-   if (NULL == mAudioStream)
+   // Close each codec.
+   if (NULL != mVideoStream)
    {
-      throw RecordingException("Could not allocate audio stream.",
-                               VRKIT_LOCATION);
+      closeVideo();
    }
 
-   AVCodecContext* acc = mAudioStream->codec;
-   acc->codec_id = mFormatOut->audio_codec;
-   acc->codec_type = CODEC_TYPE_AUDIO;
-
-   // Put sample parameters
-   acc->bit_rate = 64000;
-   acc->sample_rate = 44100;
-   acc->channels = 2;
-*/
-}
-
-// Add a video output stream
-void EncoderFFmpeg::addVideoStream(AVCodec* codec)
-{
-   // Create a new video stream to write data to.
-   mVideoStream = av_new_stream(mFormatContext, 0);
-   if ( NULL == mVideoStream )
+   if (NULL != mAudioStream)
    {
-      throw RecordingException("Could not allocate video stream.",
-                               VRKIT_LOCATION);
+      closeAudio();
    }
 
-   // XXX: Should we be discarding this?
-   mVideoStream->discard = AVDISCARD_NONKEY;
-
-   mVideoStream->codec->codec_id   = codec->id;
-   mVideoStream->codec->codec_type = CODEC_TYPE_VIDEO;
-   avcodec_get_context_defaults2(mVideoStream->codec, CODEC_TYPE_VIDEO);
-   // put sample parameters
-   // XXX: This should not be hard coded.
-   mVideoStream->codec->bit_rate = 8388608;     // 8192 kb/s
-
-   // Resolution must be a multiple of two
-   mVideoStream->codec->width  = getWidth();
-   mVideoStream->codec->height = getHeight();
-
-   // Time base: this is the fundamental unit of time (in seconds) in terms
-   // of which frame timestamps are represented. for fixed-fps content,
-   // timebase should be 1/framerate and timestamp increments should be
-   // identically 1.
-   mVideoStream->codec->time_base.den = getFramesPerSecond();
-   mVideoStream->codec->time_base.num = 1;
-   // Emit one intra frame every twelve frames at most.
-   mVideoStream->codec->gop_size = 12;
-   mVideoStream->codec->pix_fmt = STREAM_PIX_FMT;
-//   mVideoStream->codec->rate_emu
-
-   if ( mVideoStream->codec->codec_id == CODEC_ID_MPEG2VIDEO )
+   if (NULL != mFormatContext)
    {
-      // just for testing, we also add B frames
-      mVideoStream->codec->max_b_frames = 2;
-   }
+      // Write the trailer, if any
+      av_write_trailer(mFormatContext);
 
-   if ( mVideoStream->codec->codec_id == CODEC_ID_MPEG1VIDEO )
-   {
-      // Needed to avoid using macroblocks in which some coeffs overflow.
-      // This does not happen with normal video, it just happens here as
-      // the motion of the chroma plane does not match the luma plane. */
-      mVideoStream->codec->mb_decision = 2;
-   }
-
-   // Some formats want stream headers to be separate
-   if ( mFormatContext->oformat->flags & AVFMT_GLOBALHEADER )
-   {
-      mVideoStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
-   }
-}
-
-void EncoderFFmpeg::openVideo(AVCodec* codec)
-{
-   AVCodecContext* vcc = mVideoStream->codec;
-
-   // open the codec
-   if ( avcodec_open(vcc, codec) < 0 )
-   {
-      throw RecordingException("Couldn't open video encoder.",
-                               VRKIT_LOCATION);
-   }
-
-   mVideoOutBuffer = NULL;
-   if ( ! (mFormatContext->oformat->flags & AVFMT_RAWPICTURE) )
-   {
-      // allocate output buffer
-      // XXX: API change will be done
-      // buffers passed into lav* can be allocated any way you prefer,
-      // as long as they're aligned enough for the architecture, and
-      // they're freed appropriately (such as using av_free for buffers
-      // allocated with av_malloc)
-      mVideoOutBufferSize = avpicture_get_size(vcc->pix_fmt, vcc->width,
-                                               vcc->height);
-      mVideoOutBuffer =
-         reinterpret_cast<unsigned char*>(av_malloc(mVideoOutBufferSize));
-   }
-
-   // Allocate the encoded raw picture.
-   mYuvFrame = allocFrame(vcc->pix_fmt, vcc->width, vcc->height);
-   if ( NULL == mYuvFrame )
-   {
-      throw RecordingException("Couldn't allocate yuv-picture.",
-                               VRKIT_LOCATION);
-   }
-
-   mRgbFrame = avcodec_alloc_frame();
-   avcodec_get_frame_defaults(mRgbFrame);
-   if ( NULL == mRgbFrame )
-   {
-      throw RecordingException("Couldn't allocate rgb-picture.",
-                               VRKIT_LOCATION);
-   }
-}
-
-void EncoderFFmpeg::closeVideo()
-{
-   avcodec_close(mVideoStream->codec);
-
-   av_free(mYuvFrame);
-   mYuvFrame = NULL;
-
-   av_free(mRgbFrame);
-   mRgbFrame = NULL;
-
-   av_free(mVideoOutBuffer);
-   mVideoOutBuffer = NULL;
-
-   // XXX: Memory leak.
-   mVideoStream = NULL;
-}
-
-void EncoderFFmpeg::openAudio()
-{
-   // TODO: Add audio support.
-#if 0
-   AVCodecContext* acc = mAudioStream->codec;
-
-   // Find the audio encoder.
-   AVCodec* codec = avcodec_find_encoder(acc->codec_id);
-   if (!codec)
-   {
-      throw RecordingException("Audio codec not found.", VRKIT_LOCATION);
-   }
-
-   // Open the audio encoder.
-   if (avcodec_open(acc, codec) < 0)
-   {
-      throw RecordingException("Could not open audio codec.", VRKIT_LOCATION);
-   }
-
-   // Init signal generator.
-   /*
-   mT = 0;
-   mTincr = 2 * M_PI * 110.0 / acc->sample_rate;
-   // Increment frequency by 110 Hz per second.
-   mTincr2 = 2 * M_PI * 110.0 / acc->sample_rate / acc->sample_rate;
-   */
-
-   mAudioOutBufferSize = 10000;
-   mAudioOutBuffer =
-      reinterpret_cast<unsigned char*>(av_malloc(mAudioOutBufferSize));
-
-   // Ugly hack for PCM codecs (will be removed ASAP with new PCM
-   // support to compute the input frame size in samples.
-   if (acc->frame_size <= 1)
-   {
-      audio_input_frame_size = mAudioOutBufferSize / acc->channels;
-      switch(mAudioStream->codec->codec_id)
+      // free the streams
+      for(unsigned int i = 0; i < mFormatContext->nb_streams; i++)
       {
-         case CODEC_ID_PCM_S16LE:
-         case CODEC_ID_PCM_S16BE:
-         case CODEC_ID_PCM_U16LE:
-         case CODEC_ID_PCM_U16BE:
-            audio_input_frame_size >>= 1;
-            break;
-         default:
-            break;
+         av_freep(&mFormatContext->streams[i]->codec);
+         av_freep(&mFormatContext->streams[i]);
       }
+
+      if (!(mFormatOut->flags & AVFMT_NOFILE))
+      {
+         // close the output file
+         url_fclose(&mFormatContext->pb);
+      }
+
+      // free the stream
+      av_free(mFormatContext);
+      mFormatContext = NULL;
    }
-   else
-   {
-      audio_input_frame_size = acc->frame_size;
-   }
-
-   mAudioSamples =
-      reinterpret_cast<int16_t*>(
-         av_malloc(audio_input_frame_size * 2 * acc->channels)
-      );
-#endif
-}
-
-void EncoderFFmpeg::closeAudio()
-{
-   // TODO: Add audio support.
-/*
-   avcodec_close(mAudioStream->codec);
-   av_free(mAudioSamples);
-   av_free(mAudioOutBuffer);
-
-   mAudioSamples = NULL;
-   mAudioOutBuffer = NULL;
-   mAudioStream = NULL;
-*/
-}
-
-AVFrame* EncoderFFmpeg::allocFrame(const int pixFormat, const int width,
-                                   const int height)
-{
-   AVFrame* picture = avcodec_alloc_frame();
-   avcodec_get_frame_defaults(picture);
-   if (NULL == picture)
-   {
-      throw RecordingException("Error allocating frame.", VRKIT_LOCATION);
-   }
-
-   int size = avpicture_get_size(pixFormat, width, height);
-   unsigned char* picture_buf = (unsigned char*)av_malloc(size);
-
-   if (NULL == picture_buf)
-   {
-      av_free(picture);
-      throw RecordingException("Error allocating picture buffer.",
-                               VRKIT_LOCATION);
-   }
-
-   avpicture_fill((AVPicture*)picture, picture_buf, pixFormat, width, height);
-   return picture;
 }
 
 void EncoderFFmpeg::writeFrame(vpr::Uint8* data)
@@ -742,6 +503,244 @@ void EncoderFFmpeg::writeFrame(vpr::Uint8* data)
 
    //VRKIT_STATUS << "frame: " << mFrameCount << std::endl;
    ++mFrameCount;
+}
+
+AVFrame* EncoderFFmpeg::allocFrame(const int pixFormat, const int width,
+                                   const int height)
+{
+   AVFrame* picture = avcodec_alloc_frame();
+   avcodec_get_frame_defaults(picture);
+   if (NULL == picture)
+   {
+      throw RecordingException("Error allocating frame.", VRKIT_LOCATION);
+   }
+
+   int size = avpicture_get_size(pixFormat, width, height);
+   unsigned char* picture_buf = (unsigned char*)av_malloc(size);
+
+   if (NULL == picture_buf)
+   {
+      av_free(picture);
+      throw RecordingException("Error allocating picture buffer.",
+                               VRKIT_LOCATION);
+   }
+
+   avpicture_fill((AVPicture*)picture, picture_buf, pixFormat, width, height);
+   return picture;
+}
+
+// Add a video output stream
+void EncoderFFmpeg::addVideoStream(AVCodec* codec)
+{
+   // Create a new video stream to write data to.
+   mVideoStream = av_new_stream(mFormatContext, 0);
+   if ( NULL == mVideoStream )
+   {
+      throw RecordingException("Could not allocate video stream.",
+                               VRKIT_LOCATION);
+   }
+
+   // XXX: Should we be discarding this?
+   mVideoStream->discard = AVDISCARD_NONKEY;
+
+   mVideoStream->codec->codec_id   = codec->id;
+   mVideoStream->codec->codec_type = CODEC_TYPE_VIDEO;
+   avcodec_get_context_defaults2(mVideoStream->codec, CODEC_TYPE_VIDEO);
+   // put sample parameters
+   // XXX: This should not be hard coded.
+   mVideoStream->codec->bit_rate = 8388608;     // 8192 kb/s
+
+   // Resolution must be a multiple of two
+   mVideoStream->codec->width  = getWidth();
+   mVideoStream->codec->height = getHeight();
+
+   // Time base: this is the fundamental unit of time (in seconds) in terms
+   // of which frame timestamps are represented. for fixed-fps content,
+   // timebase should be 1/framerate and timestamp increments should be
+   // identically 1.
+   mVideoStream->codec->time_base.den = getFramesPerSecond();
+   mVideoStream->codec->time_base.num = 1;
+   // Emit one intra frame every twelve frames at most.
+   mVideoStream->codec->gop_size = 12;
+   mVideoStream->codec->pix_fmt = STREAM_PIX_FMT;
+//   mVideoStream->codec->rate_emu
+
+   if ( mVideoStream->codec->codec_id == CODEC_ID_MPEG2VIDEO )
+   {
+      // just for testing, we also add B frames
+      mVideoStream->codec->max_b_frames = 2;
+   }
+
+   if ( mVideoStream->codec->codec_id == CODEC_ID_MPEG1VIDEO )
+   {
+      // Needed to avoid using macroblocks in which some coeffs overflow.
+      // This does not happen with normal video, it just happens here as
+      // the motion of the chroma plane does not match the luma plane. */
+      mVideoStream->codec->mb_decision = 2;
+   }
+
+   // Some formats want stream headers to be separate
+   if ( mFormatContext->oformat->flags & AVFMT_GLOBALHEADER )
+   {
+      mVideoStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+   }
+}
+
+void EncoderFFmpeg::openVideo(AVCodec* codec)
+{
+   AVCodecContext* vcc = mVideoStream->codec;
+
+   // open the codec
+   if ( avcodec_open(vcc, codec) < 0 )
+   {
+      throw RecordingException("Couldn't open video encoder.",
+                               VRKIT_LOCATION);
+   }
+
+   mVideoOutBuffer = NULL;
+   if ( ! (mFormatContext->oformat->flags & AVFMT_RAWPICTURE) )
+   {
+      // allocate output buffer
+      // XXX: API change will be done
+      // buffers passed into lav* can be allocated any way you prefer,
+      // as long as they're aligned enough for the architecture, and
+      // they're freed appropriately (such as using av_free for buffers
+      // allocated with av_malloc)
+      mVideoOutBufferSize = avpicture_get_size(vcc->pix_fmt, vcc->width,
+                                               vcc->height);
+      mVideoOutBuffer =
+         reinterpret_cast<unsigned char*>(av_malloc(mVideoOutBufferSize));
+   }
+
+   // Allocate the encoded raw picture.
+   mYuvFrame = allocFrame(vcc->pix_fmt, vcc->width, vcc->height);
+   if ( NULL == mYuvFrame )
+   {
+      throw RecordingException("Couldn't allocate yuv-picture.",
+                               VRKIT_LOCATION);
+   }
+
+   mRgbFrame = avcodec_alloc_frame();
+   avcodec_get_frame_defaults(mRgbFrame);
+   if ( NULL == mRgbFrame )
+   {
+      throw RecordingException("Couldn't allocate rgb-picture.",
+                               VRKIT_LOCATION);
+   }
+}
+
+void EncoderFFmpeg::closeVideo()
+{
+   avcodec_close(mVideoStream->codec);
+
+   av_free(mYuvFrame);
+   mYuvFrame = NULL;
+
+   av_free(mRgbFrame);
+   mRgbFrame = NULL;
+
+   av_free(mVideoOutBuffer);
+   mVideoOutBuffer = NULL;
+
+   // XXX: Memory leak.
+   mVideoStream = NULL;
+}
+
+// Add an audio output stream
+void EncoderFFmpeg::addAudioStream()
+{
+   // TODO: Add audio support.
+/*
+   mAudioStream = av_new_stream(mFormatContext, 1);
+   if (NULL == mAudioStream)
+   {
+      throw RecordingException("Could not allocate audio stream.",
+                               VRKIT_LOCATION);
+   }
+
+   AVCodecContext* acc = mAudioStream->codec;
+   acc->codec_id = mFormatOut->audio_codec;
+   acc->codec_type = CODEC_TYPE_AUDIO;
+
+   // Put sample parameters
+   acc->bit_rate = 64000;
+   acc->sample_rate = 44100;
+   acc->channels = 2;
+*/
+}
+
+void EncoderFFmpeg::openAudio()
+{
+   // TODO: Add audio support.
+#if 0
+   AVCodecContext* acc = mAudioStream->codec;
+
+   // Find the audio encoder.
+   AVCodec* codec = avcodec_find_encoder(acc->codec_id);
+   if (!codec)
+   {
+      throw RecordingException("Audio codec not found.", VRKIT_LOCATION);
+   }
+
+   // Open the audio encoder.
+   if (avcodec_open(acc, codec) < 0)
+   {
+      throw RecordingException("Could not open audio codec.", VRKIT_LOCATION);
+   }
+
+   // Init signal generator.
+   /*
+   mT = 0;
+   mTincr = 2 * M_PI * 110.0 / acc->sample_rate;
+   // Increment frequency by 110 Hz per second.
+   mTincr2 = 2 * M_PI * 110.0 / acc->sample_rate / acc->sample_rate;
+   */
+
+   mAudioOutBufferSize = 10000;
+   mAudioOutBuffer =
+      reinterpret_cast<unsigned char*>(av_malloc(mAudioOutBufferSize));
+
+   // Ugly hack for PCM codecs (will be removed ASAP with new PCM
+   // support to compute the input frame size in samples.
+   if (acc->frame_size <= 1)
+   {
+      audio_input_frame_size = mAudioOutBufferSize / acc->channels;
+      switch(mAudioStream->codec->codec_id)
+      {
+         case CODEC_ID_PCM_S16LE:
+         case CODEC_ID_PCM_S16BE:
+         case CODEC_ID_PCM_U16LE:
+         case CODEC_ID_PCM_U16BE:
+            audio_input_frame_size >>= 1;
+            break;
+         default:
+            break;
+      }
+   }
+   else
+   {
+      audio_input_frame_size = acc->frame_size;
+   }
+
+   mAudioSamples =
+      reinterpret_cast<int16_t*>(
+         av_malloc(audio_input_frame_size * 2 * acc->channels)
+      );
+#endif
+}
+
+void EncoderFFmpeg::closeAudio()
+{
+   // TODO: Add audio support.
+/*
+   avcodec_close(mAudioStream->codec);
+   av_free(mAudioSamples);
+   av_free(mAudioOutBuffer);
+
+   mAudioSamples = NULL;
+   mAudioOutBuffer = NULL;
+   mAudioStream = NULL;
+*/
 }
 
 }
