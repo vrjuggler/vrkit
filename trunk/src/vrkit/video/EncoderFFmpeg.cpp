@@ -29,10 +29,6 @@
 #  define UINT64_C(c)     (c ## ULL)
 #endif
 
-#include <string>
-#include <cstdio>
-#include <cstdlib>
-#include <cmath>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -43,7 +39,6 @@ extern "C"
 
 #include <ffmpeg/avformat.h>
 #include <ffmpeg/avcodec.h>
-#include <ffmpeg/swscale.h>
 
 }
 
