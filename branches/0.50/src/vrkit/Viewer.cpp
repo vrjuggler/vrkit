@@ -174,8 +174,6 @@ void Viewer::contextInit()
 void Viewer::preFrame()
 {
    const vpr::Interval cur_time = getUser()->getHeadProxy()->getTimeStamp();
-   std::cout << "Adding sample of " << (cur_time - mLastFrameTime).secd()
-             << std::endl;
    mFrameRateStats.addSample((cur_time - mLastFrameTime).secd());
    mLastFrameTime = cur_time;
 
