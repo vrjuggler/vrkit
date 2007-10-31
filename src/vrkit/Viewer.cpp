@@ -30,6 +30,7 @@
 #include <jccl/Config/Configuration.h>
 #include <vrj/Kernel/Kernel.h>
 
+#include <vrkit/Scene.h>
 #include <vrkit/User.h>
 #include <vrkit/SceneObject.h>
 #include <vrkit/Status.h>
@@ -288,22 +289,6 @@ void Viewer::latePreFrame()
 #endif
 }
 
-void Viewer::sendDataToSlaves(OSG::BinaryDataHandler& writer)
-{
-   OSG::UInt8 junk(false);
-   writer.putValue(junk);
-   float near_val, far_val;
-   vrj::Projection::getNearFar(near_val, far_val);
-   writer.putValue(near_val);
-   writer.putValue(far_val);
-}
-
-void Viewer::readDataFromSlave(OSG::BinaryDataHandler& reader)
-{
-   OSG::UInt8 junk;
-   reader.getValue(junk);
-}
-
 void Viewer::contextPreDraw()
 {
    OpenSGApp::contextPreDraw();
@@ -338,9 +323,9 @@ void Viewer::contextPostDraw()
                              shared_from_this()));
 }
 
-const Viewer::base_type::context_data& Viewer::getContextData()
+void Viewer::postFrame()
 {
-   return *mContextData;
+   OpenSGApp::postFrame();
 }
 
 void Viewer::contextClose()
@@ -355,6 +340,17 @@ void Viewer::contextClose()
                              shared_from_this()));
 }
 
+void Viewer::initScene()
+{
+   /* Do nothing. */ ;
+}
+
+// Return the base of our scene object's root.
+OSG::NodePtr Viewer::getScene()
+{
+   return getSceneObj()->getSceneRoot().node();
+}
+
 void Viewer::exit()
 {
    // First we free up all the OpenSG resources that have been allocated
@@ -364,6 +360,43 @@ void Viewer::exit()
    // Then we call up to the base class implementation of this method, which
    // in turn tells OpenSG to exit.
    OpenSGApp::exit();
+}
+
+const Viewer::base_type::context_data& Viewer::getContextData()
+{
+   return *mContextData;
+}
+
+void Viewer::sendDataToSlaves(OSG::BinaryDataHandler& writer)
+{
+   OSG::UInt8 junk(false);
+   writer.putValue(junk);
+   float near_val, far_val;
+   vrj::Projection::getNearFar(near_val, far_val);
+   writer.putValue(near_val);
+   writer.putValue(far_val);
+}
+
+void Viewer::readDataFromSlave(OSG::BinaryDataHandler& reader)
+{
+   OSG::UInt8 junk;
+   reader.getValue(junk);
+}
+
+void Viewer::addObject(SceneObjectPtr obj)
+{
+   mObjects.push_back(obj);
+}
+
+void Viewer::removeObject(SceneObjectPtr obj)
+{
+   object_list_t::iterator found
+      = std::find(mObjects.begin(), mObjects.end(), obj);
+
+   if (mObjects.end() != found)
+   {
+      mObjects.erase(found);
+   }
 }
 
 void Viewer::deallocate()
@@ -726,22 +759,6 @@ void Viewer::addPlugin(viewer::PluginPtr plugin)
 {
    plugin->setFocused(shared_from_this(), true);
    mPlugins.push_back(plugin);
-}
-
-void Viewer::addObject(SceneObjectPtr obj)
-{
-   mObjects.push_back(obj);
-}
-
-void Viewer::removeObject(SceneObjectPtr obj)
-{
-   object_list_t::iterator found
-      = std::find(mObjects.begin(), mObjects.end(), obj);
-
-   if (mObjects.end() != found)
-   {
-      mObjects.erase(found);
-   }
 }
 
 }
