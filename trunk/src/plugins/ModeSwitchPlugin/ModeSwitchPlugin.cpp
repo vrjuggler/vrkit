@@ -30,6 +30,7 @@
 #include <vpr/System.h>
 #include <jccl/Config/ConfigElement.h>
 
+#include <vrkit/Scene.h>
 #include <vrkit/InterfaceTrader.h>
 #include <vrkit/User.h>
 #include <vrkit/Viewer.h>

@@ -31,6 +31,7 @@
 
 #include <jccl/Config/ConfigElement.h>
 
+#include <vrkit/Scene.h>
 #include <vrkit/Viewer.h>
 #include <vrkit/DynamicSceneObject.h>
 #include <vrkit/DynamicSceneObjectTransform.h>
