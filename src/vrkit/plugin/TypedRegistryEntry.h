@@ -55,7 +55,7 @@ namespace plugin
  * vrkit::plugin::TypedInitRegistryEntry instead.
  *
  * @see vrkit::plugin::Creator
- * @see vrkit::plugin::TypedInitRegistryEntry.
+ * @see vrkit::plugin::TypedInitRegistryEntry
  *
  * @note This class was moved into the vrkit::plugin namespace in version 0.47.
  *
