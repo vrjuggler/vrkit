@@ -40,6 +40,7 @@
 #include <vpr/Util/FileUtils.h>
 #include <jccl/Config/ConfigElement.h>
 
+#include <vrkit/Scene.h>
 #include <vrkit/Viewer.h>
 #include <vrkit/Status.h>
 #include <vrkit/Version.h>

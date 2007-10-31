@@ -34,6 +34,7 @@
 
 #include <jccl/Config/ConfigElement.h>
 
+#include <vrkit/Scene.h>
 #include <vrkit/Viewer.h>
 #include <vrkit/WandInterface.h>
 #include <vrkit/InterfaceTrader.h>

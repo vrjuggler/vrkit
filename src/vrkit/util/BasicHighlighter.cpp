@@ -30,6 +30,7 @@
 #include <vpr/Util/FileUtils.h>
 #include <jccl/Config/ConfigElement.h>
 
+#include <vrkit/Scene.h>
 #include <vrkit/SceneObject.h>
 #include <vrkit/Viewer.h>
 #include <vrkit/Exception.h>

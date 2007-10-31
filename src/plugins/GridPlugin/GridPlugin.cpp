@@ -26,6 +26,7 @@
 #include <vpr/vpr.h>
 #include <jccl/Config/ConfigElement.h>
 
+#include <vrkit/Scene.h>
 #include <vrkit/Status.h>
 #include <vrkit/User.h>
 #include <vrkit/Viewer.h>
