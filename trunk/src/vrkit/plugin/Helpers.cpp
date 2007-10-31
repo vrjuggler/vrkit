@@ -89,6 +89,7 @@ findModules(const std::vector<std::string>& searchPath)
             }
 #endif
 
+#if __VPR_version >= 1001005
             try
             {
                (*itr)->load();
@@ -98,6 +99,12 @@ findModules(const std::vector<std::string>& searchPath)
             {
                VRKIT_STATUS << ex.getDescription() << std::endl;
             }
+#else
+            if ( (*itr)->load().success() )
+            {
+               modules.push_back(*itr);
+            }
+#endif
          }
       }
       catch (std::exception& ex)
