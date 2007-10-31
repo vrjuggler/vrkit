@@ -42,6 +42,13 @@ namespace plugin
 
 /** \class TypedRegistryEntry TypedRegistryEntry.h vrkit/plugin/TypedRegistryEntry.h
  *
+ * A registry entry type fo vrrkit::plugin::Registry where the creator
+ * function must be looked up dynamically from a dynamically loaded library.
+ * The type information about the plug-in is encoded into the instantiation
+ * of this type through the \p T template parameter.
+ *
+ * @see vrkit::plugin::Creator
+ *
  * @note This class was moved into the vrkit::plugin namespace in version 0.47.
  *
  * @since 0.36
@@ -104,6 +111,11 @@ protected:
       return mCreator;
    }
 
+   /**
+    * Performs the work of creating the typed plug-in instance. This method
+    * uses the Template Method Pattern so that subclasses can customize the
+    * instantiation behavior.
+    */
    virtual plugin_ptr_type doCreate()
    {
       return mCreator->createPlugin();
