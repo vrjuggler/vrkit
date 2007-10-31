@@ -322,7 +322,13 @@ void EncoderFFmpeg::startEncoding()
       mVideoStream->codec->bit_rate = bitrate * 1000;
 
       // Write the stream header, if any.
-      av_write_header(mFormatContext);
+      const int result = av_write_header(mFormatContext);
+
+      if ( result != 0 )
+      {
+         throw RecordingException("Failed to write stream header",
+                                  VRKIT_LOCATION);
+      }
    }
    catch (std::exception& ex)
    {
