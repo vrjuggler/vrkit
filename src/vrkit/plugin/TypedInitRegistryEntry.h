@@ -37,11 +37,19 @@ namespace plugin
 
 /** \class TypedInitRegistryEntry TypedInitRegistryEntry.h vrkit/plugin/TypedInitRegistryEntry.h
  *
- * A registry entry type fo vrrkit::plugin::Registry where the creator
- * function must be looked up dynamically from a dynamically loaded library
- * and the created instance has a post-creation initialization procedure. The
- * type information about the plug-in is encoded into the instantiation of
- * this type through the \p T template parameter.
+ * A plug-in registry entry type for vrrkit::plugin::Registry where the
+ * created instance, a subclass of vrkit::AbstractPlugin, has a post-creation
+ * initialization procedure. The type of plug-in instance that is created by
+ * the create() method is not strictly important because that type may not be
+ * known at the time that vrkit and other users of this type are compiled.
+ *
+ * The tricky part here is knowing the return type of the initialization
+ * procedure. The vrkit idiom is to have an init() method that returns a
+ * shared pointer to the object being initialized (by calling
+ * shared_from_this() or equivalent). Some initialzation procedures may not
+ * have a return type. Ultimately, the return type only matters for the
+ * purposes of C++ strong typing because, as can be seen in doCreate(), the
+ * value, if any, returned by the initialization procedure is ignored.
  *
  * @see vrkit::plugin::Creator
  *
@@ -67,6 +75,20 @@ public:
    //@}
 
 private:
+   /**
+    * Constructor for the case when the creator function must be queried at
+    * run time from the given plug-in module object.
+    *
+    * @param module    The dynamically loaded library from which the creator
+    *                  will be retrieved.
+    * @param validator A validator used to ensure that \p module provides
+    *                  what is necessary to create instances of the plug-in.
+    * @param initFunc  The post-creation initialization callable. This takes
+    *                  as its only argument the plug-in instance that is
+    *                  created in doCreate(). Because this uses Boost.Function,
+    *                  it can actually be anything that can be represented
+    *                  using boost::bind().
+    */
    TypedInitRegistryEntry(vpr::LibraryPtr module,
                           validator_func_type validator,
                           init_func_type initFunc)
@@ -76,13 +98,75 @@ private:
       /* Do nothing. */
    }
 
+   /**
+    * Constuctor for the case of a creator that is known statically at
+    * compile time.
+    *
+    * @param creator  The type-specific creator of the plug-in objects. This
+    *                 must refer to an object and a type \p T known at the
+    *                 time that this code is compiled.
+    * @param initFunc The post-creation initialization callable. This takes as
+    *                 its only argument the plug-in instance that is created
+    *                 in doCreate(). Because this uses Boost.Function, it can
+    *                 actually be anything that can be represented using
+    *                 boost::bind().
+    *
+    * @since 0.51.0
+    */
+   TypedInitRegistryEntry(Creator<T>* creator, init_func_type initFunc)
+      : base_type(creator)
+      , mInitFunc(initFunc)
+   {
+      /* Do nothing. */
+   }
+
 public:
+   /**
+    * Creates a registry entry for vrrkit::plugin::Registry where the creator
+    * function must be looked up at run time from a dynamically loaded
+    * library.
+    *
+    * @param module    The dynamically loaded library from which the creator
+    *                  will be retrieved.
+    * @param validator A validator used to ensure that \p module provides
+    *                  what is necessary to create instances of the plug-in.
+    * @param initFunc  The post-creation initialization callable. This takes
+    *                  as its only argument the plug-in instance that is
+    *                  created in doCreate(). Because this uses Boost.Function,
+    *                  it can actually be anything that can be represented
+    *                  using boost::bind().
+    */
    static RegistryEntryPtr create(vpr::LibraryPtr module,
                                   validator_func_type validator,
                                   init_func_type initFunc)
    {
       return RegistryEntryPtr(new TypedInitRegistryEntry(module, validator,
                                                          initFunc));
+   }
+
+   /**
+    * Creates a registry entry for vrkit::plugin::Registry where the creator
+    * function is compiled into the code statically rather than being loaded
+    * dynamically from a plug-in module. This is not appropriate for cases
+    * when the creator function must be looked up at run time from a
+    * dynamically loaded library. The object returned by
+    * vrkit::plugin::RegistryEntry::getModule() will be a null shared pointer.
+    *
+    * @param creator  The type-specific creator of the plug-in objects. This
+    *                 must refer to an object and a type \p T known at the
+    *                 time that this code is compiled.
+    * @param initFunc The post-creation initialization callable. This takes as
+    *                 its only argument the plug-in instance that is created
+    *                 in doCreate(). Because this uses Boost.Function, it can
+    *                 actually be anything that can be represented using
+    *                 boost::bind().
+    *
+    * @since 0.51.0
+    */
+   static RegistryEntryPtr create(Creator<T>* creator,
+                                  init_func_type initFunc)
+   {
+      return RegistryEntryPtr(new TypedInitRegistryEntry(creator, initFunc));
    }
 
    virtual ~TypedInitRegistryEntry()
