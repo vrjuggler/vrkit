@@ -28,8 +28,6 @@
 #include <OpenSG/OSGBinaryDataHandler.h>
 
 #include <vpr/DynLoad/Library.h>
-#include <vpr/Util/Interval.h>
-#include <vpr/Util/SampleLimitedStatCollector.h>
 #include <jccl/Config/ConfigElementPtr.h>
 
 #include <vrj/vrjParam.h>
@@ -287,22 +285,6 @@ public:
    void removeObject(SceneObjectPtr obj);
    //@}
 
-   /** @name Frame Rate Statistics */
-   //@{
-   /** @since 0.50.2 */
-   typedef vpr::SampleLimitedStatCollector<double, false> frame_rate_stats_t;
-
-   /**
-    * Returns a reference to the internal frame rate statistics collector.
-    *
-    * @since 0.50.2
-    */
-   const frame_rate_stats_t& getFrameRateStats() const
-   {
-      return mFrameRateStats;
-   }
-   //@}
-
 protected:
    /**
     * Override this method to deallocate OpenSG resources when the
@@ -386,12 +368,6 @@ private:
    //@}
 
    object_list_t mObjects;
-
-   /** @name Frame Rate Statistics Data */
-   //@{
-   frame_rate_stats_t mFrameRateStats;
-   vpr::Interval      mLastFrameTime;
-   //@}
 
 protected:
    EventDataPtr mEventData;

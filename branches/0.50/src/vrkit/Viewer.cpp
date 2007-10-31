@@ -155,8 +155,6 @@ void Viewer::init()
          configureNetwork(cluster_cfg);
       }
    }
-
-   mLastFrameTime = vpr::Interval::now();
 }
 
 void Viewer::contextInit()
@@ -173,10 +171,6 @@ void Viewer::contextInit()
 
 void Viewer::preFrame()
 {
-   const vpr::Interval cur_time = getUser()->getHeadProxy()->getTimeStamp();
-   mFrameRateStats.addSample((cur_time - mLastFrameTime).secd());
-   mLastFrameTime = cur_time;
-
    ViewerPtr myself = shared_from_this();
 
    // Strategy for intersection
