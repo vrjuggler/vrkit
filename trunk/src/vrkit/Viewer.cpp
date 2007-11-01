@@ -145,6 +145,13 @@ void Viewer::init()
          loadAndInitPlugins(app_cfg);
       }
 
+#if OSG_MAJOR_VERSION >= 2
+      // This call is very important for ensuring that the slaves get the
+      // correct scene graph at the time of the initial connection. It must
+      // occur before configureNetwork() is invoked.
+      OSG::commitChanges();
+#endif
+
       // -- Configure cluster support --- //
       jccl::ConfigElementPtr cluster_cfg =
          mConfiguration.getConfigElement(cluster_elt_type);
