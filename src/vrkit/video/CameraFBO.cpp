@@ -181,6 +181,7 @@ void CameraFBO::render(render_action_t* ra)
    mFBO->activate(&draw_env);
 #endif
 
+#if OSG_MAJOR_VERSION < 2
    // Do the actual rendering.
    glClear(GL_DEPTH_BUFFER_BIT);
    glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -189,13 +190,12 @@ void CameraFBO::render(render_action_t* ra)
       glPopMatrix();
    glPopAttrib();
 
-#if OSG_MAJOR_VERSION < 2
    mFboVP->bind(ra->getWindow());
-#endif
 
    // If we are using an FBO, then we should change to the FBO buffer.
    glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
    checkGLError("before glReadPixels");
+#endif
 
 #if OSG_MAJOR_VERSION < 2
    OSG::CPEditor cei(mCurrentImage);
@@ -217,7 +217,7 @@ void CameraFBO::render(render_action_t* ra)
    // Double buffered.
    //glReadBuffer(GL_BACK);
 
-#if OSG_MAJOR_VERSION  <2
+#if OSG_MAJOR_VERSION < 2
    mFboVP->stop(ra->getWindow());
 #else
    mFBO->deactivate(&draw_env);
