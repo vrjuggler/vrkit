@@ -134,11 +134,15 @@ public:
    virtual void preFrame();
 
    /**
-    * Called after cluster data sync and after preFrame is complete.
+    * Called after cluster data sync and after preFrame() is complete.
     * We use it to send out OpenSG scene graph updates to the other nodes.
+    * Thus, the scene graph must be in a complete state for the current frame.
     *
     * @post OpenSG data (change list) has been sent to all remote nodes.
     *       Local change list has been cleared (after send).
+    *
+    * @note Derived class overrides \em must call this implementation as the
+    *       \em last step.
     */
    virtual void latePreFrame();
 
