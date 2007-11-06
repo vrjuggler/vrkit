@@ -34,8 +34,6 @@ RegistryEntry::RegistryEntry(vpr::LibraryPtr module)
    , mModuleInfo(getModuleInfo(module))
 {
    /* Do nothing. */ ;
-   std::cout << "Registry entry for " << mModule->getName() << " created"
-             << std::endl;
 }
 
 RegistryEntry::~RegistryEntry()
