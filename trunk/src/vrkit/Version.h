@@ -37,7 +37,7 @@
 // The major/minor/patch version (up to 3 digits each).
 #define VRKIT_VERSION_MAJOR    0
 #define VRKIT_VERSION_MINOR    51
-#define VRKIT_VERSION_PATCH    0
+#define VRKIT_VERSION_PATCH    1
 
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------------

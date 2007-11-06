@@ -16,11 +16,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <sstream>
+#include <vrkit/Config.h>
 
-#include <vrkit/AbstractPlugin.h>
-#include <vrkit/plugin/Module.h>
-#include <vrkit/plugin/RegistryEntry.h>
+#include <vrkit/plugin/data/ValueDesc.h>
 
 
 namespace vrkit
@@ -29,33 +27,25 @@ namespace vrkit
 namespace plugin
 {
 
-RegistryEntry::RegistryEntry(vpr::LibraryPtr module)
-   : mModule(module)
-   , mModuleInfo(getModuleInfo(module))
+namespace data
+{
+
+ValueDesc::ValueDesc(const std::string& name, const boost::any& initValue)
+   : mName(name)
+   , mInitValue(initValue)
 {
    /* Do nothing. */ ;
-   std::cout << "Registry entry for " << mModule->getName() << " created"
-             << std::endl;
 }
 
-RegistryEntry::~RegistryEntry()
+ValueDesc::ValueDesc(const std::string& name, const boost::any& initValue,
+                     const vpr::GUID& pointeeType)
+   : mName(name)
+   , mInitValue(initValue)
+   , mPointeeType(pointeeType)
 {
+   /* Do nothing. */ ;
 }
 
-CreatorBase*
-RegistryEntry::getCreatorFunc(vpr::LibraryPtr module,
-                              const std::string& getCreatorFuncName)
-   const
-{
-   Module pm(module);
-   return pm.getFunction<CreatorBase* ()>(getCreatorFuncName)();
-}
-
-Info RegistryEntry::getModuleInfo(vpr::LibraryPtr module)
-{
-   Module pm(module);
-   typedef const Info* sig_type();
-   return *pm.getFunction<sig_type>(AbstractPlugin::getInfoFuncName())();
 }
 
 }

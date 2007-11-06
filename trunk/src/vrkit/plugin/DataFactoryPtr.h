@@ -16,12 +16,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <sstream>
+#ifndef _VRKIT_PLUGIN_DATA_FACTORY_PTR_H_
+#define _VRKIT_PLUGIN_DATA_FACTORY_PTR_H_
 
-#include <vrkit/AbstractPlugin.h>
-#include <vrkit/plugin/Module.h>
-#include <vrkit/plugin/RegistryEntry.h>
-
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 namespace vrkit
 {
@@ -29,35 +28,12 @@ namespace vrkit
 namespace plugin
 {
 
-RegistryEntry::RegistryEntry(vpr::LibraryPtr module)
-   : mModule(module)
-   , mModuleInfo(getModuleInfo(module))
-{
-   /* Do nothing. */ ;
-   std::cout << "Registry entry for " << mModule->getName() << " created"
-             << std::endl;
-}
-
-RegistryEntry::~RegistryEntry()
-{
-}
-
-CreatorBase*
-RegistryEntry::getCreatorFunc(vpr::LibraryPtr module,
-                              const std::string& getCreatorFuncName)
-   const
-{
-   Module pm(module);
-   return pm.getFunction<CreatorBase* ()>(getCreatorFuncName)();
-}
-
-Info RegistryEntry::getModuleInfo(vpr::LibraryPtr module)
-{
-   Module pm(module);
-   typedef const Info* sig_type();
-   return *pm.getFunction<sig_type>(AbstractPlugin::getInfoFuncName())();
-}
+   class DataFactory;
+   typedef boost::shared_ptr<DataFactory> DataFactoryPtr;
+   typedef boost::weak_ptr<DataFactory> DataFactoryWeakPtr;
 
 }
 
 }
+
+#endif /* _VRKIT_PLUGIN_DATA_FACTORY_PTR_H_ */
