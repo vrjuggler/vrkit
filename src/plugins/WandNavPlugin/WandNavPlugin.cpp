@@ -227,8 +227,6 @@ void WandNavPlugin::focusChanged(ViewerPtr viewer)
    // We can only navigate when we have focus.
    mCanNavigate = isFocused();
 
-   status_panel_data->setHeaderTitle("test");
-
    if ( ! mCanNavigate )
    {
       mVelocity = 0.0f;
