@@ -16,6 +16,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#if defined(WIN32) || defined(WIN64)
+#  include <windows.h>
+#endif
+
 #if defined(__APPLE__)
 #  include <OpenGL/glu.h>
 #else
