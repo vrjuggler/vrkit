@@ -103,30 +103,63 @@ public:
     *
     * @param guidStr A GUID (in string form) for a known dynamically defined
     *                data type.
+    * @param objName The name for the created object. Once set, this cannot be
+    *                changed. It is used for looking up instances at run time.
     *
     * @throw vrkit::Exception
     *           Thrown if the identified type is not known to this data
     *           factory.
     */
-   DataPtr createInstance(const std::string& guidStr)
+   DataPtr createInstance(const std::string& guidStr,
+                          const std::string& objName)
    {
-      return createInstance(vpr::GUID(guidStr));
+      return createInstance(vpr::GUID(guidStr), objName);
    }
 
    /**
     * Creates an instance of the dynamically defined data type identified by
     * the given unique type identifier.
     *
-    * @param g A GUID for a known dynamically defined data type.
+    * @param typeID  A GUID for a known dynamically defined data type.
+    * @param objName The name for the created object. Once set, this cannot be
+    *                changed. It is used for looking up instances at run time.
     *
     * @throw vrkit::Exception
     *           Thrown if the identified type is not known to this data
     *           factory.
     */
-   DataPtr createInstance(const vpr::GUID& g);
+   DataPtr createInstance(const vpr::GUID& typeID,
+                          const std::string& objName);
+
+   /**
+    * Finds the named instance of the identified dynamically defined data
+    * type. It is important to understand that this method is \em not a
+    * creation function. Instead, it looks for an extant object instance.
+    *
+    * @param typeID  The unique type identifier for the object to be looked
+    *                up.
+    * @param objName The name of the object instance to be looked up. This is
+    *                a user-defined string. To get a statistically unique
+    *                name, use a GUID. In any event, object names must be
+    *                published so that consumer plug-ins have a way to find
+    *                the objects that they need from the producer plug-ins.
+    *
+    * @return A non-null shared pointer to a vrkit::plugin::Data instance is
+    *         returned if the search criteria find the desired object.
+    *         Otherwise, a null shared pointer is returned.
+    *
+    * @since 0.51.2
+    */
+   DataPtr findInstance(const vpr::GUID& typeID, const std::string& objName)
+      const;
    //}
 
 private:
+   /**
+    * The collection of all registered dynamic data types. These are indexed
+    * by the unique type identifier. Therefore, it is critical that no two
+    * types use the same identifier.
+    */
    std::map<vpr::GUID, data::TypeDesc> mTypes;
 };
 

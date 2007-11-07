@@ -18,6 +18,6 @@
 
 #pragma once
 
-#define VERSION_NUM     0,51,1,0
-#define VERSION_STR     "0.51.1.0"
+#define VERSION_NUM     0,51,2,0
+#define VERSION_STR     "0.51.2.0"
 #define COPYRIGHT_STR   "Copyright © 2005–2007"

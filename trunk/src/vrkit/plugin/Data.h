@@ -68,6 +68,11 @@ namespace plugin
  * instead must ask the Data Factory (vrkit::plugin::DataFactory) to create
  * instances using the GUID for the desired type.
  *
+ * When an instance is created, it must be given a name. Once given, the name
+ * is fixed. It is used for looking up instances at run time. Thus, one plug-in
+ * can create an instance of a dynamically defined data type, and another can
+ * retrieve that instance by looking it up by name.
+ *
  * @see vrkit::plugin::DataFactory
  *
  * @since 0.51.1
@@ -83,9 +88,9 @@ private:
     * @post This instance is registered in the global instance store using a
     *       unique pointer value.
     */
-   Data(const data::TypeDesc& desc);
+   Data(const data::TypeDesc& desc, const std::string& name);
 
-   static DataPtr create(const data::TypeDesc& desc);
+   static DataPtr create(const data::TypeDesc& desc, const std::string& name);
 
    friend class DataFactory;
 
@@ -116,6 +121,19 @@ public:
    const vpr::GUID& getTypeID() const
    {
       return mTypeDesc.getID();
+   }
+
+   /**
+    * Returns the name of this instance. The name is set at the time of
+    * creation and cannot be changed during the lifetime of this object. The
+    * primary purpose of naming instances is to allow them to be looked up at
+    * run time.
+    *
+    * @see vrkit::plugin::DataFactory::findInstance()
+    */
+   const std::string& getName() const
+   {
+      return mName;
    }
 
    /**
@@ -262,9 +280,35 @@ private:
        */
       const DataPtr get(const ptr_type ptr) const;
 
+      /**
+       * Finds the named instance of the identified dynamically defined data
+       * type.
+       *
+       * @param typeID  The unique type identifier for the object to be looked
+       *                up.
+       * @param objName The name of the object instance to be looked up.
+       *
+       * @return A non-null shared pointer to a vrkit::plugin::Data instance
+       *         is returned if the search criteria find the desired object.
+       *         Otherwise, a null shared pointer is returned.
+       *
+       * @since 0.51.2
+       */
+      const DataPtr getByName(const vpr::GUID& typeID,
+                              const std::string& objName) const;
+
    private:
       ptr_type mCount;
       std::map<ptr_type, DataWeakPtr> mInstances;
+
+      /**
+       * The store of instances, indexed by name. This uses a weak pointer so
+       * that the objects can be deleted externally. If this were not a weak
+       * pointer, memory leaks would result because this object, effectively
+       * a global, would always hold a reference to every instantiated
+       * vrkit::plugin::Data object.
+       */
+      std::multimap<std::string, DataWeakPtr> mNamedInstances;
    };
 
    /**
@@ -305,6 +349,8 @@ private:
    const boost::any& doGet(const std::string& key) const;
 
    static InstanceStore sInstanceStore; /**< Global instance store */
+
+   std::string mName;   /**< The (read-only) name of this instance. */
 
    /**
     * The value held by this member identifies this object uniquely within
