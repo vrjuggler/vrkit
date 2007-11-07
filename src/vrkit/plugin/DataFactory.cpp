@@ -137,16 +137,23 @@ void DataFactory::registerType(const std::string& typeDecl)
    registerType(doc->getChild("data"));
 }
 
-DataPtr DataFactory::createInstance(const vpr::GUID& g)
+DataPtr DataFactory::createInstance(const vpr::GUID& typeID,
+                                    const std::string& objName)
 {
-   if ( mTypes.count(g) == 0 )
+   if ( mTypes.count(typeID) == 0 )
    {
       std::ostringstream msg_stream;
-      msg_stream << "Unknown type identifier " << g.toString();
+      msg_stream << "Unknown type identifier " << typeID.toString();
       throw vrkit::Exception(msg_stream.str(), VRKIT_LOCATION);
    }
 
-   return Data::create((*mTypes.find(g)).second);
+   return Data::create((*mTypes.find(typeID)).second, objName);
+}
+
+DataPtr DataFactory::findInstance(const vpr::GUID& typeID,
+                                  const std::string& objName) const
+{
+   return Data::sInstanceStore.getByName(typeID, objName);
 }
 
 }

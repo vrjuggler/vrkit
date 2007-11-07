@@ -1,5 +1,8 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-11-06 patrick  Extended the dynamic data structure capabilities to include
+                    by-name instance querying.
+                    -- VERSION -- 0.51.2
 2007-11-05 patrick  Added dyamic data structure creation for creating
                     communication channels between plug-ins.
                     -- VERSION -- 0.51.1
