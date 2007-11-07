@@ -112,13 +112,14 @@ void Data::InstanceStore::remove(const ptr_type ptr)
 
 const DataPtr Data::InstanceStore::get(const ptr_type ptr) const
 {
-   DataWeakPtr instance;
+   DataPtr instance;
+
    if ( mInstances.count(ptr) != 0 )
    {
-      instance = (*mInstances.find(ptr)).second;
+      instance = (*mInstances.find(ptr)).second.lock();
    }
 
-   return instance.lock();
+   return instance;
 }
 
 const DataPtr Data::InstanceStore::getByName(const vpr::GUID& typeID,
