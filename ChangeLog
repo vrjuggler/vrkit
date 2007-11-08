@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-11-07 patrick  Added vrkit::SceneObject::ISECT_MASK.
+                    -- VERSION -- 0.50.2
 2007-10-30 patrick  Fixed encoding bugs in vrkit::video::EncoderFFmpeg.
                     -- VERSION -- 0.50.1
 2007-10-03 patrick  Install libraries into the lib64 directory on Linux/amd64.
