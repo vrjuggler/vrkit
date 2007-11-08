@@ -37,8 +37,10 @@ SceneObjectTraverser::traverse(SceneObjectPtr root,
    {
       case Skip:
          result = Continue;
+         break;
       case Continue:
          result = traverse(root->getChildren(), enterFunc, exitFunc);
+         break;
       default:
          break;
    }
