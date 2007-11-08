@@ -421,10 +421,12 @@ enterFunc(SceneObjectPtr obj)
 #if OSG_MAJOR_VERSION < 2
          OSG::CPEditor ore(root, OSG::Node::TravMaskFieldMask);
 #endif
-         root->setTravMask(root->getTravMask() | 128);
+         root->setTravMask(
+            root->getTravMask() | vrkit::SceneObject::ISECT_MASK
+         );
 
          OSG::IntersectAction* action(OSG::IntersectAction::create());
-         action->setTravMask(128);
+         action->setTravMask(vrkit::SceneObject::ISECT_MASK);
 
          action->setLine(osg_pick_ray);
          action->apply(root);
@@ -438,7 +440,9 @@ enterFunc(SceneObjectPtr obj)
          }
 
          // Disable intersection traversal into current scene object.
-         root->setTravMask(root->getTravMask() & ~128);
+         root->setTravMask(
+            root->getTravMask() & ~vrkit::SceneObject::ISECT_MASK
+         );
 
          delete action;
       }

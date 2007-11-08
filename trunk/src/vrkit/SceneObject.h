@@ -58,6 +58,20 @@ protected:
    SceneObject();
 
 public:
+   /**
+    * The traversal mask used by vrkit for performing intersection tests with
+    * OSG::IntersectAction.
+    *
+    * @see setNodeTravMask()
+    *
+    * @since 0.51.3
+    *
+    * @note This was originallly added in version 0.50.2 on the 0.50 branch
+    *       of the Subversion repository and merged to the trunk with version
+    *       0.51.3.
+    */
+   static const OSG::UInt32 ISECT_MASK;
+
    virtual ~SceneObject();
 
    /**
