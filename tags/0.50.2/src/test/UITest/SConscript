@@ -1,0 +1,51 @@
+#!python
+
+# vrkit is (C) Copyright 2005-2007
+#    by Allen Bierbaum, Aron Bierbuam, Patrick Hartling, and Daniel Shipton
+#
+# This file is part of vrkit.
+#
+# vrkit is free software; you can redistribute it and/or modify it under the
+# terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
+#
+# vrkit is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+# more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import SConsAddons.Util       # Get the utils
+import sys, os, re, string, glob
+pj = os.path.join
+GetPlatform = SConsAddons.Util.GetPlatform;
+
+Import('*')
+
+if GetPlatform() == 'darwin':
+   mac_cflags = os.popen(opensg_options.osgconfig_cmd + " --cflags GLUT").read()
+   opensg_options.found_cflags = mac_cflags.strip().split(" ")
+
+ui_env = build_env.Copy()
+opensg_options.apply(ui_env, libs = ['glut'])
+
+ui_env.Prepend(CPPPATH = inst_paths['include'],
+               LIBPATH = inst_paths['lib'])
+
+if platform == 'darwin':
+   ui_env.Append(LINKFLAGS = ['-framework', 'Cocoa',
+                              '-framework', 'GLUT',
+                              '-framework', 'OpenGL'])
+
+if platform != 'win32':
+   ui_env.Prepend(LIBS = ['vrkit' + shared_lib_suffix])
+
+plugin_dir = os.path.join('..', '..', 'plugins', 'StatusPanelPlugin')
+srcs = ['ui_test.cpp', os.path.join(plugin_dir, 'StatusPanel.cpp'),
+        os.path.join(plugin_dir, 'StatusPanelViewOriginal.cpp')]
+uitest_prog_name = 'ui_test' + runtime_suffix
+uitest_prog = ui_env.Program(uitest_prog_name, srcs)
+ui_env.Install(pj(inst_paths['test_base'],'UITest'), uitest_prog)

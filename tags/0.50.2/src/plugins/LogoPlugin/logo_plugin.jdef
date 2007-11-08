@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?org-vrjuggler-jccl-settings definition.version="3.1"?>
+<definition xmlns="http://www.vrjuggler.org/jccl/xsd/3.1/definition" name="logo_plugin" icon_path="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vrjuggler.org/jccl/xsd/3.1/definition http://www.vrjuggler.org/jccl/xsd/3.1/definition.xsd">
+   <definition_version version="1" label="Logo Plug-in">
+      <abstract>false</abstract>
+      <help>This plug-in allows loading of static logo images or models in the scene.  If an image is specified, it is used.  Otherwise the model property is checked.</help>
+      <category>/vrkit/</category>
+      <property valuetype="configelement" variable="true" name="logos">
+         <help>List of logos to load.</help>
+         <value label="Logo" />
+         <allowed_type>logo_plugin_logo</allowed_type>
+      </property>
+      <upgrade_transform />
+   </definition_version>
+</definition>
+
