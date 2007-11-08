@@ -1,5 +1,7 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
+2007-11-07 patrick  Added vrkit::SceneObject::ISECT_MASK.
+                    -- VERSION -- 0.51.3
 2007-11-06 patrick  Extended the dynamic data structure capabilities to include
                     by-name instance querying.
                     -- VERSION -- 0.51.2
