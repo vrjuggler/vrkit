@@ -16,23 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#if defined(WIN32) || defined(WIN64)
-#  include <windows.h>
-#endif
-
-#if defined(__APPLE__)
-#  include <OpenGL/glu.h>
-#else
-#  include <GL/glu.h>
-#endif
-
 #include <OpenSG/OSGSolidBackground.h>
-
-#if OSG_MAJOR_VERSION >= 2
-#  include <OpenSG/OSGRenderTraversalAction.h>
-#else
-#  include <OpenSG/OSGRenderAction.h>
-#endif
 
 #include <vrkit/video/CameraFBO.h>
 
@@ -67,10 +51,6 @@ namespace video
 CameraFBO::CameraFBO()
    : Camera()
    , mFboVP(OSG::NullFC)
-#if OSG_MAJOR_VERSION >= 2
-   , mFBO(OSG::NullFC)
-   , mTexBuffer(OSG::NullFC)
-#endif
 {
    /* Do nothing. */ ;
 }
@@ -89,10 +69,9 @@ void CameraFBO::setWindow(OSG::WindowPtr window)
 {
    Camera::setWindow(window);
 
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor fvpe(mFboVP);
-#endif
+   OSG::beginEditCP(mFboVP);
    mFboVP->setParent(window);
+   OSG::endEditCP(mFboVP);
 }
 
 CameraPtr CameraFBO::init()
@@ -100,47 +79,33 @@ CameraPtr CameraFBO::init()
    CameraPtr cam_ptr = Camera::init();
 
    OSG::SolidBackgroundPtr bg = OSG::SolidBackground::create();
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor bge(bg, OSG::SolidBackground::ColorFieldMask);
-#endif
-   bg->setColor(OSG::Color3f(0, 0, 0));
+   OSG::beginEditCP(bg);
+      bg->setColor(OSG::Color3f(0, 0, 0));
+   OSG::endEditCP(bg);
 
    // create FBOViewport
    mFboVP = OSG::FBOViewport::create();
-#if OSG_MAJOR_VERSION >= 2
-   mTexBuffer = OSG::TextureBuffer::create();
-   mFBO       = OSG::FrameBufferObject::create();
-#endif
-
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor fvpe(mFboVP);
-#endif
-   mFboVP->setBackground(bg);
-   mFboVP->setCamera(mCamera);
-#if OSG_MAJOR_VERSION < 2
-   mFboVP->getTextures().push_back(mLeftTexture);
-#else
-   mFboVP->setFrameBufferObject(mFBO);
-   mTexBuffer->setTexture(mLeftTexture);
-#endif
+   OSG::beginEditCP(mFboVP);
+      mFboVP->setBackground(bg);
+      mFboVP->setCamera(mCamera);
+      mFboVP->getTextures().push_back(mLeftTexture);
+   OSG::endEditCP(mFboVP);
 
    return cam_ptr;
 }
 
 void CameraFBO::setSceneRoot(OSG::NodePtr root)
 {
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor fvpe(mFboVP, OSG::FBOViewport::RootFieldMask);
-#endif
-   mFboVP->setRoot(root);
+   OSG::beginEditCP(mFboVP);
+      mFboVP->setRoot(root);
+   OSG::endEditCP(mFboVP);
 }
 
 void CameraFBO::setTravMask(const OSG::UInt32 value)
 {
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor fvpe(mFboVP, OSG::FBOViewport::TravMaskFieldMask);
-#endif
-   mFboVP->setTravMask(value);
+   OSG::beginEditCP(mFboVP);
+      mFboVP->setTravMask(value);
+   OSG::endEditCP(mFboVP);
 }
 
 void CameraFBO::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
@@ -153,39 +118,20 @@ void CameraFBO::setSize(const OSG::UInt32 width, const OSG::UInt32 height)
 
       // Make sure this isn't the camera calling setsize from init
       // Resize the viewport.
-#if OSG_MAJOR_VERSION < 2
-      OSG::CPEditor fvpe(mFboVP);
-#endif
-      mFboVP->setSize(0, 0, width - 1, height - 1);
-#if OSG_MAJOR_VERSION < 2
-      mFboVP->setStorageWidth(width);
-      mFboVP->setStorageHeight(height);
-#else
-      mFBO->setSize(width, height);
-#endif
+      OSG::beginEditCP(mFboVP);
+         mFboVP->setSize(0, 0, width - 1, height - 1);
+         mFboVP->setStorageWidth(width);
+         mFboVP->setStorageHeight(height);
+      OSG::endEditCP(mFboVP);
    }
 }
 
-void CameraFBO::render(render_action_t* ra)
+void CameraFBO::render(OSG::RenderAction* ra)
 {
-#if OSG_MAJOR_VERSION < 2
    OSG::beginEditCP(mFboVP);
       mFboVP->getTextures()[0] = mCurrentTexture;
    OSG::endEditCP(mFboVP);
-#else
-   mTexBuffer->setTexture(mCurrentTexture);
-#endif
 
-#if OSG_MAJOR_VERSION >= 2
-   OSG::DrawEnv draw_env;
-   draw_env.setAction(ra);
-   draw_env.setViewport(OSG::getCPtr(mFboVP));
-   draw_env.setWindow(ra->getWindow());
-   mTexBuffer->bind(&draw_env);
-   mFBO->activate(&draw_env);
-#endif
-
-#if OSG_MAJOR_VERSION < 2
    // Do the actual rendering.
    glClear(GL_DEPTH_BUFFER_BIT);
    glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -199,21 +145,11 @@ void CameraFBO::render(render_action_t* ra)
    // If we are using an FBO, then we should change to the FBO buffer.
    glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
    checkGLError("before glReadPixels");
-#endif
 
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor cei(mCurrentImage);
-#endif
    // Read the buffer into an OpenSG image.
-   void* buffer =
-#if OSG_MAJOR_VERSION < 2
-      mCurrentImage->getData();
-#else
-      mCurrentImage->editData();
-#endif
    glReadPixels(mFboVP->getPixelLeft(), mFboVP->getPixelBottom(),
                 mWidth, mHeight, mCurrentImage->getPixelFormat(),
-                GL_UNSIGNED_BYTE, buffer);
+                GL_UNSIGNED_BYTE, mCurrentImage->getData());
    checkGLError("after glReadPixels");
 
    // XXX: We don't really need to change the read buffer target since we
@@ -221,11 +157,7 @@ void CameraFBO::render(render_action_t* ra)
    // Double buffered.
    //glReadBuffer(GL_BACK);
 
-#if OSG_MAJOR_VERSION < 2
    mFboVP->stop(ra->getWindow());
-#else
-   mFBO->deactivate(&draw_env);
-#endif
 }
 
 }

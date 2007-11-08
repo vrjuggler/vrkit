@@ -1,17 +1,9 @@
 DATE       AUTHOR   CHANGE
 ---------- -------- -----------------------------------------------------------
-2007-11-06 patrick  Extended the dynamic data structure capabilities to include
-                    by-name instance querying.
-                    -- VERSION -- 0.51.2
-2007-11-05 patrick  Added dyamic data structure creation for creating
-                    communication channels between plug-ins.
-                    -- VERSION -- 0.51.1
-2007-10-30 patrick  Restored the ability to register plug-ins statically at
-                    compile time.
+2007-11-07 patrick  Added vrkit::SceneObject::ISECT_MASK.
+                    -- VERSION -- 0.50.2
 2007-10-30 patrick  Fixed encoding bugs in vrkit::video::EncoderFFmpeg.
-2007-10-29 patrick  Added OpenSG 2.0 support. The use of either OpenSG 1.8 or
-                    OpenSG 2.0 is made at compile time.
-                    -- VERSION -- 0.51.0
+                    -- VERSION -- 0.50.1
 2007-10-03 patrick  Install libraries into the lib64 directory on Linux/amd64.
 2007-10-02 patrick  Merged the classes vrkit::video::Recorder and
                     vrkit::video::EncoderManager into vrkit::video::Recorder.

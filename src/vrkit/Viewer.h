@@ -42,6 +42,7 @@
 #include <vrkit/ScenePtr.h>
 #include <vrkit/SceneObjectPtr.h>
 #include <vrkit/AbstractPluginPtr.h>
+#include <vrkit/Scene.h>
 #include <vrkit/Configuration.h>
 #include <vrkit/scenedata/EventDataPtr.h>
 #include <vrkit/plugin/RegistryPtr.h>
@@ -101,13 +102,12 @@ public:
 
    static ViewerPtr create()
    {
-      return ViewerPtr(new Viewer());
+      ViewerPtr new_viewer(new Viewer);
+      return new_viewer;
    }
 
    virtual ~Viewer();
 
-   /** @name VR Juggler Application Object Interface */
-   //@{
    /**
     * Initializes (builds) this viewer instance.
     *
@@ -142,8 +142,7 @@ public:
     *       Local change list has been cleared (after send).
     *
     * @note Derived class overrides \em must call this implementation as the
-    *       \em last step. For the OpenSG 2 case, this calls
-    *       OSG::commitChanges() before the change list gets sent.
+    *       \em last step.
     */
    virtual void latePreFrame();
 
@@ -167,39 +166,11 @@ public:
     *
     * @note Derived class overrides \em must call this implementation.
     */
-   virtual void postFrame();
+   virtual void postFrame()
+   {;}
 
-   /**
-    * @note Derived class overrides \em must call this implementation.
-    */
-   virtual void contextClose();
-
-   /** @name VR Juggler OpenSG Application Object Interface */
-   //@{
-   /**
-    * Dummy scene initialization method. It is pure virtual in base so we have
-    * to provide an implementation.
-    */
-   virtual void initScene();
-
-   /** Returns the base of our scene object's root. */
-   virtual OSG::NodePtr getScene();
-   //@}
-
-   /**
-    * @note Derived class overrides \em must call this implementation.
-    */
-   virtual void exit();
-   //@}
-
-   /** Returns the central, singular vrkit user representation. */
-   const UserPtr getUser() const
-   {
-      return mUser;
-   }
-
-   /** Returns the central, singular vrkit "scene" interface. */
-   const ScenePtr getSceneObj() const
+   /** Return the root of the associated scene. */
+   ScenePtr getSceneObj()
    {
       return mScene;
    }
@@ -213,6 +184,26 @@ public:
     * @since 0.47.1
     */
    const base_type::context_data& getContextData();
+
+   /**
+    * @note Derived class overrides \em must call this implementation.
+    */
+   virtual void contextClose();
+
+   /**
+    * @note Derived class overrides \em must call this implementation.
+    */
+   virtual void exit();
+
+public:
+   UserPtr      getUser()
+   { return mUser; }
+
+   /** Return the base of our scene object's root. */
+   virtual OSG::NodePtr getScene()
+   {
+      return getSceneObj()->getSceneRoot().node();
+   }
 
    /**
     * Returns the reference to the current configuration. This can be used to
@@ -232,18 +223,23 @@ public:
     *
     * @since 0.36
     */
-   const plugin::RegistryPtr getPluginRegistry() const
+   plugin::RegistryPtr getPluginRegistry()
    {
       return mPluginRegistry;
    }
 
-   /** @name Cluster Application Data Interface
-    *
-    * These methods are used to communicate data over an OpenSG network
-    * connection with the cluster slave nodes. It is called as part of the
-    * cluster communication protocol in latePreFrame.
-    *
-    * @note Derived classes \em must call up to parent class methods.
+   /** Dummied init scene method.  It is pure virtual in base so we have
+    * to provide an implementation.
+    */
+   virtual void initScene()
+   {;}
+
+public:
+   /** @name Cluster app data methods.
+    * These methods are used to communicate data over an OpenSG network connection
+    * with the cluster slave nodes.
+    * It is called as part of the cluster communication protocol in latePreFrame.
+    * @note Derived classes must call up to parent class methods.
     */
    //@{
    virtual void sendDataToSlaves(OSG::BinaryDataHandler& writer);

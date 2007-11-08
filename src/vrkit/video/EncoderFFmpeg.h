@@ -85,7 +85,7 @@ public:
    /**
     * Encode a frame using the current RGB data.
     */
-   void writeFrame(const vpr::Uint8* data);
+   void writeFrame(vpr::Uint8* data);
 
 private:
    /**

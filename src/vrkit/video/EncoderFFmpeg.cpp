@@ -107,7 +107,6 @@ EncoderFFmpeg::codec_list_t EncoderFFmpeg::getCodecs()
 }
 #endif
 
-
 EncoderFFmpeg::~EncoderFFmpeg()
 {
    stopEncoding();
@@ -374,7 +373,7 @@ void EncoderFFmpeg::stopEncoding()
    }
 }
 
-void EncoderFFmpeg::writeFrame(const vpr::Uint8* data)
+void EncoderFFmpeg::writeFrame(vpr::Uint8* data)
 {
    // Early out if we don't have a video stream.
    if ( NULL == mVideoStream )
@@ -382,9 +381,8 @@ void EncoderFFmpeg::writeFrame(const vpr::Uint8* data)
       return;
    }
 
-   avpicture_fill(reinterpret_cast<AVPicture*>(mRgbFrame),
-                  const_cast<vpr::Uint8*>(data), PIX_FMT_RGB24, getWidth(),
-                  getHeight());
+   avpicture_fill(reinterpret_cast<AVPicture*>(mRgbFrame), data,
+                  PIX_FMT_RGB24, getWidth(), getHeight());
 
    // convert rgb to yuv420
    img_convert(reinterpret_cast<AVPicture*>(mYuvFrame),

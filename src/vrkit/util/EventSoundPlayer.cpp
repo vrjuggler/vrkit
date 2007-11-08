@@ -24,7 +24,6 @@
 
 #include <jccl/Config/ConfigElement.h>
 
-#include <vrkit/Scene.h>
 #include <vrkit/Viewer.h>
 #include <vrkit/Exception.h>
 #include <vrkit/scenedata/EventData.h>

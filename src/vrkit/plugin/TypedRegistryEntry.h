@@ -42,21 +42,6 @@ namespace plugin
 
 /** \class TypedRegistryEntry TypedRegistryEntry.h vrkit/plugin/TypedRegistryEntry.h
  *
- * A plug-in registry entry type for vrkit::plugin::Registry for subclasses of
- * vrkit::AbstractPlugin. Specifically, the template parameter for
- * instantiations of this type must be a subclass (direct or indirect) of
- * vrkit::AbstractPlugin. The type of plug-in instance that is created by
- * the create() method is not strictly important because that type may not be
- * known at the time that vrkit and other users of this type are compiled.
- *
- * The instances created by this registry entry type have a simple
- * create-and-use procedure. Further initialization steps are not performed.
- * To perform post-creation initialization, use
- * vrkit::plugin::TypedInitRegistryEntry instead.
- *
- * @see vrkit::plugin::Creator
- * @see vrkit::plugin::TypedInitRegistryEntry
- *
  * @note This class was moved into the vrkit::plugin namespace in version 0.47.
  *
  * @since 0.36
@@ -75,15 +60,6 @@ public:
    //@}
 
 protected:
-   /**
-    * Constructor for the case when the creator function must be queried at
-    * run time from the given plug-in module object.
-    *
-    * @param module    The dynamically loaded library from which the creator
-    *                  will be retrieved.
-    * @param validator A validator used to ensure that \p module provides
-    *                  what is necessary to create instances of the plug-in.
-    */
    TypedRegistryEntry(vpr::LibraryPtr module, validator_func_type validator)
       : RegistryEntry(module)
       , mCreator(NULL)
@@ -105,57 +81,11 @@ protected:
       }
    }
 
-   /**
-    * Constuctor for the case of a creator that is known statically at
-    * compile time.
-    *
-    * @param creator The type-specific creator of the plug-in objects. This
-    *                must refer to an object and a type \p T known at the time
-    *                that this code is compiled.
-    *
-    * @since 0.51.0
-    */
-   TypedRegistryEntry(Creator<T>* creator)
-      : RegistryEntry(vpr::LibraryPtr())
-      , mCreator(creator)
-   {
-      /* Do nothing. */ ;
-   }
-
 public:
-   /**
-    * Creates a registry entry for vrrkit::plugin::Registry where the creator
-    * function must be looked up at run time from a dynamically loaded
-    * library.
-    *
-    * @param module    The dynamically loaded library from which the creator
-    *                  will be retrieved.
-    * @param validator A validator used to ensure that \p module provides
-    *                  what is necessary to create instances of the plug-in.
-    */
    static RegistryEntryPtr create(vpr::LibraryPtr module,
                                   validator_func_type validator)
    {
       return RegistryEntryPtr(new TypedRegistryEntry(module, validator));
-   }
-
-   /**
-    * Creates a registry entry for vrkit::plugin::Registry where the creator
-    * function is compiled into the code statically rather than being loaded
-    * dynamically from a plug-in module. This is not appropriate for cases
-    * when the creator function must be looked up at run time from a
-    * dynamically loaded library. The object returned by
-    * vrkit::plugin::RegistryEntry::getModule() will be a null shared pointer.
-    *
-    * @param creator The type-specific creator of the plug-in objects. This
-    *                must refer to an object and a type \p T known at the time
-    *                that this code is compiled.
-    *
-    * @since 0.51.0
-    */
-   static RegistryEntryPtr create(Creator<T>* creator)
-   {
-      return RegistryEntryPtr(new TypedRegistryEntry(creator));
    }
 
    virtual ~TypedRegistryEntry()
@@ -174,11 +104,6 @@ protected:
       return mCreator;
    }
 
-   /**
-    * Performs the work of creating the typed plug-in instance. This method
-    * uses the Template Method Pattern so that subclasses can customize the
-    * instantiation behavior.
-    */
    virtual plugin_ptr_type doCreate()
    {
       return mCreator->createPlugin();

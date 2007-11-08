@@ -19,7 +19,6 @@
 #include <boost/bind.hpp>
 #include <boost/assign/list_of.hpp>
 
-#include <vrkit/Scene.h>
 #include <vrkit/Viewer.h>
 #include <vrkit/User.h>
 #include <vrkit/InterfaceTrader.h>

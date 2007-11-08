@@ -35,7 +35,6 @@
 
 #include <vpr/Util/Assert.h>
 
-#include <vrkit/Scene.h>
 #include <vrkit/InterfaceTrader.h>
 #include <vrkit/Viewer.h>
 #include <vrkit/WandInterface.h>

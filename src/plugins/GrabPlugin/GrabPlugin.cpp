@@ -31,7 +31,6 @@
 #include <vpr/vpr.h>
 #include <vpr/Util/FileUtils.h>
 
-#include <vrkit/Scene.h>
 #include <vrkit/Viewer.h>
 #include <vrkit/User.h>
 #include <vrkit/InterfaceTrader.h>

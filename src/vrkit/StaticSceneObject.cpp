@@ -45,10 +45,9 @@ StaticSceneObject::StaticSceneObject()
 
 void StaticSceneObject::moveTo(const OSG::Matrix& matrix)
 {
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor tnce(mTransformNode.core(), OSG::Transform::MatrixFieldMask);
-#endif
-   mTransformNode->setMatrix(matrix);
+   OSG::beginEditCP(mTransformNode.core(), OSG::Transform::MatrixFieldMask);
+      mTransformNode->setMatrix(matrix);
+   OSG::endEditCP(mTransformNode.core(), OSG::Transform::MatrixFieldMask);
 }
 
 OSG::Matrix StaticSceneObject::getPos()
@@ -67,12 +66,7 @@ OSG::DynamicVolume& StaticSceneObject::getVolume(const bool update)
    {
       return mEmptyVolume;
    }
-
-#if OSG_MAJOR_VERSION < 2
    return mTransformNode.node()->getVolume(update);
-#else
-   return mTransformNode.node()->editVolume(update);
-#endif
 }
 
 

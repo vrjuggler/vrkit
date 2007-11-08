@@ -22,6 +22,8 @@
 namespace vrkit
 {
 
+const OSG::UInt32 SceneObject::ISECT_MASK(128);
+
 SceneObject::~SceneObject()
 {
    /* Do nothing. */ ;
@@ -158,10 +160,9 @@ std::vector<SceneObjectPtr> SceneObject::getChildren()
 
 void SceneObject::setNodeTravMask(OSG::NodePtr node)
 {
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor ne(node, OSG::Node::TravMaskFieldMask);
-#endif
-   node->setTravMask(node->getTravMask() & ~128);
+   OSG::beginEditCP(node, OSG::Node::TravMaskFieldMask);
+      node->setTravMask(node->getTravMask() & ~ISECT_MASK);
+   OSG::endEditCP(node, OSG::Node::TravMaskFieldMask);
 }
 
 }

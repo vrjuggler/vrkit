@@ -57,12 +57,7 @@ struct CoredNode2NodePred
 
 inline std::string getName(const OSG::FieldContainerPtr& fcp)
 {
-   OSG::AttachmentContainerPtr acp =
-#if OSG_MAJOR_VERSION < 2
-      OSG::AttachmentContainerPtr::dcast(fcp);
-#else
-      OSG::cast_dynamic<OSG::AttachmentContainerPtr>(fcp);
-#endif
+   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
    std::string name_str = "<NULL>";
    if ( OSG::NullFC != acp )
    {

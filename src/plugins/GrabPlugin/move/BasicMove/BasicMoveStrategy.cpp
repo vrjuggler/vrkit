@@ -26,7 +26,6 @@
 #include <gmtl/External/OpenSGConvert.h>
 
 #include <vrkit/plugin/Config.h>
-#include <vrkit/Scene.h>
 #include <vrkit/User.h>
 #include <vrkit/Viewer.h>
 #include <vrkit/WandInterface.h>

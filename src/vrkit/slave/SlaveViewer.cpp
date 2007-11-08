@@ -18,8 +18,6 @@
 
 #include <iostream>
 #include <cstdlib>
-#include <boost/bind.hpp>
-#include <boost/ref.hpp>
 
 #include <OpenSG/OSGAttachmentContainer.h>
 #include <OpenSG/OSGConnectionFactory.h>
@@ -31,7 +29,6 @@
 #include <OpenSG/OSGSimpleAttachments.h>
 #include <OpenSG/OSGSceneFileHandler.h>
 #include <OpenSG/OSGVerifyGraphOp.h>
-#include <OpenSG/OSGTypeFactory.h>
 
 #include <vpr/vpr.h>
 #include <vpr/Util/Debug.h>
@@ -42,6 +39,7 @@
 #include <vrkit/Version.h>
 #include <vrkit/slave/SlaveViewer.h>
 
+//OSG_USING_NAMESPACE
 
 /** @page SlaveCommunicationProtocol Slave Communication Protocol
  *
@@ -95,13 +93,7 @@ public:
       /* Do nothing. */ ;
    }
 
-#if OSG_MAJOR_VERSION < 2
-   typedef OSG::NodePtr& traverse_node_type;
-#else
-   typedef const OSG::NodePtr traverse_node_type;
-#endif
-
-   OSG::Action::ResultE enter(traverse_node_type node)
+   OSG::Action::ResultE enter(OSG::NodePtr& node)
    {
       for ( OSG::UInt16 i = 0; i < mIndent; ++i )
       {
@@ -122,20 +114,19 @@ public:
       }
 
       std::cout << " type:" << node->getType().getName().str() << " fc_id:"
-#if OSG_MAJOR_VERSION < 2
-                << node.getFieldContainerId()
-#else
-                << OSG::getContainerId(node)
-#endif
-                << " core:" << node->getCore() << std::endl;
+                << node.getFieldContainerId() << "  ";
+
+      OSG::NodeCorePtr core = node->getCore();
+      std::cout << "core: " << core << "  ";
+
+      std::cout << std::endl;
 
       ++mIndent;
 
       return OSG::Action::Continue;
    }
 
-   OSG::Action::ResultE leave(traverse_node_type node,
-                              OSG::Action::ResultE res)
+   OSG::Action::ResultE leave(OSG::NodePtr& node, OSG::Action::ResultE res)
    {
       --mIndent;
 
@@ -162,17 +153,12 @@ void printGraph(OSG::NodePtr node)
 
    OSG::traverse(
       node,
-#if OSG_MAJOR_VERSION < 2
       OSG::osgTypedMethodFunctor1ObjPtrCPtrRef<
          OSG::Action::ResultE, TravState, OSG::NodePtr
       >(&t, &TravState::enter),
       OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
          OSG::Action::ResultE, TravState, OSG::NodePtr, OSG::Action::ResultE
       >(&t, &TravState::leave)
-#else
-      boost::bind(&TravState::enter, boost::ref(t), _1),
-      boost::bind(&TravState::leave, boost::ref(t), _1, _2)
-#endif
    );
    std::cout << "--------------------------------------------" << std::endl;
 }
@@ -198,12 +184,7 @@ SlaveViewer::SlaveViewer(const std::string& masterAddr,
    , mGeometries(0)
 #endif
 {
-   mConnection =
-#if OSG_MAJOR_VERSION < 2
-      OSG::ConnectionFactory::the().createPoint("StreamSock");
-#else
-      OSG::ConnectionFactory::the()->createPoint("StreamSock");
-#endif
+   mConnection = OSG::ConnectionFactory::the().createPoint("StreamSock");
 }
 
 SlaveViewer::~SlaveViewer()
@@ -221,31 +202,19 @@ void SlaveViewer::init()
 void SlaveViewer::initScene()
 {
    OSG::RemoteAspect::Functor changed =
-#if OSG_MAJOR_VERSION < 2
       OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
          bool, SlaveViewer, OSG::FieldContainerPtr, OSG::RemoteAspect*
       >(this, &SlaveViewer::changedFunction);
-#else
-      boost::bind(&SlaveViewer::changedFunction, this, _1, _2);
-#endif
 
    OSG::RemoteAspect::Functor destroyed =
-#if OSG_MAJOR_VERSION < 2
       OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
          bool, SlaveViewer, OSG::FieldContainerPtr, OSG::RemoteAspect*
       >(this, &SlaveViewer::destroyedFunction);
-#else
-      boost::bind(&SlaveViewer::destroyedFunction, this, _1, _2);
-#endif
 
    OSG::RemoteAspect::Functor created =
-#if OSG_MAJOR_VERSION < 2
       OSG::osgTypedMethodFunctor2ObjPtrCPtrRef<
          bool, SlaveViewer, OSG::FieldContainerPtr, OSG::RemoteAspect*
       >(this, &SlaveViewer::createdFunction);
-#else
-      boost::bind(&SlaveViewer::createdFunction, this, _1, _2);
-#endif
 
    for ( OSG::UInt32 i = 0; i < OSG::TypeFactory::the()->getNumTypes(); ++i )
    {
@@ -277,11 +246,7 @@ void SlaveViewer::initScene()
       mConnection->getValue(mDrawScaleFactor);
       mAspect->receiveSync(*mConnection);
 
-#if OSG_MAJOR_VERSION < 2
       OSG::Thread::getCurrentChangeList()->clearAll();
-#else
-      OSG::Thread::getCurrentChangeList()->clear();
-#endif
       OSG::UInt8 finish(false);
       mConnection->getValue(finish);
 
@@ -309,24 +274,12 @@ void SlaveViewer::initScene()
          << "Searching for scene root (name is " << mRootNodeName
          << ") ... " << std::flush << vprDEBUG_FLUSH;
 
-#if OSG_MAJOR_VERSION < 2
       const std::vector<OSG::FieldContainerPtr>* fcs =
          OSG::FieldContainerFactory::the()->getFieldContainerStore();
-      const OSG::UInt32 fcs_size(fcs->size());
-#else
-      const std::vector<OSG::FieldContainerPtr>& fcs =
-         OSG::FieldContainerFactory::the()->getContainerStore();
-      const OSG::UInt32 fcs_size(fcs.size());
-#endif
 
-      for ( OSG::UInt32 i = 0; i < fcs_size; ++i )
+      for ( OSG::UInt32 i = 0; i < fcs->size(); ++i )
       {
-         OSG::NodePtr node =
-#if OSG_MAJOR_VERSION < 2
-            OSG::NodePtr::dcast((*fcs)[i]);
-#else
-            OSG::cast_dynamic<OSG::NodePtr>(fcs[i]);
-#endif
+         OSG::NodePtr node = OSG::NodePtr::dcast((*fcs)[i]);
 
          if ( OSG::NullFC != node )
          {
@@ -379,11 +332,10 @@ void SlaveViewer::contextInit()
       << std::dec << std::endl << vprDEBUG_FLUSH;
 
    mContextData->mRenderAction->setTravMask(mTravMask);
-#if OSG_MAJOR_VERSION < 2
-   OSG::CPEditor vpe(mContextData->mViewport,
-                     OSG::Viewport::TravMaskFieldMask);
-#endif
-   mContextData->mViewport->setTravMask(mTravMask);
+   OSG::beginEditCP(mContextData->mViewport,
+                    OSG::Viewport::TravMaskFieldMask);
+      mContextData->mViewport->setTravMask(mTravMask);
+   OSG::endEditCP(mContextData->mViewport, OSG::Viewport::TravMaskFieldMask);
 
    initGl();
 }
@@ -400,11 +352,7 @@ void SlaveViewer::latePreFrame()
          //std::cout << "-------- Recv data: " << iter_num++ << " --------"
          //          << std::endl;
          mAspect->receiveSync(*mConnection);
-#if OSG_MAJOR_VERSION < 2
          OSG::Thread::getCurrentChangeList()->clearAll();
-#else
-         OSG::Thread::getCurrentChangeList()->clear();
-#endif
          mConnection->getValue(finish);
          readDataFromMaster(*mConnection);
          sendDataToMaster(*mConnection);
@@ -458,15 +406,8 @@ void SlaveViewer::latePreFrame()
       file_name = std::string("slave_scene.out2.osb");
    }
 
-#if OSG_MAJOR_VERSION < 2
    OSG::SceneFileHandler::the().write(getScene(), file_name.c_str());
-#else
-   OSG::SceneFileHandler::the()->write(getScene(), file_name.c_str());
-#endif
    */
-
-   // In the OpenSG 2 case, this calls OSG::commitChanges().
-   OpenSGApp::latePreFrame();
 }
 
 void SlaveViewer::exit()
@@ -533,7 +474,7 @@ void SlaveViewer::initGl()
 #endif
 }
 
-bool SlaveViewer::createdFunction(field_container_ptr_type fcp,
+bool SlaveViewer::createdFunction(OSG::FieldContainerPtr& fcp,
                                   OSG::RemoteAspect*)
 {
 #ifdef VRKIT_DEBUG
@@ -552,20 +493,10 @@ bool SlaveViewer::createdFunction(field_container_ptr_type fcp,
 
    vprDEBUG(vrkitSLAVE_APP, SLAVE_DBG_LVL)
       << "Created: " << fcp->getType().getName() << " fc_id:"
-#  if OSG_MAJOR_VERSION < 2
-      << fcp.getFieldContainerId()
-#  else
-      << OSG::getContainerId(fcp)
-#  endif
-      << " " << vprDEBUG_FLUSH;
+      << fcp.getFieldContainerId() << " " << vprDEBUG_FLUSH;
 #endif
 
-   OSG::AttachmentContainerPtr acp =
-#if OSG_MAJOR_VERSION < 2
-      OSG::AttachmentContainerPtr::dcast(fcp);
-#else
-      OSG::cast_dynamic<OSG::AttachmentContainerPtr>(fcp);
-#endif
+   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
 
    if ( OSG::NullFC != acp )
    {
@@ -595,25 +526,15 @@ bool SlaveViewer::createdFunction(field_container_ptr_type fcp,
    return true;
 }
 
-bool SlaveViewer::changedFunction(field_container_ptr_type fcp,
+bool SlaveViewer::changedFunction(OSG::FieldContainerPtr& fcp,
                                   OSG::RemoteAspect*)
 {
 #ifdef VRKIT_DEBUG
    vprDEBUG(vrkitSLAVE_APP, SLAVE_DBG_LVL)
       << "Changed: " << fcp->getType().getName() << " fc_id:"
-#  if OSG_MAJOR_VERSION < 2
-      << fcp.getFieldContainerId()
-#  else
-      << OSG::getContainerId(fcp)
-#  endif
-      << " "<< vprDEBUG_FLUSH;
+      << fcp.getFieldContainerId() << " "<< vprDEBUG_FLUSH;
 
-   OSG::AttachmentContainerPtr acp =
-#  if OSG_MAJOR_VERSION < 2
-      OSG::AttachmentContainerPtr::dcast(fcp);
-#  else
-      OSG::cast_dynamic<OSG::AttachmentContainerPtr>(fcp);
-#  endif
+   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
 
    if ( OSG::NullFC != acp )
    {
@@ -639,25 +560,15 @@ bool SlaveViewer::changedFunction(field_container_ptr_type fcp,
    return true;
 }
 
-bool SlaveViewer::destroyedFunction(field_container_ptr_type fcp,
+bool SlaveViewer::destroyedFunction(OSG::FieldContainerPtr& fcp,
                                     OSG::RemoteAspect*)
 {
 #ifdef VRKIT_DEBUG
    vprDEBUG(vrkitSLAVE_APP, SLAVE_DBG_LVL)
       << "Destroyed: " << fcp->getType().getName() << " fc_id:"
-#  if OSG_MAJOR_VERSION < 2
-      << fcp.getFieldContainerId()
-#  else
-      << OSG::getContainerId(fcp)
-#  endif
-      << " "<< vprDEBUG_FLUSH;
+      << fcp.getFieldContainerId() << " "<< vprDEBUG_FLUSH;
 
-   OSG::AttachmentContainerPtr acp =
-#  if OSG_MAJOR_VERSION < 2
-      OSG::AttachmentContainerPtr::dcast(fcp);
-#  else
-      OSG::cast_dynamic<OSG::AttachmentContainerPtr>(fcp);
-#  endif
+   OSG::AttachmentContainerPtr acp = OSG::AttachmentContainerPtr::dcast(fcp);
 
    if ( OSG::NullFC != acp )
    {

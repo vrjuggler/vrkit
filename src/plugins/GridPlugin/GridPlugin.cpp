@@ -26,7 +26,6 @@
 #include <vpr/vpr.h>
 #include <jccl/Config/ConfigElement.h>
 
-#include <vrkit/Scene.h>
 #include <vrkit/Status.h>
 #include <vrkit/User.h>
 #include <vrkit/Viewer.h>
@@ -109,10 +108,9 @@ viewer::PluginPtr GridPlugin::init(ViewerPtr viewer)
    {
       OSG::GroupNodePtr decorator_root =
          viewer->getSceneObj()->getDecoratorRoot();
-#if OSG_MAJOR_VERSION < 2
-      OSG::CPEditor dre(decorator_root.node(), OSG::Node::ChildrenFieldMask);
-#endif
-      decorator_root.node()->addChild((*g)->getRoot());
+      OSG::beginEditCP(decorator_root.node(), OSG::Node::ChildrenFieldMask);
+         decorator_root.node()->addChild((*g)->getRoot());
+      OSG::endEditCP(decorator_root.node(), OSG::Node::ChildrenFieldMask);
       (*g)->setVisible(mGridsVisible);
    }
 

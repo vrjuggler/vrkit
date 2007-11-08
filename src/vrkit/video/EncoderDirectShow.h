@@ -92,7 +92,7 @@ public:
     * The width, height and bitsPerPixel are the width, height and bits per
     * pixel of the bitmap pointed to by the input pBits.
     */
-   virtual void writeFrame(const vpr::Uint8* data);
+   virtual void writeFrame(vpr::Uint8* data);
 
    virtual OSG::Image::PixelFormat getPixelFormat()
    {

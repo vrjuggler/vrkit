@@ -30,7 +30,6 @@
 #include <jccl/Config/Configuration.h>
 #include <vrj/Kernel/Kernel.h>
 
-#include <vrkit/Scene.h>
 #include <vrkit/User.h>
 #include <vrkit/SceneObject.h>
 #include <vrkit/Status.h>
@@ -75,11 +74,9 @@ Viewer::~Viewer()
 
 void Viewer::init()
 {
-#if OSG_MAJOR_VERSION < 2
    // This has to be called before OSG::osgInit(), which is done by
    // OpenSGApp::init().
    OSG::ChangeList::setReadWriteDefault();
-#endif
 
    OpenSGApp::init();
 
@@ -138,19 +135,14 @@ void Viewer::init()
          // This has to be done before the slave connections are received so
          // that this change is included with the initial sync.
          OSG::GroupNodePtr root_node = mScene->getSceneRoot();
-         OSG::setName(root_node.node(), root_name);
+         OSG::beginEditCP(root_node);
+            OSG::setName(root_node.node(), root_name);
+         OSG::endEditCP(root_node);
 
          // Setup the plugins that are configured to load
          config(app_cfg);
          loadAndInitPlugins(app_cfg);
       }
-
-#if OSG_MAJOR_VERSION >= 2
-      // This call is very important for ensuring that the slaves get the
-      // correct scene graph at the time of the initial connection. It must
-      // occur before configureNetwork() is invoked.
-      OSG::commitChanges();
-#endif
 
       // -- Configure cluster support --- //
       jccl::ConfigElementPtr cluster_cfg =
@@ -244,9 +236,6 @@ void Viewer::preFrame()
 
 void Viewer::latePreFrame()
 {
-   // In the OpenSG 2 case, this calls OSG::commitChanges().
-   base_type::latePreFrame();
-
    //static int iter_num(0);
 
    OSG::Connection::Channel channel;
@@ -289,11 +278,23 @@ void Viewer::latePreFrame()
    // We are using writeable change lists, so we need to clear them out.
    // We do this here because it should be after anything else that the user
    // may want to do.
-#if OSG_MAJOR_VERSION < 2
    OSG::Thread::getCurrentChangeList()->clearAll();
-#else
-   OSG::Thread::getCurrentChangeList()->clear();
-#endif
+}
+
+void Viewer::sendDataToSlaves(OSG::BinaryDataHandler& writer)
+{
+   OSG::UInt8 junk(false);
+   writer.putValue(junk);
+   float near_val, far_val;
+   vrj::Projection::getNearFar(near_val, far_val);
+   writer.putValue(near_val);
+   writer.putValue(far_val);
+}
+
+void Viewer::readDataFromSlave(OSG::BinaryDataHandler& reader)
+{
+   OSG::UInt8 junk;
+   reader.getValue(junk);
 }
 
 void Viewer::contextPreDraw()
@@ -330,9 +331,9 @@ void Viewer::contextPostDraw()
                              shared_from_this()));
 }
 
-void Viewer::postFrame()
+const Viewer::base_type::context_data& Viewer::getContextData()
 {
-   OpenSGApp::postFrame();
+   return *mContextData;
 }
 
 void Viewer::contextClose()
@@ -347,17 +348,6 @@ void Viewer::contextClose()
                              shared_from_this()));
 }
 
-void Viewer::initScene()
-{
-   /* Do nothing. */ ;
-}
-
-// Return the base of our scene object's root.
-OSG::NodePtr Viewer::getScene()
-{
-   return getSceneObj()->getSceneRoot().node();
-}
-
 void Viewer::exit()
 {
    // First we free up all the OpenSG resources that have been allocated
@@ -367,43 +357,6 @@ void Viewer::exit()
    // Then we call up to the base class implementation of this method, which
    // in turn tells OpenSG to exit.
    OpenSGApp::exit();
-}
-
-const Viewer::base_type::context_data& Viewer::getContextData()
-{
-   return *mContextData;
-}
-
-void Viewer::sendDataToSlaves(OSG::BinaryDataHandler& writer)
-{
-   OSG::UInt8 junk(false);
-   writer.putValue(junk);
-   float near_val, far_val;
-   vrj::Projection::getNearFar(near_val, far_val);
-   writer.putValue(near_val);
-   writer.putValue(far_val);
-}
-
-void Viewer::readDataFromSlave(OSG::BinaryDataHandler& reader)
-{
-   OSG::UInt8 junk;
-   reader.getValue(junk);
-}
-
-void Viewer::addObject(SceneObjectPtr obj)
-{
-   mObjects.push_back(obj);
-}
-
-void Viewer::removeObject(SceneObjectPtr obj)
-{
-   object_list_t::iterator found
-      = std::find(mObjects.begin(), mObjects.end(), obj);
-
-   if (mObjects.end() != found)
-   {
-      mObjects.erase(found);
-   }
 }
 
 void Viewer::deallocate()
@@ -445,9 +398,8 @@ void Viewer::deallocate()
    typedef std::vector<OSG::FieldContainerPtr> FieldContainerStore;
    typedef FieldContainerStore::const_iterator FieldContainerStoreConstIt;
 
-#if OSG_MAJOR_VERSION < 2
    OSG::FieldContainerFactory* fact = OSG::FieldContainerFactory::the();
-   const FieldContainerStore *pFCStore = fact->getFieldContainerStore();
+   const FieldContainerStore *pFCStore =fact->getFieldContainerStore();
    unsigned int num_types = fact->getNumTypes();
 
    std::vector<unsigned int> type_ids;
@@ -481,7 +433,6 @@ void Viewer::deallocate()
 
    std::cout << "Remaining non-null OpenSG objects (w/o types): "
              << (non_null_count-num_types) << std::endl;
-#endif
 
 // Enable this section when you want to see the names and types of the objects
 // that remain.
@@ -535,11 +486,7 @@ void Viewer::configureNetwork(jccl::ConfigElementPtr clusterCfg)
    {
       std::cout << "Setting up remote slave network:" << std::endl;
       mAspect = new OSG::RemoteAspect();
-#if OSG_MAJOR_VERSION < 2
       mConnection = OSG::ConnectionFactory::the().createGroup("StreamSock");
-#else
-      mConnection = OSG::ConnectionFactory::the()->createGroup("StreamSock");
-#endif
 
       // Construct the binding address to hand off to OpenSG.
       // At this point, listen_addr may be an empty string. This would give us
@@ -766,6 +713,22 @@ void Viewer::addPlugin(viewer::PluginPtr plugin)
 {
    plugin->setFocused(shared_from_this(), true);
    mPlugins.push_back(plugin);
+}
+
+void Viewer::addObject(SceneObjectPtr obj)
+{
+   mObjects.push_back(obj);
+}
+
+void Viewer::removeObject(SceneObjectPtr obj)
+{
+   object_list_t::iterator found
+      = std::find(mObjects.begin(), mObjects.end(), obj);
+
+   if (mObjects.end() != found)
+   {
+      mObjects.erase(found);
+   }
 }
 
 }
