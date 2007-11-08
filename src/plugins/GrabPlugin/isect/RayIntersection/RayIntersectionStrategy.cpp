@@ -328,10 +328,12 @@ enterFunc(SceneObjectPtr obj)
 
    vprASSERT(obj->getRoot() != OSG::NullFC);
 
+   OSG::NodeRefPtr root(obj->getRoot());
+
    // If we have no parent then we want to use the identity.
-   if ( obj->getRoot()->getParent() != OSG::NullFC )
+   if ( root->getParent() != OSG::NullFC )
    {
-      obj->getRoot()->getParent()->getToWorld(world_xform);
+      root->getParent()->getToWorld(world_xform);
    }
 
    gmtl::Matrix44f obj_M_vp;
@@ -344,8 +346,6 @@ enterFunc(SceneObjectPtr obj)
    gmtl::Rayf pick_ray(gmtl::Vec3f(0.0f, 0.0f, 0.0f),
                        gmtl::Vec3f(0.0f, 0.0f, -1.0f));
    gmtl::xform(pick_ray, obj_M_wand, pick_ray);
-
-   OSG::NodeRefPtr root = obj->getRoot();
 
    OSG::Pnt3f vol_min, vol_max;
    root->getVolume().getBounds(vol_min, vol_max);
@@ -381,10 +381,10 @@ enterFunc(SceneObjectPtr obj)
       {
          // Temporarily allow intersection traversal into current scene
          // object.
-         OSG::UInt32 trav_mask = obj->getRoot()->getTravMask();
-         OSG::beginEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
-            obj->getRoot()->setTravMask(trav_mask | 128);
-         OSG::endEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
+         OSG::UInt32 trav_mask = root->getTravMask();
+         OSG::beginEditCP(root, OSG::Node::TravMaskFieldMask);
+            root->setTravMask(trav_mask | 128);
+         OSG::endEditCP(root, OSG::Node::TravMaskFieldMask);
 
          OSG::IntersectAction* action(OSG::IntersectAction::create());
          action->setTravMask(128);
@@ -401,10 +401,10 @@ enterFunc(SceneObjectPtr obj)
          }
 
          // Disable intersection traversal into current scene object.
-         trav_mask = obj->getRoot()->getTravMask();
-         OSG::beginEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
-            obj->getRoot()->setTravMask(trav_mask & ~128);
-         OSG::endEditCP(obj->getRoot(), OSG::Node::TravMaskFieldMask);
+         trav_mask = root->getTravMask();
+         OSG::beginEditCP(root, OSG::Node::TravMaskFieldMask);
+            root->setTravMask(trav_mask & ~128);
+         OSG::endEditCP(root, OSG::Node::TravMaskFieldMask);
 
          delete action;
       }
