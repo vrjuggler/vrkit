@@ -1,4 +1,4 @@
-// vrkit is (C) Copyright 2005-2007
+// vrkit is (C) Copyright 2005-2008
 //    by Allen Bierbaum, Aron Bierbuam, Patrick Hartling, and Daniel Shipton
 //
 // This file is part of vrkit.
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
                    << SLAVE_VIEWER_VERSION_MAJOR << "."
                    << SLAVE_VIEWER_VERSION_MINOR << "."
                    << SLAVE_VIEWER_VERSION_PATCH << std::endl
-                   << "\tCopyright (c) 2005-2007 Allen Bierbaum, "
+                   << "\tCopyright (c) 2005-2008 Allen Bierbaum, "
                    << "Aron Bierbaum, Patrick Hartling, and Daniel Shipton"
                    << std::endl;
          return EXIT_SUCCESS;

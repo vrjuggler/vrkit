@@ -1,6 +1,6 @@
 #!python
 
-# vrkit is (C) Copyright 2005-2007
+# vrkit is (C) Copyright 2005-2008
 #    by Allen Bierbaum, Aron Bierbuam, Patrick Hartling, and Daniel Shipton
 #
 # This file is part of vrkit.
