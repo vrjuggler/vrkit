@@ -28,12 +28,6 @@
 #     define VRKIT_LIB_RT_OPT ""
 #  endif
 
-#  if defined(VRKIT_DEBUG) && defined(_DEBUG)
-#     define VRKIT_LIB_RT_OPT "_d"
-#  else
-#     define VRKIT_LIB_RT_OPT ""
-#  endif
-
 #  define VRKIT_STRINGIZE(X) VRKIT_DO_STRINGIZE(X)
 #  define VRKIT_DO_STRINGIZE(X) #X
 #  define VRKIT_VERSION_STR VRKIT_STRINGIZE(VRKIT_VERSION_MAJOR) "_" \
