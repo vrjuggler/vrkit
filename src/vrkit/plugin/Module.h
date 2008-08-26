@@ -63,7 +63,7 @@ public:
     * given symbol.
     *
     * @param name The name of the symbol to be looked up in the dynamically
-    *             located code unit contained within this object.
+    *             loaded code unit contained within this object.
     *
     * @return true is returned if \p name is in the symbol table of the
     *         contained dynamically loaded code unit; false otherwise.
@@ -77,7 +77,7 @@ public:
     * boost::function<T>.
     *
     * @param name The name of the symbol to be looked up in the dynamically
-    *             located code unit contained within this object.
+    *             loaded code unit contained within this object.
     *
     * @throw vrkit::PluginInterfaceException
     *           Thrown when \p name is not a symbol in the contained
@@ -115,9 +115,9 @@ private:
     * loaded code unit.
     *
     * @param name The name of the symbol to be looked up in the dynamically
-    *             located code unit contained within this object.
+    *             loaded code unit contained within this object.
     *
-    * @return A non-NULL void pointer to the symbol table entry for \p is
+    * @return A non-NULL void pointer to the symbol table entry for \p name is
     *         returned to the caller.
     *
     * @throw vrkit::PluginInterfaceException
