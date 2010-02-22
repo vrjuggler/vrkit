@@ -1,0 +1,14 @@
+#summary vrkit documentation
+
+= vrkit Documentation =
+
+At the moment, vrkit lacks formal documentation. As with many open source projects, the code offers the best documentation. Nevertheless, a user's guide is being written and will be published soon. Additional, more focused documentation is available on this wiki covering the following topics:
+
+ * ApplicationUsage -- Instructions on how to use `vrkit_app` and `slaveViewer`. Refer to the ''User's Guide'' for more details.
+ * API Reference -- Rendered C++ API documentation
+   * [https://205.237.115.86/trac/vrkit/chrome/site/0.48/api/index.html Version 0.48]
+   * [https://205.237.115.86/trac/vrkit/chrome/site/0.50/api/index.html Version 0.50]
+   * [https://205.237.115.86/trac/vrkit/chrome/site/0.51/api/index.html Version 0.51] (still in development)
+ * ''User's Guide''
+   * Version 0.50: [/trac/vrkit/chrome/site/0.50/user_guide/index.html Multi-page HTML], [https://205.237.115.86/trac/vrkit/chrome/site/0.50/user_guide.html single page HTML], and [https://205.237.115.86/trac/vrkit/chrome/site/0.50/user_guide.pdf PDF]
+ * ''Programmer's Guide'' -- Coming soon
