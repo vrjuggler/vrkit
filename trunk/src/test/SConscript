@@ -1,6 +1,6 @@
 #!python
 
-# vrkit is (C) Copyright 2005-2008
+# vrkit is (C) Copyright 2005-2011
 #    by Allen Bierbaum, Aron Bierbuam, Patrick Hartling, and Daniel Shipton
 #
 # This file is part of vrkit.
@@ -18,4 +18,4 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SConscript(dirs = ['UITest',])
+SConscript(dirs = ['UITest'])

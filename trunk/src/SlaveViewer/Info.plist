@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>slaveViewer</string>
 	<key>CFBundleGetInfoString</key>
-	<string>vrkit 0.51.0. Copyright © 2005-2008 Allen Bierbaum, Aron Bierbaum, Patrick Hartling, and Daniel Shipton</string>
+	<string>vrkit 0.51.0. Copyright © 2005-2011 Allen Bierbaum, Aron Bierbaum, Patrick Hartling, and Daniel Shipton</string>
 	<key>CFBundleIconFile</key>
 	<string>vrkit.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleLongVersionString</key>
-	<string>0.51.0, © 2005-2008 Allen Bierbaum, Aron Bierbaum, Patrick Hartling, and Daniel Shipton</string>
+	<string>0.51.0, © 2005-2011 Allen Bierbaum, Aron Bierbaum, Patrick Hartling, and Daniel Shipton</string>
 	<key>CFBundleName</key>
 	<string>SlaveViewer</string>
 	<key>CFBundlePackageType</key>
@@ -29,7 +29,7 @@
 	<key>CSResourcesFileMapped</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2005-2008 Allen Bierbaum, Aron Bierbaum, Patrick Hartlnig, and Daniel Shipton</string>
+	<string>Copyright © 2005-2011 Allen Bierbaum, Aron Bierbaum, Patrick Hartlnig, and Daniel Shipton</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
