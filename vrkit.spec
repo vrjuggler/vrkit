@@ -1,4 +1,4 @@
-# vrkit is (C) Copyright 2005-2008
+# vrkit is (C) Copyright 2005-2011
 #    by Allen Bierbaum, Aron Bierbuam, Patrick Hartling, and Daniel Shipton
 #
 # This file is part of vrkit.
